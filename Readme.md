@@ -39,6 +39,23 @@ anything not supported by Markdown directly. Depending on your context this may 
 significant issue.
 
 
+## What remains to be done?
+
+The core of the Markdown render is complete. The structure of the MarkdownSharp codebase has been 
+retained to aid maintenance - if there are any regular expression fixes there, they should be easy 
+to patch in here.
+
+With HTML output, details of fonts and colours (and so on) are handled by CSS, but with a 
+FlowDocument there's nothing equivalent, meaning that there isn't yet much control over styling
+with this library. I'm thinking of defining an `IFlowDocumentFactory` which would manage styling
+separately from the Markdown processing.
+
+There are a number of Markdown extensions that could be supported, though since MarkdownSharp 
+targets only the core, this would necessitate a departure from keeping the codebase as similar as
+possible.
+
+
+
 ## License
 
 Markdown XAML is licensed under the MIT license.
