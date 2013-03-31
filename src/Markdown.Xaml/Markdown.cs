@@ -61,6 +61,11 @@ namespace Markdown.Xaml
 
         public FlowDocument Transform(string text)
         {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+
             text = Normalize(text);
             var document = Create<FlowDocument, Block>(RunBlockGamut(text));
 
@@ -87,6 +92,11 @@ namespace Markdown.Xaml
         /// </summary>
         private IEnumerable<Block> RunBlockGamut(string text)
         {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+
             return DoHeaders(text,
                 s1 => DoHorizontalRules(s1,
                     s2 => DoLists(s2,
@@ -111,6 +121,11 @@ namespace Markdown.Xaml
         /// </summary>
         private IEnumerable<Inline> RunSpanGamut(string text)
         {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+
             return DoCodeSpans(text,
                 s0 => DoAnchors(s0,
                 s1 => DoItalicsAndBold(s1,
@@ -143,6 +158,11 @@ namespace Markdown.Xaml
         /// </summary>
         private IEnumerable<Block> FormParagraphs(string text)
         {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+
             // split on two or more newlines
             string[] grafs = _newlinesMultiple.Split(_newlinesLeadingTrailing.Replace(text, ""));
 
@@ -227,12 +247,22 @@ namespace Markdown.Xaml
         /// </remarks>
         private IEnumerable<Inline> DoAnchors(string text, Func<string, IEnumerable<Inline>> defaultHandler)
         {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+
             // Next, inline-style links: [link text](url "optional title") or [link text](url "optional title")
             return Evaluate(text, _anchorInline, AnchorInlineEvaluator, defaultHandler);
         }
 
         private Inline AnchorInlineEvaluator(Match match)
         {
+            if (match == null)
+            {
+                throw new ArgumentNullException("match");
+            }
+
             string linkText = match.Groups[2].Value;
             string url = match.Groups[3].Value;
             string title = match.Groups[6].Value;
@@ -279,12 +309,22 @@ namespace Markdown.Xaml
         /// </remarks>
         private IEnumerable<Block> DoHeaders(string text, Func<string, IEnumerable<Block>> defaultHandler)
         {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+
             return Evaluate<Block>(text, _headerSetext, m => SetextHeaderEvaluator(m),
                 s => Evaluate<Block>(s, _headerAtx, m => AtxHeaderEvaluator(m), defaultHandler));
         }
 
         private Block SetextHeaderEvaluator(Match match)
         {
+            if (match == null)
+            {
+                throw new ArgumentNullException("match");
+            }
+
             string header = match.Groups[1].Value;
             int level = match.Groups[2].Value.StartsWith("=") ? 1 : 2;
 
@@ -294,6 +334,11 @@ namespace Markdown.Xaml
 
         private Block AtxHeaderEvaluator(Match match)
         {
+            if (match == null)
+            {
+                throw new ArgumentNullException("match");
+            }
+            
             string header = match.Groups[2].Value;
             int level = match.Groups[1].Value.Length;
             //TODO: Style the paragraph based on the header level
@@ -302,6 +347,11 @@ namespace Markdown.Xaml
 
         public Block CreateHeader(int level, IEnumerable<Inline> content)
         {
+            if (content == null)
+            {
+                throw new ArgumentNullException("content");
+            }
+
             var block = Create<Paragraph, Inline>(content);
 
             if (HeadingFont != null)
@@ -376,11 +426,21 @@ namespace Markdown.Xaml
         /// </remarks>
         private IEnumerable<Block> DoHorizontalRules(string text, Func<string, IEnumerable<Block>> defaultHandler)
         {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+
             return Evaluate(text, _horizontalRules, RuleEvaluator, defaultHandler);
         }
 
         private Block RuleEvaluator(Match match)
         {
+            if (match == null)
+            {
+                throw new ArgumentNullException("match");
+            }
+            
             var line = new Line() { X2 = 1, StrokeThickness = 1.0 };
             var container = new BlockUIContainer(line);
             return container;
@@ -417,6 +477,11 @@ namespace Markdown.Xaml
         /// </summary>
         private IEnumerable<Block> DoLists(string text, Func<string, IEnumerable<Block>> defaultHandler)
         {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+
             // We use a different prefix before nested lists than top-level lists.
             // See extended comment in _ProcessListItems().
             if (_listLevel > 0)
@@ -427,6 +492,11 @@ namespace Markdown.Xaml
 
         private Block ListEvaluator(Match match)
         {
+            if (match == null)
+            {
+                throw new ArgumentNullException("match");
+            }
+            
             string list = match.Groups[1].Value;
             string listType = Regex.IsMatch(match.Groups[3].Value, _markerUL) ? "ul" : "ol";
 
@@ -497,6 +567,11 @@ namespace Markdown.Xaml
 
         private ListItem ListItemEvaluator(Match match)
         {
+            if (match == null)
+            {
+                throw new ArgumentNullException("match");
+            }
+            
             string item = match.Groups[4].Value;
             string leadingLine = match.Groups[1].Value;
 
@@ -523,6 +598,11 @@ namespace Markdown.Xaml
         /// </summary>
         private IEnumerable<Inline> DoCodeSpans(string text, Func<string, IEnumerable<Inline>> defaultHandler)
         {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+
             //    * You can use multiple backticks as the delimiters if you want to
             //        include literal backticks in the code span. So, this input:
             //
@@ -550,6 +630,11 @@ namespace Markdown.Xaml
 
         private Inline CodeSpanEvaluator(Match match)
         {
+            if (match == null)
+            {
+                throw new ArgumentNullException("match");
+            }
+            
             string span = match.Groups[2].Value;
             span = Regex.Replace(span, @"^[ ]*", ""); // leading whitespace
             span = Regex.Replace(span, @"[ ]*$", ""); // trailing whitespace
@@ -585,6 +670,11 @@ namespace Markdown.Xaml
         /// </summary>
         private IEnumerable<Inline> DoItalicsAndBold(string text, Func<string, IEnumerable<Inline>> defaultHandler)
         {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+
             // <strong> must go first, then <em>
             if (StrictBoldItalic)
             {
@@ -602,12 +692,22 @@ namespace Markdown.Xaml
 
         private Inline ItalicEvaluator(Match match, int contentGroup)
         {
+            if (match == null)
+            {
+                throw new ArgumentNullException("match");
+            }
+            
             var content = match.Groups[contentGroup].Value;
             return Create<Italic, Inline>(RunSpanGamut(content));
         }
 
         private Inline BoldEvaluator(Match match, int contentGroup)
         {
+            if (match == null)
+            {
+                throw new ArgumentNullException("match");
+            }
+            
             var content = match.Groups[contentGroup].Value;
             return Create<Bold, Inline>(RunSpanGamut(content));
         }
@@ -630,6 +730,11 @@ namespace Markdown.Xaml
         /// </summary>
         private string Normalize(string text)
         {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+
             var output = new StringBuilder(text.Length);
             var line = new StringBuilder();
             bool valid = false;
@@ -683,6 +788,11 @@ namespace Markdown.Xaml
         /// </summary>
         private static string RepeatString(string text, int count)
         {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+
             var sb = new StringBuilder(text.Length * count);
             for (int i = 0; i < count; i++)
                 sb.Append(text);
@@ -703,6 +813,11 @@ namespace Markdown.Xaml
 
         private IEnumerable<T> Evaluate<T>(string text, Regex expression, Func<Match, T> build, Func<string, IEnumerable<T>> rest)
         {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+
             var matches = expression.Matches(text);
             var index = 0;
             foreach (Match m in matches)
@@ -731,10 +846,17 @@ namespace Markdown.Xaml
             }
         }
 
+        private static Regex _eoln = new Regex("\\s+");
+
         public IEnumerable<Inline> DoText(string text)
         {
-            yield return new Run(text);
-        }
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
 
+            var t = _eoln.Replace(text, " ");
+            yield return new Run(t);
+        }
     }
 }
