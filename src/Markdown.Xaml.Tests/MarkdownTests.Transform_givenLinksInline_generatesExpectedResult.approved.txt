@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<FlowDocument FontFamily="Calibri" TextAlignment="Left" PagePadding="0,0,0,0" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+<FlowDocument PagePadding="0,0,0,0" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
   <Paragraph>Just a <Hyperlink Command="GoToPage" CommandParameter="/url/">URL</Hyperlink>.</Paragraph>
   <Paragraph>
     <Hyperlink Command="GoToPage" CommandParameter="/url/">URL and title</Hyperlink>.</Paragraph>

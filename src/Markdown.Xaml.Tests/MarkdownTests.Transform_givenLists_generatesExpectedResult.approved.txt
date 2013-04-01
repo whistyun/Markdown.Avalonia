@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<FlowDocument FontFamily="Calibri" TextAlignment="Left" PagePadding="0,0,0,0" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+<FlowDocument PagePadding="0,0,0,0" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
   <Paragraph>First we have a simple numeric list</Paragraph>
   <List MarkerStyle="Decimal">
     <ListItem>
@@ -30,7 +30,7 @@
       <Paragraph>Obiwan</Paragraph>
     </ListItem>
   </List>
-  <Paragraph FontWeight="Bold">Unordered</Paragraph>
+  <Paragraph>Unordered</Paragraph>
   <Paragraph>Asterisks tight:</Paragraph>
   <List MarkerStyle="Disc">
     <ListItem>
@@ -109,7 +109,7 @@
       <Paragraph>Minus 3</Paragraph>
     </ListItem>
   </List>
-  <Paragraph FontWeight="Bold">Ordered</Paragraph>
+  <Paragraph>Ordered</Paragraph>
   <Paragraph>Tight:</Paragraph>
   <List MarkerStyle="Decimal">
     <ListItem>
@@ -162,8 +162,7 @@
   <List MarkerStyle="Decimal">
     <ListItem>
       <Paragraph>Item 1, graf one.</Paragraph>
-      <Paragraph xml:space="preserve">    Item 2. graf two. The quick brown fox jumped over the lazy dog's
-    back.</Paragraph>
+      <Paragraph> Item 2. graf two. The quick brown fox jumped over the lazy dog's back.</Paragraph>
     </ListItem>
     <ListItem>
       <Paragraph>Item 2.</Paragraph>
@@ -172,12 +171,10 @@
       <Paragraph>Item 3.</Paragraph>
     </ListItem>
   </List>
-  <Paragraph FontWeight="Bold">Nested</Paragraph>
+  <Paragraph>Nested</Paragraph>
   <List MarkerStyle="Disc">
     <ListItem>
-      <Paragraph xml:space="preserve">Tab
-    *   Tab
-        *   Tab</Paragraph>
+      <Paragraph>Tab * Tab * Tab</Paragraph>
     </ListItem>
   </List>
   <Paragraph>Here's another:</Paragraph>
@@ -186,10 +183,7 @@
       <Paragraph>First</Paragraph>
     </ListItem>
     <ListItem>
-      <Paragraph xml:space="preserve">Second:
-    * Fee
-    * Fie
-    * Foe</Paragraph>
+      <Paragraph>Second: * Fee * Fie * Foe</Paragraph>
     </ListItem>
     <ListItem>
       <Paragraph>Third</Paragraph>
@@ -201,10 +195,7 @@
       <Paragraph>First</Paragraph>
     </ListItem>
     <ListItem>
-      <Paragraph xml:space="preserve">Second:
-    * Fee
-    * Fie
-    * Foe</Paragraph>
+      <Paragraph>Second: * Fee * Fie * Foe</Paragraph>
     </ListItem>
     <ListItem>
       <Paragraph>Third</Paragraph>
@@ -214,8 +205,8 @@
   <List MarkerStyle="Disc">
     <ListItem>
       <Paragraph>this</Paragraph>
-      <Paragraph xml:space="preserve">    *   sub</Paragraph>
-      <Paragraph xml:space="preserve">    that</Paragraph>
+      <Paragraph> * sub</Paragraph>
+      <Paragraph> that</Paragraph>
     </ListItem>
   </List>
 </FlowDocument>

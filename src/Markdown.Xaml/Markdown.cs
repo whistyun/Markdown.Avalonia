@@ -121,7 +121,10 @@ namespace Markdown.Xaml
             var document = Create<FlowDocument, Block>(RunBlockGamut(text));
 
             document.PagePadding = new Thickness(0);
-            document.Style = DocumentStyle;
+            if (DocumentStyle != null)
+            {
+                document.Style = DocumentStyle;
+            }
 
             return document;
         }

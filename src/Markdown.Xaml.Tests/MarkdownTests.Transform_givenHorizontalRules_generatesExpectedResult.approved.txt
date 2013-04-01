@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<FlowDocument FontFamily="Calibri" TextAlignment="Left" PagePadding="0,0,0,0" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+<FlowDocument PagePadding="0,0,0,0" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
   <Paragraph>Dashes:</Paragraph>
   <BlockUIContainer>
     <Line X2="1" StrokeThickness="1" />
@@ -16,7 +16,7 @@
   <BlockUIContainer>
     <Line X2="1" StrokeThickness="1" />
   </BlockUIContainer>
-  <Paragraph xml:space="preserve">    ---</Paragraph>
+  <Paragraph> ---</Paragraph>
   <BlockUIContainer>
     <Line X2="1" StrokeThickness="1" />
   </BlockUIContainer>
@@ -32,7 +32,7 @@
   <BlockUIContainer>
     <Line X2="1" StrokeThickness="1" />
   </BlockUIContainer>
-  <Paragraph xml:space="preserve">    - - -</Paragraph>
+  <Paragraph> - - -</Paragraph>
   <Paragraph>Asterisks:</Paragraph>
   <BlockUIContainer>
     <Line X2="1" StrokeThickness="1" />
@@ -49,7 +49,7 @@
   <BlockUIContainer>
     <Line X2="1" StrokeThickness="1" />
   </BlockUIContainer>
-  <Paragraph xml:space="preserve">    <Bold>*</Bold></Paragraph>
+  <Paragraph> <Bold>*</Bold></Paragraph>
   <BlockUIContainer>
     <Line X2="1" StrokeThickness="1" />
   </BlockUIContainer>
@@ -65,7 +65,7 @@
   <BlockUIContainer>
     <Line X2="1" StrokeThickness="1" />
   </BlockUIContainer>
-  <Paragraph xml:space="preserve">    * * *</Paragraph>
+  <Paragraph> * * *</Paragraph>
   <Paragraph>Underscores:</Paragraph>
   <BlockUIContainer>
     <Line X2="1" StrokeThickness="1" />
@@ -82,7 +82,7 @@
   <BlockUIContainer>
     <Line X2="1" StrokeThickness="1" />
   </BlockUIContainer>
-  <Paragraph xml:space="preserve">    <Bold>_</Bold></Paragraph>
+  <Paragraph> <Bold>_</Bold></Paragraph>
   <BlockUIContainer>
     <Line X2="1" StrokeThickness="1" />
   </BlockUIContainer>
@@ -98,5 +98,5 @@
   <BlockUIContainer>
     <Line X2="1" StrokeThickness="1" />
   </BlockUIContainer>
-  <Paragraph xml:space="preserve">    _ _ _</Paragraph>
+  <Paragraph> _ _ _</Paragraph>
 </FlowDocument>
