@@ -1,0 +1,84 @@
+﻿<Window x:Class="Markdown.Demo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Markdown.Xaml;assembly=Markdown.Xaml"
+        Title="Markdown.Xaml Demo"
+        Height="600"
+        Width="800"
+        Loaded="Window_Loaded_1">
+
+    <Window.Resources>
+
+        <Style TargetType="FlowDocument" x:Key="DocumentStyle">
+            <Setter Property="FontFamily"
+                    Value="Calibri" />
+            <Setter Property="TextAlignment"
+                    Value="Left" />
+        </Style>
+               
+        <Style x:Key="PageHeader"
+               TargetType="Paragraph">
+            <Setter Property="FontSize"
+                    Value="42" />
+            <Setter Property="Foreground"
+                    Value="#ff000000" />
+            <Setter Property="FontWeight"
+                    Value="Light" />
+        </Style>
+
+        <Style x:Key="SubHeader"
+               TargetType="Paragraph">
+            <Setter Property="FontSize"
+                    Value="20" />
+            <Setter Property="Foreground"
+                    Value="#ff000000" />
+            <Setter Property="FontWeight"
+                    Value="Light" />
+        </Style>
+
+        <Style x:Key="SubHeaderSecondary"
+               TargetType="Paragraph">
+            <Setter Property="FontSize"
+                    Value="20" />
+            <Setter Property="Foreground"
+                    Value="#99000000" />
+            <Setter Property="FontWeight"
+                    Value="Light" />
+        </Style>
+
+        <local:Markdown x:Key="Markdown"
+                        DocumentStyle="{StaticResource DocumentStyle}"
+                        Heading1Style="{StaticResource PageHeader}"
+                        Heading2Style="{StaticResource SubHeader}"
+                        Heading3Style="{StaticResource SubHeaderSecondary}"/>
+
+        <local:TextToFlowDocumentConverter x:Key="TextToFlowDocumentConverter" 
+                                           Markdown="{StaticResource Markdown}"/>
+
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <TextBox x:Name="editSource"
+                 Grid.Row="0"
+                 Grid.Column="0"
+                 VerticalAlignment="Stretch"
+                 HorizontalAlignment="Stretch"
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True"
+                 Margin="5" 
+                 VerticalScrollBarVisibility="Auto"/>
+
+        <FlowDocumentScrollViewer Grid.Row="0"
+                                  Grid.Column="1"
+                                  VerticalAlignment="Stretch"
+                                  HorizontalAlignment="Stretch"
+                                  Margin="5"
+                                  Document="{Binding ElementName=editSource, Path=Text, Converter={StaticResource TextToFlowDocumentConverter}}" />
+
+    </Grid>
+</Window>
