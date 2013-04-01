@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Markdown.Xaml", "src\Markdo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Markdown.Xaml.Tests", "src\Markdown.Xaml.Tests\Markdown.Xaml.Tests.csproj", "{C44D58E8-AE6E-4F9C-8EFC-E5E816D82EF2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Markdown.Demo", "src\Markdown.Xaml.Demo\Markdown.Demo.csproj", "{75978320-D1C6-4662-9563-5BAF7CE8A540}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Analysis|Any CPU = Analysis|Any CPU
@@ -24,6 +26,12 @@ Global
 		{C44D58E8-AE6E-4F9C-8EFC-E5E816D82EF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C44D58E8-AE6E-4F9C-8EFC-E5E816D82EF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C44D58E8-AE6E-4F9C-8EFC-E5E816D82EF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75978320-D1C6-4662-9563-5BAF7CE8A540}.Analysis|Any CPU.ActiveCfg = Release|Any CPU
+		{75978320-D1C6-4662-9563-5BAF7CE8A540}.Analysis|Any CPU.Build.0 = Release|Any CPU
+		{75978320-D1C6-4662-9563-5BAF7CE8A540}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75978320-D1C6-4662-9563-5BAF7CE8A540}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75978320-D1C6-4662-9563-5BAF7CE8A540}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75978320-D1C6-4662-9563-5BAF7CE8A540}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

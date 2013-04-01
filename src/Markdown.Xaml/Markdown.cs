@@ -40,23 +40,74 @@ namespace Markdown.Xaml
 
         public ICommand HyperlinkCommand { get; set; }
 
-        public FontFamily TextFont { get; set; }
-        public Brush TextColor { get; set; }
+        public Style DocumentStyle
+        {
+            get { return (Style)GetValue(DocumentStyleProperty); }
+            set { SetValue(DocumentStyleProperty, value); }
+        }
 
-        public FontFamily HeadingFont { get; set; }
-        public Brush HeadingColor { get; set; }
+        // Using a DependencyProperty as the backing store for DocumentStyle.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DocumentStyleProperty =
+            DependencyProperty.Register("DocumentStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
 
-        public double? HeadingSize { get; set; }
-        public double? SubheadingSize { get; set; }
+        public Style Heading1Style
+        {
+            get { return (Style)GetValue(Heading1StyleProperty); }
+            set { SetValue(Heading1StyleProperty, value); }
+        }
 
-        public FontFamily CodeFont { get; set; }
-        public Brush CodeColor { get; set; }
+        // Using a DependencyProperty as the backing store for Heading1Style.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty Heading1StyleProperty =
+            DependencyProperty.Register("Heading1Style", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
+
+        public Style Heading2Style
+        {
+            get { return (Style)GetValue(Heading2StyleProperty); }
+            set { SetValue(Heading2StyleProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Heading2Style.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty Heading2StyleProperty =
+            DependencyProperty.Register("Heading2Style", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
+
+        public Style Heading3Style
+        {
+            get { return (Style)GetValue(Heading3StyleProperty); }
+            set { SetValue(Heading3StyleProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Heading3Style.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty Heading3StyleProperty =
+            DependencyProperty.Register("Heading3Style", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
+
+        public Style Heading4Style
+        {
+            get { return (Style)GetValue(Heading4StyleProperty); }
+            set { SetValue(Heading4StyleProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Heading4Style.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty Heading4StyleProperty =
+            DependencyProperty.Register("Heading4Style", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
+
+
+
+        public Style CodeStyle
+        {
+            get { return (Style)GetValue(CodeStyleProperty); }
+            set { SetValue(CodeStyleProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for CodeStyle.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty CodeStyleProperty =
+            DependencyProperty.Register("CodeStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
+
+
+
 
         public Markdown()
         {
             HyperlinkCommand = NavigationCommands.GoToPage;
-            TextFont = new FontFamily("Calibri");
-            CodeFont = new FontFamily("Consolas");
         }
 
         public FlowDocument Transform(string text)
@@ -70,19 +121,7 @@ namespace Markdown.Xaml
             var document = Create<FlowDocument, Block>(RunBlockGamut(text));
 
             document.PagePadding = new Thickness(0);
-
-            if (TextFont != null)
-            {
-                document.FontFamily = TextFont;
-            }
-
-            if (TextColor != null)
-            {
-                document.Foreground = TextColor;
-            }
-
-            //TODO: Make this configurable through a property
-            document.TextAlignment = TextAlignment.Left;
+            document.Style = DocumentStyle;
 
             return document;
         }
@@ -338,10 +377,9 @@ namespace Markdown.Xaml
             {
                 throw new ArgumentNullException("match");
             }
-            
+
             string header = match.Groups[2].Value;
             int level = match.Groups[1].Value.Length;
-            //TODO: Style the paragraph based on the header level
             return CreateHeader(level, RunSpanGamut(header));
         }
 
@@ -354,50 +392,34 @@ namespace Markdown.Xaml
 
             var block = Create<Paragraph, Inline>(content);
 
-            if (HeadingFont != null)
-            {
-                block.FontFamily = HeadingFont;
-            }
-
-            if (HeadingColor != null)
-            {
-                block.Foreground = HeadingColor;
-            }
-
             switch (level)
             {
                 case 1:
-                    if (HeadingSize.HasValue)
+                    if (Heading1Style != null)
                     {
-                        block.FontSize = HeadingSize.Value;
+                        block.Style = Heading1Style;
                     }
-
-                    block.FontWeight = FontWeights.Bold;
                     break;
 
                 case 2:
-                    if (SubheadingSize.HasValue)
+                    if (Heading2Style != null)
                     {
-                        block.FontSize = SubheadingSize.Value;
+                        block.Style = Heading2Style;
                     }
-
-                    block.FontWeight = FontWeights.Bold;
                     break;
 
                 case 3:
-                    block.FontWeight = FontWeights.Bold;
+                    if (Heading3Style != null)
+                    {
+                        block.Style = Heading3Style;
+                    }
                     break;
 
                 case 4:
-                    block.FontWeight = FontWeights.Bold;
-                    block.FontStyle = FontStyles.Italic;
-                    break;
-
-                case 5:
-                    break;
-
-                case 6:
-                    block.FontStyle = FontStyles.Italic;
+                    if (Heading4Style != null)
+                    {
+                        block.Style = Heading4Style;
+                    }
                     break;
             }
 
@@ -440,7 +462,7 @@ namespace Markdown.Xaml
             {
                 throw new ArgumentNullException("match");
             }
-            
+
             var line = new Line() { X2 = 1, StrokeThickness = 1.0 };
             var container = new BlockUIContainer(line);
             return container;
@@ -496,7 +518,7 @@ namespace Markdown.Xaml
             {
                 throw new ArgumentNullException("match");
             }
-            
+
             string list = match.Groups[1].Value;
             string listType = Regex.IsMatch(match.Groups[3].Value, _markerUL) ? "ul" : "ol";
 
@@ -571,7 +593,7 @@ namespace Markdown.Xaml
             {
                 throw new ArgumentNullException("match");
             }
-            
+
             string item = match.Groups[4].Value;
             string leadingLine = match.Groups[1].Value;
 
@@ -634,22 +656,15 @@ namespace Markdown.Xaml
             {
                 throw new ArgumentNullException("match");
             }
-            
+
             string span = match.Groups[2].Value;
             span = Regex.Replace(span, @"^[ ]*", ""); // leading whitespace
             span = Regex.Replace(span, @"[ ]*$", ""); // trailing whitespace
 
             var result = new Run(span);
-
-
-            if (CodeFont != null)
+            if (CodeStyle != null)
             {
-                result.FontFamily = CodeFont;
-            }
-
-            if (CodeColor != null)
-            {
-                result.Foreground = CodeColor;
+                result.Style = CodeStyle;
             }
 
             return result;
@@ -696,7 +711,7 @@ namespace Markdown.Xaml
             {
                 throw new ArgumentNullException("match");
             }
-            
+
             var content = match.Groups[contentGroup].Value;
             return Create<Italic, Inline>(RunSpanGamut(content));
         }
@@ -707,7 +722,7 @@ namespace Markdown.Xaml
             {
                 throw new ArgumentNullException("match");
             }
-            
+
             var content = match.Groups[contentGroup].Value;
             return Create<Bold, Inline>(RunSpanGamut(content));
         }
