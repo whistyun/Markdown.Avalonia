@@ -56,6 +56,16 @@ namespace Markdown.Xaml.Tests
             Approvals.Verify(AsXaml(result));
         }
 
+        [Test]
+        [RequiresSTA]
+        public void Transform_givenTextStyles_generatesExpectedResult()
+        {
+            var text = LoadText("Text_style.md");
+            var markdown = new Markdown();
+            var result = markdown.Transform(text);
+            Approvals.Verify(AsXaml(result));
+        }
+
         private string LoadText(string name)
         {
             using (Stream stream = Assembly.GetExecutingAssembly()

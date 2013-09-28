@@ -77,6 +77,7 @@
     <EmbeddedResource Include="Test1.md" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Text_style.md" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -49,7 +49,7 @@
   <BlockUIContainer>
     <Line X2="1" StrokeThickness="1" />
   </BlockUIContainer>
-  <Paragraph> <Bold>*</Bold></Paragraph>
+  <Paragraph> <Italic>*</Italic></Paragraph>
   <BlockUIContainer>
     <Line X2="1" StrokeThickness="1" />
   </BlockUIContainer>
@@ -82,7 +82,7 @@
   <BlockUIContainer>
     <Line X2="1" StrokeThickness="1" />
   </BlockUIContainer>
-  <Paragraph> <Bold>_</Bold></Paragraph>
+  <Paragraph> <Italic>_</Italic></Paragraph>
   <BlockUIContainer>
     <Line X2="1" StrokeThickness="1" />
   </BlockUIContainer>
