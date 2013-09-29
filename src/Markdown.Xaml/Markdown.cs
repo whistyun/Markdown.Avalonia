@@ -696,14 +696,14 @@ namespace Markdown.Xaml
             // <strong> must go first, then <em>
             if (StrictBoldItalic)
             {
-                return Evaluate<Inline>(text, _strictBold, m => ItalicEvaluator(m, 3),
-                    s1 => Evaluate<Inline>(s1, _strictItalic, m => BoldEvaluator(m, 3),
+                return Evaluate<Inline>(text, _strictBold, m => BoldEvaluator(m, 3),
+                    s1 => Evaluate<Inline>(s1, _strictItalic, m => ItalicEvaluator(m, 3),
                     s2 => defaultHandler(s2)));
             }
             else
             {
-                return Evaluate<Inline>(text, _bold, m => ItalicEvaluator(m, 2),
-                   s1 => Evaluate<Inline>(s1, _italic, m => BoldEvaluator(m, 2),
+                return Evaluate<Inline>(text, _bold, m => BoldEvaluator(m, 2),
+                   s1 => Evaluate<Inline>(s1, _italic, m => ItalicEvaluator(m, 2),
                    s2 => defaultHandler(s2)));
             }
         }
