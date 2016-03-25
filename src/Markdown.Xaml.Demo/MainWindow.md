@@ -14,6 +14,24 @@ MarkDown.Xaml has a number of convenient features
 If there are any bug fixes to the regular expressions in MarkdownSharp, merging those fixes in the Markdown.Xaml should be straightforward
 * Includes a `TextToFlowDocumentConverter` to make it easy to bind Markdown text
 
+
+## Markdown capabilities and customizables styles ##
+
+* Links [Go to Google!](https://www.google.com)
+* Remote images
+
+![image1](http://placehold.it/350x150)
+
+![imageleft](http://placehold.it/100x150/0000FF)![imageright](http://placehold.it/100x150/00FFFF)
+
+* Local images
+
+![localimage](sampleimage.jpg)
+
+* Separator
+***
+
+
 ## What is this Demo? ##
 
 This demo application shows MarkDown.Xaml in use - as you make changes to the 

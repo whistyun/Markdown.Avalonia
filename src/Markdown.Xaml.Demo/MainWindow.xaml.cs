@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,8 @@ namespace Markdown.Demo
         public MainWindow()
         {
             InitializeComponent();
+
+            CommandBindings.Add(new CommandBinding(NavigationCommands.GoToPage, (sender, e) => Process.Start((string)e.Parameter)));
         }
 
         private void Window_Loaded_1(object sender, RoutedEventArgs e)

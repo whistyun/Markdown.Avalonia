@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace Markdown.Xaml
@@ -89,9 +90,7 @@ namespace Markdown.Xaml
         // Using a DependencyProperty as the backing store for Heading4Style.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty Heading4StyleProperty =
             DependencyProperty.Register("Heading4Style", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
-
-
-
+    
         public Style CodeStyle
         {
             get { return (Style)GetValue(CodeStyleProperty); }
@@ -102,8 +101,44 @@ namespace Markdown.Xaml
         public static readonly DependencyProperty CodeStyleProperty =
             DependencyProperty.Register("CodeStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
 
+        public Style LinkStyle
+        {
+            get { return (Style)GetValue(LinkStyleProperty); }
+            set { SetValue(LinkStyleProperty, value); }
+        }
 
+        // Using a DependencyProperty as the backing store for LinkStyle.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty LinkStyleProperty =
+            DependencyProperty.Register("LinkStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
 
+        public Style ImageStyle
+        {
+            get { return (Style)GetValue(ImageStyleProperty); }
+            set { SetValue(ImageStyleProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ImageStyle.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ImageStyleProperty =
+            DependencyProperty.Register("ImageStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
+
+        public Style SeparatorStyle
+        {
+            get { return (Style)GetValue(SeparatorStyleProperty); }
+            set { SetValue(SeparatorStyleProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for SeparatorStyle.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty SeparatorStyleProperty =
+            DependencyProperty.Register("SeparatorStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
+
+        public string AssetPathRoot
+        {
+          get { return (string)GetValue(AssetPathRootProperty); }
+          set { SetValue(AssetPathRootProperty, value); }
+        }
+
+        public static readonly DependencyProperty AssetPathRootProperty =
+            DependencyProperty.Register("AssetPathRootRoot", typeof(string), typeof(Markdown), new PropertyMetadata(null));
 
         public Markdown()
         {
@@ -120,10 +155,13 @@ namespace Markdown.Xaml
             text = Normalize(text);
             var document = Create<FlowDocument, Block>(RunBlockGamut(text));
 
-            document.PagePadding = new Thickness(0);
             if (DocumentStyle != null)
             {
                 document.Style = DocumentStyle;
+            }
+            else
+            {
+                document.PagePadding = new Thickness(0);
             }
 
             return document;
@@ -169,9 +207,10 @@ namespace Markdown.Xaml
             }
 
             return DoCodeSpans(text,
-                s0 => DoAnchors(s0,
-                s1 => DoItalicsAndBold(s1,
-                s2 => DoText(s2))));
+                s0 => DoImages(s0,
+                s1 => DoAnchors(s1,
+                s2 => DoItalicsAndBold(s2,
+                s3 => DoText(s3)))));
 
             //text = EscapeSpecialCharsWithinTagAttributes(text);
             //text = EscapeBackslashes(text);
@@ -262,6 +301,49 @@ namespace Markdown.Xaml
             return _nestedParensPattern;
         }
 
+        private static string _nestedParensPatternWithWhiteSpace;
+
+        /// <summary>
+        /// Reusable pattern to match balanced (parens), including whitespace. See Friedl's 
+        /// "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
+        /// </summary>
+        private static string GetNestedParensPatternWithWhiteSpace()
+        {
+            // in other words (this) and (this(also)) and (this(also(too)))
+            // up to _nestDepth
+            if (_nestedParensPatternWithWhiteSpace == null)
+                _nestedParensPatternWithWhiteSpace =
+                    RepeatString(@"
+                    (?>              # Atomic matching
+                       [^()]+      # Anything other than parens
+                     |
+                       \(
+                           ", _nestDepth) + RepeatString(
+                    @" \)
+                    )*"
+                    , _nestDepth);
+            return _nestedParensPatternWithWhiteSpace;
+        }
+
+        private static Regex _imageInline = new Regex(string.Format(@"
+                (                           # wrap whole match in $1
+                    !\[
+                        ({0})               # link text = $2
+                    \]
+                    \(                      # literal paren
+                        [ ]*
+                        ({1})               # href = $3
+                        [ ]*
+                        (                   # $4
+                        (['""])           # quote char = $5
+                        (.*?)               # title = $6
+                        \5                  # matching quote
+                        #[ ]*                # ignore any spaces between closing quote and )
+                        )?                  # title is optional
+                    \)
+                )", GetNestedBracketsPattern(), GetNestedParensPatternWithWhiteSpace()),
+                  RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
         private static Regex _anchorInline = new Regex(string.Format(@"
                 (                           # wrap whole match in $1
                     \[
@@ -280,6 +362,80 @@ namespace Markdown.Xaml
                     \)
                 )", GetNestedBracketsPattern(), GetNestedParensPattern()),
                   RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
+        /// <summary>
+        /// Turn Markdown images into images
+        /// </summary>
+        /// <remarks>
+        /// ![image alt](url) 
+        /// </remarks>
+        private IEnumerable<Inline> DoImages(string text, Func<string, IEnumerable<Inline>> defaultHandler)
+        {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+
+            return Evaluate(text, _imageInline, ImageInlineEvaluator, defaultHandler);
+        }
+
+        private Inline ImageInlineEvaluator(Match match)
+        {
+            if (match == null)
+            {
+                throw new ArgumentNullException("match");
+            }
+
+            string linkText = match.Groups[2].Value;
+            string url = match.Groups[3].Value;
+            BitmapImage imgSource = null;
+            try
+            {
+                if (!Uri.IsWellFormedUriString(url, UriKind.Absolute) && !System.IO.Path.IsPathRooted(url))
+                {
+                    url = System.IO.Path.Combine(AssetPathRoot ?? string.Empty, url);
+                }
+
+                imgSource = new BitmapImage(new Uri(url, UriKind.RelativeOrAbsolute));
+            }
+            catch (Exception)
+            {
+                return new Run("!" + url) { Foreground = Brushes.Red };
+            }
+
+            Image image = new Image { Source = imgSource, Tag = linkText };
+            if (ImageStyle == null)
+            {
+                image.Margin = new Thickness(0);
+            }
+            else
+            {
+                image.Style = ImageStyle;
+            }
+
+            // Bind size so document is updated when image is downloaded
+            if (imgSource.IsDownloading)
+            {
+                Binding binding = new Binding(nameof(BitmapImage.Width));
+                binding.Source = imgSource;
+                binding.Mode = BindingMode.OneWay;
+
+                BindingExpressionBase bindingExpression = BindingOperations.SetBinding(image, Image.WidthProperty, binding);
+                EventHandler downloadCompletedHandler = null;
+                downloadCompletedHandler = (sender, e) =>
+                    {
+                        imgSource.DownloadCompleted -= downloadCompletedHandler;
+                        bindingExpression.UpdateTarget();
+                    };
+                imgSource.DownloadCompleted += downloadCompletedHandler;
+            }
+            else
+            {
+                image.Width = imgSource.Width;
+            }
+
+            return new InlineUIContainer(image);
+        }
 
         /// <summary>
         /// Turn Markdown link shortcuts into hyperlinks
@@ -312,6 +468,11 @@ namespace Markdown.Xaml
             var result = Create<Hyperlink, Inline>(RunSpanGamut(linkText));
             result.Command = HyperlinkCommand;
             result.CommandParameter = url;
+            if (LinkStyle != null)
+            {
+                result.Style = LinkStyle;
+            }
+
             return result;
         }
 
@@ -466,7 +627,17 @@ namespace Markdown.Xaml
                 throw new ArgumentNullException("match");
             }
 
-            var line = new Line() { X2 = 1, StrokeThickness = 1.0 };
+            Line line = new Line();
+            if (SeparatorStyle == null)
+            {
+                line.X2 = 1;
+                line.StrokeThickness = 1.0;
+            }
+            else
+            {
+              line.Style = SeparatorStyle;
+            }
+
             var container = new BlockUIContainer(line);
             return container;
         }
