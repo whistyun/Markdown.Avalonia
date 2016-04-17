@@ -162,7 +162,7 @@
   <List MarkerStyle="Decimal">
     <ListItem>
       <Paragraph>Item 1, graf one.</Paragraph>
-      <Paragraph> Item 2. graf two. The quick brown fox jumped over the lazy dog's back.</Paragraph>
+      <Paragraph xml:space="preserve"> Item 2. graf two. The quick brown fox jumped over the lazy dog's back.</Paragraph>
     </ListItem>
     <ListItem>
       <Paragraph>Item 2.</Paragraph>
@@ -205,8 +205,8 @@
   <List MarkerStyle="Disc">
     <ListItem>
       <Paragraph>this</Paragraph>
-      <Paragraph> * sub</Paragraph>
-      <Paragraph> that</Paragraph>
+      <Paragraph xml:space="preserve"> * sub</Paragraph>
+      <Paragraph xml:space="preserve"> that</Paragraph>
     </ListItem>
   </List>
 </FlowDocument>

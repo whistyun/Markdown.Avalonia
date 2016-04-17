@@ -1,13 +1,8 @@
 ﻿using ApprovalTests;
 using ApprovalTests.Reporters;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
 using System.Xml;
 
@@ -61,6 +56,16 @@ namespace Markdown.Xaml.Tests
         public void Transform_givenTextStyles_generatesExpectedResult()
         {
             var text = LoadText("Text_style.md");
+            var markdown = new Markdown();
+            var result = markdown.Transform(text);
+            Approvals.Verify(AsXaml(result));
+        }
+
+        [Test]
+        [RequiresSTA]
+        public void Transform_givenImages_generatesExpectedResult()
+        {
+            var text = LoadText("Images.md");
             var markdown = new Markdown();
             var result = markdown.Transform(text);
             Approvals.Verify(AsXaml(result));
