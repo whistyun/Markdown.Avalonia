@@ -47,6 +47,16 @@ namespace Markdown.Xaml
             set { SetValue(DocumentStyleProperty, value); }
         }
 
+		public Style NormalParagraphStyle
+		{
+			get { return (Style)GetValue(NormalParagraphStyleProperty); }
+			set { SetValue(NormalParagraphStyleProperty, value); }
+		}
+
+		// Using a DependencyProperty as the backing store for NormalParagraphStyle.  This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty NormalParagraphStyleProperty =
+			DependencyProperty.Register("NormalParagraphStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
+
         // Using a DependencyProperty as the backing store for DocumentStyle.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty DocumentStyleProperty =
             DependencyProperty.Register("DocumentStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
@@ -249,7 +259,9 @@ namespace Markdown.Xaml
 
             foreach (var g in grafs)
             {
-                yield return Create<Paragraph, Inline>(RunSpanGamut(g));
+				var block = Create<Paragraph, Inline>(RunSpanGamut(g));
+				block.Style = this.NormalParagraphStyle;
+				yield return block;
             }
         }
 
