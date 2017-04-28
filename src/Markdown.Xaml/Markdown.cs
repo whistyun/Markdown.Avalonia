@@ -1036,6 +1036,7 @@ namespace Markdown.Xaml
         }
 
         private static Regex _eoln = new Regex("\\s+");
+		private static Regex _lbrk = new Regex(@"\ {2,}\n");
 
         public IEnumerable<Inline> DoText(string text)
         {
@@ -1044,8 +1045,17 @@ namespace Markdown.Xaml
                 throw new ArgumentNullException("text");
             }
 
-            var t = _eoln.Replace(text, " ");
-            yield return new Run(t);
+			var lines = _lbrk.Split(text);
+			bool first = true;
+			foreach (var line in lines)
+			{
+				if (first)
+					first = false;
+				else
+					yield return new LineBreak();
+				var t = _eoln.Replace(line, " ");
+				yield return new Run(t);
+			}
         }
     }
 }
