@@ -643,18 +643,13 @@ namespace Markdown.Xaml
                 throw new ArgumentNullException("match");
             }
 
-            Line line = new Line();
-            if (SeparatorStyle == null)
-            {
-                line.X2 = 1;
-                line.StrokeThickness = 1.0;
-            }
-            else
-            {
-              line.Style = SeparatorStyle;
-            }
+			var separator = new Separator();
+			if (SeparatorStyle != null)
+			{
+				separator.Style = SeparatorStyle;
+			}
 
-            var container = new BlockUIContainer(line);
+			var container = new BlockUIContainer(separator);
             return container;
         }
 
