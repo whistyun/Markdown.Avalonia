@@ -79,6 +79,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Text_style.md" />
     <EmbeddedResource Include="Images.md" />
+    <EmbeddedResource Include="Tables.md" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

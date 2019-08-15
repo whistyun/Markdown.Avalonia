@@ -28,6 +28,15 @@ If there are any bug fixes to the regular expressions in MarkdownSharp, merging 
 
 ![localimage](sampleimage.jpg)
 
+* Table
+
+table begin string
+|a|b|c|d|
+|:-:|:-|-:|
+|a1234567890|b1234567890|c1234567890|d1234567890|
+|a|b|c|d|
+table end string
+
 * Separator
 ***
 

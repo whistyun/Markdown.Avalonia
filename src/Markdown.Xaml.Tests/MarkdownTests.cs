@@ -32,6 +32,14 @@ namespace Markdown.Xaml.Tests
         }
 
         [Test]
+        public void Transform_givenTables_generatesExpectedResult() {
+            var text = LoadText("Tables.md");
+            var markdown = new Markdown();
+            var result = markdown.Transform(text);
+            Approvals.Verify(AsXaml(result));
+        }
+
+        [Test]
         [RequiresSTA]
         public void Transform_givenHorizontalRules_generatesExpectedResult()
         {
