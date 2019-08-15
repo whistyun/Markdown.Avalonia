@@ -425,7 +425,14 @@ namespace Markdown.Xaml
                     url = System.IO.Path.Combine(AssetPathRoot ?? string.Empty, url);
                 }
 
-                imgSource = new BitmapImage(new Uri(url, UriKind.RelativeOrAbsolute));
+                imgSource = new BitmapImage();
+				imgSource.BeginInit();
+				imgSource.CacheOption = BitmapCacheOption.None;
+				imgSource.UriCachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
+				imgSource.CacheOption = BitmapCacheOption.OnLoad;
+				imgSource.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+				imgSource.UriSource = new Uri(url);
+				imgSource.EndInit();
             }
             catch (Exception)
             {
