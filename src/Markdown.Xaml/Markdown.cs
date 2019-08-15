@@ -517,10 +517,11 @@ namespace Markdown.Xaml
             var result = Create<Hyperlink, Inline>(RunSpanGamut(linkText));
             result.Command = HyperlinkCommand;
             result.CommandParameter = url;
-			if (!string.IsNullOrWhiteSpace(title))
-			{
-				result.ToolTip = title;
-			}
+
+            result.ToolTip = string.IsNullOrWhiteSpace(title) ?
+                url :
+                String.Format("\"{0}\"\r\n{1}", title, url);
+
 			if (LinkStyle != null)
             {
                 result.Style = LinkStyle;

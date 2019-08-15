@@ -18,6 +18,7 @@ If there are any bug fixes to the regular expressions in MarkdownSharp, merging 
 ## Markdown capabilities and customizables styles ##
 
 * Links [Go to Google!](https://www.google.com)
+* Links with title [Go to Google!](https://www.google.com "google.")
 * Remote images
 
 ![image1](http://placehold.it/350x150)
