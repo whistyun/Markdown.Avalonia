@@ -150,7 +150,7 @@ namespace Markdown.Xaml
         }
 
         public static readonly DependencyProperty AssetPathRootProperty =
-            DependencyProperty.Register("AssetPathRootRoot", typeof(string), typeof(Markdown), new PropertyMetadata(null));
+            DependencyProperty.Register("AssetPathRoot", typeof(string), typeof(Markdown), new PropertyMetadata(null));
 
         public Style TableStyle
         {
