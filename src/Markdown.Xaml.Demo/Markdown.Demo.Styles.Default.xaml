@@ -66,13 +66,4 @@
           </Style.Triggers>
       </Style>
 
-      <Style x:Key="SeparatorStyle"
-             TargetType="Line">
-          <Setter Property="X2"
-                  Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=FlowDocumentScrollViewer}}" />
-          <Setter Property="Stroke"
-                  Value="#99000000" />
-          <Setter Property="StrokeThickness"
-                  Value="2" />
-      </Style>
 </ResourceDictionary>
