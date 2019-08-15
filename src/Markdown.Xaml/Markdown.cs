@@ -290,8 +290,11 @@ namespace Markdown.Xaml
             foreach (var g in grafs)
             {
 				var block = Create<Paragraph, Inline>(RunSpanGamut(g));
-				block.Style = this.NormalParagraphStyle;
-				yield return block;
+                if (NormalParagraphStyle != null)
+                {
+                    block.Style = NormalParagraphStyle;
+                }
+                yield return block;
             }
         }
 
@@ -832,7 +835,7 @@ namespace Markdown.Xaml
 
         private static Regex _table = new Regex(@"
             (                               # $1 = whole table
-                [ ]*
+                [ \r\n]*
                 (                           # $2 = table header
                     \|([^|\r\n]*\|)+        # $3
                 )

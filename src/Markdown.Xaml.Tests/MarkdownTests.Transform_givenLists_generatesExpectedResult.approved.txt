@@ -56,7 +56,7 @@
     </ListItem>
   </List>
   <BlockUIContainer>
-    <Line X2="1" StrokeThickness="1" />
+    <Separator />
   </BlockUIContainer>
   <Paragraph>Pluses tight:</Paragraph>
   <List MarkerStyle="Disc">
@@ -83,7 +83,7 @@
     </ListItem>
   </List>
   <BlockUIContainer>
-    <Line X2="1" StrokeThickness="1" />
+    <Separator />
   </BlockUIContainer>
   <Paragraph>Minuses tight:</Paragraph>
   <List MarkerStyle="Disc">
