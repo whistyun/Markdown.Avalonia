@@ -13,7 +13,7 @@
     </TableRowGroup>
     <TableRowGroup>
       <TableRow>
-        <TableCell TextAlignment="Left">
+        <TableCell>
           <Paragraph>asdf</Paragraph>
         </TableCell>
       </TableRow>
@@ -44,7 +44,7 @@
     </TableRowGroup>
     <TableRowGroup>
       <TableRow>
-        <TableCell TextAlignment="Left">
+        <TableCell>
           <Paragraph>a</Paragraph>
         </TableCell>
         <TableCell TextAlignment="Left">
@@ -58,7 +58,7 @@
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell TextAlignment="Left">
+        <TableCell>
           <Paragraph>a</Paragraph>
         </TableCell>
         <TableCell TextAlignment="Left">
@@ -100,7 +100,7 @@
     </TableRowGroup>
     <TableRowGroup>
       <TableRow>
-        <TableCell TextAlignment="Left">
+        <TableCell>
           <Paragraph>a</Paragraph>
         </TableCell>
         <TableCell TextAlignment="Left">
@@ -115,7 +115,7 @@
         <TableCell />
       </TableRow>
       <TableRow>
-        <TableCell TextAlignment="Left">
+        <TableCell>
           <Paragraph>a</Paragraph>
         </TableCell>
         <TableCell TextAlignment="Left">
@@ -127,7 +127,7 @@
         <TableCell TextAlignment="Center">
           <Paragraph>d</Paragraph>
         </TableCell>
-        <TableCell TextAlignment="Left">
+        <TableCell>
           <Paragraph>e</Paragraph>
         </TableCell>
       </TableRow>

@@ -905,7 +905,7 @@ namespace Markdown.Xaml
 
 
             // table style
-            var aligns = new List<TextAlignment>();
+            var aligns = new List<TextAlignment?>();
             foreach (var colStyleTxt in styles)
             {
                 var firstChar = colStyleTxt.First();
@@ -925,15 +925,15 @@ namespace Markdown.Xaml
                 {
                     aligns.Add(TextAlignment.Left);
                 }
-                // ...left(default)
+                // default
                 else
                 {
-                    aligns.Add(TextAlignment.Left);
+                    aligns.Add(null);
                 }
             }
             while (aligns.Count < maxColCount)
             {
-                aligns.Add(TextAlignment.Left);
+                aligns.Add(null);
             }
 
             // table
@@ -988,7 +988,9 @@ namespace Markdown.Xaml
 
                     var cellParagraph = Create<Paragraph, Inline>(RunSpanGamut(rowItemTxt));
                     var rowCell = new TableCell(cellParagraph);
-                    rowCell.TextAlignment = aligns[rowItemIdx];
+                    if (aligns[rowItemIdx].HasValue) {
+                        rowCell.TextAlignment = aligns[rowItemIdx].Value;
+                    }
 
                     tableBody.Cells.Add(rowCell);
                 }
