@@ -377,17 +377,20 @@ namespace Markdown.Xaml
                     \]
                     \(                      # literal paren
                         [ ]*
-                        ({1})               # href = $3
+                        ({1})               # href(with title) = $3
                         [ ]*
-                        (                   # $4
-                        (['""])           # quote char = $5
-                        (.*?)               # title = $6
-                        \5                  # matching quote
-                        #[ ]*                # ignore any spaces between closing quote and )
-                        )?                  # title is optional
                     \)
                 )", GetNestedBracketsPattern(), GetNestedParensPatternWithWhiteSpace()),
                   RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
+        private static Regex _imageHrefWithTitle = new Regex(@"^
+                (                           # wrap whole match in $1
+                    (.+?)                   # url = $2
+                    [ ]+
+                    (['""])                 # quote char = $3
+                    (.*?)                   # title = $4
+                    \3
+                )$", RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static Regex _anchorInline = new Regex(string.Format(@"
                 (                           # wrap whole match in $1
@@ -399,7 +402,7 @@ namespace Markdown.Xaml
                         ({1})               # href = $3
                         [ ]*
                         (                   # $4
-                        (['""])           # quote char = $5
+                        (['""])             # quote char = $5
                         (.*?)               # title = $6
                         \5                  # matching quote
                         [ ]*                # ignore any spaces between closing quote and )
@@ -433,6 +436,14 @@ namespace Markdown.Xaml
 
             string linkText = match.Groups[2].Value;
             string url = match.Groups[3].Value;
+            string title = null;
+
+            var titleMatch = _imageHrefWithTitle.Match(url);
+            if (titleMatch.Success) {
+                url = titleMatch.Groups[2].Value;
+                title = titleMatch.Groups[4].Value;
+            }
+
             BitmapImage imgSource = null;
             try
             {
@@ -463,6 +474,10 @@ namespace Markdown.Xaml
             else
             {
                 image.Style = ImageStyle;
+            }
+            if (!string.IsNullOrWhiteSpace(title))
+            {
+                image.ToolTip = title;
             }
 
             // Bind size so document is updated when image is downloaded

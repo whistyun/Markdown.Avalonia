@@ -23,7 +23,7 @@ If there are any bug fixes to the regular expressions in MarkdownSharp, merging 
 
 ![image1](http://placehold.it/350x150)
 
-![imageleft](http://placehold.it/100x150/0000FF)![imageright](http://placehold.it/100x150/00FFFF)
+![imageleft](http://placehold.it/100x150/0000FF "blue")![imageright](http://placehold.it/100x150/00FFFF "cyan")
 
 * Local images
 
