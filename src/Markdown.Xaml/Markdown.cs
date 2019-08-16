@@ -38,146 +38,53 @@ namespace Markdown.Xaml
         /// when true, bold and italic require non-word characters on either side  
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
-        /// 
         public bool StrictBoldItalic { get; set; }
+
+        public string AssetPathRoot { get; set; }
 
         public ICommand HyperlinkCommand { get; set; }
 
+
+        #region dependencyobject property
+
+        // Using a DependencyProperty as the backing store for DocumentStyle.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DocumentStyleProperty =
+            DependencyProperty.Register("DocumentStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
+
+        /// <summary>
+        /// top-level flow document style
+        /// </summary>
         public Style DocumentStyle
         {
             get { return (Style)GetValue(DocumentStyleProperty); }
             set { SetValue(DocumentStyleProperty, value); }
         }
 
-		public Style NormalParagraphStyle
-		{
-			get { return (Style)GetValue(NormalParagraphStyleProperty); }
-			set { SetValue(NormalParagraphStyleProperty, value); }
-		}
+        #endregion
 
-		// Using a DependencyProperty as the backing store for NormalParagraphStyle.  This enables animation, styling, binding, etc...
-		public static readonly DependencyProperty NormalParagraphStyleProperty =
-			DependencyProperty.Register("NormalParagraphStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
 
-        // Using a DependencyProperty as the backing store for DocumentStyle.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty DocumentStyleProperty =
-            DependencyProperty.Register("DocumentStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
+        #region legacy property
 
-        public Style Heading1Style
-        {
-            get { return (Style)GetValue(Heading1StyleProperty); }
-            set { SetValue(Heading1StyleProperty, value); }
-        }
+        public Style Heading1Style { get; set; }
+        public Style Heading2Style { get; set; }
+        public Style Heading3Style { get; set; }
+        public Style Heading4Style { get; set; }
+        public Style NormalParagraphStyle { get; set; }
+        public Style CodeStyle { get; set; }
+        public Style LinkStyle { get; set; }
+        public Style ImageStyle { get; set; }
+        public Style SeparatorStyle { get; set; }
+        public Style TableStyle { get; set; }
+        public Style TableHeaderStyle { get; set; }
+        public Style TableBodyStyle { get; set; }
 
-        // Using a DependencyProperty as the backing store for Heading1Style.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty Heading1StyleProperty =
-            DependencyProperty.Register("Heading1Style", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
+        #endregion
 
-        public Style Heading2Style
-        {
-            get { return (Style)GetValue(Heading2StyleProperty); }
-            set { SetValue(Heading2StyleProperty, value); }
-        }
 
-        // Using a DependencyProperty as the backing store for Heading2Style.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty Heading2StyleProperty =
-            DependencyProperty.Register("Heading2Style", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
+        #region regex pattern
 
-        public Style Heading3Style
-        {
-            get { return (Style)GetValue(Heading3StyleProperty); }
-            set { SetValue(Heading3StyleProperty, value); }
-        }
 
-        // Using a DependencyProperty as the backing store for Heading3Style.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty Heading3StyleProperty =
-            DependencyProperty.Register("Heading3Style", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
-
-        public Style Heading4Style
-        {
-            get { return (Style)GetValue(Heading4StyleProperty); }
-            set { SetValue(Heading4StyleProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for Heading4Style.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty Heading4StyleProperty =
-            DependencyProperty.Register("Heading4Style", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
-    
-        public Style CodeStyle
-        {
-            get { return (Style)GetValue(CodeStyleProperty); }
-            set { SetValue(CodeStyleProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for CodeStyle.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty CodeStyleProperty =
-            DependencyProperty.Register("CodeStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
-
-        public Style LinkStyle
-        {
-            get { return (Style)GetValue(LinkStyleProperty); }
-            set { SetValue(LinkStyleProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for LinkStyle.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty LinkStyleProperty =
-            DependencyProperty.Register("LinkStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
-
-        public Style ImageStyle
-        {
-            get { return (Style)GetValue(ImageStyleProperty); }
-            set { SetValue(ImageStyleProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for ImageStyle.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ImageStyleProperty =
-            DependencyProperty.Register("ImageStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
-
-        public Style SeparatorStyle
-        {
-            get { return (Style)GetValue(SeparatorStyleProperty); }
-            set { SetValue(SeparatorStyleProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for SeparatorStyle.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty SeparatorStyleProperty =
-            DependencyProperty.Register("SeparatorStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
-
-        public string AssetPathRoot
-        {
-          get { return (string)GetValue(AssetPathRootProperty); }
-          set { SetValue(AssetPathRootProperty, value); }
-        }
-
-        public static readonly DependencyProperty AssetPathRootProperty =
-            DependencyProperty.Register("AssetPathRoot", typeof(string), typeof(Markdown), new PropertyMetadata(null));
-
-        public Style TableStyle
-        {
-            get { return (Style)GetValue(TableStyleProperty); }
-            set { SetValue(TableStyleProperty, value); }
-        }
-
-        public static readonly DependencyProperty TableStyleProperty =
-            DependencyProperty.Register("TableStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
-
-        public Style TableHeaderStyle
-        {
-            get { return (Style)GetValue(TableHeaderStyleProperty); }
-            set { SetValue(TableHeaderStyleProperty, value); }
-        }
-
-        public static readonly DependencyProperty TableHeaderStyleProperty =
-            DependencyProperty.Register("TableHeaderStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
-
-        public Style TableBodyStyle
-        {
-            get { return (Style)GetValue(TableBodyStyleProperty); }
-            set { SetValue(TableBodyStyleProperty, value); }
-        }
-
-        public static readonly DependencyProperty TableBodyStyleProperty =
-            DependencyProperty.Register("TableBodyStyle", typeof(Style), typeof(Markdown), new PropertyMetadata(null));
+        #endregion
 
         public Markdown()
         {
@@ -194,16 +101,70 @@ namespace Markdown.Xaml
             text = Normalize(text);
             var document = Create<FlowDocument, Block>(RunBlockGamut(text));
 
-            if (DocumentStyle != null)
-            {
-                document.Style = DocumentStyle;
-            }
-            else
-            {
-                document.PagePadding = new Thickness(0);
-            }
+            document.SetBinding(FlowDocument.StyleProperty, new Binding(DocumentStyleProperty.Name) { Source = this });
 
             return document;
+        }
+
+        /// <summary>
+        /// convert all tabs to _tabWidth spaces; 
+        /// standardizes line endings from DOS (CR LF) or Mac (CR) to UNIX (LF); 
+        /// makes sure text ends with a couple of newlines; 
+        /// removes any blank lines (only spaces) in the text
+        /// </summary>
+        private string Normalize(string text)
+        {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+
+            var output = new StringBuilder(text.Length);
+            var line = new StringBuilder();
+            bool valid = false;
+
+            for (int i = 0; i < text.Length; i++)
+            {
+                switch (text[i])
+                {
+                    case '\n':
+                        if (valid)
+                            output.Append(line);
+                        output.Append('\n');
+                        line.Length = 0;
+                        valid = false;
+                        break;
+                    case '\r':
+                        if ((i < text.Length - 1) && (text[i + 1] != '\n'))
+                        {
+                            if (valid)
+                                output.Append(line);
+                            output.Append('\n');
+                            line.Length = 0;
+                            valid = false;
+                        }
+                        break;
+                    case '\t':
+                        int width = (_tabWidth - line.Length % _tabWidth);
+                        for (int k = 0; k < width; k++)
+                            line.Append(' ');
+                        break;
+                    case '\x1A':
+                        break;
+                    default:
+                        if (!valid && text[i] != ' ')
+                            valid = true;
+                        line.Append(text[i]);
+                        break;
+                }
+            }
+
+            if (valid)
+                output.Append(line);
+            output.Append('\n');
+
+            // add two newlines to the end before return
+            return output.Append("\n\n").ToString();
         }
 
         /// <summary>
@@ -270,9 +231,10 @@ namespace Markdown.Xaml
             //return text;
         }
 
+        #region grammer - paragraph
+
         private static Regex _newlinesLeadingTrailing = new Regex(@"^\n+|\n+\z", RegexOptions.Compiled);
         private static Regex _newlinesMultiple = new Regex(@"\n{2,}", RegexOptions.Compiled);
-        private static Regex _leadingWhitespace = new Regex(@"^[ ]*", RegexOptions.Compiled);
 
         /// <summary>
         /// splits on two or more newlines, to form "paragraphs";    
@@ -289,7 +251,7 @@ namespace Markdown.Xaml
 
             foreach (var g in grafs)
             {
-				var block = Create<Paragraph, Inline>(RunSpanGamut(g));
+                var block = Create<Paragraph, Inline>(RunSpanGamut(g));
                 if (NormalParagraphStyle != null)
                 {
                     block.Style = NormalParagraphStyle;
@@ -298,77 +260,10 @@ namespace Markdown.Xaml
             }
         }
 
-        private static string _nestedBracketsPattern;
+        #endregion
 
-        /// <summary>
-        /// Reusable pattern to match balanced [brackets]. See Friedl's 
-        /// "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
-        /// </summary>
-        private static string GetNestedBracketsPattern()
-        {
-            // in other words [this] and [this[also]] and [this[also[too]]]
-            // up to _nestDepth
-            if (_nestedBracketsPattern == null)
-                _nestedBracketsPattern =
-                    RepeatString(@"
-                    (?>              # Atomic matching
-                       [^\[\]]+      # Anything other than brackets
-                     |
-                       \[
-                           ", _nestDepth) + RepeatString(
-                    @" \]
-                    )*"
-                    , _nestDepth);
-            return _nestedBracketsPattern;
-        }
 
-        private static string _nestedParensPattern;
-
-        /// <summary>
-        /// Reusable pattern to match balanced (parens). See Friedl's 
-        /// "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
-        /// </summary>
-        private static string GetNestedParensPattern()
-        {
-            // in other words (this) and (this(also)) and (this(also(too)))
-            // up to _nestDepth
-            if (_nestedParensPattern == null)
-                _nestedParensPattern =
-                    RepeatString(@"
-                    (?>              # Atomic matching
-                       [^()\s]+      # Anything other than parens or whitespace
-                     |
-                       \(
-                           ", _nestDepth) + RepeatString(
-                    @" \)
-                    )*"
-                    , _nestDepth);
-            return _nestedParensPattern;
-        }
-
-        private static string _nestedParensPatternWithWhiteSpace;
-
-        /// <summary>
-        /// Reusable pattern to match balanced (parens), including whitespace. See Friedl's 
-        /// "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
-        /// </summary>
-        private static string GetNestedParensPatternWithWhiteSpace()
-        {
-            // in other words (this) and (this(also)) and (this(also(too)))
-            // up to _nestDepth
-            if (_nestedParensPatternWithWhiteSpace == null)
-                _nestedParensPatternWithWhiteSpace =
-                    RepeatString(@"
-                    (?>              # Atomic matching
-                       [^()]+      # Anything other than parens
-                     |
-                       \(
-                           ", _nestDepth) + RepeatString(
-                    @" \)
-                    )*"
-                    , _nestDepth);
-            return _nestedParensPatternWithWhiteSpace;
-        }
+        #region grammer - image
 
         private static Regex _imageInline = new Regex(string.Format(@"
                 (                           # wrap whole match in $1
@@ -391,25 +286,6 @@ namespace Markdown.Xaml
                     (.*?)                   # title = $4
                     \3
                 )$", RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private static Regex _anchorInline = new Regex(string.Format(@"
-                (                           # wrap whole match in $1
-                    \[
-                        ({0})               # link text = $2
-                    \]
-                    \(                      # literal paren
-                        [ ]*
-                        ({1})               # href = $3
-                        [ ]*
-                        (                   # $4
-                        (['""])             # quote char = $5
-                        (.*?)               # title = $6
-                        \5                  # matching quote
-                        [ ]*                # ignore any spaces between closing quote and )
-                        )?                  # title is optional
-                    \)
-                )", GetNestedBracketsPattern(), GetNestedParensPattern()),
-                  RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
         /// Turn Markdown images into images
@@ -439,12 +315,14 @@ namespace Markdown.Xaml
             string title = null;
 
             var titleMatch = _imageHrefWithTitle.Match(url);
-            if (titleMatch.Success) {
+            if (titleMatch.Success)
+            {
                 url = titleMatch.Groups[2].Value;
                 title = titleMatch.Groups[4].Value;
             }
 
             BitmapImage imgSource = null;
+
             try
             {
                 if (!Uri.IsWellFormedUriString(url, UriKind.Absolute) && !System.IO.Path.IsPathRooted(url))
@@ -453,13 +331,13 @@ namespace Markdown.Xaml
                 }
 
                 imgSource = new BitmapImage();
-				imgSource.BeginInit();
-				imgSource.CacheOption = BitmapCacheOption.None;
-				imgSource.UriCachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
-				imgSource.CacheOption = BitmapCacheOption.OnLoad;
-				imgSource.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
-				imgSource.UriSource = new Uri(url);
-				imgSource.EndInit();
+                imgSource.BeginInit();
+                imgSource.CacheOption = BitmapCacheOption.None;
+                imgSource.UriCachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
+                imgSource.CacheOption = BitmapCacheOption.OnLoad;
+                imgSource.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+                imgSource.UriSource = new Uri(url);
+                imgSource.EndInit();
             }
             catch (Exception)
             {
@@ -490,10 +368,10 @@ namespace Markdown.Xaml
                 BindingExpressionBase bindingExpression = BindingOperations.SetBinding(image, Image.WidthProperty, binding);
                 EventHandler downloadCompletedHandler = null;
                 downloadCompletedHandler = (sender, e) =>
-                    {
-                        imgSource.DownloadCompleted -= downloadCompletedHandler;
-                        bindingExpression.UpdateTarget();
-                    };
+                {
+                    imgSource.DownloadCompleted -= downloadCompletedHandler;
+                    bindingExpression.UpdateTarget();
+                };
                 imgSource.DownloadCompleted += downloadCompletedHandler;
             }
             else
@@ -503,6 +381,30 @@ namespace Markdown.Xaml
 
             return new InlineUIContainer(image);
         }
+
+        #endregion
+
+
+        #region grammer - anchor
+
+        private static Regex _anchorInline = new Regex(string.Format(@"
+                (                           # wrap whole match in $1
+                    \[
+                        ({0})               # link text = $2
+                    \]
+                    \(                      # literal paren
+                        [ ]*
+                        ({1})               # href = $3
+                        [ ]*
+                        (                   # $4
+                        (['""])             # quote char = $5
+                        (.*?)               # title = $6
+                        \5                  # matching quote
+                        [ ]*                # ignore any spaces between closing quote and )
+                        )?                  # title is optional
+                    \)
+                )", GetNestedBracketsPattern(), GetNestedParensPattern()),
+                  RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
         /// Turn Markdown link shortcuts into hyperlinks
@@ -540,13 +442,18 @@ namespace Markdown.Xaml
                 url :
                 String.Format("\"{0}\"\r\n{1}", title, url);
 
-			if (LinkStyle != null)
+            if (LinkStyle != null)
             {
                 result.Style = LinkStyle;
             }
 
             return result;
         }
+
+        #endregion
+
+
+        #region grammer - header
 
         private static Regex _headerSetext = new Regex(@"
                 ^(.+?)
@@ -555,7 +462,7 @@ namespace Markdown.Xaml
                 (=+|-+)     # $1 = string of ='s or -'s
                 [ ]*
                 \n+",
-    RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+                RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static Regex _headerAtx = new Regex(@"
                 ^(\#{1,6})  # $1 = string of #'s
@@ -564,7 +471,7 @@ namespace Markdown.Xaml
                 [ ]*
                 \#*         # optional closing #'s (not counted)
                 \n+",
-            RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+                RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
         /// Turn Markdown headers into HTML header tags
@@ -661,6 +568,10 @@ namespace Markdown.Xaml
 
             return block;
         }
+        #endregion
+
+
+        #region grammer - horizontal rules
 
         private static Regex _horizontalRules = new Regex(@"
             ^[ ]{0,3}         # Leading space
@@ -699,15 +610,20 @@ namespace Markdown.Xaml
                 throw new ArgumentNullException("match");
             }
 
-			var separator = new Separator();
-			if (SeparatorStyle != null)
-			{
-				separator.Style = SeparatorStyle;
-			}
+            var separator = new Separator();
+            if (SeparatorStyle != null)
+            {
+                separator.Style = SeparatorStyle;
+            }
 
-			var container = new BlockUIContainer(separator);
+            var container = new BlockUIContainer(separator);
             return container;
         }
+
+        #endregion
+
+
+        #region grammer - list
 
         private static string _wholeList = string.Format(@"
             (                               # $1 = whole list
@@ -847,6 +763,11 @@ namespace Markdown.Xaml
                 return Create<ListItem, Block>(RunBlockGamut(item));
             }
         }
+
+        #endregion
+
+
+        #region grammer - table
 
         private static Regex _table = new Regex(@"
             (                               # $1 = whole table
@@ -988,7 +909,8 @@ namespace Markdown.Xaml
 
                     var cellParagraph = Create<Paragraph, Inline>(RunSpanGamut(rowItemTxt));
                     var rowCell = new TableCell(cellParagraph);
-                    if (aligns[rowItemIdx].HasValue) {
+                    if (aligns[rowItemIdx].HasValue)
+                    {
                         rowCell.TextAlignment = aligns[rowItemIdx].Value;
                     }
 
@@ -1005,6 +927,10 @@ namespace Markdown.Xaml
             return table;
         }
 
+        #endregion
+
+
+        #region grammer - code
 
         private static Regex _codeSpan = new Regex(@"
                     (?<!\\)   # Character before opening ` can't be a backslash
@@ -1069,6 +995,11 @@ namespace Markdown.Xaml
             return result;
         }
 
+        #endregion
+
+
+        #region grammer - inline & bold
+
         private static Regex _bold = new Regex(@"(\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
         private static Regex _strictBold = new Regex(@"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)",
@@ -1126,75 +1057,109 @@ namespace Markdown.Xaml
             return Create<Bold, Inline>(RunSpanGamut(content));
         }
 
-        private static Regex _outDent = new Regex(@"^[ ]{1," + _tabWidth + @"}", RegexOptions.Multiline | RegexOptions.Compiled);
+        #endregion
 
-        /// <summary>
-        /// Remove one level of line-leading spaces
-        /// </summary>
-        private string Outdent(string block)
-        {
-            return _outDent.Replace(block, "");
-        }
 
-        /// <summary>
-        /// convert all tabs to _tabWidth spaces; 
-        /// standardizes line endings from DOS (CR LF) or Mac (CR) to UNIX (LF); 
-        /// makes sure text ends with a couple of newlines; 
-        /// removes any blank lines (only spaces) in the text
-        /// </summary>
-        private string Normalize(string text)
+        #region grammer - text
+
+        private static Regex _eoln = new Regex("\\s+");
+        private static Regex _lbrk = new Regex(@"\ {2,}\n");
+
+        public IEnumerable<Inline> DoText(string text)
         {
             if (text == null)
             {
                 throw new ArgumentNullException("text");
             }
 
-            var output = new StringBuilder(text.Length);
-            var line = new StringBuilder();
-            bool valid = false;
-
-            for (int i = 0; i < text.Length; i++)
+            var lines = _lbrk.Split(text);
+            bool first = true;
+            foreach (var line in lines)
             {
-                switch (text[i])
-                {
-                    case '\n':
-                        if (valid)
-                            output.Append(line);
-                        output.Append('\n');
-                        line.Length = 0;
-                        valid = false;
-                        break;
-                    case '\r':
-                        if ((i < text.Length - 1) && (text[i + 1] != '\n'))
-                        {
-                            if (valid)
-                                output.Append(line);
-                            output.Append('\n');
-                            line.Length = 0;
-                            valid = false;
-                        }
-                        break;
-                    case '\t':
-                        int width = (_tabWidth - line.Length % _tabWidth);
-                        for (int k = 0; k < width; k++)
-                            line.Append(' ');
-                        break;
-                    case '\x1A':
-                        break;
-                    default:
-                        if (!valid && text[i] != ' ')
-                            valid = true;
-                        line.Append(text[i]);
-                        break;
-                }
+                if (first)
+                    first = false;
+                else
+                    yield return new LineBreak();
+                var t = _eoln.Replace(line, " ");
+                yield return new Run(t);
             }
+        }
 
-            if (valid)
-                output.Append(line);
-            output.Append('\n');
+        #endregion
 
-            // add two newlines to the end before return
-            return output.Append("\n\n").ToString();
+
+        #region helper - make regex
+
+        private static string _nestedBracketsPattern;
+
+        /// <summary>
+        /// Reusable pattern to match balanced [brackets]. See Friedl's 
+        /// "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
+        /// </summary>
+        private static string GetNestedBracketsPattern()
+        {
+            // in other words [this] and [this[also]] and [this[also[too]]]
+            // up to _nestDepth
+            if (_nestedBracketsPattern == null)
+                _nestedBracketsPattern =
+                    RepeatString(@"
+                    (?>              # Atomic matching
+                       [^\[\]]+      # Anything other than brackets
+                     |
+                       \[
+                           ", _nestDepth) + RepeatString(
+                    @" \]
+                    )*"
+                    , _nestDepth);
+            return _nestedBracketsPattern;
+        }
+
+        private static string _nestedParensPattern;
+
+        /// <summary>
+        /// Reusable pattern to match balanced (parens). See Friedl's 
+        /// "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
+        /// </summary>
+        private static string GetNestedParensPattern()
+        {
+            // in other words (this) and (this(also)) and (this(also(too)))
+            // up to _nestDepth
+            if (_nestedParensPattern == null)
+                _nestedParensPattern =
+                    RepeatString(@"
+                    (?>              # Atomic matching
+                       [^()\s]+      # Anything other than parens or whitespace
+                     |
+                       \(
+                           ", _nestDepth) + RepeatString(
+                    @" \)
+                    )*"
+                    , _nestDepth);
+            return _nestedParensPattern;
+        }
+
+        private static string _nestedParensPatternWithWhiteSpace;
+
+        /// <summary>
+        /// Reusable pattern to match balanced (parens), including whitespace. See Friedl's 
+        /// "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
+        /// </summary>
+        private static string GetNestedParensPatternWithWhiteSpace()
+        {
+            // in other words (this) and (this(also)) and (this(also(too)))
+            // up to _nestDepth
+            if (_nestedParensPatternWithWhiteSpace == null)
+                _nestedParensPatternWithWhiteSpace =
+                    RepeatString(@"
+                    (?>              # Atomic matching
+                       [^()]+      # Anything other than parens
+                     |
+                       \(
+                           ", _nestDepth) + RepeatString(
+                    @" \)
+                    )*"
+                    , _nestDepth);
+            return _nestedParensPatternWithWhiteSpace;
         }
 
         /// <summary>
@@ -1212,6 +1177,11 @@ namespace Markdown.Xaml
                 sb.Append(text);
             return sb.ToString();
         }
+
+        #endregion
+
+
+        #region helper - parse
 
         private TResult Create<TResult, TContent>(IEnumerable<TContent> content)
             where TResult : IAddChild, new()
@@ -1260,27 +1230,6 @@ namespace Markdown.Xaml
             }
         }
 
-        private static Regex _eoln = new Regex("\\s+");
-		private static Regex _lbrk = new Regex(@"\ {2,}\n");
-
-        public IEnumerable<Inline> DoText(string text)
-        {
-            if (text == null)
-            {
-                throw new ArgumentNullException("text");
-            }
-
-			var lines = _lbrk.Split(text);
-			bool first = true;
-			foreach (var line in lines)
-			{
-				if (first)
-					first = false;
-				else
-					yield return new LineBreak();
-				var t = _eoln.Replace(line, " ");
-				yield return new Run(t);
-			}
-        }
+        #endregion
     }
 }

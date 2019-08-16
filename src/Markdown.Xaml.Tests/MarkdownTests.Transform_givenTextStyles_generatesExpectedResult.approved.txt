@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<FlowDocument PagePadding="0,0,0,0" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+<FlowDocument Style="{x:Null}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <Paragraph>
     <Italic>This text will be italic</Italic> <Italic>This will also be italic</Italic></Paragraph>
   <Paragraph>
