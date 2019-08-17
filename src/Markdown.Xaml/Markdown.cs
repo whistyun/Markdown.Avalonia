@@ -18,6 +18,7 @@ namespace Markdown.Xaml
 {
     public class Markdown : DependencyObject
     {
+        #region const
         /// <summary>
         /// maximum nested depth of [] and () supported by the transform; implementation detail
         /// </summary>
@@ -32,6 +33,19 @@ namespace Markdown.Xaml
         private const string _markerUL = @"[*+-]";
         private const string _markerOL = @"\d+[.]";
 
+        private const string TagHeading1 = "Heading1";
+        private const string TagHeading2 = "Heading2";
+        private const string TagHeading3 = "Heading3";
+        private const string TagHeading4 = "Heading4";
+        private const string TagCode = "CodeSpan";
+        private const string TagCodeBlock = "CodeBlock";
+        private const string TagTableHeader = "TableHeader";
+        private const string TagTableBody = "TableBody";
+        private const string TagOddTableRow = "OddTableRow";
+        private const string TagEvenTableRow = "EvenTableRow";
+
+        #endregion
+
         private int _listLevel;
 
         /// <summary>
@@ -39,6 +53,12 @@ namespace Markdown.Xaml
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
         public bool StrictBoldItalic { get; set; }
+
+        public bool DisabledTag { get; set; }
+
+        public bool DisabledTootip { get; set; }
+
+        public bool DisabledLazyLoad { get; set; }
 
         public string AssetPathRoot { get; set; }
 
@@ -71,6 +91,7 @@ namespace Markdown.Xaml
         public Style Heading4Style { get; set; }
         public Style NormalParagraphStyle { get; set; }
         public Style CodeStyle { get; set; }
+        public Style CodeBlockStyle { get; set; }
         public Style LinkStyle { get; set; }
         public Style ImageStyle { get; set; }
         public Style SeparatorStyle { get; set; }
@@ -177,11 +198,14 @@ namespace Markdown.Xaml
                 throw new ArgumentNullException("text");
             }
 
-            return DoHeaders(text,
-                s1 => DoHorizontalRules(s1,
-                    s2 => DoLists(s2,
-                    s3 => DoTable(s3,
-                    sn => FormParagraphs(sn)))));
+            return
+                DoCodeBlocks(text,
+                    s1 => DoHeaders(s1,
+                    s2 => DoHorizontalRules(s2,
+                    s3 => DoLists(s3,
+                    s4 => DoTable(s4,
+                    sn => FormParagraphs(sn
+                    ))))));
 
             //text = DoCodeBlocks(text);
             //text = DoBlockQuotes(text);
@@ -230,6 +254,7 @@ namespace Markdown.Xaml
 
             //return text;
         }
+
 
         #region grammer - paragraph
 
@@ -330,14 +355,21 @@ namespace Markdown.Xaml
                     url = System.IO.Path.Combine(AssetPathRoot ?? string.Empty, url);
                 }
 
-                imgSource = new BitmapImage();
-                imgSource.BeginInit();
-                imgSource.CacheOption = BitmapCacheOption.None;
-                imgSource.UriCachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
-                imgSource.CacheOption = BitmapCacheOption.OnLoad;
-                imgSource.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
-                imgSource.UriSource = new Uri(url);
-                imgSource.EndInit();
+                if (DisabledLazyLoad)
+                {
+                    imgSource = new BitmapImage(new Uri(url, UriKind.RelativeOrAbsolute));
+                }
+                else
+                {
+                    imgSource = new BitmapImage();
+                    imgSource.BeginInit();
+                    imgSource.CacheOption = BitmapCacheOption.None;
+                    imgSource.UriCachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
+                    imgSource.CacheOption = BitmapCacheOption.OnLoad;
+                    imgSource.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+                    imgSource.UriSource = new Uri(url);
+                    imgSource.EndInit();
+                }
             }
             catch (Exception)
             {
@@ -353,7 +385,7 @@ namespace Markdown.Xaml
             {
                 image.Style = ImageStyle;
             }
-            if (!string.IsNullOrWhiteSpace(title))
+            if (!DisabledTootip && !string.IsNullOrWhiteSpace(title))
             {
                 image.ToolTip = title;
             }
@@ -438,9 +470,12 @@ namespace Markdown.Xaml
             result.Command = HyperlinkCommand;
             result.CommandParameter = url;
 
-            result.ToolTip = string.IsNullOrWhiteSpace(title) ?
-                url :
-                String.Format("\"{0}\"\r\n{1}", title, url);
+            if (!DisabledTootip)
+            {
+                result.ToolTip = string.IsNullOrWhiteSpace(title) ?
+                    url :
+                    String.Format("\"{0}\"\r\n{1}", title, url);
+            }
 
             if (LinkStyle != null)
             {
@@ -542,12 +577,20 @@ namespace Markdown.Xaml
                     {
                         block.Style = Heading1Style;
                     }
+                    if (!DisabledTag)
+                    {
+                        block.Tag = TagHeading1;
+                    }
                     break;
 
                 case 2:
                     if (Heading2Style != null)
                     {
                         block.Style = Heading2Style;
+                    }
+                    if (!DisabledTag)
+                    {
+                        block.Tag = TagHeading2;
                     }
                     break;
 
@@ -556,12 +599,20 @@ namespace Markdown.Xaml
                     {
                         block.Style = Heading3Style;
                     }
+                    if (!DisabledTag)
+                    {
+                        block.Tag = TagHeading3;
+                    }
                     break;
 
                 case 4:
                     if (Heading4Style != null)
                     {
                         block.Style = Heading4Style;
+                    }
+                    if (!DisabledTag)
+                    {
+                        block.Tag = TagHeading4;
                     }
                     break;
             }
@@ -876,6 +927,10 @@ namespace Markdown.Xaml
             {
                 tableHeaderRG.Style = TableHeaderStyle;
             }
+            if (!DisabledTag)
+            {
+                tableHeaderRG.Tag = TagTableHeader;
+            }
             {
                 var tableHeader = new TableRow();
                 foreach (var headerColTxt in headers)
@@ -899,9 +954,19 @@ namespace Markdown.Xaml
             {
                 tableBodyRG.Style = TableBodyStyle;
             }
-            foreach (string[] rowAry in rowList)
+            if (!DisabledTag)
             {
+                tableBodyRG.Tag = TagTableBody;
+            }
+            foreach (int rowIdx in Enumerable.Range(0, rowList.Count))
+            {
+                string[] rowAry = rowList[rowIdx];
+
                 var tableBody = new TableRow();
+                if (!DisabledTag)
+                {
+                    tableBody.Tag = (rowIdx & 1) == 0 ? TagOddTableRow : TagEvenTableRow;
+                }
 
                 foreach (var rowItemIdx in Enumerable.Range(0, rowAry.Length))
                 {
@@ -925,6 +990,55 @@ namespace Markdown.Xaml
             table.RowGroups.Add(tableBodyRG);
 
             return table;
+        }
+
+        #endregion
+
+
+        #region grammer - code block
+
+        private static Regex _codeBlock = new Regex(@"
+                    (?<=\n)          # Character before opening ` can't be a backslash
+                    (`+)             # $1 = Opening run of `
+                    ([^\r\n`]*)      # $2 = The code lang
+                    \r?\n
+                    ((.|\n)+?)       # $3 = The code block
+                    \n[ ]*
+                    \1
+                    (?!`)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
+
+        private IEnumerable<Block> DoCodeBlocks(string text, Func<string, IEnumerable<Block>> defaultHandler)
+        {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+
+            return Evaluate(text, _codeBlock, CodeBlocksEvaluator, defaultHandler);
+        }
+
+        private Paragraph CodeBlocksEvaluator(Match match)
+        {
+            if (match == null)
+            {
+                throw new ArgumentNullException("match");
+            }
+
+            string span = match.Groups[3].Value;
+
+            var text = new Run(span);
+
+            var result = new Paragraph(text);
+            if (CodeBlockStyle != null)
+            {
+                result.Style = CodeBlockStyle;
+            }
+            if (!DisabledTag)
+            {
+                result.Tag = TagCodeBlock;
+            }
+
+            return result;
         }
 
         #endregion
@@ -990,6 +1104,10 @@ namespace Markdown.Xaml
             if (CodeStyle != null)
             {
                 result.Style = CodeStyle;
+            }
+            if (!DisabledTag)
+            {
+                result.Tag = TagCode;
             }
 
             return result;

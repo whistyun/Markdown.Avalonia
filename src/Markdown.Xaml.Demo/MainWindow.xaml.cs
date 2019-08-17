@@ -31,7 +31,9 @@ namespace Markdown.Demo
 
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
-            editSource.Text = LoadSample();
+            var sampleMarkdown = LoadSample();
+            editSource.Text = sampleMarkdown;
+            editSource2.Text = sampleMarkdown;
         }
 
         private string LoadSample()

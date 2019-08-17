@@ -36,7 +36,24 @@ table begin string
 |:-:|:-|-:|
 |a1234567890|b1234567890|c1234567890|d1234567890|
 |a|b|c|d|
+|A||C|
+|1|2|3|4|
+|あ|い|う|え|
 table end string
+
+* Code
+
+Markdown.Xaml support ```inline code ```
+
+```
+#include <stdio.h>
+int main()
+{
+   // printf() displays the string inside quotation
+   printf("Hello, World!");
+   return 0;
+}
+```
 
 * Separator
 ***

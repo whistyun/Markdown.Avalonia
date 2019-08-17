@@ -54,8 +54,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Markdown.cs" />
+    <Compile Include="MarkdownStyle.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TextToFlowDocumentConverter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Markdown.Style.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
