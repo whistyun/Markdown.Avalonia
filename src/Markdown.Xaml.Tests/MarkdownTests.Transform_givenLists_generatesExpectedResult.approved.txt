@@ -30,7 +30,7 @@
       <Paragraph>Obiwan</Paragraph>
     </ListItem>
   </List>
-  <Paragraph>Unordered</Paragraph>
+  <Paragraph Tag="Heading2">Unordered</Paragraph>
   <Paragraph>Asterisks tight:</Paragraph>
   <List MarkerStyle="Disc">
     <ListItem>
@@ -109,7 +109,7 @@
       <Paragraph>Minus 3</Paragraph>
     </ListItem>
   </List>
-  <Paragraph>Ordered</Paragraph>
+  <Paragraph Tag="Heading2">Ordered</Paragraph>
   <Paragraph>Tight:</Paragraph>
   <List MarkerStyle="Decimal">
     <ListItem>
@@ -171,7 +171,7 @@
       <Paragraph>Item 3.</Paragraph>
     </ListItem>
   </List>
-  <Paragraph>Nested</Paragraph>
+  <Paragraph Tag="Heading2">Nested</Paragraph>
   <List MarkerStyle="Disc">
     <ListItem>
       <Paragraph>Tab * Tab * Tab</Paragraph>
