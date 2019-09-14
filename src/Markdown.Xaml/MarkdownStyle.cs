@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Markup;
 
 namespace Markdown.Xaml
@@ -13,17 +9,45 @@ namespace Markdown.Xaml
     {
         static MarkdownStyle()
         {
+            LoadXaml();
+        }
+
+        /*
+            Workaround for Visual Studio Xaml Designer.
+            When you open MarkdownStyle from Xaml Designer,
+            A null error occurs. Perhaps static constructor is not executed.         
+        */
+        static void LoadXaml()
+        {
             Assembly asm = Assembly.GetCallingAssembly();
             using (var stream = asm.GetManifestResourceStream("Markdown.Xaml.Markdown.Style.xaml"))
             {
                 var resources = (ResourceDictionary)XamlReader.Load(stream);
-                Standard = (Style)resources["DocumentStyleStandard"];
-                Compact = (Style)resources["DocumentStyleCompact"];
+                _standard = (Style)resources["DocumentStyleStandard"];
+                _compact = (Style)resources["DocumentStyleCompact"];
             }
         }
 
-        public static Style Standard { private set; get; }
 
-        public static Style Compact { private set; get; }
+        private static Style _standard;
+        private static Style _compact;
+
+        public static Style Standard
+        {
+            get
+            {
+                if (_standard == null) LoadXaml();
+                return _standard;
+            }
+        }
+
+        public static Style Compact
+        {
+            get
+            {
+                if (_compact == null) LoadXaml();
+                return _compact;
+            }
+        }
     }
 }

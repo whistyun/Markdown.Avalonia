@@ -23,6 +23,14 @@ achieve this (the route taken by [MarkPad](http://code52.org/DownmarkerWPF/), bu
 give me the fine control over appearance that I desired.
 
 
+## Samples
+
+Try Markdown.Xaml.Demo for another markdown and style.
+
+![](img/sc1.png)
+![](img/sc2.png)
+![](img/sc3.png)
+
 
 ## Where shouldn't I use this?
 
