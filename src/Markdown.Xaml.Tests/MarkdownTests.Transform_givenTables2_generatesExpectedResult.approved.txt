@@ -31,13 +31,13 @@
         <TableCell>
           <Paragraph>a</Paragraph>
         </TableCell>
-        <TableCell>
+        <TableCell TextAlignment="Left">
           <Paragraph>b</Paragraph>
         </TableCell>
-        <TableCell>
+        <TableCell TextAlignment="Right">
           <Paragraph>c</Paragraph>
         </TableCell>
-        <TableCell>
+        <TableCell TextAlignment="Center">
           <Paragraph>d</Paragraph>
         </TableCell>
       </TableRow>
@@ -86,13 +86,13 @@
         <TableCell>
           <Paragraph>a</Paragraph>
         </TableCell>
-        <TableCell>
+        <TableCell TextAlignment="Left">
           <Paragraph>b</Paragraph>
         </TableCell>
-        <TableCell>
+        <TableCell TextAlignment="Right">
           <Paragraph>c</Paragraph>
         </TableCell>
-        <TableCell>
+        <TableCell TextAlignment="Center">
           <Paragraph>d</Paragraph>
         </TableCell>
         <TableCell />
