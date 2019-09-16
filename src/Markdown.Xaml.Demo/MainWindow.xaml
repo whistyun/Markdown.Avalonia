@@ -21,6 +21,8 @@
                         ImageStyle="{StaticResource ImageStyle}"
                         TableStyle="{StaticResource TableStyle}"
                         TableHeaderStyle="{StaticResource TableHeaderStyle}"
+                        CodeBlockStyle="{StaticResource CodeBlockStyle}"
+                        BlockquoteStyle="{StaticResource BlockquoteStyle}"
                         AssetPathRoot="{x:Static system:Environment.CurrentDirectory}"/>
 
         <local:TextToFlowDocumentConverter x:Key="TextToFlowDocumentConverter" 
@@ -32,13 +34,15 @@
 
         <local:TextToFlowDocumentConverter x:Key="TextToFlowDocumentConverter2" 
                                            Markdown="{StaticResource Markdown2}"/>
+
+        <local_demo:MarkdownXamlConverter x:Key="MarkdownXamlConverter"/>
     </Window.Resources>
 
     <Window.DataContext>
         <StaticResource ResourceKey="ViewModel" />
     </Window.DataContext>
-    
-    
+
+
     <TabControl>
         <TabItem Header="PreviousStyle">
             <Grid>
@@ -55,7 +59,8 @@
                      TextWrapping="Wrap"
                      AcceptsReturn="True"
                      Margin="5" 
-                     VerticalScrollBarVisibility="Auto"/>
+                     VerticalScrollBarVisibility="Auto">
+                </TextBox>
 
                 <FlowDocumentScrollViewer Grid.Row="0"
                     Grid.Column="1"
@@ -89,9 +94,9 @@
                             <TextBlock Text="{Binding Name}"/>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
-                    
+
                 </ComboBox>
-                
+
                 <TextBox x:Name="editSource2"
                     Grid.Row="1" Grid.Column="0"
                     VerticalAlignment="Stretch"
@@ -110,6 +115,44 @@
 
             </Grid>
         </TabItem>
+
+        <TabItem Header="ViewXaml">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBox x:Name="editSource3"
+                     Grid.Row="0"
+                     Grid.Column="0"
+                     VerticalAlignment="Stretch"
+                     HorizontalAlignment="Stretch"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     Margin="5" 
+                     xml:space="preserve"
+                     VerticalScrollBarVisibility="Auto"># H1 Header
+
+text contents
+**BOLD** and *Italic*
+|column1|column2|
+|--|--|
+|row1|row2|
+                </TextBox>
+
+                <TextBox x:Name="outXaml3"
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    AcceptsReturn="True"
+                    Margin="5" 
+                    IsReadOnly="True"
+                    HorizontalScrollBarVisibility="Auto"
+                    VerticalScrollBarVisibility="Auto"
+                    Text="{Binding ElementName=editSource3, Path=Text, Converter={StaticResource MarkdownXamlConverter}}">
+                </TextBox>
+            </Grid>
+        </TabItem>
     </TabControl>
-    
+
 </Window>

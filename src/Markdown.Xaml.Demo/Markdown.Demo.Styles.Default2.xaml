@@ -8,6 +8,14 @@
         <Setter Property="FontSize"      Value="14"/>
 
         <Style.Resources>
+            <Style TargetType="Section">
+                <Setter Property="Padding"     Value="10, 5"/>
+                <Setter Property="BorderBrush"
+                                Value="#DEDEDE"/>
+                <Setter Property="BorderThickness"
+                                Value="5,0,0,0"/>
+            </Style>
+            
             <Style TargetType="Paragraph">
                 <Setter Property="Margin" Value="0, 7, 0, 0"/>
 
