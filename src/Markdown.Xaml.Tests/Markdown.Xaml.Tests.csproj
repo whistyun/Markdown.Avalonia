@@ -83,7 +83,9 @@
     <EmbeddedResource Include="Text_style.md" />
     <EmbeddedResource Include="Images.md" />
     <EmbeddedResource Include="Tables.md" />
+    <EmbeddedResource Include="Mixing.md" />
     <None Include="packages.config" />
+    <EmbeddedResource Include="Blockquite.md" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Markdown.Xaml.Demo\sampleimage.jpg">

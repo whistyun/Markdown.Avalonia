@@ -10,6 +10,14 @@
                 Value="0"></Setter>
 
         <Style.Resources>
+            <Style TargetType="Section">
+                <Setter Property="Padding"     Value="10, 5"/>
+                <Setter Property="BorderBrush"
+                                Value="#DEDEDE"/>
+                <Setter Property="BorderThickness"
+                                Value="5,0,0,0"/>
+            </Style>
+
             <Style TargetType="Paragraph">
                 <Style.Triggers>
                     <Trigger Property="Tag" Value="Heading1">
@@ -140,6 +148,14 @@
         <Setter Property="FontSize"      Value="12"/>
 
         <Style.Resources>
+            <Style TargetType="Section">
+                <Setter Property="Padding"     Value="5, 2"/>
+                <Setter Property="BorderBrush"
+                                Value="#DEDEDE"/>
+                <Setter Property="BorderThickness"
+                                Value="5,0,0,0"/>
+            </Style>
+
             <Style TargetType="Paragraph">
                 <Setter Property="Margin" Value="4, 2, 0, 6"/>
 

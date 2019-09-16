@@ -144,6 +144,28 @@ namespace Markdown.Xaml.Tests
             Approvals.Verify(AsXaml(result));
         }
 
+        [Test]
+        [Apartment(ApartmentState.STA)]
+        public void Transform_givenBlockqoute_generatesExpectedResult()
+        {
+            var text = LoadText("Blockquite.md");
+            var markdown = new Markdown();
+
+            var result = markdown.Transform(text);
+            Approvals.Verify(AsXaml(result));
+        }
+
+        [Test]
+        [Apartment(ApartmentState.STA)]
+        public void Transform_givenMixing_generatesExpectedResult()
+        {
+            var text = LoadText("Mixing.md");
+            var markdown = new Markdown();
+
+            var result = markdown.Transform(text);
+            Approvals.Verify(AsXaml(result));
+        }
+
         private string LoadText(string name)
         {
             using (Stream stream = Assembly.GetExecutingAssembly()

@@ -39,6 +39,7 @@ namespace Markdown.Xaml
         private const string TagHeading4 = "Heading4";
         private const string TagCode = "CodeSpan";
         private const string TagCodeBlock = "CodeBlock";
+        private const string TagBlockquote = "Blockquote";
         private const string TagTableHeader = "TableHeader";
         private const string TagTableBody = "TableBody";
         private const string TagOddTableRow = "OddTableRow";
@@ -92,18 +93,13 @@ namespace Markdown.Xaml
         public Style NormalParagraphStyle { get; set; }
         public Style CodeStyle { get; set; }
         public Style CodeBlockStyle { get; set; }
+        public Style BlockquoteStyle { get; set; }
         public Style LinkStyle { get; set; }
         public Style ImageStyle { get; set; }
         public Style SeparatorStyle { get; set; }
         public Style TableStyle { get; set; }
         public Style TableHeaderStyle { get; set; }
         public Style TableBodyStyle { get; set; }
-
-        #endregion
-
-
-        #region regex pattern
-
 
         #endregion
 
@@ -200,12 +196,13 @@ namespace Markdown.Xaml
 
             return
                 DoCodeBlocks(text,
-                    s1 => DoHeaders(s1,
-                    s2 => DoHorizontalRules(s2,
-                    s3 => DoLists(s3,
-                    s4 => DoTable(s4,
+                    s1 => DoBlockquotes(s1,
+                    s2 => DoHeaders(s2,
+                    s3 => DoHorizontalRules(s3,
+                    s4 => DoLists(s4,
+                    s5 => DoTable(s5,
                     sn => FormParagraphs(sn
-                    ))))));
+                    )))))));
 
             //text = DoCodeBlocks(text);
             //text = DoBlockQuotes(text);
@@ -997,14 +994,25 @@ namespace Markdown.Xaml
         #region grammer - code block
 
         private static Regex _codeBlock = new Regex(@"
-                    (?<=\n)          # Character before opening ` can't be a backslash
+                    (?<=\n)          # Character before opening
+                    [ \r\n]*
                     (`+)             # $1 = Opening run of `
                     ([^\r\n`]*)      # $2 = The code lang
                     \r?\n
                     ((.|\n)+?)       # $3 = The code block
                     \n[ ]*
                     \1
-                    (?!`)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
+                    (?!`)[\r\n]+", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
+
+        private static Regex _codeBlockFirst = new Regex(@"
+                    ^          # Character before opening
+                    (`+)             # $1 = Opening run of `
+                    ([^\r\n`]*)      # $2 = The code lang
+                    \r?\n
+                    ((.|\n)+?)       # $3 = The code block
+                    \n[ ]*
+                    \1
+                    (?!`)[\r\n]+", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
 
         private IEnumerable<Block> DoCodeBlocks(string text, Func<string, IEnumerable<Block>> defaultHandler)
         {
@@ -1013,7 +1021,10 @@ namespace Markdown.Xaml
                 throw new ArgumentNullException("text");
             }
 
-            return Evaluate(text, _codeBlock, CodeBlocksEvaluator, defaultHandler);
+            return Evaluate(
+                text, _codeBlockFirst, CodeBlocksEvaluator,
+                sn => Evaluate(sn, _codeBlock, CodeBlocksEvaluator, defaultHandler)
+            );
         }
 
         private Paragraph CodeBlocksEvaluator(Match match)
@@ -1204,6 +1215,75 @@ namespace Markdown.Xaml
 
         #endregion
 
+
+        #region grammer - blockquote
+
+        private static Regex _blockquote = new Regex(@"
+            (?<=\n)
+            [\r\n]*
+            ([>].*)
+            (\r?\n[>].*)*
+            [\r\n]*
+            ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
+        private static Regex _blockquoteFirst = new Regex(@"
+            ^
+            ([>].*)
+            (\r?\n[>].*)*
+            [\r\n]*
+            ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
+        private IEnumerable<Block> DoBlockquotes(string text, Func<string, IEnumerable<Block>> defaultHandler)
+        {
+            if (text == null)
+            {
+                throw new ArgumentNullException("text");
+            }
+
+            return Evaluate(
+                text, _blockquoteFirst, BlockquotesEvaluator,
+                sn => Evaluate(sn, _blockquote, BlockquotesEvaluator, defaultHandler)
+            );
+        }
+
+        private Section BlockquotesEvaluator(Match match)
+        {
+            if (match == null)
+            {
+                throw new ArgumentNullException("match");
+            }
+
+            // trim '>'
+            var ln = new Regex("\r?\n");
+            var trimmedTxt = string.Join(
+                    "\n",
+                    ln.Split(match.Value.Trim())
+                        .Select(txt =>
+                        {
+                            if (txt.Length <= 1) return string.Empty;
+                            var trimmed = txt.Substring(1);
+                            if (trimmed.FirstOrDefault() == ' ') trimmed = trimmed.Substring(1);
+                            return trimmed;
+                        })
+                        .ToArray()
+            );
+
+            var blocks = RunBlockGamut(Normalize(trimmedTxt));
+            var result = Create<Section, Block>(blocks);
+            if (BlockquoteStyle != null)
+            {
+                result.Style = BlockquoteStyle;
+            }
+            if (!DisabledTag)
+            {
+                result.Tag = TagBlockquote;
+            }
+
+            return result;
+        }
+
+
+        #endregion
 
         #region helper - make regex
 
