@@ -77,7 +77,14 @@ int main()
 
 
 ### Separator ###
-***
+single line
+ ---
+two lines
+ ===
+bold line
+ ***
+bold with single
+___
 
 ### Blockquote ###
 > ## Features ##

@@ -793,16 +793,23 @@ namespace MdXaml
 
         #region grammer - horizontal rules
 
-        private static readonly Regex _horizontalRules = new Regex(@"
-            ^[ ]{0,3}         # Leading space
-                ([-*_])       # $1: First marker
-                (?>           # Repeated marker group
-                    [ ]{0,2}  # Zero, one, or two spaces.
-                    \1        # Marker character
-                ){2,}         # Group repeated at least twice
-                [ ]*          # Trailing spaces
-                $             # End of line.
-            ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+        private static readonly Regex _horizontalRules = HorizontalRulesRegex("-");
+        private static readonly Regex _horizontalTwoLinesRules = HorizontalRulesRegex("=");
+        private static readonly Regex _horizontalBoldRules = HorizontalRulesRegex("*");
+        private static readonly Regex _horizontalBoldWithSingleRules = HorizontalRulesRegex("_");
+        private static Regex HorizontalRulesRegex(string markers)
+        {
+            return new Regex(@"
+                ^[ ]{0,3}                   # Leading space
+                    ([" + markers + @"])    # $1: First marker ([markers])
+                    (?>                     # Repeated marker group
+                        [ ]{0,2}            # Zero, one, or two spaces.
+                        \1                  # Marker character
+                    ){2,}                   # Group repeated at least twice
+                    [ ]*                    # Trailing spaces
+                    $                       # End of line.
+                ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+        }
 
         /// <summary>
         /// Turn Markdown horizontal rules into HTML hr tags
@@ -820,9 +827,15 @@ namespace MdXaml
                 throw new ArgumentNullException(nameof(text));
             }
 
-            return Evaluate(text, _horizontalRules, RuleEvaluator, defaultHandler);
+            return Evaluate(text, _horizontalRules, RuleEvaluator,
+                s1 => Evaluate(s1, _horizontalTwoLinesRules, TwoLinesRuleEvaluator,
+                s2 => Evaluate(s2, _horizontalBoldRules, BoldRuleEvaluator,
+                s3 => Evaluate(s3, _horizontalBoldWithSingleRules, BoldWithSingleRuleEvaluator, defaultHandler))));
         }
 
+        /// <summary>
+        /// Single line separator.
+        /// </summary>
         private Block RuleEvaluator(Match match)
         {
             if (match is null)
@@ -830,13 +843,96 @@ namespace MdXaml
                 throw new ArgumentNullException(nameof(match));
             }
 
-            var separator = new Separator();
+            var sep = new Separator();
             if (SeparatorStyle != null)
+                sep.Style = SeparatorStyle;
+
+            return new BlockUIContainer(sep);
+        }
+
+        /// <summary>
+        /// Two lines separator.
+        /// </summary>
+        private Block TwoLinesRuleEvaluator(Match match)
+        {
+            if (match is null)
             {
-                separator.Style = SeparatorStyle;
+                throw new ArgumentNullException(nameof(match));
             }
 
-            var container = new BlockUIContainer(separator);
+            var stackPanel = new StackPanel();
+            for (int i = 0; i < 2; i++)
+            {
+                var sep = new Separator();
+                if (SeparatorStyle != null)
+                    sep.Style = SeparatorStyle;
+
+                stackPanel.Children.Add(sep);
+            }
+
+            var container = new BlockUIContainer(stackPanel);
+            return container;
+        }
+
+        /// <summary>
+        /// Double line separator.
+        /// </summary>
+        private Block BoldRuleEvaluator(Match match)
+        {
+            if (match is null)
+            {
+                throw new ArgumentNullException(nameof(match));
+            }
+
+            var stackPanel = new StackPanel();
+            for (int i = 0; i < 2; i++)
+            {
+                var sep = new Separator()
+                {
+                    Margin = new Thickness(0)
+                };
+
+                if (SeparatorStyle != null)
+                    sep.Style = SeparatorStyle;
+
+                stackPanel.Children.Add(sep);
+            }
+
+            var container = new BlockUIContainer(stackPanel);
+            return container;
+        }
+
+        /// <summary>
+        /// Two lines separator consisting of a double line and a single line.
+        /// </summary>
+        private Block BoldWithSingleRuleEvaluator(Match match)
+        {
+            if (match is null)
+            {
+                throw new ArgumentNullException(nameof(match));
+            }
+
+            var stackPanel = new StackPanel();
+            for (int i = 0; i < 2; i++)
+            {
+                var sep = new Separator()
+                {
+                    Margin = new Thickness(0)
+                };
+
+                if (SeparatorStyle != null)
+                    sep.Style = SeparatorStyle;
+
+                stackPanel.Children.Add(sep);
+            }
+
+            var sepLst = new Separator();
+            if (SeparatorStyle != null)
+                sepLst.Style = SeparatorStyle;
+
+            stackPanel.Children.Add(sepLst);
+
+            var container = new BlockUIContainer(stackPanel);
             return container;
         }
 
