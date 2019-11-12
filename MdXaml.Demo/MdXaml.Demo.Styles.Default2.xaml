@@ -58,6 +58,15 @@
                         <Setter Property="Background" Value="#12181F25"/>
                         <Setter Property="Padding"     Value="20, 10"/>
                     </Trigger>
+
+                    <Trigger Property="Tag" Value="Note">
+                        <Setter Property="Margin"      Value="5,0,5,0"/>
+                        <Setter Property="Padding"     Value="10, 5"/>
+                        <Setter Property="BorderBrush" Value="#DEDEDE"/>
+                        <Setter Property="BorderThickness" Value="3,3,3,3"/>
+                        <Setter Property="Background"  Value="#FAFAFA"/>
+                    </Trigger>
+
                 </Style.Triggers>
             </Style>
 

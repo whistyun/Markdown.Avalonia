@@ -12,7 +12,6 @@ using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 #if !MIG_FREE
 using ICSharpCode.AvalonEdit;
@@ -46,6 +45,7 @@ namespace MdXaml
         private const string TagCode = "CodeSpan";
         private const string TagCodeBlock = "CodeBlock";
         private const string TagBlockquote = "Blockquote";
+        private const string TagNote = "Note";
         private const string TagTableHeader = "TableHeader";
         private const string TagTableBody = "TableBody";
         private const string TagOddTableRow = "OddTableRow";
@@ -110,6 +110,7 @@ namespace MdXaml
         public Style TableStyle { get; set; }
         public Style TableHeaderStyle { get; set; }
         public Style TableBodyStyle { get; set; }
+        public Style NoteStyle { get; set; }
 
         #endregion
 
@@ -218,8 +219,9 @@ namespace MdXaml
                     s3 => DoHorizontalRules(s3,
                     s4 => DoLists(s4,
                     s5 => DoTable(s5,
+                    s6 => DoNote(s6, supportTextAlignment,
                     sn => FormParagraphs(sn, supportTextAlignment
-                    )))))));
+                    ))))))));
 
             //text = DoCodeBlocks(text);
             //text = DoBlockQuotes(text);
@@ -700,6 +702,94 @@ namespace MdXaml
         }
         #endregion
 
+        #region grammer - Note
+        private static readonly Regex _note = new Regex(@"
+                ^(\<)       # $1 = starting marker <
+                [ ]*
+                (.+?)       # $2 = Header text
+                [ ]*
+                \>*         # optional closing >'s (not counted)
+                \n+
+            ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
+        /// <summary>
+        /// Turn Markdown into HTML paragraphs.
+        /// </summary>
+        /// <remarks>
+        /// < Note
+        /// </remarks>
+        private IEnumerable<Block> DoNote(string text, bool supportTextAlignment,
+                Func<string, IEnumerable<Block>> defaultHandler)
+        {
+            if (text is null)
+            {
+                throw new ArgumentNullException(nameof(text));
+            }
+
+            return Evaluate<Block>(text, _note,
+                m => NoteEvaluator(m, supportTextAlignment),
+                defaultHandler);
+        }
+
+        private Block NoteEvaluator(Match match, bool supportTextAlignment)
+        {
+            if (match is null)
+            {
+                throw new ArgumentNullException(nameof(match));
+            }
+
+            string text = match.Groups[2].Value;
+
+            TextAlignment? indiAlignment = null;
+
+            if (supportTextAlignment)
+            {
+                var alignMatch = _align.Match(text);
+                if (alignMatch.Success)
+                {
+                    text = text.Substring(alignMatch.Length);
+                    switch (alignMatch.Groups[1].Value)
+                    {
+                        case "<":
+                            indiAlignment = TextAlignment.Left;
+                            break;
+                        case ">":
+                            indiAlignment = TextAlignment.Right;
+                            break;
+                        case "=":
+                            indiAlignment = TextAlignment.Center;
+                            break;
+                    }
+                }
+            }
+
+            return NoteComment(RunSpanGamut(text), indiAlignment);
+        }
+
+        public Block NoteComment(IEnumerable<Inline> content, TextAlignment? indiAlignment)
+        {
+            if (content is null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
+            var block = Create<Paragraph, Inline>(content);
+            if (NoteStyle != null)
+            {
+                block.Style = NoteStyle;
+            }
+            if (!DisabledTag)
+            {
+                block.Tag = TagNote;
+            }
+            if (indiAlignment.HasValue)
+            {
+                block.TextAlignment = indiAlignment.Value;
+            }
+
+            return block;
+        }
+        #endregion
 
         #region grammer - horizontal rules
 
