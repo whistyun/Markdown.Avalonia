@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFrameworks>netcoreapp3.0;net45</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+    <PackageId>MdXaml</PackageId>
+    <Version>1.1.0</Version>
+    <Authors>Bevan Arps(original); whistyun</Authors>
+    <Company />
+    <Description>This package is my modify version of Markdown.Xaml.
+IT IS NOT MARKDOWN.XAML OFFICIAL PACKAGE.
+See https://github.com/theunrepentantgeek/Markdown.XAML to get official code.</Description>
+    <Copyright>Copyright (c) 2019 Bevan Arps</Copyright>
+    <PackageProjectUrl>https://github.com/whistyun/MdXaml</PackageProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Page Remove="Markdown.Style.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Markdown.Style.xaml" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <PackageReference Include="AvalonEdit" Version="5.0.4" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
+    <PackageReference Include="AvalonEdit" Version="6.0.0" />
+  </ItemGroup>
+</Project>
