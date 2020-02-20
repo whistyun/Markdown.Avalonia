@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
@@ -11,8 +11,10 @@
     <Description>This package is my modify version of Markdown.Xaml.
 IT IS NOT MARKDOWN.XAML OFFICIAL PACKAGE.
 See https://github.com/theunrepentantgeek/Markdown.XAML to get official code.</Description>
-    <Copyright>Copyright (c) 2019 Bevan Arps</Copyright>
+    <Copyright>Copyright (c) 2019 Bevan Arps 2020 whistyun</Copyright>
     <PackageProjectUrl>https://github.com/whistyun/MdXaml</PackageProjectUrl>
+	<PackageLicenseFile>LICENSE</PackageLicenseFile>
+	<PackageTags>Markdown WPF Xaml FlowDocument</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,4 +32,12 @@ See https://github.com/theunrepentantgeek/Markdown.XAML to get official code.</D
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
     <PackageReference Include="AvalonEdit" Version="6.0.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
 </Project>
