@@ -20,10 +20,15 @@ stylesheet to the rendered output, MarkDown.Xaml uses WPF styles that are linked
 the rendering engine and applied to the output as it is generated. See the *included demo* 
 application for an example of how this can be configured.
 
+## Nuget
+
+[https://www.nuget.org/packages/MdXaml/](https://www.nuget.org/packages/MdXaml/)
+
 ## How to use
 
 * [Transform markdow to flowdocument](Document/transform_markdow_to_flowdocument.md)
 * [Render markdown in Control](Document/render_markdown_in_control.md)
+* [Image reading priority order](Document/image_load_priority.md)
 
 ## License
 

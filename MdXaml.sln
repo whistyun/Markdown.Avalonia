@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29519.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MdXaml", "MdXaml\MdXaml.csproj", "{3B285B6B-C6C9-4FF5-AD2B-04808862D81E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MdXaml.Demo", "MdXaml.Demo\MdXaml.Demo.csproj", "{68CFBE0C-F19B-4462-BE8C-A971A479E848}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MdXaml.Demo", "MdXaml.Demo\MdXaml.Demo.csproj", "{68CFBE0C-F19B-4462-BE8C-A971A479E848}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

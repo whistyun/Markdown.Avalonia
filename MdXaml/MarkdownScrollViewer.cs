@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Markup;
 
 namespace MdXaml
 {
-    public class MarkdownScrollViewer : FlowDocumentScrollViewer
+    public class MarkdownScrollViewer : FlowDocumentScrollViewer, IUriContext
     {
         public static readonly DependencyProperty MarkdownProperty =
             DependencyProperty.Register(
@@ -34,7 +35,7 @@ namespace MdXaml
         {
             if (d is MarkdownScrollViewer owner)
             {
-                var doc = owner.engine.Transform((string)e.NewValue ?? "");
+                var doc = owner.Engine.Transform((string)e.NewValue ?? "");
                 owner.SetCurrentValue(DocumentProperty, doc);
             }
         }
@@ -43,7 +44,7 @@ namespace MdXaml
         {
             if (d is MarkdownScrollViewer owner)
             {
-                owner.engine.DocumentStyle = (Style)e.NewValue;
+                owner.Engine.DocumentStyle = (Style)e.NewValue;
             }
         }
 
@@ -62,7 +63,23 @@ namespace MdXaml
             }
         }
 
-        private Markdown engine = new Markdown();
+        public Markdown Engine
+        {
+            set;
+            get;
+        }
+
+        public Uri BaseUri
+        {
+            set { Engine.BaseUri = value; }
+            get => Engine.BaseUri;
+        }
+
+        public string AssetPathRoot
+        {
+            set { Engine.AssetPathRoot = value; }
+            get => Engine.AssetPathRoot;
+        }
 
         public string Markdown
         {
@@ -84,7 +101,7 @@ namespace MdXaml
 
         public MarkdownScrollViewer()
         {
-            engine = new Markdown();
+            Engine = new Markdown();
         }
     }
 }

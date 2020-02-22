@@ -9,7 +9,13 @@
         Loaded="Window_Loaded_1">
     <Window.Resources>
         <local:MainWindowViewModel x:Key="ViewModel"/>
-        <local:MarkdownXamlConverter x:Key="MarkdownXamlConverter"/>
+
+        <mdxam:Markdown
+            x:Key="Markdown"/>
+
+        <local:MarkdownXamlConverter 
+            x:Key="MarkdownXamlConverter"
+            Markdown="{StaticResource Markdown}"/>
     </Window.Resources>
 
     <Window.DataContext>

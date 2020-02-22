@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Cache;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -18,7 +19,7 @@ using System.Windows.Shapes;
 
 namespace MdXaml
 {
-    public class Markdown : DependencyObject
+    public class Markdown : DependencyObject, IUriContext
     {
         #region const
         /// <summary>
@@ -67,6 +68,7 @@ namespace MdXaml
 
         public ICommand HyperlinkCommand { get; set; }
 
+        public Uri BaseUri { get; set; }
 
         #region dependencyobject property
 
@@ -114,6 +116,7 @@ namespace MdXaml
         public Markdown()
         {
             HyperlinkCommand = NavigationCommands.GoToPage;
+            AssetPathRoot = Environment.CurrentDirectory;
         }
 
         public FlowDocument Transform(string text)
@@ -333,6 +336,7 @@ namespace MdXaml
             return Evaluate(text, _imageInline, ImageInlineEvaluator, defaultHandler);
         }
 
+
         private Inline ImageInlineEvaluator(Match match)
         {
             if (match == null)
@@ -353,33 +357,44 @@ namespace MdXaml
 
             BitmapImage imgSource = null;
 
+            // check embedded resoruce
             try
             {
-                if (!Uri.IsWellFormedUriString(url, UriKind.Absolute) && !System.IO.Path.IsPathRooted(url))
+                Uri packUri;
+                if (!Uri.IsWellFormedUriString(url, UriKind.Absolute) && BaseUri != null)
                 {
-                    url = System.IO.Path.Combine(AssetPathRoot ?? string.Empty, url);
-                }
-
-                if (DisabledLazyLoad)
-                {
-                    imgSource = new BitmapImage(new Uri(url, UriKind.RelativeOrAbsolute));
+                    packUri = new Uri(BaseUri, url);
                 }
                 else
                 {
-                    imgSource = new BitmapImage();
-                    imgSource.BeginInit();
-                    imgSource.CacheOption = BitmapCacheOption.None;
-                    imgSource.UriCachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
-                    imgSource.CacheOption = BitmapCacheOption.OnLoad;
-                    imgSource.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
-                    imgSource.UriSource = new Uri(url);
-                    imgSource.EndInit();
+                    packUri = new Uri(url);
                 }
+
+                imgSource = MakeImage(packUri);
             }
-            catch (Exception)
+            catch { }
+
+            // check filesystem
+            if (imgSource == null)
+            {
+                try
+                {
+                    if (!Uri.IsWellFormedUriString(url, UriKind.Absolute) && !System.IO.Path.IsPathRooted(url))
+                    {
+                        url = System.IO.Path.Combine(AssetPathRoot ?? string.Empty, url);
+                    }
+
+                    imgSource = MakeImage(new Uri(url, UriKind.RelativeOrAbsolute));
+                }
+                catch { }
+            }
+
+            // error
+            if (imgSource == null)
             {
                 return new Run("!" + url) { Foreground = Brushes.Red };
             }
+
 
             Image image = new Image { Source = imgSource, Tag = linkText };
             if (ImageStyle == null)
@@ -417,6 +432,27 @@ namespace MdXaml
             }
 
             return new InlineUIContainer(image);
+        }
+
+        private BitmapImage MakeImage(Uri url)
+        {
+            if (DisabledLazyLoad)
+            {
+                return new BitmapImage(url);
+            }
+            else
+            {
+                var imgSource = new BitmapImage();
+                imgSource.BeginInit();
+                imgSource.CacheOption = BitmapCacheOption.None;
+                imgSource.UriCachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
+                imgSource.CacheOption = BitmapCacheOption.OnLoad;
+                imgSource.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+                imgSource.UriSource = url;
+                imgSource.EndInit();
+
+                return imgSource;
+            }
         }
 
         #endregion

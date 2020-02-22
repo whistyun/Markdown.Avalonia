@@ -28,7 +28,11 @@ If there are any bug fixes to the regular expressions in MarkdownSharp, merging 
 
 * Local images
 
-![localimage](sampleimage.jpg)
+![localimage](LocalPath.png)
+
+* Resource image
+
+![ResourceImage](Asset/ResourceImage.png)
 
 * Table
 
