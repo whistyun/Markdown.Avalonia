@@ -131,13 +131,6 @@
                 <Setter Property="CellSpacing" Value="0"/>
                 <Setter Property="BorderThickness" Value="0.5"/>
                 <Setter Property="BorderBrush" Value="Gray"/>
-                <Style.Resources>
-                    <Style TargetType="TableCell">
-                        <Setter Property="BorderThickness" Value="0.5"/>
-                        <Setter Property="BorderBrush" Value="Gray"/>
-                        <Setter Property="Padding" Value="2"/>
-                    </Style>
-                </Style.Resources>
             </Style>
 
             <Style TargetType="TableRowGroup">
@@ -154,6 +147,18 @@
                     <Trigger Property="Tag" Value="EvenTableRow">
                         <Setter Property="Background" Value="#F5F5F5"/>
                     </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style TargetType="TableCell">
+                <Setter Property="BorderThickness" Value="0.5"/>
+                <Setter Property="BorderBrush" Value="Gray"/>
+                <Setter Property="Padding" Value="2"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TableRow}}, Path=Tag}"
+                                     Value="EvenTableRow">
+                        <Setter Property="Background" Value="#F5F5F5"/>
+                    </DataTrigger>
                 </Style.Triggers>
             </Style>
         </Style.Resources>
@@ -272,13 +277,6 @@
                 <Setter Property="CellSpacing" Value="0"/>
                 <Setter Property="BorderThickness" Value="0.5"/>
                 <Setter Property="BorderBrush" Value="Gray"/>
-                <Style.Resources>
-                    <Style TargetType="TableCell">
-                        <Setter Property="BorderThickness" Value="0.5"/>
-                        <Setter Property="BorderBrush" Value="Gray"/>
-                        <Setter Property="Padding" Value="1"/>
-                    </Style>
-                </Style.Resources>
             </Style>
 
             <Style TargetType="TableRowGroup">
@@ -290,11 +288,15 @@
                 </Style.Triggers>
             </Style>
 
-            <Style TargetType="TableRow">
+            <Style TargetType="TableCell">
+                <Setter Property="BorderThickness" Value="0.5"/>
+                <Setter Property="BorderBrush" Value="Gray"/>
+                <Setter Property="Padding" Value="1"/>
                 <Style.Triggers>
-                    <Trigger Property="Tag" Value="EvenTableRow">
+                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TableRow}}, Path=Tag}"
+                                     Value="EvenTableRow">
                         <Setter Property="Background" Value="#F5F5F5"/>
-                    </Trigger>
+                    </DataTrigger>
                 </Style.Triggers>
             </Style>
         </Style.Resources>
