@@ -142,14 +142,6 @@
                 </Style.Triggers>
             </Style>
 
-            <Style TargetType="TableRow">
-                <Style.Triggers>
-                    <Trigger Property="Tag" Value="EvenTableRow">
-                        <Setter Property="Background" Value="#F5F5F5"/>
-                    </Trigger>
-                </Style.Triggers>
-            </Style>
-
             <Style TargetType="TableCell">
                 <Setter Property="BorderThickness" Value="0.5"/>
                 <Setter Property="BorderBrush" Value="Gray"/>

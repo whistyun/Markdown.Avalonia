@@ -29,6 +29,7 @@ application for an example of how this can be configured.
 * [Transform markdow to flowdocument](Document/transform_markdow_to_flowdocument.md)
 * [Render markdown in Control](Document/render_markdown_in_control.md)
 * [Image reading priority order](Document/image_load_priority.md)
+* [enhance table syntac](Document/table_enhance.md)
 
 ## License
 

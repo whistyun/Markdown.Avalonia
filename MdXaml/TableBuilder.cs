@@ -202,8 +202,7 @@ namespace MdXaml
 
                     switch (c)
                     {
-                        case '/':
-                        case 'r': // /2 rowspan
+                        case '/': // /2 rowspan
                             ++i;
                             var numTxt = ContinueToNum(styleTxt, ref i);
                             if (numTxt.Length == 0) goto default;
@@ -211,8 +210,7 @@ namespace MdXaml
 
                             break;
 
-                        case '\\':
-                        case 'c': // \2 colspan
+                        case '\\': // \2 colspan
                             ++i;
                             numTxt = ContinueToNum(styleTxt, ref i);
                             if (numTxt.Length == 0) goto default;

@@ -975,8 +975,11 @@ namespace MdXaml
                 if (mdcell.Horizontal.HasValue)
                     cell.TextAlignment = mdcell.Horizontal.Value;
 
-                cell.RowSpan = mdcell.RowSpan;
-                cell.ColumnSpan = mdcell.ColSpan;
+                if (mdcell.RowSpan != 1)
+                    cell.RowSpan = mdcell.RowSpan;
+
+                if (mdcell.ColSpan != 1)
+                    cell.ColumnSpan = mdcell.ColSpan;
 
                 tableRow.Cells.Add(cell);
             }

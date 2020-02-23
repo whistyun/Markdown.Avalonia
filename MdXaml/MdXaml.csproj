@@ -8,9 +8,7 @@
     <Version>1.2.0</Version>
     <Authors>Bevan Arps(original); whistyun</Authors>
     <Company />
-    <Description>This package is my modify version of Markdown.Xaml.
-IT IS NOT MARKDOWN.XAML OFFICIAL PACKAGE.
-See https://github.com/theunrepentantgeek/Markdown.XAML to get official code.</Description>
+    <Description>Markdown XAML processor</Description>
     <Copyright>Copyright (c) 2019 Bevan Arps 2020 whistyun</Copyright>
     <PackageProjectUrl>https://github.com/whistyun/MdXaml</PackageProjectUrl>
 	<PackageLicenseFile>LICENSE</PackageLicenseFile>
