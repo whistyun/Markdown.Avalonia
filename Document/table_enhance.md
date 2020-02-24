@@ -37,3 +37,11 @@ If you don't want to parse, type space after pipe(|).
 ```
 
 ![view2](generated_table.2.png)
+
+
+## MarkdownTableBuilder.ods
+
+To make table easily, We provide 'MarkdownTableBuilder.ods'.
+With LibreOffice It can open it and execute macros.
+
+![how to](howtouse_mdtblbuilder.gif)
