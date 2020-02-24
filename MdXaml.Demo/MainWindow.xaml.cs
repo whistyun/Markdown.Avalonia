@@ -26,11 +26,16 @@ namespace MdXaml.Demo
         {
             InitializeComponent();
 
-            CommandBindings.Add(new CommandBinding(NavigationCommands.GoToPage, (sender, e) => Process.Start((string)e.Parameter)));
-        }
+            CommandBindings.Add(new CommandBinding(
+                NavigationCommands.GoToPage,
+                (sender, e) =>
+                {
+                    var proc = new Process();
+                    proc.StartInfo.UseShellExecute = true;
+                    proc.StartInfo.FileName = (string)e.Parameter;
 
-        private void Window_Loaded_1(object sender, RoutedEventArgs e)
-        {
+                    proc.Start();
+                }));
         }
     }
 }

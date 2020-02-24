@@ -5,11 +5,11 @@
     <TargetFrameworks>netcoreapp3.0;net45</TargetFrameworks>
     <UseWPF>true</UseWPF>
     <PackageId>MdXaml</PackageId>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <Authors>Bevan Arps(original); whistyun</Authors>
     <Company />
     <Description>Markdown XAML processor</Description>
-    <Copyright>Copyright (c) 2019 Bevan Arps 2020 whistyun</Copyright>
+    <Copyright>Copyright (c) 2019 Bevan Arps, 2020 whistyun</Copyright>
     <PackageProjectUrl>https://github.com/whistyun/MdXaml</PackageProjectUrl>
 	<PackageLicenseFile>LICENSE</PackageLicenseFile>
 	<PackageTags>Markdown WPF Xaml FlowDocument</PackageTags>
