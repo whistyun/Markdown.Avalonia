@@ -33,9 +33,6 @@ namespace MdXaml
         /// </summary>
         private const int _tabWidth = 4;
 
-        private const string _markerUL = @"[*+-]";
-        private const string _markerOL = @"\d+[.]";
-
         private const string TagHeading1 = "Heading1";
         private const string TagHeading2 = "Heading2";
         private const string TagHeading3 = "Heading3";
@@ -49,8 +46,6 @@ namespace MdXaml
         private const string TagEvenTableRow = "EvenTableRow";
 
         #endregion
-
-        private int _listLevel;
 
         /// <summary>
         /// when true, bold and italic require non-word characters on either side  
@@ -121,7 +116,7 @@ namespace MdXaml
 
         public FlowDocument Transform(string text)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
@@ -142,7 +137,7 @@ namespace MdXaml
         /// </summary>
         private string Normalize(string text)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
@@ -200,7 +195,7 @@ namespace MdXaml
         /// </summary>
         private IEnumerable<Block> RunBlockGamut(string text)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
@@ -234,7 +229,7 @@ namespace MdXaml
         /// </summary>
         private IEnumerable<Inline> RunSpanGamut(string text)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
@@ -274,7 +269,7 @@ namespace MdXaml
         /// </summary>
         private IEnumerable<Block> FormParagraphs(string text)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
@@ -328,7 +323,7 @@ namespace MdXaml
         /// </remarks>
         private IEnumerable<Inline> DoImages(string text, Func<string, IEnumerable<Inline>> defaultHandler)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
@@ -339,7 +334,7 @@ namespace MdXaml
 
         private Inline ImageInlineEvaluator(Match match)
         {
-            if (match == null)
+            if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
@@ -375,7 +370,7 @@ namespace MdXaml
             catch { }
 
             // check filesystem
-            if (imgSource == null)
+            if (imgSource is null)
             {
                 try
                 {
@@ -390,14 +385,14 @@ namespace MdXaml
             }
 
             // error
-            if (imgSource == null)
+            if (imgSource is null)
             {
                 return new Run("!" + url) { Foreground = Brushes.Red };
             }
 
 
             Image image = new Image { Source = imgSource, Tag = linkText };
-            if (ImageStyle == null)
+            if (ImageStyle is null)
             {
                 image.Margin = new Thickness(0);
             }
@@ -487,7 +482,7 @@ namespace MdXaml
         /// </remarks>
         private IEnumerable<Inline> DoAnchors(string text, Func<string, IEnumerable<Inline>> defaultHandler)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
@@ -498,7 +493,7 @@ namespace MdXaml
 
         private Inline AnchorInlineEvaluator(Match match)
         {
-            if (match == null)
+            if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
@@ -567,7 +562,7 @@ namespace MdXaml
         /// </remarks>
         private IEnumerable<Block> DoHeaders(string text, Func<string, IEnumerable<Block>> defaultHandler)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
@@ -578,7 +573,7 @@ namespace MdXaml
 
         private Block SetextHeaderEvaluator(Match match)
         {
-            if (match == null)
+            if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
@@ -592,7 +587,7 @@ namespace MdXaml
 
         private Block AtxHeaderEvaluator(Match match)
         {
-            if (match == null)
+            if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
@@ -604,7 +599,7 @@ namespace MdXaml
 
         public Block CreateHeader(int level, IEnumerable<Inline> content)
         {
-            if (content == null)
+            if (content is null)
             {
                 throw new ArgumentNullException(nameof(content));
             }
@@ -687,7 +682,7 @@ namespace MdXaml
         /// </remarks>
         private IEnumerable<Block> DoHorizontalRules(string text, Func<string, IEnumerable<Block>> defaultHandler)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
@@ -697,7 +692,7 @@ namespace MdXaml
 
         private Block RuleEvaluator(Match match)
         {
-            if (match == null)
+            if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
@@ -716,8 +711,31 @@ namespace MdXaml
 
 
         #region grammer - list
+        private const string _markerUL = @"[*+=-]";
+        private const string _markerOL = @"\d+[.]|\p{L}+[.,]";
 
-        private static string _wholeList = string.Format(@"
+        // Unordered List
+        private const string _markerUL_Disc = @"[*]";
+        private const string _markerUL_Box = @"[+]";
+        private const string _markerUL_Circle = @"[-]";
+        private const string _markerUL_Square = @"[=]";
+
+        // Ordered List
+        private const string _markerOL_Number = @"\d+[.]";
+        private const string _markerOL_LetterLower = @"\p{Ll}+[.]";
+        private const string _markerOL_LetterUpper = @"\p{Lu}+[.]";
+        private const string _markerOL_RomanLower = @"\p{Ll}+[,]";
+        private const string _markerOL_RomanUpper = @"\p{Lu}+[,]";
+
+        private int _listLevel;
+
+        /// <summary>
+        /// Maximum number of levels a single list can have.
+        /// In other words, _listDepth - 1 is the maximum number of nested lists.
+        /// </summary>
+        private const int _listDepth = 6;
+
+        private static readonly string _wholeList = string.Format(@"
             (                               # $1 = whole list
               (                             # $2
                 [ ]{{0,{1}}}
@@ -735,12 +753,12 @@ namespace MdXaml
                     {0}[ ]+
                   )
               )
-            )", string.Format("(?:{0}|{1})", _markerUL, _markerOL), _tabWidth - 1);
+            )", string.Format("(?:{0}|{1})", _markerUL, _markerOL), _listDepth - 1);
 
-        private static Regex _listNested = new Regex(@"^" + _wholeList,
+        private static readonly Regex _listNested = new Regex(@"^" + _wholeList,
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        private static Regex _listTopLevel = new Regex(@"(?:(?<=\n\n)|\A\n?)" + _wholeList,
+        private static readonly Regex _listTopLevel = new Regex(@"(?:(?<=\n\n)|\A\n?)" + _wholeList,
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
@@ -748,7 +766,7 @@ namespace MdXaml
         /// </summary>
         private IEnumerable<Block> DoLists(string text, Func<string, IEnumerable<Block>> defaultHandler)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
@@ -763,7 +781,7 @@ namespace MdXaml
 
         private Block ListEvaluator(Match match)
         {
-            if (match == null)
+            if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
@@ -771,13 +789,16 @@ namespace MdXaml
             string list = match.Groups[1].Value;
             string listType = Regex.IsMatch(match.Groups[3].Value, _markerUL) ? "ul" : "ol";
 
+            // Set text marker style.
+            TextMarkerStyle textMarker = GetTextMarkerStyle(listType, match);
+
             // Turn double returns into triple returns, so that we can make a
             // paragraph for the last item in a list, if necessary:
             list = Regex.Replace(list, @"\n{2,}", "\n\n\n");
 
             var resultList = Create<List, ListItem>(ProcessListItems(list, listType == "ul" ? _markerUL : _markerOL));
 
-            resultList.MarkerStyle = listType == "ul" ? TextMarkerStyle.Disc : TextMarkerStyle.Decimal;
+            resultList.MarkerStyle = textMarker;
 
             return resultList;
         }
@@ -816,7 +837,7 @@ namespace MdXaml
                 list = Regex.Replace(list, @"\n{2,}\z", "\n");
 
                 string pattern = string.Format(
-                  @"(\n)?                      # leading line = $1
+                  @"(\n)?                  # leading line = $1
                 (^[ ]*)                    # leading whitespace = $2
                 ({0}) [ ]+                 # list marker = $3
                 ((?s:.+?)                  # list item text = $4
@@ -838,7 +859,7 @@ namespace MdXaml
 
         private ListItem ListItemEvaluator(Match match)
         {
-            if (match == null)
+            if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
@@ -854,6 +875,58 @@ namespace MdXaml
                 // recursion for sub-lists
                 return Create<ListItem, Block>(RunBlockGamut(item));
             }
+        }
+
+        /// <summary>
+        /// Get the text marker style based on a specific regex.
+        /// </summary>
+        /// <param name="listType">Specify what kind of list: ul, ol.</param>
+        private static TextMarkerStyle GetTextMarkerStyle(string listType, Match match)
+        {
+            switch (listType)
+            {
+                case "ul":
+                    if (Regex.IsMatch(match.Groups[3].Value, _markerUL_Disc))
+                    {
+                        return TextMarkerStyle.Disc;
+                    }
+                    else if (Regex.IsMatch(match.Groups[3].Value, _markerUL_Box))
+                    {
+                        return TextMarkerStyle.Box;
+                    }
+                    else if (Regex.IsMatch(match.Groups[3].Value, _markerUL_Circle))
+                    {
+                        return TextMarkerStyle.Circle;
+                    }
+                    else if (Regex.IsMatch(match.Groups[3].Value, _markerUL_Square))
+                    {
+                        return TextMarkerStyle.Square;
+                    }
+                    break;
+                case "ol":
+                    if (Regex.IsMatch(match.Groups[3].Value, _markerOL_Number))
+                    {
+                        return TextMarkerStyle.Decimal;
+                    }
+                    else if (Regex.IsMatch(match.Groups[3].Value, _markerOL_LetterLower))
+                    {
+                        return TextMarkerStyle.LowerLatin;
+                    }
+                    else if (Regex.IsMatch(match.Groups[3].Value, _markerOL_LetterUpper))
+                    {
+                        return TextMarkerStyle.UpperLatin;
+                    }
+                    else if (Regex.IsMatch(match.Groups[3].Value, _markerOL_RomanLower))
+                    {
+                        return TextMarkerStyle.LowerRoman;
+                    }
+                    else if (Regex.IsMatch(match.Groups[3].Value, _markerOL_RomanUpper))
+                    {
+                        return TextMarkerStyle.UpperRoman;
+                    }
+                    break;
+            }
+            return TextMarkerStyle.None;
         }
 
         #endregion
@@ -882,7 +955,7 @@ namespace MdXaml
 
         public IEnumerable<Block> DoTable(string text, Func<string, IEnumerable<Block>> defaultHandler)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
@@ -892,7 +965,7 @@ namespace MdXaml
 
         private Block TableEvalutor(Match match)
         {
-            if (match == null)
+            if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
@@ -1015,7 +1088,7 @@ namespace MdXaml
 
         private IEnumerable<Block> DoCodeBlocks(string text, Func<string, IEnumerable<Block>> defaultHandler)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
@@ -1028,7 +1101,7 @@ namespace MdXaml
 
         private Block CodeBlocksEvaluator(Match match)
         {
-            if (match == null)
+            if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
@@ -1075,7 +1148,7 @@ namespace MdXaml
         /// </summary>
         private IEnumerable<Inline> DoCodeSpans(string text, Func<string, IEnumerable<Inline>> defaultHandler)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
@@ -1107,7 +1180,7 @@ namespace MdXaml
 
         private Inline CodeSpanEvaluator(Match match)
         {
-            if (match == null)
+            if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
@@ -1149,7 +1222,7 @@ namespace MdXaml
         /// </summary>
         private IEnumerable<Inline> DoItalicsAndBold(string text, Func<string, IEnumerable<Inline>> defaultHandler)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
@@ -1171,7 +1244,7 @@ namespace MdXaml
 
         private Inline ItalicEvaluator(Match match, int contentGroup)
         {
-            if (match == null)
+            if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
@@ -1182,7 +1255,7 @@ namespace MdXaml
 
         private Inline BoldEvaluator(Match match, int contentGroup)
         {
-            if (match == null)
+            if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
@@ -1201,7 +1274,7 @@ namespace MdXaml
 
         public IEnumerable<Inline> DoText(string text)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
@@ -1240,7 +1313,7 @@ namespace MdXaml
 
         private IEnumerable<Block> DoBlockquotes(string text, Func<string, IEnumerable<Block>> defaultHandler)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
@@ -1253,7 +1326,7 @@ namespace MdXaml
 
         private Section BlockquotesEvaluator(Match match)
         {
-            if (match == null)
+            if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
@@ -1302,7 +1375,7 @@ namespace MdXaml
         {
             // in other words [this] and [this[also]] and [this[also[too]]]
             // up to _nestDepth
-            if (_nestedBracketsPattern == null)
+            if (_nestedBracketsPattern is null)
                 _nestedBracketsPattern =
                     RepeatString(@"
                     (?>              # Atomic matching
@@ -1326,7 +1399,7 @@ namespace MdXaml
         {
             // in other words (this) and (this(also)) and (this(also(too)))
             // up to _nestDepth
-            if (_nestedParensPattern == null)
+            if (_nestedParensPattern is null)
                 _nestedParensPattern =
                     RepeatString(@"
                     (?>              # Atomic matching
@@ -1350,7 +1423,7 @@ namespace MdXaml
         {
             // in other words (this) and (this(also)) and (this(also(too)))
             // up to _nestDepth
-            if (_nestedParensPatternWithWhiteSpace == null)
+            if (_nestedParensPatternWithWhiteSpace is null)
                 _nestedParensPatternWithWhiteSpace =
                     RepeatString(@"
                     (?>              # Atomic matching
@@ -1369,7 +1442,7 @@ namespace MdXaml
         /// </summary>
         private static string RepeatString(string text, int count)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
@@ -1399,7 +1472,7 @@ namespace MdXaml
 
         private IEnumerable<T> Evaluate<T>(string text, Regex expression, Func<Match, T> build, Func<string, IEnumerable<T>> rest)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }

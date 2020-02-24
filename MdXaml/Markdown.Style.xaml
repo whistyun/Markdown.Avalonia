@@ -260,6 +260,10 @@
                 </Style.Triggers>
             </Style>
 
+            <Style TargetType="List">
+                <Setter Property="Margin"  Value="0,0,0,0" />
+            </Style>
+
             <!--
                 The Table's style don't seem to support border-collapse.
                 By making the ruled line width 0.5 and applying it to cell and table,
