@@ -55,7 +55,7 @@
                     TextWrapping="Wrap"
                     AcceptsReturn="True"
                     Margin="5" 
-                    Text="{Binding Text}"
+                    Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"
                     VerticalScrollBarVisibility="Auto"/>
 
                 <mdxam:MarkdownScrollViewer
@@ -85,7 +85,7 @@
                      TextWrapping="Wrap"
                      AcceptsReturn="True"
                      Margin="5" 
-                     Text="{Binding Text}"
+                     Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"
                      VerticalScrollBarVisibility="Auto"/>
 
                 <TextBox x:Name="outXaml3"

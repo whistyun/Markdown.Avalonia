@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Markup;
@@ -91,9 +92,27 @@ namespace MdXaml.Demo
             {
                 if (_text == value) return;
                 _text = value;
-                FirePropertyChanged();
+
+                if (TextChangeEvent == null || TextChangeEvent.Status >= TaskStatus.RanToCompletion)
+                {
+                    TextChangeEvent = Task.Run(() =>
+                    {
+                        Task.Delay(100);
+                    retry:
+                        var oldVal = _text;
+
+                        Thread.MemoryBarrier();
+                        FirePropertyChanged(nameof(Text));
+
+                        Thread.MemoryBarrier();
+                        if (oldVal != _text) goto retry;
+                    });
+                }
             }
         }
+
+        private Task TextChangeEvent;
+
 
         /// <summary> <see cref="INotifyPropertyChanged"/> </summary>
         public event PropertyChangedEventHandler PropertyChanged;
