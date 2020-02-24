@@ -22,14 +22,14 @@ namespace MdXaml
                 nameof(MarkdownStyle),
                 typeof(Style),
                 typeof(MarkdownScrollViewer),
-                new PropertyMetadata(MdXaml.MarkdownStyle.Standard, UpdateStyle));
+                new PropertyMetadata(null, UpdateStyle));
 
         public static readonly DependencyProperty MarkdownStyleNameProperty =
             DependencyProperty.Register(
             nameof(MarkdownStyleName),
             typeof(string),
             typeof(MarkdownScrollViewer),
-            new PropertyMetadata(nameof(MdXaml.MarkdownStyle.Standard), UpdateStyleName));
+            new PropertyMetadata(null, UpdateStyleName));
 
         private static void UpdateMarkdown(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -102,6 +102,7 @@ namespace MdXaml
         public MarkdownScrollViewer()
         {
             Engine = new Markdown();
+            MarkdownStyleName = nameof(MdXaml.MarkdownStyle.Standard);
         }
     }
 }
