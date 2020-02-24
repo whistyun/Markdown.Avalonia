@@ -31,32 +31,6 @@ namespace MdXaml.Demo
 
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
-
-            var sampleMarkdown = LoadSample();
-
-            editSource1.Text = sampleMarkdown;
-            editSource2.Text = sampleMarkdown;
-        }
-
-        private string LoadSample()
-
-        {
-            var subjectType = GetType();
-            var subjectAssembly = subjectType.Assembly;
-
-            using (Stream stream = subjectAssembly.GetManifestResourceStream(subjectType.FullName + ".md"))
-            {
-
-                if (stream == null)
-                {
-                    return String.Format("Could not find sample text *{0}*.md", subjectType.FullName);
-                }
-
-                using (StreamReader reader = new StreamReader(stream))
-                {
-                    return reader.ReadToEnd();
-                }
-            }
         }
     }
 }
