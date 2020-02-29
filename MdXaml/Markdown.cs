@@ -127,7 +127,7 @@ namespace MdXaml
             }
 
             text = Normalize(text);
-            var document = Create<FlowDocument, Block>(RunBlockGamut(text));
+            var document = Create<FlowDocument, Block>(RunBlockGamut(text, true));
 
             document.SetBinding(FlowDocument.StyleProperty, new Binding(DocumentStyleProperty.Name) { Source = this });
 
@@ -198,7 +198,7 @@ namespace MdXaml
         /// <summary>
         /// Perform transformations that form block-level tags like paragraphs, headers, and list items.
         /// </summary>
-        private IEnumerable<Block> RunBlockGamut(string text)
+        private IEnumerable<Block> RunBlockGamut(string text, bool supportTextAlignment)
         {
             if (text is null)
             {
@@ -212,7 +212,7 @@ namespace MdXaml
                     s3 => DoHorizontalRules(s3,
                     s4 => DoLists(s4,
                     s5 => DoTable(s5,
-                    sn => FormParagraphs(sn
+                    sn => FormParagraphs(sn, supportTextAlignment
                     )))))));
 
             //text = DoCodeBlocks(text);
@@ -266,13 +266,14 @@ namespace MdXaml
 
         #region grammer - paragraph
 
-        private static Regex _newlinesLeadingTrailing = new Regex(@"^\n+|\n+\z", RegexOptions.Compiled);
-        private static Regex _newlinesMultiple = new Regex(@"\n{2,}", RegexOptions.Compiled);
+        private static readonly Regex _align = new Regex(@"^p([<=>])\.", RegexOptions.Compiled);
+        private static readonly Regex _newlinesLeadingTrailing = new Regex(@"^\n+|\n+\z", RegexOptions.Compiled);
+        private static readonly Regex _newlinesMultiple = new Regex(@"\n{2,}", RegexOptions.Compiled);
 
         /// <summary>
         /// splits on two or more newlines, to form "paragraphs";    
         /// </summary>
-        private IEnumerable<Block> FormParagraphs(string text)
+        private IEnumerable<Block> FormParagraphs(string text, bool supportTextAlignment)
         {
             if (text is null)
             {
@@ -284,11 +285,41 @@ namespace MdXaml
 
             foreach (var g in grafs)
             {
-                var block = Create<Paragraph, Inline>(RunSpanGamut(g));
+                var chip = g;
+
+                TextAlignment? indiAlignment = null;
+
+                if (supportTextAlignment)
+                {
+                    var alignMatch = _align.Match(chip);
+                    if (alignMatch.Success)
+                    {
+                        chip = chip.Substring(alignMatch.Length);
+                        switch (alignMatch.Groups[1].Value)
+                        {
+                            case "<":
+                                indiAlignment = TextAlignment.Left;
+                                break;
+                            case ">":
+                                indiAlignment = TextAlignment.Right;
+                                break;
+                            case "=":
+                                indiAlignment = TextAlignment.Center;
+                                break;
+                        }
+                    }
+                }
+
+                var block = Create<Paragraph, Inline>(RunSpanGamut(chip));
                 if (NormalParagraphStyle != null)
                 {
                     block.Style = NormalParagraphStyle;
                 }
+                if (indiAlignment.HasValue)
+                {
+                    block.TextAlignment = indiAlignment.Value;
+                }
+
                 yield return block;
             }
         }
@@ -298,7 +329,7 @@ namespace MdXaml
 
         #region grammer - image
 
-        private static Regex _imageInline = new Regex(string.Format(@"
+        private static readonly Regex _imageInline = new Regex(string.Format(@"
                 (                           # wrap whole match in $1
                     !\[
                         ({0})               # link text = $2
@@ -311,7 +342,7 @@ namespace MdXaml
                 )", GetNestedBracketsPattern(), GetNestedParensPatternWithWhiteSpace()),
                   RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        private static Regex _imageHrefWithTitle = new Regex(@"^
+        private static readonly Regex _imageHrefWithTitle = new Regex(@"^
                 (                           # wrap whole match in $1
                     (.+?)                   # url = $2
                     [ ]+
@@ -460,7 +491,7 @@ namespace MdXaml
 
         #region grammer - anchor
 
-        private static Regex _anchorInline = new Regex(string.Format(@"
+        private static readonly Regex _anchorInline = new Regex(string.Format(@"
                 (                           # wrap whole match in $1
                     \[
                         ({0})               # link text = $2
@@ -531,7 +562,7 @@ namespace MdXaml
 
         #region grammer - header
 
-        private static Regex _headerSetext = new Regex(@"
+        private static readonly Regex _headerSetext = new Regex(@"
                 ^(.+?)
                 [ ]*
                 \n
@@ -540,7 +571,7 @@ namespace MdXaml
                 \n+",
                 RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        private static Regex _headerAtx = new Regex(@"
+        private static readonly Regex _headerAtx = new Regex(@"
                 ^(\#{1,6})  # $1 = string of #'s
                 [ ]*
                 (.+?)       # $2 = Header text
@@ -665,7 +696,7 @@ namespace MdXaml
 
         #region grammer - horizontal rules
 
-        private static Regex _horizontalRules = new Regex(@"
+        private static readonly Regex _horizontalRules = new Regex(@"
             ^[ ]{0,3}         # Leading space
                 ([-*_])       # $1: First marker
                 (?>           # Repeated marker group
@@ -874,11 +905,11 @@ namespace MdXaml
 
             if (!String.IsNullOrEmpty(leadingLine) || Regex.IsMatch(item, @"\n{2,}"))
                 // we could correct any bad indentation here..
-                return Create<ListItem, Block>(RunBlockGamut(item));
+                return Create<ListItem, Block>(RunBlockGamut(item, false));
             else
             {
                 // recursion for sub-lists
-                return Create<ListItem, Block>(RunBlockGamut(item));
+                return Create<ListItem, Block>(RunBlockGamut(item, false));
             }
         }
 
@@ -1406,7 +1437,7 @@ namespace MdXaml
                         .ToArray()
             );
 
-            var blocks = RunBlockGamut(Normalize(trimmedTxt));
+            var blocks = RunBlockGamut(Normalize(trimmedTxt), true);
             var result = Create<Section, Block>(blocks);
             if (BlockquoteStyle != null)
             {
