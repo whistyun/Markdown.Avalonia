@@ -45,6 +45,11 @@ namespace MdXaml
         private const string TagOddTableRow = "OddTableRow";
         private const string TagEvenTableRow = "EvenTableRow";
 
+        private const string TagBoldSpan = "Bold";
+        private const string TagItalicSpan = "Italic";
+        private const string TagStrikethroughSpan = "Strikethrough";
+        private const string TagUnderlineSpan = "Underline";
+
         #endregion
 
         /// <summary>
@@ -237,7 +242,7 @@ namespace MdXaml
             return DoCodeSpans(text,
                 s0 => DoImages(s0,
                 s1 => DoAnchors(s1,
-                s2 => DoItalicsAndBold(s2,
+                s2 => DoTextDecorations(s2,
                 s3 => DoText(s3)))));
 
             //text = EscapeSpecialCharsWithinTagAttributes(text);
@@ -1207,20 +1212,27 @@ namespace MdXaml
 
         #region grammer - inline & bold
 
-        private static Regex _bold = new Regex(@"(\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1",
+        private static readonly Regex _strictBold = new Regex(@"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
-        private static Regex _strictBold = new Regex(@"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)",
+        private static readonly Regex _strictItalic = new Regex(@"([\W_]|^) (\*|_) (?=\S) ([^\r\*_]*?\S) \2 ([\W_]|$)",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
-        private static Regex _italic = new Regex(@"(\*|_) (?=\S) (.+?) (?<=\S) \1",
+        private static readonly Regex _bold = new Regex(@"(\*\*) (?=\S) (.+?[*]*) (?<=\S) \1",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
-        private static Regex _strictItalic = new Regex(@"([\W_]|^) (\*|_) (?=\S) ([^\r\*_]*?\S) \2 ([\W_]|$)",
+
+        private static readonly Regex _italic = new Regex(@"(\*) (?=\S) (.+?) (?<=\S) \1",
+            RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+
+        private static readonly Regex _strikethrough = new Regex(@"(~~) (?=\S) (.+?) (?<=\S) \1",
+            RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+
+        private static readonly Regex _underline = new Regex(@"(__) (?=\S) (.+?) (?<=\S) \1",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
         /// <summary>
         /// Turn Markdown *italics* and **bold** into HTML strong and em tags
         /// </summary>
-        private IEnumerable<Inline> DoItalicsAndBold(string text, Func<string, IEnumerable<Inline>> defaultHandler)
+        private IEnumerable<Inline> DoTextDecorations(string text, Func<string, IEnumerable<Inline>> defaultHandler)
         {
             if (text is null)
             {
@@ -1232,13 +1244,17 @@ namespace MdXaml
             {
                 return Evaluate<Inline>(text, _strictBold, m => BoldEvaluator(m, 3),
                     s1 => Evaluate<Inline>(s1, _strictItalic, m => ItalicEvaluator(m, 3),
-                    s2 => defaultHandler(s2)));
+                    s2 => Evaluate<Inline>(s2, _strikethrough, m => StrikethroughEvaluator(m, 2),
+                    s3 => Evaluate<Inline>(s3, _underline, m => UnderlineEvaluator(m, 2),
+                    s4 => defaultHandler(s4)))));
             }
             else
             {
                 return Evaluate<Inline>(text, _bold, m => BoldEvaluator(m, 2),
-                   s1 => Evaluate<Inline>(s1, _italic, m => ItalicEvaluator(m, 2),
-                   s2 => defaultHandler(s2)));
+                    s1 => Evaluate<Inline>(s1, _italic, m => ItalicEvaluator(m, 2),
+                    s2 => Evaluate<Inline>(s2, _strikethrough, m => StrikethroughEvaluator(m, 2),
+                    s3 => Evaluate<Inline>(s3, _underline, m => UnderlineEvaluator(m, 2),
+                    s4 => defaultHandler(s4)))));
             }
         }
 
@@ -1250,7 +1266,12 @@ namespace MdXaml
             }
 
             var content = match.Groups[contentGroup].Value;
-            return Create<Italic, Inline>(RunSpanGamut(content));
+            var span = Create<Italic, Inline>(RunSpanGamut(content));
+            if (!DisabledTag)
+            {
+                span.Tag = TagItalicSpan;
+            }
+            return span;
         }
 
         private Inline BoldEvaluator(Match match, int contentGroup)
@@ -1261,7 +1282,46 @@ namespace MdXaml
             }
 
             var content = match.Groups[contentGroup].Value;
-            return Create<Bold, Inline>(RunSpanGamut(content));
+            var span = Create<Bold, Inline>(RunSpanGamut(content));
+            if (!DisabledTag)
+            {
+                span.Tag = TagBoldSpan;
+            }
+            return span;
+        }
+
+        private Inline StrikethroughEvaluator(Match match, int contentGroup)
+        {
+            if (match is null)
+            {
+                throw new ArgumentNullException(nameof(match));
+            }
+
+            var content = match.Groups[contentGroup].Value;
+
+            var span = Create<Span, Inline>(RunSpanGamut(content));
+            span.TextDecorations = TextDecorations.Strikethrough;
+            if (!DisabledTag)
+            {
+                span.Tag = TagStrikethroughSpan;
+            }
+            return span;
+        }
+
+        private Inline UnderlineEvaluator(Match match, int contentGroup)
+        {
+            if (match is null)
+            {
+                throw new ArgumentNullException(nameof(match));
+            }
+
+            var content = match.Groups[contentGroup].Value;
+            var span = Create<Underline, Inline>(RunSpanGamut(content));
+            if (!DisabledTag)
+            {
+                span.Tag = TagUnderlineSpan;
+            }
+            return span;
         }
 
         #endregion

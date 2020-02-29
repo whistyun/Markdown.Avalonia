@@ -31,7 +31,7 @@ namespace MdXaml
                 row.Select(txt => new MdTableCell(txt)).ToList()
             ).ToList();
 
-            var styleMt = new OverrunList<Nullable<TextAlignment>>(
+            var styleMt = new MdOverrunList<Nullable<TextAlignment>>(
                 styles.Select(txt =>
                 {
                     var firstChar = txt[0];
@@ -64,7 +64,7 @@ namespace MdXaml
 
             ColCount = Header.Sum(cell => cell.ColSpan);
 
-            var rowSpanLife = new OverrunList<Span>(() => new Span(-1, 1));
+            var rowSpanLife = new MdOverrunList<MdSpan>(() => new MdSpan(-1, 1));
             // apply cell style to header
             foreach (var row in Details)
             {
@@ -86,7 +86,7 @@ namespace MdXaml
                         if (cell.RowSpan > 1)
                         {
                             rowSpanLife[colOffset] =
-                                new Span(cell.RowSpan, cell.ColSpan);
+                                new MdSpan(cell.RowSpan, cell.ColSpan);
                         }
                     }
                     else
@@ -119,30 +119,30 @@ namespace MdXaml
         }   //
     }
 
-    class Span
+    class MdSpan
     {
         public int Life { set; get; }
         public int ColSpan { set; get; }
 
-        public Span(int l, int c)
+        public MdSpan(int l, int c)
         {
             Life = l;
             ColSpan = c;
         }
     }
 
-    class OverrunList<T>
+    class MdOverrunList<T>
     {
         Func<T> IndexOutVal;
 
         List<T> list = new List<T>();
 
-        public OverrunList(Func<T> indexOutVal)
+        public MdOverrunList(Func<T> indexOutVal)
         {
             IndexOutVal = indexOutVal;
         }
 
-        public OverrunList(IEnumerable<T> lst, Func<T> indexOutVal) : this(indexOutVal)
+        public MdOverrunList(IEnumerable<T> lst, Func<T> indexOutVal) : this(indexOutVal)
         {
             list = lst.ToList();
         }
