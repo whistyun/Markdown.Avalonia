@@ -24,12 +24,29 @@ application for an example of how this can be configured.
 
 [https://www.nuget.org/packages/MdXaml/](https://www.nuget.org/packages/MdXaml/)
 
-## How to use
+## Quick start
 
+```cs
+// using MdXaml;
+// using System.Windows.Documents;
+
+Markdown engine = new Markdown();
+
+string markdownTxt = System.IO.File.ReadAllText("example.md");
+
+FlowDocument document = engine.Transform(markdownTxt);
+```
+
+## How to use (Markdown standard)
 * [Transform markdow to flowdocument](Document/transform_markdow_to_flowdocument.md)
 * [Render markdown in Control](Document/render_markdown_in_control.md)
 * [Image reading priority order](Document/image_load_priority.md)
-* [enhance table syntac](Document/table_enhance.md)
+
+## [How to use (Markdown enhance)](Document/original_enhance.md)
+* list; alphabet-order, roman-order
+* table; row-span, columnspan
+* text alignment
+* text decoration(bold, italic, strikethrough, underline, color)
 
 ## License
 
