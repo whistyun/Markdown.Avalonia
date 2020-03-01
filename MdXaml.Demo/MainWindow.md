@@ -8,35 +8,47 @@ WPF window or usercontrol.
 
 ## Features ##
 
-MarkDown.Xaml has a number of convenient features
+MdXaml has a number of convenient features
 
 * The engine itself is a single file, for easy inclusion in your own projects
-* Code for the engine is structured in the same manner as the original MarkdownSharp  
-If there are any bug fixes to the regular expressions in MarkdownSharp, merging those fixes in the Markdown.Xaml should be straightforward
-* Includes a `TextToFlowDocumentConverter` to make it easy to bind Markdown text
+* Includes a `MarkdownScrollViewer` to make it easy to bind Markdown text
+* MdXaml has some original enhances idiom base on textile.
 
+## The Example Of ... ##
 
-## Markdown capabilities and customizables styles ##
+### Text decolation [included original enhance] ###
+*italic*, **bold**, ***bold-italic***, ~~strikethrough~~, __underline__ and %{color:red}color%.  
+%{color:blue}***~~__Mixing Text__~~***%
 
-* Links [Go to Google!](https://www.google.com)
-* Links with title [Go to Google!](https://www.google.com "google.")
-* Remote images
+### Link ###
+Links [Go to Google!](https://www.google.com)  
+Links with title [Go to Google!](https://www.google.com "google.")
 
-![image1](http://placehold.it/350x150)
-
-![imageleft](http://placehold.it/100x150/0000FF "blue")![imageright](http://placehold.it/100x150/00FFFF "cyan")
-
-* Local images
-
+### Image ###
+#### Remote images ####
+![image1](http://placehold.it/300x25)  
+![imageleft](http://placehold.it/150x25/0000FF "blue")![imageright](http://placehold.it/150x25/00FFFF "cyan")
+#### Local and resource images ####
 ![localimage](LocalPath.png)
-
-* Resource image
-
 ![ResourceImage](Asset/ResourceImage.png)
 
-* Table
+### List ###
+#### ul
+* one
+* two
 
-table begin string
+#### ol
+1. one
+2. two
+#### alphabet-ol [original enhance]
+a. one
+b. two
+
+#### roman-ol [original enhance]
+i, one
+ii, two
+
+### Table [included original enhance] ###
 |a|b|c|d|
 |:-:|:-|-:|
 |a1234567890|b1234567890|c1234567890|d1234567890|
@@ -44,12 +56,9 @@ table begin string
 |A|\2.C|
 |1|2|3|4|
 |あ|い|う|え|
-table end string
 
-* Code
-
+### Code ###
 Markdown.Xaml support ```inline code ``` and block code.
-
 ```c
 #include <stdio.h>
 int main()
@@ -60,17 +69,24 @@ int main()
 }
 ```
 
-* Separator
+### Separator ###
 ***
 
-* Blockquote
-
+### Blockquote ###
 > ## Features ##
 > MarkDown.Xaml has a number of convenient features
 > 
 > * The engine itself is a single file, for easy inclusion in your own projects
 > * Code for the engine is structured in the same manner as the original MarkdownSharp  
 > * Includes a `TextToFlowDocumentConverter` to make it easy to bind Markdown text
+
+### Text Alignment [original enhance] ###
+MdXaml parse a head of paragraph. If 'p[<=>].' is found, apply text alignment to it.
+> p<. left alignment text
+> 
+> p>. right alignment text
+> 
+> p=. center alignment
 
 
 ## What is this Demo? ##

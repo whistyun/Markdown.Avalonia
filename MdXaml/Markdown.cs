@@ -978,7 +978,7 @@ namespace MdXaml
                 )
                 [ ]*\r?\n[ ]*
                 (                           # $4 = column style
-                    \|(:?-+:?\|)*           # $5
+                    \|(:?-+:?\|)+           # $5
                 )
                 (                           # $6 = table row
                     (                       # $7
@@ -1241,12 +1241,14 @@ namespace MdXaml
         #endregion
 
 
-        #region grammer - inline & bold
+        #region grammer - textdecorations
 
         private static readonly Regex _strictBold = new Regex(@"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
         private static readonly Regex _strictItalic = new Regex(@"([\W_]|^) (\*|_) (?=\S) ([^\r\*_]*?\S) \2 ([\W_]|$)",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+
+        private static readonly Regex _color = new Regex(@"%\{[ \t]*color[ \t]*:([^\}]+)\}", RegexOptions.Compiled);
 
         private static readonly Regex _bold = new Regex(@"(\*\*) (?=\S) (.+?[*]*) (?<=\S) \1",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
@@ -1281,13 +1283,292 @@ namespace MdXaml
             }
             else
             {
-                return Evaluate<Inline>(text, _bold, m => BoldEvaluator(m, 2),
-                    s1 => Evaluate<Inline>(s1, _italic, m => ItalicEvaluator(m, 2),
-                    s2 => Evaluate<Inline>(s2, _strikethrough, m => StrikethroughEvaluator(m, 2),
-                    s3 => Evaluate<Inline>(s3, _underline, m => UnderlineEvaluator(m, 2),
-                    s4 => defaultHandler(s4)))));
+                var rtn = new List<Inline>();
+
+                var buff = new StringBuilder();
+
+                for (var i = 0; i < text.Length; ++i)
+                {
+                    var ch = text[i];
+                    switch (ch)
+                    {
+                        default:
+                            buff.Append(ch);
+                            break;
+
+                        case '\\': // escape
+                            buff.Append(++i < text.Length ? text[i] : '\\');
+                            break;
+
+                        case '*': // bold? or italic
+                            {
+                                var oldI = i;
+                                var inline = ParseAsBoldOrItalic(text, ref i);
+                                if (inline == null)
+                                {
+                                    buff.Append(text, oldI, i - oldI + 1);
+                                }
+                                else
+                                {
+                                    rtn.AddRange(defaultHandler(buff.ToString()));
+                                    rtn.Add(inline);
+                                    buff.Clear();
+                                }
+                                break;
+                            }
+
+                        case '~': // strikethrough?
+                            {
+                                var oldI = i;
+                                var inline = ParseAsStrikethrough(text, ref i);
+                                if (inline == null)
+                                {
+                                    buff.Append(text, oldI, i - oldI + 1);
+                                }
+                                else
+                                {
+                                    rtn.AddRange(defaultHandler(buff.ToString()));
+                                    rtn.Add(inline);
+                                    buff.Clear();
+                                }
+                                break;
+                            }
+
+                        case '_': // underline?
+                            {
+                                var oldI = i;
+                                var inline = ParseAsUnderline(text, ref i);
+                                if (inline == null)
+                                {
+                                    buff.Append(text, oldI, i - oldI + 1);
+                                }
+                                else
+                                {
+                                    rtn.AddRange(defaultHandler(buff.ToString()));
+                                    rtn.Add(inline);
+                                    buff.Clear();
+                                }
+                                break;
+                            }
+
+                        case '%': // color?
+                            {
+                                var oldI = i;
+                                var inline = ParseAsColor(text, ref i);
+                                if (inline == null)
+                                {
+                                    buff.Append(text, oldI, i - oldI + 1);
+                                }
+                                else
+                                {
+                                    rtn.AddRange(defaultHandler(buff.ToString()));
+                                    rtn.Add(inline);
+                                    buff.Clear();
+                                }
+                                break;
+                            }
+                    }
+                }
+
+                if (buff.Length > 0)
+                {
+                    rtn.AddRange(defaultHandler(buff.ToString()));
+                }
+
+                return rtn;
             }
         }
+
+        private Inline ParseAsUnderline(string text, ref int start)
+        {
+            var bgnCnt = CountRepeat(text, start, '_');
+
+            int last = EscapedIndexOf(text, start + bgnCnt, '_');
+
+            int endCnt = last >= 0 ? CountRepeat(text, last, '_') : -1;
+
+            if (endCnt >= 2 && bgnCnt >= 2)
+            {
+                int cnt = 2;
+                int bgn = start + cnt;
+                int end = last;
+
+                start = end + cnt - 1;
+                var span = Create<Underline, Inline>(RunSpanGamut(text.Substring(bgn, end - bgn)));
+                if (!DisabledTag)
+                {
+                    span.Tag = TagUnderlineSpan;
+                }
+                return span;
+            }
+            else
+            {
+                start += bgnCnt - 1;
+                return null;
+            }
+        }
+
+        private Inline ParseAsStrikethrough(string text, ref int start)
+        {
+            var bgnCnt = CountRepeat(text, start, '~');
+
+            int last = EscapedIndexOf(text, start + bgnCnt, '~');
+
+            int endCnt = last >= 0 ? CountRepeat(text, last, '~') : -1;
+
+            if (endCnt >= 2 && bgnCnt >= 2)
+            {
+                int cnt = 2;
+                int bgn = start + cnt;
+                int end = last;
+
+                start = end + cnt - 1;
+                var span = Create<Span, Inline>(RunSpanGamut(text.Substring(bgn, end - bgn)));
+                span.TextDecorations = TextDecorations.Strikethrough;
+
+                if (!DisabledTag)
+                {
+                    span.Tag = TagStrikethroughSpan;
+                }
+                return span;
+            }
+            else
+            {
+                start += bgnCnt - 1;
+                return null;
+            }
+        }
+
+        private Inline ParseAsBoldOrItalic(string text, ref int start)
+        {
+            // count asterisk (bgn)
+            var bgnCnt = CountRepeat(text, start, '*');
+
+            int last = EscapedIndexOf(text, start + bgnCnt, '*');
+
+            int endCnt = last >= 0 ? CountRepeat(text, last, '*') : -1;
+
+            if (endCnt >= 1)
+            {
+                int cnt = Math.Min(bgnCnt, endCnt);
+                int bgn = start + cnt;
+                int end = last;
+
+                switch (cnt)
+                {
+                    case 1: // italic
+                        {
+                            start = end + cnt - 1;
+
+                            var span = Create<Italic, Inline>(RunSpanGamut(text.Substring(bgn, end - bgn)));
+                            if (!DisabledTag)
+                            {
+                                span.Tag = TagItalicSpan;
+                            }
+                            return span;
+                        }
+                    case 2: // bold
+                        {
+                            start = end + cnt - 1;
+                            var span = Create<Bold, Inline>(RunSpanGamut(text.Substring(bgn, end - bgn)));
+                            if (!DisabledTag)
+                            {
+                                span.Tag = TagBoldSpan;
+                            }
+                            return span;
+                        }
+
+                    default: // >3; bold-italic
+                        {
+                            bgn = start + 3;
+                            start = end + 3 - 1;
+
+                            var inline = Create<Italic, Inline>(RunSpanGamut(text.Substring(bgn, end - bgn)));
+                            if (!DisabledTag)
+                            {
+                                inline.Tag = TagItalicSpan;
+                            }
+
+                            var span = new Bold(inline);
+                            if (!DisabledTag)
+                            {
+                                span.Tag = TagBoldSpan;
+                            }
+                            return span;
+                        }
+                }
+            }
+            else
+            {
+                start += bgnCnt - 1;
+                return null;
+            }
+        }
+
+        private Inline ParseAsColor(string text, ref int start)
+        {
+            var mch = _color.Match(text, start);
+
+            if (mch.Success && start == mch.Index)
+            {
+                int bgnIdx = start + mch.Value.Length;
+                int endIdx = EscapedIndexOf(text, bgnIdx, '%');
+
+                Span span;
+                if (endIdx == -1)
+                {
+                    endIdx = text.Length - 1;
+                    span = Create<Span, Inline>(
+                        RunSpanGamut(text.Substring(bgnIdx)));
+                }
+                else
+                {
+                    span = Create<Span, Inline>(
+                        RunSpanGamut(text.Substring(bgnIdx, endIdx - bgnIdx)));
+                }
+
+                var colorLbl = mch.Groups[1].Value;
+
+                try
+                {
+                    var color = colorLbl.StartsWith("#") ?
+                        (SolidColorBrush)new BrushConverter().ConvertFrom(colorLbl) :
+                        (SolidColorBrush)new BrushConverter().ConvertFromString(colorLbl);
+
+                    span.Foreground = color;
+                }
+                catch { }
+
+                start = endIdx;
+                return span;
+            }
+            else return null;
+        }
+
+
+        private int EscapedIndexOf(string text, int start, char target)
+        {
+            for (var i = start; i < text.Length; ++i)
+            {
+                var ch = text[i];
+                if (ch == '\\') ++i;
+                else if (ch == target) return i;
+            }
+            return -1;
+        }
+        private int CountRepeat(string text, int start, char target)
+        {
+            var count = 0;
+
+            for (var i = start; i < text.Length; ++i)
+            {
+                if (text[i] == target) ++count;
+                else break;
+            }
+
+            return count;
+        }
+
 
         private Inline ItalicEvaluator(Match match, int contentGroup)
         {
