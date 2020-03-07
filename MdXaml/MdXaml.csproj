@@ -11,7 +11,7 @@
     <Description>Markdown XAML processor</Description>
     <Copyright>Copyright (c) 2019 Bevan Arps, 2020 whistyun</Copyright>
     <PackageProjectUrl>https://github.com/whistyun/MdXaml</PackageProjectUrl>
-	<PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageTags>Markdown WPF Xaml FlowDocument</PackageTags>
   </PropertyGroup>
 
@@ -30,12 +30,4 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
     <PackageReference Include="AvalonEdit" Version="6.0.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\LICENSE">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
-
 </Project>
