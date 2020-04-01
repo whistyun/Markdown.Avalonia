@@ -977,24 +977,24 @@ namespace MdXaml
 
         #region grammer - table
 
-        private static Regex _table = new Regex(@"
-            (                               # $1 = whole table
+        private static readonly Regex _table = new Regex(@"
+            (                               # whole table
                 [ \r\n]*
-                (                           # $2 = table header
-                    \|([^|\r\n]*\|)+        # $3
+                (?<hdr>                     # table header
+                    \|([^|\r\n]*\|)+
                 )
                 [ ]*\r?\n[ ]*
-                (                           # $4 = column style
-                    \|([ ]*:?-+:?[ ]*\|)+   # $5
+                (?<col>                     # column style
+                    \|?([ ]*:?-+:?[ ]*(\||$))+
                 )
-                (                           # $6 = table row
-                    (                       # $7
+                (?<row>                     # table row
+                    (
                         [ ]*\r?\n[ ]*
-                        \|([^|\r\n]*\|)+    # $8
+                        ([^\r\n\|]*\|[^\r\n]+)
                     )+
                 )
             )",
-            RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+            RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
         public IEnumerable<Block> DoTable(string text, Func<string, IEnumerable<Block>> defaultHandler)
         {
@@ -1013,9 +1013,9 @@ namespace MdXaml
                 throw new ArgumentNullException(nameof(match));
             }
 
-            var headerTxt = match.Groups[2].Value.Trim();
-            var styleTxt = match.Groups[4].Value.Trim();
-            var rowTxt = match.Groups[6].Value.Trim();
+            var headerTxt = match.Groups["hdr"].Value.Trim();
+            var styleTxt = match.Groups["col"].Value.Trim();
+            var rowTxt = match.Groups["row"].Value.Trim();
 
             var mdtable = new MdTable(
                 headerTxt.Substring(1, headerTxt.Length - 2).Split('|'),
@@ -1271,10 +1271,10 @@ namespace MdXaml
             return result;
         }
 
-#endregion
+        #endregion
 
 
-#region grammer - textdecorations
+        #region grammer - textdecorations
 
         private static readonly Regex _strictBold = new Regex(@"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
@@ -1661,10 +1661,10 @@ namespace MdXaml
             return span;
         }
 
-#endregion
+        #endregion
 
 
-#region grammer - text
+        #region grammer - text
 
         private static Regex _eoln = new Regex("\\s+");
         private static Regex _lbrk = new Regex(@"\ {2,}\n");
@@ -1689,9 +1689,9 @@ namespace MdXaml
             }
         }
 
-#endregion
+        #endregion
 
-#region grammer - blockquote
+        #region grammer - blockquote
 
         private static Regex _blockquote = new Regex(@"
             (?<=\n)
@@ -1758,9 +1758,9 @@ namespace MdXaml
         }
 
 
-#endregion
+        #endregion
 
-#region helper - make regex
+        #region helper - make regex
 
         private static string _nestedBracketsPattern;
 
@@ -1850,10 +1850,10 @@ namespace MdXaml
             return sb.ToString();
         }
 
-#endregion
+        #endregion
 
 
-#region helper - parse
+        #region helper - parse
 
         private TResult Create<TResult, TContent>(IEnumerable<TContent> content)
             where TResult : IAddChild, new()
@@ -1902,6 +1902,6 @@ namespace MdXaml
             }
         }
 
-#endregion
+        #endregion
     }
 }
