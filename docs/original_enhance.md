@@ -20,7 +20,7 @@ Below table shows each idioms.
 |color-text(2) | %{color:#00FF00}colortext% |
 
 ```
-![text_deco](text_deco.png)
+![text_deco](img/text_deco.png)
 
 ## Text alignment
 
@@ -39,7 +39,7 @@ p>. arrange paragraph right-side.
 p=. arrange paragraph center.  
 p=>. inner paragraph is ignored.
 ```
-![text_alignment](text_alignment.png)
+![text_alignment](img/text_alignment.png)
 
 
 ## list
@@ -60,7 +60,7 @@ ii, two
 I, one
 II, two
 ```
-![list](list.png)
+![list](img/list.png)
 
 
 ## Table colspan or rowspan
@@ -78,7 +78,7 @@ MdXaml extends table format to explain colspan and rowspan. Its format is Influe
 | hoge        |>. right-align | hoge          | hoge     |
 
 ```
-![view1](generated_table.1.png)
+![view1](img/generated_table.1.png)
 
 ### Format
 
@@ -101,7 +101,7 @@ If you don't want to parse, type space after pipe(|).
 | \2. ignore  | hoge          |
 ```
 
-![view2](generated_table.2.png)
+![view2](img/generated_table.2.png)
 
 
 ### MarkdownTableBuilder.ods
@@ -109,4 +109,4 @@ If you don't want to parse, type space after pipe(|).
 To make table easily, We provide 'MarkdownTableBuilder.ods'.
 With LibreOffice It can open it and execute macros.
 
-![how to](howtouse_mdtblbuilder.gif)
+![how to](img/howtouse_mdtblbuilder.gif)

@@ -38,11 +38,11 @@ FlowDocument document = engine.Transform(markdownTxt);
 ```
 
 ## How to use (Markdown standard)
-* [Transform markdow to flowdocument](Document/transform_markdow_to_flowdocument.md)
-* [Render markdown in Control](Document/render_markdown_in_control.md)
-* [Image reading priority order](Document/image_load_priority.md)
+* [Transform markdow to flowdocument](docs/transform_markdow_to_flowdocument.md)
+* [Render markdown in Control](docs/render_markdown_in_control.md)
+* [Image reading priority order](docs/image_load_priority.md)
 
-## [How to use (Markdown enhance)](Document/original_enhance.md)
+## [How to use (Markdown enhance)](docs/original_enhance.md)
 * list; alphabet-order, roman-order
 * table; row-span, columnspan
 * text alignment
