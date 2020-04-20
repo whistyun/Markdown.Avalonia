@@ -2,8 +2,7 @@
 
 MdXaml is a modify version of Markdown.Xaml.
 It can convert Markdown to FlowDocument of WPF.
-
-[(for japanese|日本語)](index_jp.md)
+([for japanese|日本語](index_jp.md))
 
 ## What are Markdown.Xaml and MdXaml ?
 
