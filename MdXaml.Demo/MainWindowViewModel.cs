@@ -48,12 +48,14 @@ namespace MdXaml.Demo
 
                 if (stream == null)
                 {
-                    Text = String.Format("Could not find sample text *{0}*.md", subjectType.FullName);
+                    TextView =
+                    TextXaml = String.Format("Could not find sample text *{0}*.md", subjectType.FullName);
                 }
 
                 using (StreamReader reader = new StreamReader(stream))
                 {
-                    Text = reader.ReadToEnd();
+                    TextView =
+                    TextXaml = reader.ReadToEnd();
                 }
             }
 
@@ -84,34 +86,45 @@ namespace MdXaml.Demo
             }
         }
 
-        public string _text;
-        public string Text
+        public string _textView;
+        public string TextView
         {
-            get { return _text; }
+            get { return _textView; }
             set
             {
-                if (_text == value) return;
-                _text = value;
+                if (_textView == value) return;
+                _textView = value;
+                FirePropertyChanged();
+            }
+        }
 
-                if (TextChangeEvent == null || TextChangeEvent.Status >= TaskStatus.RanToCompletion)
+
+        private Task TextXamlChangeEvent;
+        public string _textXaml;
+        public string TextXaml
+        {
+            get { return _textXaml; }
+            set
+            {
+                if (_textXaml == value) return;
+                _textXaml = value;
+                if (TextXamlChangeEvent == null || TextXamlChangeEvent.Status >= TaskStatus.RanToCompletion)
                 {
-                    TextChangeEvent = Task.Run(() =>
+                    TextXamlChangeEvent = Task.Run(() =>
                     {
                         Task.Delay(100);
                     retry:
-                        var oldVal = _text;
+                        var oldVal = _textXaml;
 
                         Thread.MemoryBarrier();
-                        FirePropertyChanged(nameof(Text));
+                        FirePropertyChanged(nameof(TextXaml));
 
                         Thread.MemoryBarrier();
-                        if (oldVal != _text) goto retry;
+                        if (oldVal != _textXaml) goto retry;
                     });
                 }
             }
         }
-
-        private Task TextChangeEvent;
 
 
         /// <summary> <see cref="INotifyPropertyChanged"/> </summary>

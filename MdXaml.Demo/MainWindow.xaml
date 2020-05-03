@@ -22,7 +22,7 @@
     </Window.DataContext>
 
 
-    <TabControl>
+    <TabControl SelectionChanged="TabControl_SelectionChanged">
         <TabItem Header="BindingStyle">
             <Grid>
                 <Grid.RowDefinitions>
@@ -55,7 +55,7 @@
                     TextWrapping="Wrap"
                     AcceptsReturn="True"
                     Margin="5" 
-                    Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"
+                    Text="{Binding TextView, UpdateSourceTrigger=PropertyChanged}"
                     VerticalScrollBarVisibility="Auto"/>
 
                 <mdxam:MarkdownScrollViewer
@@ -64,7 +64,7 @@
                     HorizontalAlignment="Stretch"
                     Margin="5"
                     MarkdownStyle="{Binding SelectedStyleInfo.Style}"
-                    Markdown="{Binding Text}"
+                    Markdown="{Binding TextView}"
                      />
 
             </Grid>
@@ -85,7 +85,7 @@
                      TextWrapping="Wrap"
                      AcceptsReturn="True"
                      Margin="5" 
-                     Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding TextXaml, UpdateSourceTrigger=PropertyChanged}"
                      VerticalScrollBarVisibility="Auto"/>
 
                 <TextBox x:Name="outXaml3"
@@ -96,7 +96,7 @@
                     IsReadOnly="True"
                     HorizontalScrollBarVisibility="Auto"
                     VerticalScrollBarVisibility="Auto"
-                    Text="{Binding Path=Text, Converter={StaticResource MarkdownXamlConverter}}">
+                    Text="{Binding Path=TextXaml, Converter={StaticResource MarkdownXamlConverter}}">
                 </TextBox>
             </Grid>
         </TabItem>

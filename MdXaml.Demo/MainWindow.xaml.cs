@@ -37,5 +37,28 @@ namespace MdXaml.Demo
                     proc.Start();
                 }));
         }
+
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var tabControl = sender as TabControl;
+            if (tabControl is null) return;
+
+            var selectedTab = tabControl.SelectedItem as TabItem;
+            if (selectedTab is null) return;
+
+            var dataContext = (MainWindowViewModel)DataContext;
+            if (dataContext is null) return;
+
+            var selectedTabHeader = (String)selectedTab.Header;
+
+            if (selectedTabHeader == "BindingStyle")
+            {
+                dataContext.TextView = dataContext.TextXaml;
+            }
+            else
+            {
+                dataContext.TextXaml = dataContext.TextView;
+            }
+        }
     }
 }
