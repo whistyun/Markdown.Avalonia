@@ -4,7 +4,11 @@ using System.Text;
 using System.Linq;
 using System.Windows;
 
+#if MIG_FREE
+namespace Markdown.Xaml
+#else
 namespace MdXaml
+#endif
 {
     class MdTable
     {

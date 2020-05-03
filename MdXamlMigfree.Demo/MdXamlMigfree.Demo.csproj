@@ -4,7 +4,6 @@
     <OutputType>WinExe</OutputType>
     <TargetFrameworks>netcoreapp3.0;net45</TargetFrameworks>
     <UseWPF>true</UseWPF>
-    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Remove="MdXaml.Demo.Styles.Default2.xaml" />
+    <Page Remove="MdXamlMigfree.Demo.Styles.Default2.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,13 +22,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="MdXaml.Demo.Styles.Default2.xaml">
+    <None Include="MdXamlMigfree.Demo.Styles.Default2.xaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MdXaml\MdXaml.csproj" />
+    <ProjectReference Include="..\MdXaml\MdXamlMigfree.csproj" />
   </ItemGroup>
 
   <ItemGroup>

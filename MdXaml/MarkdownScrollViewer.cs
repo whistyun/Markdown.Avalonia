@@ -5,7 +5,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
 
+#if MIG_FREE
+using MdStyle = Markdown.Xaml.MarkdownStyle;
+namespace Markdown.Xaml
+#else
+using MdStyle = MdXaml.MarkdownStyle;
 namespace MdXaml
+#endif
 {
     public class MarkdownScrollViewer : FlowDocumentScrollViewer, IUriContext
     {
@@ -102,7 +108,7 @@ namespace MdXaml
         public MarkdownScrollViewer()
         {
             Engine = new Markdown();
-            MarkdownStyleName = nameof(MdXaml.MarkdownStyle.Standard);
+            MarkdownStyleName = nameof(MdStyle.Standard);
         }
     }
 }

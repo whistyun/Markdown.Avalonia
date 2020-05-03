@@ -1,61 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Markup;
+using System.Xml;
 
-#if MIG_FREE
-namespace Markdown.Xaml
-#else
-namespace MdXaml
-#endif
+namespace MdXamlMigfree.Demo
 {
-    public class TextToFlowDocumentConverter : DependencyObject, IValueConverter
+    public class MarkdownXamlConverter : DependencyObject, IValueConverter
     {
         // Using a DependencyProperty as the backing store for Markdown.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MarkdownProperty =
-            DependencyProperty.Register("Markdown", typeof(Markdown), typeof(TextToFlowDocumentConverter), new PropertyMetadata(null, MarkdownUpdate));
+            DependencyProperty.Register("Markdown",
+                typeof(Markdown.Xaml.Markdown),
+                typeof(MarkdownXamlConverter),
+                new PropertyMetadata(null));
 
-        private static void MarkdownUpdate(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private Lazy<Markdown.Xaml.Markdown> mMarkdown;
+
+        public MarkdownXamlConverter()
         {
-            if (e.NewValue != null)
-            {
-                var owner = (TextToFlowDocumentConverter)d;
-                if (owner.MarkdownStyle != null)
-                {
-                    ((Markdown)e.NewValue).DocumentStyle = owner.MarkdownStyle;
-                }
-            }
+            mMarkdown = new Lazy<Markdown.Xaml.Markdown>(MakeMarkdown);
         }
 
-        private Lazy<Markdown> mMarkdown;
-        private Style markdownStyle;
-
-        public TextToFlowDocumentConverter()
+        public Markdown.Xaml.Markdown Markdown
         {
-            mMarkdown = new Lazy<Markdown>(MakeMarkdown);
-        }
-
-        public Markdown Markdown
-        {
-            get { return (Markdown)GetValue(MarkdownProperty); }
+            get { return (Markdown.Xaml.Markdown)GetValue(MarkdownProperty); }
             set { SetValue(MarkdownProperty, value); }
-        }
-        public Style MarkdownStyle
-        {
-            get { return markdownStyle; }
-            set
-            {
-                markdownStyle = value;
-                if (value != null && Markdown != null)
-                {
-                    Markdown.DocumentStyle = value;
-                }
-            }
         }
 
         /// <summary>
@@ -79,7 +55,7 @@ namespace MdXaml
 
             var engine = Markdown ?? mMarkdown.Value;
 
-            return engine.Transform(text);
+            return AsXaml(engine.Transform(text));
         }
 
         /// <summary>
@@ -97,14 +73,25 @@ namespace MdXaml
             throw new NotImplementedException();
         }
 
-        private Markdown MakeMarkdown()
+        private Markdown.Xaml.Markdown MakeMarkdown()
         {
-            var markdown = new Markdown();
-            if (MarkdownStyle != null)
-            {
-                markdown.DocumentStyle = MarkdownStyle;
-            }
+            var markdown = new Markdown.Xaml.Markdown();
             return markdown;
+        }
+
+        private string AsXaml(object instance)
+        {
+            using (var writer = new StringWriter())
+            {
+                var settings = new XmlWriterSettings { Indent = true };
+                using (var xmlWriter = XmlWriter.Create(writer, settings))
+                {
+                    XamlWriter.Save(instance, xmlWriter);
+                }
+
+                writer.WriteLine();
+                return writer.ToString();
+            }
         }
     }
 }

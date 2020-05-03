@@ -1,10 +1,7 @@
-﻿using ICSharpCode.AvalonEdit;
-using ICSharpCode.AvalonEdit.Highlighting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Cache;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -17,7 +14,16 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+#if !MIG_FREE
+using ICSharpCode.AvalonEdit;
+using ICSharpCode.AvalonEdit.Highlighting;
+#endif
+
+#if MIG_FREE
+namespace Markdown.Xaml
+#else
 namespace MdXaml
+#endif
 {
     public class Markdown : DependencyObject, IUriContext
     {
@@ -1135,6 +1141,31 @@ namespace MdXaml
             );
         }
 
+#if MIG_FREE
+        private Block CodeBlocksEvaluator(Match match)
+        {
+            if (match is null)
+            {
+                throw new ArgumentNullException(nameof(match));
+            }
+
+            string lang = match.Groups[2].Value;
+            string code = match.Groups[3].Value;
+
+            var text = new Run(code);
+            var result = new Paragraph(text);
+            if (CodeBlockStyle != null)
+            {
+                result.Style = CodeBlockStyle;
+            }
+            if (!DisabledTag)
+            {
+                result.Tag = TagCodeBlock;
+            }
+
+            return result;
+        }
+#else
         private Block CodeBlocksEvaluator(Match match)
         {
             if (match is null)
@@ -1165,6 +1196,7 @@ namespace MdXaml
 
             return result;
         }
+#endif
 
         #endregion
 
@@ -1238,10 +1270,10 @@ namespace MdXaml
             return result;
         }
 
-        #endregion
+#endregion
 
 
-        #region grammer - textdecorations
+#region grammer - textdecorations
 
         private static readonly Regex _strictBold = new Regex(@"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
@@ -1628,10 +1660,10 @@ namespace MdXaml
             return span;
         }
 
-        #endregion
+#endregion
 
 
-        #region grammer - text
+#region grammer - text
 
         private static Regex _eoln = new Regex("\\s+");
         private static Regex _lbrk = new Regex(@"\ {2,}\n");
@@ -1656,9 +1688,9 @@ namespace MdXaml
             }
         }
 
-        #endregion
+#endregion
 
-        #region grammer - blockquote
+#region grammer - blockquote
 
         private static Regex _blockquote = new Regex(@"
             (?<=\n)
@@ -1725,9 +1757,9 @@ namespace MdXaml
         }
 
 
-        #endregion
+#endregion
 
-        #region helper - make regex
+#region helper - make regex
 
         private static string _nestedBracketsPattern;
 
@@ -1817,10 +1849,10 @@ namespace MdXaml
             return sb.ToString();
         }
 
-        #endregion
+#endregion
 
 
-        #region helper - parse
+#region helper - parse
 
         private TResult Create<TResult, TContent>(IEnumerable<TContent> content)
             where TResult : IAddChild, new()
@@ -1869,6 +1901,6 @@ namespace MdXaml
             }
         }
 
-        #endregion
+#endregion
     }
 }
