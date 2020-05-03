@@ -981,7 +981,7 @@ namespace MdXaml
             (                               # whole table
                 [ \r\n]*
                 (?<hdr>                     # table header
-                    \|([^|\r\n]*\|)+
+                    ([^\r\n\|]*\|[^\r\n]+)
                 )
                 [ ]*\r?\n[ ]*
                 (?<col>                     # column style
@@ -1017,13 +1017,23 @@ namespace MdXaml
             var styleTxt = match.Groups["col"].Value.Trim();
             var rowTxt = match.Groups["row"].Value.Trim();
 
+            string ExtractCoverBar(string txt)
+            {
+                if (txt[0] == '|')
+                    txt = txt.Substring(1);
+
+                if (txt[txt.Length - 1] == '|')
+                    txt = txt.Substring(0, txt.Length - 1);
+                return txt;
+            }
+
             var mdtable = new MdTable(
-                headerTxt.Substring(1, headerTxt.Length - 2).Split('|'),
-                styleTxt.Substring(1, styleTxt.Length - 2).Split('|'),
+                ExtractCoverBar(headerTxt).Split('|'),
+                ExtractCoverBar(styleTxt).Split('|').Select(txt => txt.Trim()).ToArray(),
                 rowTxt.Split('\n').Select(ritm =>
                 {
                     var trimRitm = ritm.Trim();
-                    return trimRitm.Substring(1, trimRitm.Length - 2).Split('|');
+                    return ExtractCoverBar(trimRitm).Split('|');
                 }).ToList());
 
             // table
