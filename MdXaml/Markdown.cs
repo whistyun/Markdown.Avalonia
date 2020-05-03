@@ -459,6 +459,7 @@ namespace MdXaml
                 downloadCompletedHandler = (sender, e) =>
                 {
                     imgSource.DownloadCompleted -= downloadCompletedHandler;
+                    imgSource.Freeze();
                     bindingExpression.UpdateTarget();
                 };
                 imgSource.DownloadCompleted += downloadCompletedHandler;
