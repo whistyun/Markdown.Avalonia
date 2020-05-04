@@ -40,7 +40,7 @@ namespace MdXaml.Demo
 
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var tabControl = sender as TabControl;
+            var tabControl = e.Source as TabControl;
             if (tabControl is null) return;
 
             var selectedTab = tabControl.SelectedItem as TabItem;
