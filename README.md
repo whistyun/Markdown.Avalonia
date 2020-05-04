@@ -20,6 +20,14 @@ stylesheet to the rendered output, MarkDown.Xaml uses WPF styles that are linked
 the rendering engine and applied to the output as it is generated. See the *included demo* 
 application for an example of how this can be configured.
 
+## Samle
+
+![sc1](docs/img.demo/sc1.png)
+![sc2](docs/img.demo/sc2.png)
+![sc3](docs/img.demo/sc3.png)
+![sc4](docs/img.demo/sc4.png)
+![sc5](docs/img.demo/sc5.png)
+
 ## Nuget
 
 [https://www.nuget.org/packages/MdXaml/](https://www.nuget.org/packages/MdXaml/)

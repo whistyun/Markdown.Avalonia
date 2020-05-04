@@ -6,13 +6,6 @@ with one very significant difference: Instead of rendering to a string
 containing HTML, it renders to a FlowDocument suitable for embedding into a 
 WPF window or usercontrol.
 
-## Features ##
-
-MdXaml has a number of convenient features
-
-* The engine itself is a single file, for easy inclusion in your own projects
-* Includes a `MarkdownScrollViewer` to make it easy to bind Markdown text
-* MdXaml has some original enhances idiom base on textile.
 
 ## The Example Of ... ##
 

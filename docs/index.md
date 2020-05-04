@@ -24,18 +24,15 @@ Additionary, MdXaml add the bellow.
     * text-decoration(strikethrough, underline, color)
     * text-align
 
-## Example
+## Sample
 
 If you want to try yourself, please download [Demo-application](MdXaml_Demo.zip) and execute it.
 
-### table
-![table-fowdoc.png    ](img/table-fowdoc.png)
-
-### list
-![list-flowdoc.png    ](img/list-flowdoc.png)
-
-### text-decoration and text-align
-![textdeco-flowdoc.png](img/textdeco-flowdoc.png)
+![sc1](img.demo/sc1.png)
+![sc2](img.demo/sc2.png)
+![sc3](img.demo/sc3.png)
+![sc4](img.demo/sc4.png)
+![sc5](img.demo/sc5.png)
 
 ## Nuget
 
