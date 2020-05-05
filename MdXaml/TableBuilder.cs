@@ -35,84 +35,150 @@ namespace MdXaml
                 row.Select(txt => new MdTableCell(txt)).ToList()
             ).ToList();
 
-            var styleMt = new MdOverrunList<Nullable<TextAlignment>>(
-                styles.Select(txt =>
-                {
-                    var firstChar = txt[0];
-                    var lastChar = txt[txt.Length - 1];
+            Dictionary<int, TextAlignment> styleMt = styles
+                    .Select((txt, idx) =>
+                    {
+                        var firstChar = txt[0];
+                        var lastChar = txt[txt.Length - 1];
 
-                    return
-                        (firstChar == ':' && lastChar == ':') ?
-                            (Nullable<TextAlignment>)TextAlignment.Center :
+                        return
+                            (firstChar == ':' && lastChar == ':') ?
+                                 Tuple.Create(idx, (TextAlignment?)TextAlignment.Center) :
 
-                        (lastChar == ':') ?
-                            (Nullable<TextAlignment>)TextAlignment.Right :
+                            (lastChar == ':') ?
+                                Tuple.Create(idx, (TextAlignment?)TextAlignment.Right) :
 
-                        (firstChar == ':') ?
-                            (Nullable<TextAlignment>)TextAlignment.Left :
+                            (firstChar == ':') ?
+                                Tuple.Create(idx, (TextAlignment?)TextAlignment.Left) :
 
-                            null;
-                }),
-                () => null
-            );
+                                Tuple.Create(idx, (TextAlignment?)null);
+                    })
+                    .Where(tpl => tpl.Item2.HasValue)
+                    .ToDictionary(tpl => tpl.Item1, tpl => tpl.Item2.Value);
+
+            var styleColumnCount = styleMt.Count;
 
             // apply cell style to header
-            var colOffset = 0;
-            foreach (var cell in Header)
+            var headerColumnCount = 0;
             {
-                var style = styleMt[colOffset];
-                if (style.HasValue) cell.Horizontal = style;
+                var colOffset = 0;
+                foreach (var cell in Header)
+                {
+                    // apply text align
+                    if (styleMt.TryGetValue(colOffset, out var style))
+                    {
+                        cell.Horizontal = style;
+                    }
 
-                colOffset += cell.ColSpan;
+                    colOffset += cell.ColSpan;
+                }
+
+                headerColumnCount = colOffset;
             }
 
-            ColCount = Header.Sum(cell => cell.ColSpan);
 
-            var rowSpanLife = new MdOverrunList<MdSpan>(() => new MdSpan(-1, 1));
             // apply cell style to header
-            foreach (var row in Details)
+            var detailsRowCount = new List<int>();
+            var detailsRowCountSummary = 1;
             {
-                colOffset = 0;
-
-                foreach (var cell in row)
+                var rowSpanLife = new Dictionary<int, MdSpan>();
+                for (var rowIdx = 0; rowIdx < Details.Count; ++rowIdx)
                 {
-                    var span = rowSpanLife[colOffset];
+                    var row = Details[rowIdx];
 
-                    int colSpan;
-                    if (span.Life <= 0)
-                    {
-                        colSpan = cell.ColSpan;
+                    var hasAnyCell = false;
+                    var colOffset = 0;
 
-                        var style = styleMt[colOffset];
-                        if (style.HasValue && !cell.Horizontal.HasValue)
-                            cell.Horizontal = style;
+                    var rowspansColOffset = rowSpanLife
+                        .Select(ent => ent.Value.ColSpan)
+                        .Sum();
 
-                        if (cell.RowSpan > 1)
+                    if (rowspansColOffset < detailsRowCountSummary) {
+                        for (var colIdx = 0; colIdx < row.Count;)
                         {
-                            rowSpanLife[colOffset] =
-                                new MdSpan(cell.RowSpan, cell.ColSpan);
+                            var cell = row[colIdx];
+
+                            // apply text align
+                            if (!cell.Horizontal.HasValue
+                                        && styleMt.TryGetValue(colOffset, out var style))
+                            {
+                                cell.Horizontal = style;
+                            }
+
+                            int colSpan;
+                            if (rowSpanLife.TryGetValue(colOffset, out var span))
+                            {
+                                colSpan = span.ColSpan;
+                            }
+                            else
+                            {
+                                colSpan = cell.ColSpan;
+                                hasAnyCell = true;
+
+                                if (cell.RowSpan > 1)
+                                {
+                                    rowSpanLife[colOffset] =
+                                        new MdSpan(cell.RowSpan, cell.ColSpan);
+                                }
+
+                                ++colIdx;
+                            }
+
+                            colOffset += colSpan;
                         }
                     }
-                    else
+
+                    colOffset += rowSpanLife
+                        .Where(ent => ent.Key >= colOffset)
+                        .Select(ent => ent.Value.ColSpan)
+                        .Sum();
+
+                    foreach (var spanEntry in rowSpanLife.ToArray())
                     {
-                        colSpan = span.ColSpan;
-
-                        var style = styleMt[colOffset + colSpan];
-                        if (style.HasValue && !cell.Horizontal.HasValue)
-                            cell.Horizontal = style;
-
+                        if (--spanEntry.Value.Life == 0)
+                        {
+                            rowSpanLife.Remove(spanEntry.Key);
+                        }
                     }
 
-                    for (var j = 0; j < colSpan; ++j)
+                    detailsRowCount.Add(colOffset);
+                    detailsRowCountSummary = Math.Max(detailsRowCountSummary, colOffset);
+
+                    if (!hasAnyCell)
                     {
-                        rowSpanLife[colOffset++].Life--;
+                        Details.Insert(rowIdx, new List<MdTableCell>());
                     }
                 }
 
-                ColCount = Math.Max(ColCount, colOffset);
+                while (rowSpanLife.Count > 0)
+                {
+                    Details.Add(new List<MdTableCell>());
+
+                    var colOffset = 0;
+
+                    foreach (var spanEntry in rowSpanLife.ToArray())
+                    {
+                        colOffset += spanEntry.Value.ColSpan;
+
+                        if (--spanEntry.Value.Life == 0)
+                        {
+                            rowSpanLife.Remove(spanEntry.Key);
+                        }
+                    }
+
+                    detailsRowCount.Add(colOffset);
+                }
             }
 
+            ColCount = Math.Max(Math.Max(headerColumnCount, styleColumnCount), detailsRowCountSummary);
             RowCount = Details.Count;
+
+            while (Header.Count < ColCount)
+                Header.Add(new MdTableCell(null));
+
+            for (var rowIdx = 0; rowIdx < Details.Count; ++rowIdx)
+                for (var retry = detailsRowCount[rowIdx]; retry < ColCount; ++retry)
+                    Details[rowIdx].Add(new MdTableCell(null));
 
             //while (Header.Count < ColCount)
             //    Header.Add(new MdTableCell(""));
@@ -135,43 +201,6 @@ namespace MdXaml
         }
     }
 
-    class MdOverrunList<T>
-    {
-        Func<T> IndexOutVal;
-
-        List<T> list = new List<T>();
-
-        public MdOverrunList(Func<T> indexOutVal)
-        {
-            IndexOutVal = indexOutVal;
-        }
-
-        public MdOverrunList(IEnumerable<T> lst, Func<T> indexOutVal) : this(indexOutVal)
-        {
-            list = lst.ToList();
-        }
-
-        public T this[int idx]
-        {
-            set
-            {
-                while (idx >= list.Count)
-                    list.Add(IndexOutVal());
-
-                list[idx] = value;
-            }
-            get
-            {
-                return idx < list.Count ? list[idx] : IndexOutVal();
-            }
-        }
-
-        public IEnumerable<T> Enumerable
-        {
-            get { return list; }
-        }
-    }
-
     class MdTableCell
     {
         public string RawText { get; }
@@ -188,6 +217,8 @@ namespace MdXaml
             ColSpan = 1;
             Horizontal = null;
             Vertical = null;
+
+            if (txt is null) return;
 
             int idx = txt.IndexOf('.');
 

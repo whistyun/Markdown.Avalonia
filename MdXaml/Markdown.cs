@@ -1280,9 +1280,9 @@ namespace MdXaml
 
             foreach (var mdcell in mdcells)
             {
-                var paragraph = Create<Paragraph, Inline>(RunSpanGamut(mdcell.Text));
-
-                var cell = new TableCell(paragraph);
+                TableCell cell = mdcell.Text is null ?
+                    new TableCell() :
+                    new TableCell(Create<Paragraph, Inline>(RunSpanGamut(mdcell.Text)));
 
                 if (mdcell.Horizontal.HasValue)
                     cell.TextAlignment = mdcell.Horizontal.Value;
