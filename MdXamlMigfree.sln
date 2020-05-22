@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MdXamlMigfree", "MdXaml\MdX
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MdXamlMigfree.Demo", "MdXamlMigfree.Demo\MdXamlMigfree.Demo.csproj", "{3264F38A-168B-40DD-AF08-F83564721A04}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MdXaml.TestMigfree", "MdXaml.Test\MdXaml.TestMigfree.csproj", "{5C44C645-E8E3-4F56-B1CE-F2EA126B5457}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{3264F38A-168B-40DD-AF08-F83564721A04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3264F38A-168B-40DD-AF08-F83564721A04}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3264F38A-168B-40DD-AF08-F83564721A04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C44C645-E8E3-4F56-B1CE-F2EA126B5457}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C44C645-E8E3-4F56-B1CE-F2EA126B5457}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C44C645-E8E3-4F56-B1CE-F2EA126B5457}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C44C645-E8E3-4F56-B1CE-F2EA126B5457}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

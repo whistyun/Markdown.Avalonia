@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-16"?>
+<FlowDocument Style="{x:Null}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit" xmlns:icscaed="clr-namespace:ICSharpCode.AvalonEdit.Document;assembly=ICSharpCode.AvalonEdit" xmlns:scmd="clr-namespace:System.ComponentModel.Design;assembly=System.ComponentModel.TypeConverter">
+  <Paragraph Tag="Heading1">Markdown.Xaml</Paragraph>
+  <Paragraph>Markdown XAML is a port of the popular <Italic Tag="Italic">MarkdownSharp</Italic> Markdown processor, but with one very significant difference: Instead of rendering to a string containing HTML, it renders to a FlowDocument suitable for embedding into a WPF window or usercontrol.</Paragraph>
+  <Paragraph Tag="Heading2">Features</Paragraph>
+  <Paragraph>MarkDown.Xaml has a number of convenient features</Paragraph>
+  <List MarkerStyle="Disc">
+    <ListItem>
+      <Paragraph>The engine itself is a single file, for easy inclusion in your own projects</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Code for the engine is structured in the same manner as the original MarkdownSharp<LineBreak />If there are any bug fixes to the regular expressions in MarkdownSharp, merging those fixes in the Markdown.Xaml should be straightforward</Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Includes a <Run Tag="CodeSpan">TextToFlowDocumentConverter</Run> to make it easy to bind Markdown text</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph Tag="Heading2">Markdown capabilities and customizables styles</Paragraph>
+  <List MarkerStyle="Disc">
+    <ListItem>
+      <Paragraph>Links <Hyperlink Command="GoToPage" CommandParameter="https://www.google.com" ToolTip="https://www.google.com">Go to Google!</Hyperlink></Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Links with title <Hyperlink Command="GoToPage" CommandParameter="https://www.google.com" ToolTip="&quot;google.&quot;&#xD;&#xA;https://www.google.com">Go to Google!</Hyperlink></Paragraph>
+    </ListItem>
+    <ListItem>
+      <Paragraph>Remote images</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph>
+    <Image Tag="image1" Width="1" Margin="0,0,0,0">
+      <Image.Source>
+        <BitmapImage BaseUri="{x:Null}" UriCachePolicy="BypassCache" UriSource="http://placehold.it/350x150" CreateOptions="IgnoreImageCache" CacheOption="OnLoad" />
+      </Image.Source>
+    </Image>
+  </Paragraph>
+  <Paragraph>
+    <Image Tag="imageleft" Width="1" Margin="0,0,0,0" ToolTip="blue">
+      <Image.Source>
+        <BitmapImage BaseUri="{x:Null}" UriCachePolicy="BypassCache" UriSource="http://placehold.it/100x150/0000FF" CreateOptions="IgnoreImageCache" CacheOption="OnLoad" />
+      </Image.Source>
+    </Image>
+    <Image Tag="imageright" Width="1" Margin="0,0,0,0" ToolTip="cyan">
+      <Image.Source>
+        <BitmapImage BaseUri="{x:Null}" UriCachePolicy="BypassCache" UriSource="http://placehold.it/100x150/00FFFF" CreateOptions="IgnoreImageCache" CacheOption="OnLoad" />
+      </Image.Source>
+    </Image>
+  </Paragraph>
+  <List MarkerStyle="Disc">
+    <ListItem>
+      <Paragraph>Local images</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph>
+    <Image Tag="image" Width="701.6608276367188" Margin="0,0,0,0">
+      <Image.Source>
+        <BitmapImage BaseUri="{x:Null}" UriCachePolicy="BypassCache" UriSource="pack://application:,,,/MdXaml.Test;Component/RscImg.png" CreateOptions="IgnoreImageCache" CacheOption="OnLoad" />
+      </Image.Source>
+    </Image> <Image Tag="image" Width="384.1552734375" Margin="0,0,0,0"><Image.Source><BitmapImage BaseUri="{x:Null}" UriCachePolicy="BypassCache" UriSource="D:\MdXaml\MdXaml.Test\bin\Debug\netcoreapp3.1\ExtImg.png" CreateOptions="IgnoreImageCache" CacheOption="OnLoad" /></Image.Source></Image></Paragraph>
+  <List MarkerStyle="Disc">
+    <ListItem>
+      <Paragraph>Table</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph>table begin string</Paragraph>
+  <Table>
+    <Table.Columns>
+      <TableColumn />
+      <TableColumn />
+      <TableColumn />
+      <TableColumn />
+    </Table.Columns>
+    <TableRowGroup Tag="TableHeader">
+      <TableRow>
+        <TableCell TextAlignment="Center">
+          <Paragraph>a</Paragraph>
+        </TableCell>
+        <TableCell TextAlignment="Left">
+          <Paragraph>b</Paragraph>
+        </TableCell>
+        <TableCell TextAlignment="Right">
+          <Paragraph>c</Paragraph>
+        </TableCell>
+        <TableCell>
+          <Paragraph>d</Paragraph>
+        </TableCell>
+      </TableRow>
+    </TableRowGroup>
+    <TableRowGroup Tag="TableBody">
+      <TableRow Tag="OddTableRow">
+        <TableCell TextAlignment="Center">
+          <Paragraph>a1234567890</Paragraph>
+        </TableCell>
+        <TableCell TextAlignment="Left">
+          <Paragraph>b1234567890</Paragraph>
+        </TableCell>
+        <TableCell TextAlignment="Right">
+          <Paragraph>c1234567890</Paragraph>
+        </TableCell>
+        <TableCell>
+          <Paragraph>d1234567890</Paragraph>
+        </TableCell>
+      </TableRow>
+      <TableRow Tag="EvenTableRow">
+        <TableCell TextAlignment="Center">
+          <Paragraph>a</Paragraph>
+        </TableCell>
+        <TableCell TextAlignment="Left">
+          <Paragraph>b</Paragraph>
+        </TableCell>
+        <TableCell TextAlignment="Right">
+          <Paragraph>c</Paragraph>
+        </TableCell>
+        <TableCell>
+          <Paragraph>d</Paragraph>
+        </TableCell>
+      </TableRow>
+      <TableRow Tag="OddTableRow">
+        <TableCell TextAlignment="Center">
+          <Paragraph>A</Paragraph>
+        </TableCell>
+        <TableCell TextAlignment="Left">
+          <Paragraph />
+        </TableCell>
+        <TableCell TextAlignment="Right">
+          <Paragraph>C</Paragraph>
+        </TableCell>
+        <TableCell />
+      </TableRow>
+      <TableRow Tag="EvenTableRow">
+        <TableCell TextAlignment="Center">
+          <Paragraph>1</Paragraph>
+        </TableCell>
+        <TableCell TextAlignment="Left">
+          <Paragraph>2</Paragraph>
+        </TableCell>
+        <TableCell TextAlignment="Right">
+          <Paragraph>3</Paragraph>
+        </TableCell>
+        <TableCell>
+          <Paragraph>4</Paragraph>
+        </TableCell>
+      </TableRow>
+      <TableRow Tag="OddTableRow">
+        <TableCell TextAlignment="Center">
+          <Paragraph>あ</Paragraph>
+        </TableCell>
+        <TableCell TextAlignment="Left">
+          <Paragraph>い</Paragraph>
+        </TableCell>
+        <TableCell TextAlignment="Right">
+          <Paragraph>う</Paragraph>
+        </TableCell>
+        <TableCell>
+          <Paragraph>え</Paragraph>
+        </TableCell>
+      </TableRow>
+    </TableRowGroup>
+  </Table>
+  <Paragraph>table end string</Paragraph>
+  <List MarkerStyle="Disc">
+    <ListItem>
+      <Paragraph>Code</Paragraph>
+    </ListItem>
+  </List>
+  <Paragraph>Markdown.Xaml support <Run Tag="CodeSpan">inline code</Run></Paragraph>
+  <BlockUIContainer Tag="CodeBlock">
+    <avalonedit:TextEditor SyntaxHighlighting="{x:Null}" IsReadOnly="True" IsModified="True" HorizontalAlignment="Stretch" xml:space="preserve"><avalonedit:TextEditor.Document><icscaed:TextDocument Text="#include &lt;stdio.h&gt;&#xA;int main()&#xA;{&#xA;   // printf() displays the string inside quotation&#xA;   printf(&quot;Hello, World!&quot;);&#xA;   return 0;&#xA;}" FileName="{x:Null}"><icscaed:TextDocument.UndoStack><icscaed:UndoStack SizeLimit="2147483647" /></icscaed:TextDocument.UndoStack><icscaed:TextDocument.ServiceProvider><scmd:ServiceContainer /></icscaed:TextDocument.ServiceProvider></icscaed:TextDocument></avalonedit:TextEditor.Document><avalonedit:TextEditor.Options><avalonedit:TextEditorOptions /></avalonedit:TextEditor.Options>#include &lt;stdio.h&gt;
+int main()
+{
+   // printf() displays the string inside quotation
+   printf("Hello, World!");
+   return 0;
+}</avalonedit:TextEditor>
+  </BlockUIContainer>
+  <List MarkerStyle="Disc">
+    <ListItem>
+      <Paragraph>Separator</Paragraph>
+    </ListItem>
+  </List>
+  <BlockUIContainer>
+    <StackPanel>
+      <Separator Margin="0,0,0,0" />
+      <Separator Margin="0,0,0,0" />
+    </StackPanel>
+  </BlockUIContainer>
+  <Paragraph />
+  <List MarkerStyle="Disc">
+    <ListItem>
+      <Paragraph>Blockquote</Paragraph>
+    </ListItem>
+  </List>
+  <Section Tag="Blockquote">
+    <Paragraph Tag="Heading2">Features</Paragraph>
+    <Paragraph>MarkDown.Xaml has a number of convenient features</Paragraph>
+    <List MarkerStyle="Disc">
+      <ListItem>
+        <Paragraph>The engine itself is a single file, for easy inclusion in your own projects</Paragraph>
+      </ListItem>
+      <ListItem>
+        <Paragraph xml:space="preserve">Code for the engine is structured in the same manner as the original MarkdownSharp </Paragraph>
+      </ListItem>
+      <ListItem>
+        <Paragraph>Includes a <Run Tag="CodeSpan">TextToFlowDocumentConverter</Run> to make it easy to bind Markdown text</Paragraph>
+      </ListItem>
+    </List>
+  </Section>
+  <Paragraph Tag="Heading2">What is this Demo?</Paragraph>
+  <Paragraph>This demo application shows MarkDown.Xaml in use - as you make changes to the left pane, the rendered MarkDown will appear in the right pane.</Paragraph>
+  <Paragraph Tag="Heading3">Source</Paragraph>
+  <Paragraph>Review the source for this demo to see how MarkDown.Xaml works in practice, how to use the TextToFlowDocumentConverter, and how to style the output to appear the way you desire.</Paragraph>
+</FlowDocument>

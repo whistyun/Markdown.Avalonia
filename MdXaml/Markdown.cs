@@ -1208,8 +1208,12 @@ namespace MdXaml
                 if (txt[0] == '|')
                     txt = txt.Substring(1);
 
+                if (String.IsNullOrEmpty(txt)) 
+                    return txt;
+
                 if (txt[txt.Length - 1] == '|')
                     txt = txt.Substring(0, txt.Length - 1);
+
                 return txt;
             }
 
