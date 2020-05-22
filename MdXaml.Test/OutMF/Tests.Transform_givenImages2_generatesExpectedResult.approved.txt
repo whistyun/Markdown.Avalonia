@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-16"?>
+<FlowDocument Style="{x:Null}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Paragraph>A remote <Image Source="http://placehold.it/350x150" Tag="image" Width="1" Margin="0,0,0,0" />.</Paragraph>
+  <Paragraph>Images side by side <Image Source="http://placehold.it/100x150/0000FF" Tag="imageleft" Width="1" Margin="0,0,0,0" /><Image Source="http://placehold.it/100x150/00FFFF" Tag="imageright" Width="1" Margin="0,0,0,0" /></Paragraph>
+  <Paragraph>
+    <Image Source="http://placehold.it/100x150/00FFFF" Tag="imageright" Width="1" Margin="0,0,0,0" ToolTip="cyan" />
+  </Paragraph>
+  <Paragraph>A resource image <Image Source="pack://application:,,,/MdXaml.TestMigfree;Component/RscImg.png" Tag="image" Width="701.6608276367188" Margin="0,0,0,0" />. A local image <Image Source="file:///D:/MdXaml/MdXaml.Test/bin/Debug/netcoreapp3.1/ExtImg.png" Tag="image" Width="384.1552734375" Margin="0,0,0,0" />.</Paragraph>
+</FlowDocument>

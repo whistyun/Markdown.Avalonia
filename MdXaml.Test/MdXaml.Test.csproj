@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.1;net462</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Md\Blockquite.md" />
+    <None Remove="Md\HorizontalRules.md" />
+    <None Remove="Md\Images.md" />
+    <None Remove="Md\Links_inline_style.md" />
+    <None Remove="Md\Lists.md" />
+    <None Remove="Md\Mixing.md" />
+    <None Remove="Md\Tables.md" />
+    <None Remove="Md\Test1.md" />
+    <None Remove="Md\Text_style.md" />
+    <None Remove="RscImg.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Md\Blockquite.md" />
+    <EmbeddedResource Include="Md\HorizontalRules.md" />
+    <EmbeddedResource Include="Md\Images.md" />
+    <EmbeddedResource Include="Md\Links_inline_style.md" />
+    <EmbeddedResource Include="Md\Lists.md" />
+    <EmbeddedResource Include="Md\Mixing.md" />
+    <EmbeddedResource Include="Md\Tables.md" />
+    <EmbeddedResource Include="Md\Test1.md" />
+    <EmbeddedResource Include="Md\Text_style.md" />
+    <Resource Include="RscImg.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ApprovalTests" Version="5.2.4" />
+    <PackageReference Include="nunit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MdXaml\MdXaml.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ExtImg.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

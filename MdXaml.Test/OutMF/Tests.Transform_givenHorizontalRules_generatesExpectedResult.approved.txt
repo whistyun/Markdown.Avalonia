@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-16"?>
+<FlowDocument Style="{x:Null}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Paragraph>Dashes:</Paragraph>
+  <BlockUIContainer>
+    <Separator />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Separator />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Separator />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Separator />
+  </BlockUIContainer>
+  <Paragraph xml:space="preserve"> ---</Paragraph>
+  <BlockUIContainer>
+    <Separator />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Separator />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Separator />
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <Separator />
+  </BlockUIContainer>
+  <Paragraph />
+  <List MarkerStyle="Circle">
+    <ListItem>
+      <List MarkerStyle="Circle">
+        <ListItem>
+          <Paragraph>-</Paragraph>
+        </ListItem>
+      </List>
+    </ListItem>
+  </List>
+  <Paragraph>Asterisks:</Paragraph>
+  <BlockUIContainer>
+    <StackPanel>
+      <Separator Margin="0,0,0,0" />
+      <Separator Margin="0,0,0,0" />
+    </StackPanel>
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <StackPanel>
+      <Separator Margin="0,0,0,0" />
+      <Separator Margin="0,0,0,0" />
+    </StackPanel>
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <StackPanel>
+      <Separator Margin="0,0,0,0" />
+      <Separator Margin="0,0,0,0" />
+    </StackPanel>
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <StackPanel>
+      <Separator Margin="0,0,0,0" />
+      <Separator Margin="0,0,0,0" />
+    </StackPanel>
+  </BlockUIContainer>
+  <Paragraph xml:space="preserve"> ***</Paragraph>
+  <BlockUIContainer>
+    <StackPanel>
+      <Separator Margin="0,0,0,0" />
+      <Separator Margin="0,0,0,0" />
+    </StackPanel>
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <StackPanel>
+      <Separator Margin="0,0,0,0" />
+      <Separator Margin="0,0,0,0" />
+    </StackPanel>
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <StackPanel>
+      <Separator Margin="0,0,0,0" />
+      <Separator Margin="0,0,0,0" />
+    </StackPanel>
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <StackPanel>
+      <Separator Margin="0,0,0,0" />
+      <Separator Margin="0,0,0,0" />
+    </StackPanel>
+  </BlockUIContainer>
+  <Paragraph />
+  <List MarkerStyle="Disc">
+    <ListItem>
+      <List MarkerStyle="Disc">
+        <ListItem>
+          <Paragraph>*</Paragraph>
+        </ListItem>
+      </List>
+    </ListItem>
+  </List>
+  <Paragraph>Underscores:</Paragraph>
+  <BlockUIContainer>
+    <StackPanel>
+      <Separator Margin="0,0,0,0" />
+      <Separator Margin="0,0,0,0" />
+      <Separator />
+    </StackPanel>
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <StackPanel>
+      <Separator Margin="0,0,0,0" />
+      <Separator Margin="0,0,0,0" />
+      <Separator />
+    </StackPanel>
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <StackPanel>
+      <Separator Margin="0,0,0,0" />
+      <Separator Margin="0,0,0,0" />
+      <Separator />
+    </StackPanel>
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <StackPanel>
+      <Separator Margin="0,0,0,0" />
+      <Separator Margin="0,0,0,0" />
+      <Separator />
+    </StackPanel>
+  </BlockUIContainer>
+  <Paragraph xml:space="preserve"> ___</Paragraph>
+  <BlockUIContainer>
+    <StackPanel>
+      <Separator Margin="0,0,0,0" />
+      <Separator Margin="0,0,0,0" />
+      <Separator />
+    </StackPanel>
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <StackPanel>
+      <Separator Margin="0,0,0,0" />
+      <Separator Margin="0,0,0,0" />
+      <Separator />
+    </StackPanel>
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <StackPanel>
+      <Separator Margin="0,0,0,0" />
+      <Separator Margin="0,0,0,0" />
+      <Separator />
+    </StackPanel>
+  </BlockUIContainer>
+  <Paragraph />
+  <BlockUIContainer>
+    <StackPanel>
+      <Separator Margin="0,0,0,0" />
+      <Separator Margin="0,0,0,0" />
+      <Separator />
+    </StackPanel>
+  </BlockUIContainer>
+  <Paragraph xml:space="preserve"> _ _ _</Paragraph>
+</FlowDocument>

@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MdXaml", "MdXaml\MdXaml.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MdXaml.Demo", "MdXaml.Demo\MdXaml.Demo.csproj", "{68CFBE0C-F19B-4462-BE8C-A971A479E848}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MdXaml.Test", "MdXaml.Test\MdXaml.Test.csproj", "{5EB28A44-E0F0-4004-B14A-AF97435C4B03}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{68CFBE0C-F19B-4462-BE8C-A971A479E848}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68CFBE0C-F19B-4462-BE8C-A971A479E848}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68CFBE0C-F19B-4462-BE8C-A971A479E848}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EB28A44-E0F0-4004-B14A-AF97435C4B03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EB28A44-E0F0-4004-B14A-AF97435C4B03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EB28A44-E0F0-4004-B14A-AF97435C4B03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EB28A44-E0F0-4004-B14A-AF97435C4B03}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

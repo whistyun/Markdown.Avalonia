@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-16"?>
+<FlowDocument Style="{x:Null}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Paragraph><Italic Tag="Italic">This text will be italic</Italic> <Bold Tag="Bold">This text will be bold</Bold></Paragraph>
+  <Paragraph><Span Tag="Strikethrough"><Span.TextDecorations><TextDecoration Location="Strikethrough" /></Span.TextDecorations>This text will be striketrhough</Span> <Underline Tag="Underline">This text will be underline</Underline></Paragraph>
+</FlowDocument>
