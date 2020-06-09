@@ -7,21 +7,21 @@
 
     <TabControl>
         <TabItem Header="direct">
-            <mdxam:MarkdownScrollViewer  xml:space="preserve">
-            # sample title
-            * document1
-                * two
-                * three
-            * document2
+            <mdxam:MarkdownScrollViewer xml:space="preserve">
+                # sample title
+                * document1
+                    * two
+                    * three
+                * document2
             </mdxam:MarkdownScrollViewer>
         </TabItem>
         <TabItem Header="direc(migfree)">
             <mdxamlf:MarkdownScrollViewer xml:space="preserve">
-            # sample title
-            * document1
-                * two
-                * three
-            * document2
+                    # sample title
+                    * document1
+                        * two
+                        * three
+                    * document2
             </mdxamlf:MarkdownScrollViewer>
         </TabItem>
     </TabControl>

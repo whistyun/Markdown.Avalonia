@@ -15,7 +15,7 @@ using MdStyle = MdXaml.MarkdownStyle;
 namespace MdXaml
 #endif
 {
-    [ContentProperty(nameof(HereDocument))]
+    [ContentProperty(nameof(HereMarkdown))]
     public class MarkdownScrollViewer : FlowDocumentScrollViewer, IUriContext
     {
         public static readonly DependencyProperty MarkdownProperty =
@@ -90,7 +90,7 @@ namespace MdXaml
             get => Engine.AssetPathRoot;
         }
 
-        public string HereDocument
+        public string HereMarkdown
         {
             get { return Markdown; }
             set
@@ -106,20 +106,32 @@ namespace MdXaml
                     // the amount of whitespace to strip from each line 
                     var lines = Regex.Split(value, "\r\n|\r|\n", RegexOptions.Multiline);
 
-                    // count last line indent
-                    var lastLine = lines.Last();
-                    int indentCount = 0;
-                    foreach (var c in lastLine)
+                    int CountIndent(string line)
                     {
-                        if (c == ' ') indentCount += 1;
-                        else if (c == '\t')
+                        var count = 0;
+                        foreach (var c in line)
                         {
-                            // In default in vs, tab is treated as four-spaces.
-                            indentCount = ((indentCount >> 2) + 1) << 2;
+                            if (c == ' ') count += 1;
+                            else if (c == '\t')
+                            {
+                                // In default in vs, tab is treated as four-spaces.
+                                count = ((count >> 2) + 1) << 2;
+                            }
+                            else break;
                         }
-                        else break;
+                        return count;
                     }
 
+
+                    // count last line indent
+                    int lastIdtCnt = CountIndent(lines.Last());
+                    // count full indent
+                    int someIdtCnt = lines
+                        .Where(line => !String.IsNullOrWhiteSpace(line))
+                        .Select(line => CountIndent(line))
+                        .Min();
+
+                    var indentCount = Math.Max(lastIdtCnt, someIdtCnt);
 
                     Markdown = String.Join(
                         "\n",
