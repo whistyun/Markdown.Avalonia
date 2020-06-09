@@ -1,42 +1,101 @@
 # Render markdown in Control
 
+MdXaml provide MarkdownScrollViewer which is the control to view markdown from string.
+If you want flowdocument which is converted from markdown, use MarkdownXamlConverter.
 
-## Redner on FlowDocumentScrollViewer
+## MarkdownScrollViewer
 
-### Case1. Use SampleControlViewModel
+### Use Code-behind
 
-MdXaml provide MarkdownScrollViewer which is sample using FlowDocumentScrollViewer.
+You can download the full-example from [here](./render_example_codebehind.zip).
 
-See MdXaml.Demo/MainWindow.xaml. It is the full sample using FlowDocumentScrollViewer.
-
-**SampleControl.xaml**
+**MainWindow.xaml**
 ```xml
-<UserControl x:Class="MdXamlSample.SampleControl"
+<Window x:Class="render_example_codebehind.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:mdxam="clr-namespace:MdXaml;assembly=MdXaml"
-        xmlns:local="clr-namespace:MdXamlSample">
+        xmlns:local="clr-namespace:render_example_codebehind"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
 
-    <UserControl.DataContext>
-        <local:SampleControlViewModel/>
-    </UserControl.DataContext>
-
-    <mdxam:MarkdownScrollViewer
-            Markdown="{Binding MarkdownDoc}"
-            />
-</UserControl>
+    <mdxam:MarkdownScrollViewer x:Name="Markdownview"/>
+</Window>
 ```
 
-**SampleControlViewModel.cs**
+**MainWindow.xaml.cs**
 ```cs
-namespace MdXamlSample {
-    class SampleControlViewModel{
-        public string MarkdownDoc {get; set;}
+using System.IO;
+using System.Windows;
+
+namespace render_example_codebehind
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            ReadMarkdownAndSetViewer();
+        }
+
+
+        private void ReadMarkdownAndSetViewer()
+        {
+            Markdownview.Markdown = File.ReadAllText("SampleMarkdown.md");
+        }
     }
 }
 ```
 
-### Case2. Use MarkdownXamlConverter
+### Use Binding
+
+You can download the full-example from [here](./render_example_binding.zip)
+
+**MainWindow.xaml**
+```xml
+<Window x:Class="render_example_binding.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:mdxam="clr-namespace:MdXaml;assembly=MdXaml"
+        xmlns:local="clr-namespace:render_example_binding"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+
+    <mdxam:MarkdownScrollViewer
+            Markdown="{Binding MarkdownDoc}"/>
+</Window>
+```
+
+**MainWindowViewModel.cs**
+```cs
+using System.IO;
+
+namespace render_example_binding
+{
+    class MainWindowViewModel
+    {
+
+        public MainWindowViewModel()
+        {
+            MarkdownDoc = File.ReadAllText("SampleMarkdown.md");
+        }
+
+        public string MarkdownDoc { get; }
+    }
+}
+```
+
+
+## MarkdownXamlConverter
 
 If you want only FlowDocument object but don't want visual element, you can use MarkdownXamlConverter.
 

@@ -58,42 +58,49 @@ FlowDocument document = engine.Transform(markdownTxt);
 
 ### Render markdown in Control
 
-**SampleControl.xaml**
+**MainWindow.xaml**
 ```xml
-<UserControl x:Class="MdXamlSample.SampleControl"
+<Window x:Class="render_example_codebehind.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:mdxam="clr-namespace:MdXaml;assembly=MdXaml"
-        xmlns:local="clr-namespace:MdXamlSample">
+        xmlns:local="clr-namespace:render_example_codebehind"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
 
-    <UserControl.DataContext>
-        <local:SampleControlViewModel/>
-    </UserControl.DataContext>
-
-    <!--
-    <mdxam:MarkdownScrollViewer
-            MarkdownStyle="{Binding DocStyle}"
-            Markdown="{Binding MarkdownDoc}"
-            />
-    -->
-
-    <mdxam:MarkdownScrollViewer
-            Markdown="{Binding MarkdownDoc}"
-            />
-</UserControl>
+    <mdxam:MarkdownScrollViewer x:Name="Markdownview"/>
+</Window>
 ```
 
-**SampleControlViewModel.cs**
+**MainWindow.xaml.cs**
 ```cs
-namespace MdXamlSample {
-    class SampleControlViewModel{
-        // public Style DocStyle {get; set;}
-        public string MarkdownDoc {get; set;}
+using System.IO;
+using System.Windows;
+
+namespace render_example_codebehind
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            ReadMarkdownAndSetViewer();
+        }
+
+
+        private void ReadMarkdownAndSetViewer()
+        {
+            Markdownview.Markdown = File.ReadAllText("SampleMarkdown.md");
+        }
     }
 }
 ```
 
 ### More document
+* [Render markdown in Control](render_markdown_in_control.md)
 * [Image reading priority order](image_load_priority.md)
 * [enhance(list, table, text-decoration)](original_enhance.md)
 
