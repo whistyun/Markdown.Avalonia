@@ -57,41 +57,23 @@ FlowDocument document = engine.Transform(markdownTxt);
 
 ### Control上に描画
 
-**SampleControl.xaml**
+**MainWindow.xaml**
 ```xml
-<UserControl x:Class="MdXamlSample.SampleControl"
+<Window x:Class="HeredocSample.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mdxam="clr-namespace:MdXaml;assembly=MdXaml"
-        xmlns:local="clr-namespace:MdXamlSample">
+        Title="MainWindow" Height="450" Width="800">
 
-    <UserControl.DataContext>
-        <local:SampleControlViewModel/>
-    </UserControl.DataContext>
-
-    <!--
-    <mdxam:MarkdownScrollViewer
-            MarkdownStyle="{Binding DocStyle}"
-            Markdown="{Binding MarkdownDoc}"
-            />
-    -->
-
-    <mdxam:MarkdownScrollViewer
-            Markdown="{Binding MarkdownDoc}"
-            />
-</UserControl>
+	<mdxam:MarkdownScrollViewer xml:space="preserve">
+		# sample title
+		* document1
+			* two
+			* three
+		* document2
+	</mdxam:MarkdownScrollViewer>
+</Window>
 ```
-
-**SampleControlViewModel.cs**
-```cs
-namespace MdXamlSample {
-    class SampleControlViewModel{
-        // public Style DocStyle {get; set;}
-        public string MarkdownDoc {get; set;}
-    }
-}
-```
-
 
 ## ライセンス
 

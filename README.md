@@ -34,6 +34,8 @@ application for an example of how this can be configured.
 
 ## Quick start
 
+### Convert markdown-string in a code.
+
 ```cs
 // using MdXaml;
 // using System.Windows.Documents;
@@ -44,6 +46,26 @@ string markdownTxt = System.IO.File.ReadAllText("example.md");
 
 FlowDocument document = engine.Transform(markdownTxt);
 ```
+
+### Write markdown in a xaml.
+
+```xml
+<Window x:Class="HeredocSample.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mdxam="clr-namespace:MdXaml;assembly=MdXaml"
+        Title="MainWindow" Height="450" Width="800">
+
+	<mdxam:MarkdownScrollViewer xml:space="preserve">
+		# sample title
+		* document1
+			* two
+			* three
+		* document2
+	</mdxam:MarkdownScrollViewer>
+</Window>
+```
+We can use MarkdownScrollViewer with code-behind and with binding.
 
 ## How to use (Markdown standard)
 * [Transform markdow to flowdocument](docs/transform_markdow_to_flowdocument.md)

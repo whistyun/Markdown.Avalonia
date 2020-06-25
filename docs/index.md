@@ -60,43 +60,20 @@ FlowDocument document = engine.Transform(markdownTxt);
 
 **MainWindow.xaml**
 ```xml
-<Window x:Class="render_example_codebehind.MainWindow"
+<Window x:Class="HeredocSample.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:mdxam="clr-namespace:MdXaml;assembly=MdXaml"
-        xmlns:local="clr-namespace:render_example_codebehind"
-        mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
 
-    <mdxam:MarkdownScrollViewer x:Name="Markdownview"/>
+	<mdxam:MarkdownScrollViewer xml:space="preserve">
+		# sample title
+		* document1
+			* two
+			* three
+		* document2
+	</mdxam:MarkdownScrollViewer>
 </Window>
-```
-
-**MainWindow.xaml.cs**
-```cs
-using System.IO;
-using System.Windows;
-
-namespace render_example_codebehind
-{
-    public partial class MainWindow : Window
-    {
-        public MainWindow()
-        {
-            InitializeComponent();
-
-            ReadMarkdownAndSetViewer();
-        }
-
-
-        private void ReadMarkdownAndSetViewer()
-        {
-            Markdownview.Markdown = File.ReadAllText("SampleMarkdown.md");
-        }
-    }
-}
 ```
 
 ### More document

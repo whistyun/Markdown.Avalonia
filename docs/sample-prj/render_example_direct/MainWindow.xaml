@@ -2,27 +2,13 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mdxam="clr-namespace:MdXaml;assembly=MdXaml"
-        xmlns:mdxamlf="clr-namespace:Markdown.Xaml;assembly=Markdown.Xaml"
         Title="MainWindow" Height="450" Width="800">
 
-    <TabControl>
-        <TabItem Header="direct">
-            <mdxam:MarkdownScrollViewer xml:space="preserve">
-                # sample title
-                * document1
-                    * two
-                    * three
-                * document2
-            </mdxam:MarkdownScrollViewer>
-        </TabItem>
-        <TabItem Header="direc(migfree)">
-            <mdxamlf:MarkdownScrollViewer xml:space="preserve">
-                    # sample title
-                    * document1
-                        * two
-                        * three
-                    * document2
-            </mdxamlf:MarkdownScrollViewer>
-        </TabItem>
-    </TabControl>
+    <mdxam:MarkdownScrollViewer xml:space="preserve">
+        # sample title
+        * document1
+            * two
+            * three
+        * document2
+    </mdxam:MarkdownScrollViewer>
 </Window>

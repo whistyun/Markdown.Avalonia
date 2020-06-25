@@ -5,6 +5,31 @@ If you want flowdocument which is converted from markdown, use MarkdownXamlConve
 
 ## MarkdownScrollViewer
 
+### Write markdown in Xaml
+
+You can download the example from [here](./render_example_direct.zip).  
+In a xaml you can write markdown with indent.
+MarkdownScrollView is remove indent automatically and view as FlowDocument.
+
+**MainWindow.xaml**
+```xml
+<Window x:Class="HeredocSample.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mdxam="clr-namespace:MdXaml;assembly=MdXaml"
+        Title="MainWindow" Height="450" Width="800">
+
+	<mdxam:MarkdownScrollViewer xml:space="preserve">
+		# sample title
+		* document1
+			* two
+			* three
+		* document2
+	</mdxam:MarkdownScrollViewer>
+</Window>
+```
+
+
 ### Use Code-behind
 
 You can download the full-example from [here](./render_example_codebehind.zip).
