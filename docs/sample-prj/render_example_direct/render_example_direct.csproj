@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MdXaml" Version="1.5.0.2" />
-    <PackageReference Include="MdXaml_migfree" Version="1.5.0.2" />
+    <PackageReference Include="MdXaml" Version="1.5.0" />
+    <PackageReference Include="MdXaml_migfree" Version="1.5.0" />
   </ItemGroup>
 
 
