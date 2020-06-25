@@ -42,12 +42,14 @@ namespace MdXaml
                 var resources = (ResourceDictionary)XamlReader.Load(stream);
                 _standard = (Style)resources["DocumentStyleStandard"];
                 _compact = (Style)resources["DocumentStyleCompact"];
+                _githublike = (Style)resources["DocumentStyleGithubLike"];
             }
         }
 
 
         private static Style _standard;
         private static Style _compact;
+        private static Style _githublike;
 
         public static Style Standard
         {
@@ -66,5 +68,15 @@ namespace MdXaml
                 return _compact;
             }
         }
+
+        public static Style GithubLike
+        {
+            get
+            {
+                if (_githublike == null) LoadXaml();
+                return _githublike;
+            }
+        }
+
     }
 }
