@@ -5,8 +5,11 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.IO.Packaging;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Windows;
+using System.Windows.Markup;
 
 
 #if !MIG_FREE
@@ -198,6 +201,29 @@ namespace Markdown.Xaml.Test
 
             var result = markdown.Transform(text);
             Approvals.Verify(Utils.AsXaml(result));
+        }
+
+
+        [Test]
+        [Apartment(ApartmentState.STA)]
+        public void Transform_givenstring()
+        {
+            ResourceDictionary resources;
+            using (var stream = new FileStream("IndentTest.xaml", FileMode.Open))
+            {
+                resources = (ResourceDictionary)XamlReader.Load(stream);
+            }
+
+            var markdownViewer = new MarkdownScrollViewer();
+            markdownViewer.MarkdownStyle = null;
+
+            foreach (var idx in Enumerable.Range(1, 4))
+            {
+                var jaggingMarkdown = (string)resources["Indent" + idx];
+                markdownViewer.HereMarkdown = jaggingMarkdown;
+                var document = markdownViewer.Document;
+                Approvals.Verify(Utils.AsXaml(document));
+            }
         }
     }
 }

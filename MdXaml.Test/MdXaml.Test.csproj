@@ -20,6 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Remove="IndentTest.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Md\Blockquite.md" />
     <EmbeddedResource Include="Md\HorizontalRules.md" />
     <EmbeddedResource Include="Md\Images.md" />
@@ -29,6 +33,10 @@
     <EmbeddedResource Include="Md\Tables.md" />
     <EmbeddedResource Include="Md\Test1.md" />
     <EmbeddedResource Include="Md\Text_style.md" />
+    <None Include="IndentTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Resource Include="RscImg.png" />
   </ItemGroup>
 

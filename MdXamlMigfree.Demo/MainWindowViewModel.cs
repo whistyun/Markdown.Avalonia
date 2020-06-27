@@ -17,30 +17,14 @@ namespace MdXamlMigfree.Demo
     {
         public MainWindowViewModel()
         {
-            string currentAssembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string styleFilePath = Path.Combine(Path.GetDirectoryName(currentAssembly), Path.GetFileNameWithoutExtension(currentAssembly) + ".Styles.Default2.xaml");
-
-            ResourceDictionary resources;
-            using (Stream stream = new FileStream(styleFilePath, FileMode.Open, FileAccess.Read))
-            {
-                resources = (ResourceDictionary)XamlReader.Load(stream);
-            }
-
             Styles = new List<StyleInfo>();
 
             Styles.Add(new StyleInfo("Plain", null));
             Styles.Add(new StyleInfo("Standard", MarkdownStyle.Standard));
             Styles.Add(new StyleInfo("Compact", MarkdownStyle.Compact));
+            Styles.Add(new StyleInfo("GithubLike", MarkdownStyle.GithubLike));
 
             SelectedStyleInfo = Styles[1];
-
-            foreach (var rscNm in resources.Keys)
-            {
-                if (rscNm is string && resources[rscNm] is Style)
-                {
-                    Styles.Add(new StyleInfo((string)rscNm, (Style)resources[rscNm]));
-                }
-            }
 
             var subjectType = typeof(MainWindow);
             var subjectAssembly = GetType().Assembly;

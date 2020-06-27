@@ -12,19 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Remove="MdXamlMigfree.Demo.Styles.Default2.xaml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="MainWindow.md">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="MdXamlMigfree.Demo.Styles.Default2.xaml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
