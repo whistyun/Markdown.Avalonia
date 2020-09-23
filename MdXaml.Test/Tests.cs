@@ -68,9 +68,19 @@ namespace Markdown.Xaml.Test
 
         [Test]
         [Apartment(ApartmentState.STA)]
-        public void Transform_givenLists_generatesExpectedResult()
+        public void Transform_givenLists1_generatesExpectedResult()
         {
-            var text = Utils.LoadText("Lists.md");
+            var text = Utils.LoadText("Lists1.md");
+            var markdown = new Markdown();
+            var result = markdown.Transform(text);
+            Approvals.Verify(Utils.AsXaml(result));
+        }
+
+        [Test]
+        [Apartment(ApartmentState.STA)]
+        public void Transform_givenLists2_generatesExpectedResult()
+        {
+            var text = Utils.LoadText("Lists2.md");
             var markdown = new Markdown();
             var result = markdown.Transform(text);
             Approvals.Verify(Utils.AsXaml(result));

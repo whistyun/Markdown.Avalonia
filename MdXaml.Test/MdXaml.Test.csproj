@@ -11,7 +11,8 @@
     <None Remove="Md\HorizontalRules.md" />
     <None Remove="Md\Images.md" />
     <None Remove="Md\Links_inline_style.md" />
-    <None Remove="Md\Lists.md" />
+    <None Remove="Md\Lists1.md" />
+    <None Remove="Md\Lists2.md" />
     <None Remove="Md\Mixing.md" />
     <None Remove="Md\Tables.md" />
     <None Remove="Md\Test1.md" />
@@ -28,7 +29,8 @@
     <EmbeddedResource Include="Md\HorizontalRules.md" />
     <EmbeddedResource Include="Md\Images.md" />
     <EmbeddedResource Include="Md\Links_inline_style.md" />
-    <EmbeddedResource Include="Md\Lists.md" />
+    <EmbeddedResource Include="Md\Lists2.md" />
+    <EmbeddedResource Include="Md\Lists1.md" />
     <EmbeddedResource Include="Md\Mixing.md" />
     <EmbeddedResource Include="Md\Tables.md" />
     <EmbeddedResource Include="Md\Test1.md" />

@@ -24,7 +24,8 @@
     <EmbeddedResource Include="Md\HorizontalRules.md" />
     <EmbeddedResource Include="Md\Images.md" />
     <EmbeddedResource Include="Md\Links_inline_style.md" />
-    <EmbeddedResource Include="Md\Lists.md" />
+    <EmbeddedResource Include="Md\Lists1.md" />
+    <EmbeddedResource Include="Md\Lists2.md" />
     <EmbeddedResource Include="Md\Mixing.md" />
     <EmbeddedResource Include="Md\Tables.md" />
     <EmbeddedResource Include="Md\Test1.md" />
