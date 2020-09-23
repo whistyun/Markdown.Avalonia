@@ -570,4 +570,46 @@
     </TableRowGroup>
   </Table>
   <Paragraph />
+  <BlockUIContainer>
+    <Separator />
+  </BlockUIContainer>
+  <Table>
+    <Table.Columns>
+      <TableColumn />
+      <TableColumn />
+    </Table.Columns>
+    <TableRowGroup>
+      <TableRow>
+        <TableCell TextAlignment="Right">
+          <Paragraph>a<LineBreak />b</Paragraph>
+        </TableCell>
+        <TableCell />
+      </TableRow>
+    </TableRowGroup>
+    <TableRowGroup>
+      <TableRow>
+        <TableCell TextAlignment="Right">
+          <Paragraph>alpha</Paragraph>
+        </TableCell>
+        <TableCell />
+      </TableRow>
+      <TableRow>
+        <TableCell TextAlignment="Right">
+          <Paragraph>be<LineBreak />ta</Paragraph>
+        </TableCell>
+        <TableCell TextAlignment="Center">
+          <Paragraph>gamma</Paragraph>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell TextAlignment="Right">
+          <Paragraph>\a. delta</Paragraph>
+        </TableCell>
+        <TableCell TextAlignment="Center">
+          <Paragraph>epsilon<LineBreak />kappa?</Paragraph>
+        </TableCell>
+      </TableRow>
+    </TableRowGroup>
+  </Table>
+  <Paragraph />
 </FlowDocument>
