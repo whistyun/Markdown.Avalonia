@@ -62,12 +62,27 @@ II, two
 ```
 ![list](img/list.png)
 
+## Table 
 
-## Table colspan or rowspan
+### linebreak
+
+MdXaml treats '\n' which is contained in the cell of tables as linebreak.
+If you don't want it, use escape sequence.
+
+#### Example
+
+```txt
+| column1\nwith linebreak     | column2       |
+|-----------------------------|---------------|
+| text\nwith\nlinebreak       | text\\nnobreak|
+```
+![view1](img/generated_table.linebreak.png)
+
+### colspan or rowspan
 
 MdXaml extends table format to explain colspan and rowspan. Its format is Influenced by textile.
 
-### Example
+#### Example
 
 ```txt
 | column1     | column2       | column4       | column5  |
@@ -78,9 +93,9 @@ MdXaml extends table format to explain colspan and rowspan. Its format is Influe
 | hoge        |>. right-align | hoge          | hoge     |
 
 ```
-![view1](img/generated_table.1.png)
+![view1](img/generated_table.span.png)
 
-### Format
+#### Format
 
 Type any character between pipe(|) and period(.), and MdXaml parse it.
 
@@ -101,7 +116,7 @@ If you don't want to parse, type space after pipe(|).
 | \2. ignore  | hoge          |
 ```
 
-![view2](img/generated_table.2.png)
+![view2](img/generated_table.nospan.png)
 
 
 ### [MarkdownTableBuilder.ods](MarkdownTableBuilder.ods)
