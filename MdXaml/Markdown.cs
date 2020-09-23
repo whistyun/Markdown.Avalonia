@@ -1208,7 +1208,7 @@ namespace MdXaml
                 if (txt[0] == '|')
                     txt = txt.Substring(1);
 
-                if (String.IsNullOrEmpty(txt)) 
+                if (String.IsNullOrEmpty(txt))
                     return txt;
 
                 if (txt[txt.Length - 1] == '|')
@@ -1522,8 +1522,40 @@ namespace MdXaml
                             break;
 
                         case '\\': // escape
-                            buff.Append(++i < text.Length ? text[i] : '\\');
+                            if (++i < text.Length)
+                            {
+                                switch (text[i])
+                                {
+                                    default:
+                                        buff.Append('\\').Append(text[i]);
+                                        break;
+
+                                    case '\\': // escape
+                                    case ':': // bold? or italic
+                                    case '*': // bold? or italic
+                                    case '~': // strikethrough?
+                                    case '_': // underline?
+                                    case '%': // color?
+                                        buff.Append(text[i]);
+                                        break;
+                                }
+                            }
+                            else
+                                buff.Append('\\');
+
                             break;
+
+                        case ':': // emoji?
+                            {
+                                var nxtI = text.IndexOf(':', i + 1);
+                                if (nxtI != -1 && EmojiTable.TryGet(text.Substring(i + 1, nxtI - i - 1), out var emoji))
+                                {
+                                    buff.Append(emoji);
+                                    i = nxtI;
+                                }
+                                else buff.Append(':');
+                                break;
+                            }
 
                         case '*': // bold? or italic
                             {

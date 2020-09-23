@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Windows;
+using System.Text.RegularExpressions;
 
 #if MIG_FREE
 namespace Markdown.Xaml
@@ -93,7 +94,8 @@ namespace MdXaml
                         .Select(ent => ent.Value.ColSpan)
                         .Sum();
 
-                    if (rowspansColOffset < detailsRowCountSummary) {
+                    if (rowspansColOffset < detailsRowCountSummary)
+                    {
                         for (var colIdx = 0; colIdx < row.Count;)
                         {
                             var cell = row[colIdx];
@@ -220,15 +222,41 @@ namespace MdXaml
 
             if (txt is null) return;
 
+            txt = ParseFormatFrom(txt);
+
+            var sb = new StringBuilder();
+            for (var i = 0; i < txt.Length; ++i)
+            {
+                var c = txt[i];
+
+                if (c == '\\')
+                {
+                    if (++i < txt.Length)
+                    {
+                        if (txt[i] == 'n')
+                            sb.Append("  \n"); // \n => linebreak
+                        else
+                            sb.Append('\\').Append(txt[i]);
+                    }
+                    else
+                        sb.Append('\\');
+                }
+                else
+                    sb.Append(c);
+            }
+            Text = sb.ToString();
+        }
+
+        private string ParseFormatFrom(string txt)
+        {
             int idx = txt.IndexOf('.');
 
             if (idx == -1)
             {
-                Text = txt.Trim();
+                return txt.Trim();
             }
             else
             {
-
                 var styleTxt = txt.Substring(0, idx);
 
                 for (var i = 0; i < styleTxt.Length; ++i)
@@ -273,17 +301,17 @@ namespace MdXaml
                             break;
 
                         default:
-                            Text = txt.Trim();
                             RowSpan = 1;
                             ColSpan = 1;
                             Horizontal = null;
                             Vertical = null;
-                            return;
+                            return txt.Trim();
                     }
                 }
-                Text = txt.Substring(idx + 1).Trim();
+                return txt.Substring(idx + 1).Trim();
             }
         }
+
 
         private static string ContinueToNum(string charSource, ref int idx)
         {
