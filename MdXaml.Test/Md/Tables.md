@@ -61,3 +61,11 @@ a|b|c|d
 1|2|3|4
 あ|い|う|え
 \2. a|b
+
+---
+
+| a\nb   |
+| -----: | :-----: |
+| alpha |
+| be\nta  | gamma |
+|\a. delta | epsilon\nkappa? |

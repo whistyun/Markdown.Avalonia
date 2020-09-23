@@ -225,5 +225,17 @@ namespace Markdown.Xaml.Test
                 Approvals.Verify(Utils.AsXaml(document));
             }
         }
+
+        [Test]
+        [Apartment(ApartmentState.STA)]
+        public void Transform_givenEmoji() {
+            var text = Utils.LoadText("Emoji.md");
+            var markdown = new Markdown();
+            markdown.AssetPathRoot = assetPath;
+            markdown.BaseUri = baseUri;
+
+            var result = markdown.Transform(text);
+            Approvals.Verify(Utils.AsXaml(result));
+        }
     }
 }

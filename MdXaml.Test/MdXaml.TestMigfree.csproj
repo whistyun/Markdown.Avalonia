@@ -29,6 +29,7 @@
     <EmbeddedResource Include="Md\Tables.md" />
     <EmbeddedResource Include="Md\Test1.md" />
     <EmbeddedResource Include="Md\Text_style.md" />
+    <EmbeddedResource Include="Md\Emoji.md" />
     <Resource Include="RscImg.png" />
   </ItemGroup>
 

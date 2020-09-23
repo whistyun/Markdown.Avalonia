@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Remove="Md\Blockquite.md" />
+    <None Remove="Md\Emoji.md" />
     <None Remove="Md\HorizontalRules.md" />
     <None Remove="Md\Images.md" />
     <None Remove="Md\Links_inline_style.md" />
@@ -31,6 +32,7 @@
     <EmbeddedResource Include="Md\Lists.md" />
     <EmbeddedResource Include="Md\Mixing.md" />
     <EmbeddedResource Include="Md\Tables.md" />
+    <EmbeddedResource Include="Md\Emoji.md" />
     <EmbeddedResource Include="Md\Test1.md" />
     <EmbeddedResource Include="Md\Text_style.md" />
     <None Include="IndentTest.xaml">
