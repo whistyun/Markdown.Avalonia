@@ -48,10 +48,20 @@ namespace ColorTextBlock.Avalonia
 
             var fmt = Measure(Size.Infinity, family, size, style, weight, TextWrapping.Wrap);
 
+            if (String.IsNullOrEmpty(Text))
+            {
+                fmt.Text = "Ty";
 
-            var lineTxts = Regex.Split(Text, "\r\n|\r|\n");
+                infos.Add(new TextGeometry(
+                    0, fmt.Bounds.Height, false,
+                    foreground, background,
+                    underline, strikethrough,
+                    "", fmt));
 
-            foreach (string txtChip in lineTxts)
+                return infos;
+            }
+
+            foreach (string txtChip in Regex.Split(Text, "\r\n|\r|\n"))
             {
                 if (string.IsNullOrEmpty(txtChip))
                 {

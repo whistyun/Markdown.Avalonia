@@ -1,14 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Text.RegularExpressions;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Avalonia.Metadata;
+using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Markdown.Avalonia
 {
-    public class MarkdownScrollViewer : ScrollViewer, IUriContext
+    public class MarkdownScrollViewer : UserControl
     {
         public static readonly AvaloniaProperty<string> MarkdownProperty =
             AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, string>(
@@ -16,16 +15,26 @@ namespace Markdown.Avalonia
                 o => o.Markdown,
                 (o, v) => o.Markdown = v);
 
+        private ScrollViewer _viewer;
+
+        public MarkdownScrollViewer()
+        {
+            Engine = new Markdown();
+
+            this.InitializeComponent();
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+
+            _viewer = this.FindControl<ScrollViewer>("Viewer");
+        }
+
         public Markdown Engine
         {
             set;
             get;
-        }
-
-        public Uri BaseUri
-        {
-            set { Engine.BaseUri = value; }
-            get => Engine.BaseUri;
         }
 
         public string AssetPathRoot
@@ -34,7 +43,7 @@ namespace Markdown.Avalonia
             get => Engine.AssetPathRoot;
         }
 
-        [Content]
+        //[Content]
         public string HereMarkdown
         {
             get { return Markdown; }
@@ -115,21 +124,17 @@ namespace Markdown.Avalonia
         private string _markdown;
         public string Markdown
         {
-            get { return (string)GetValue(MarkdownProperty); }
+            get { return _markdown; }
             set
             {
-                SetValue(MarkdownProperty, value);
                 if (SetAndRaise(MarkdownProperty, ref _markdown, value))
                 {
                     var doc = Engine.Transform(value ?? "");
-                    Content = doc;
+                    doc.Styles = MarkdownStyle.Standard;
+                    _viewer.Content = doc;
                 }
             }
         }
 
-        public MarkdownScrollViewer()
-        {
-            Engine = new Markdown();
-        }
     }
 }

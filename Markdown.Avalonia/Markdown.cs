@@ -32,27 +32,20 @@ namespace Markdown.Avalonia
         /// </summary>
         private const int _tabWidth = 4;
 
-        private const string TagHeading1 = "Heading1";
-        private const string TagHeading2 = "Heading2";
-        private const string TagHeading3 = "Heading3";
-        private const string TagHeading4 = "Heading4";
-        private const string TagCode = "CodeSpan";
-        private const string TagCodeBlock = "CodeBlock";
-        private const string TagBlockquote = "Blockquote";
-        private const string TagNote = "Note";
+        private const string Heading1Class = "Heading1";
+        private const string Heading2Class = "Heading2";
+        private const string Heading3Class = "Heading3";
+        private const string Heading4Class = "Heading4";
+        private const string CodeBlockClass = "CodeBlock";
+        private const string BlockquoteClass = "Blockquote";
+        private const string NoteClass = "Note";
 
-        private const string TagTable = "Table";
-        private const string TagTableHeader = "TableHeader";
-        private const string TagTableBody = "TableBody";
-        private const string TagOddTableRow = "OddTableRow";
-        private const string TagEvenTableRow = "EvenTableRow";
+        private const string TableClass = "Table";
+        private const string TableHeaderClass = "TableHeader";
+        private const string TableRowOddClass = "OddTableRow";
+        private const string TableRowEvenClass = "EvenTableRow";
 
-        private const string TagList = "List";
-
-        private const string TagBoldSpan = "Bold";
-        private const string TagItalicSpan = "Italic";
-        private const string TagStrikethroughSpan = "Strikethrough";
-        private const string TagUnderlineSpan = "Underline";
+        private const string ListClass = "List";
 
         #endregion
 
@@ -61,8 +54,6 @@ namespace Markdown.Avalonia
         /// WARNING: this is a significant deviation from the markdown spec
         /// </summary>
         public bool StrictBoldItalic { get; set; }
-
-        public bool DisabledTag { get; set; }
 
         public bool DisabledTootip { get; set; }
 
@@ -330,7 +321,7 @@ namespace Markdown.Avalonia
             }
 
             var ctbox = new CTextBlock();
-            ctbox.Content = lines.SelectMany(ln => RunSpanGamut(ln).Concat(new[] { new CLineBreak() }));
+            ctbox.Content = lines.SelectMany(ln => RunSpanGamut(ln).Concat(new[] { new CLineBreak() })).ToList();
 
             if (indiAlignment.HasValue)
                 ctbox.TextAlignment = indiAlignment.Value;
@@ -604,36 +595,24 @@ namespace Markdown.Avalonia
                 throw new ArgumentNullException(nameof(content));
             }
 
-            var heading = new CTextBlock() { Content = content };
+            var heading = new CTextBlock() { Content = content.ToList() };
 
             switch (level)
             {
                 case 1:
-                    if (!DisabledTag)
-                    {
-                        heading.Classes.Add(TagHeading1);
-                    }
+                    heading.Classes.Add(Heading1Class);
                     break;
 
                 case 2:
-                    if (!DisabledTag)
-                    {
-                        heading.Classes.Add(TagHeading2);
-                    }
+                    heading.Classes.Add(Heading2Class);
                     break;
 
                 case 3:
-                    if (!DisabledTag)
-                    {
-                        heading.Classes.Add(TagHeading3);
-                    }
+                    heading.Classes.Add(Heading3Class);
                     break;
 
                 case 4:
-                    if (!DisabledTag)
-                    {
-                        heading.Classes.Add(TagHeading4);
-                    }
+                    heading.Classes.Add(Heading4Class);
                     break;
             }
 
@@ -670,7 +649,7 @@ namespace Markdown.Avalonia
                 defaultHandler);
         }
 
-        private CTextBlock NoteEvaluator(Match match, bool supportTextAlignment)
+        private Border NoteEvaluator(Match match, bool supportTextAlignment)
         {
             if (match is null)
             {
@@ -705,24 +684,25 @@ namespace Markdown.Avalonia
             return NoteComment(RunSpanGamut(text), indiAlignment);
         }
 
-        public CTextBlock NoteComment(IEnumerable<CInline> content, TextAlignment? indiAlignment)
+        public Border NoteComment(IEnumerable<CInline> content, TextAlignment? indiAlignment)
         {
             if (content is null)
             {
                 throw new ArgumentNullException(nameof(content));
             }
 
-            var note = new CTextBlock() { Content = content };
-            if (!DisabledTag)
-            {
-                note.Tag = TagNote;
-            }
+            var note = new CTextBlock() { Content = content.ToList() };
+            note.Classes.Add(NoteClass);
             if (indiAlignment.HasValue)
             {
                 note.TextAlignment = indiAlignment.Value;
             }
 
-            return note;
+            var result = new Border();
+            result.Classes.Add(NoteClass);
+            result.Child = note;
+
+            return result;
         }
         #endregion
 
@@ -928,10 +908,7 @@ namespace Markdown.Avalonia
                 Grid.SetColumn(control, 1);
             }
 
-            if (!DisabledTag)
-            {
-                grid.Classes.Add(TagList);
-            }
+            grid.Classes.Add(ListClass);
 
             return grid;
         }
@@ -1097,7 +1074,7 @@ namespace Markdown.Avalonia
             return Evaluate(text, _table, TableEvalutor, defaultHandler);
         }
 
-        private Grid TableEvalutor(Match match)
+        private Border TableEvalutor(Match match)
         {
             if (match is null)
             {
@@ -1140,12 +1117,10 @@ namespace Markdown.Avalonia
 
             // table header
             table.RowDefinitions.Add(new RowDefinition());
-            foreach (Panel tableHeaderCell in CreateTableRow(mdtable.Header, 0))
+            foreach (Border tableHeaderCell in CreateTableRow(mdtable.Header, 0))
             {
-                if (!DisabledTag)
-                {
-                    tableHeaderCell.Classes.Add(TagTableHeader);
-                }
+                tableHeaderCell.Classes.Add(TableHeaderClass);
+
                 table.Children.Add(tableHeaderCell);
             }
 
@@ -1153,46 +1128,46 @@ namespace Markdown.Avalonia
             foreach (int rowIdx in Enumerable.Range(0, mdtable.Details.Count))
             {
                 table.RowDefinitions.Add(new RowDefinition());
-                foreach (Panel cell in CreateTableRow(mdtable.Details[rowIdx], rowIdx + 1))
+                foreach (Border cell in CreateTableRow(mdtable.Details[rowIdx], rowIdx + 1))
                 {
-                    if (!DisabledTag)
-                    {
-                        cell.Classes.Add((rowIdx & 1) == 0 ? TagOddTableRow : TagEvenTableRow);
-                    }
+                    cell.Classes.Add((rowIdx & 1) == 0 ? TableRowOddClass : TableRowEvenClass);
 
                     table.Children.Add(cell);
                 }
             }
 
-            if (!DisabledTag)
-            {
-                table.Classes.Add(TagTable);
-            }
+            table.Classes.Add(TableClass);
 
-            return table;
+            var result = new Border();
+            result.Child = table;
+            result.Classes.Add(TableClass);
+
+            return result;
         }
 
-        private IEnumerable<Panel> CreateTableRow(IList<MdTableCell> mdcells, int rowIdx)
+        private IEnumerable<Border> CreateTableRow(IList<MdTableCell> mdcells, int rowIdx)
         {
-            int colIdx = 0;
-
             foreach (var mdcell in mdcells)
             {
-                var cell = new Panel();
+                var cell = new Border();
 
                 if (!(mdcell.Text is null))
                 {
-                    var txtbx = new CTextBlock() { Content = RunSpanGamut(mdcell.Text) };
-                    cell.Children.Add(txtbx);
+                    var txtbx = new CTextBlock() { Content = RunSpanGamut(mdcell.Text).ToList() };
+                    cell.Child = txtbx;
 
                     if (mdcell.Horizontal.HasValue)
                         txtbx.TextAlignment = mdcell.Horizontal.Value;
                 }
 
                 Grid.SetRow(cell, rowIdx);
-                Grid.SetColumn(cell, colIdx++);
-                if (mdcell.RowSpan != 1) Grid.SetColumn(cell, mdcell.RowSpan);
-                if (mdcell.ColSpan != 1) Grid.SetColumn(cell, mdcell.ColSpan);
+                Grid.SetColumn(cell, mdcell.ColumnIndex);
+
+                if (mdcell.RowSpan != 1)
+                    Grid.SetRowSpan(cell, mdcell.RowSpan);
+
+                if (mdcell.ColSpan != 1)
+                    Grid.SetColumnSpan(cell, mdcell.ColSpan);
 
                 yield return cell;
             }
@@ -1237,7 +1212,7 @@ namespace Markdown.Avalonia
             );
         }
 
-        private CTextBlock CodeBlocksEvaluator(Match match)
+        private Border CodeBlocksEvaluator(Match match)
         {
             if (match is null)
             {
@@ -1250,13 +1225,13 @@ namespace Markdown.Avalonia
 
             var text = new CCode(new[] { new CRun() { Text = code } });
 
-            var result = new CTextBlock();
-            result.Content = new[] { text };
+            var ctxt = new CTextBlock();
+            ctxt.Content = new[] { text };
+            ctxt.Classes.Add(CodeBlockClass);
 
-            if (!DisabledTag)
-            {
-                result.Classes.Add(TagCodeBlock);
-            }
+            var result = new Border();
+            result.Classes.Add(CodeBlockClass);
+            result.Child = ctxt;
 
             return result;
         }
@@ -1650,8 +1625,8 @@ namespace Markdown.Avalonia
                 try
                 {
                     var color = colorLbl.StartsWith("#") ?
-                        (SolidColorBrush)new BrushConverter().ConvertFrom(colorLbl) :
-                        (SolidColorBrush)new BrushConverter().ConvertFromString(colorLbl);
+                        (IBrush)new BrushConverter().ConvertFrom(colorLbl) :
+                        (IBrush)new BrushConverter().ConvertFromString(colorLbl);
 
                     span.Foreground = color;
                 }
@@ -1819,10 +1794,7 @@ namespace Markdown.Avalonia
 
             var blocks = RunBlockGamut(Normalize(trimmedTxt), true);
             var result = Create<Panel, Control>(blocks);
-            if (!DisabledTag)
-            {
-                result.Classes.Add(TagBlockquote);
-            }
+            result.Classes.Add(BlockquoteClass);
 
             return result;
         }

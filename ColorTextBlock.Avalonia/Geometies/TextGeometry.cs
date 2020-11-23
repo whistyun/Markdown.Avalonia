@@ -85,7 +85,7 @@ namespace ColorTextBlock.Avalonia.Geometries
             var background = Background;
             if (background != null)
             {
-                ctx.FillRectangle(background, new Rect(0, 0, Width, Height));
+                ctx.FillRectangle(background, new Rect(Left, Top, Width, Height));
             }
 
             var pen = new Pen(Foreground);

@@ -66,7 +66,8 @@ namespace ColorTextBlock.Avalonia
                 FontSizeProperty.Changed,
                 FontStyleProperty.Changed,
                 FontWeightProperty.Changed,
-                TextWrappingProperty.Changed
+                TextWrappingProperty.Changed,
+                BoundsProperty.Changed
             ).AddClassHandler<CTextBlock>((x, _) => x.OnMeasureSourceChanged());
         }
 
@@ -191,6 +192,9 @@ namespace ColorTextBlock.Avalonia
             int lineStartIndex = 0;
 
             double entireWidth = availableSize.Width;
+            if (Double.IsInfinity(availableSize.Width) && Bounds.Width != 0)
+                entireWidth = Bounds.Width;
+
             double remainWidth = entireWidth;
             foreach (CInline inline in Content)
             {
@@ -229,6 +233,12 @@ namespace ColorTextBlock.Avalonia
                         lineStartIndex = metries.Count;
                     }
                 }
+            }
+
+            if (prevElmntWid != 0)
+            {
+                width = Math.Max(width, prevElmntWid);
+                height += prevElmntHei;
             }
 
             return new Size(width, height);

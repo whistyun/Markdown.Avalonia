@@ -1,0 +1,117 @@
+﻿<controls:ResourceDictionary
+        xmlns="clr-namespace:Avalonia.Styling;assembly=Avalonia.Styling"
+
+        xmlns:ava="https://github.com/avaloniaui"
+        xmlns:ctxt="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:Avalonia.Controls;assembly=Avalonia.Styling">
+
+    <Styles x:Key="DocumentStyleStandard">
+        <Style Selector="ctxt|CTextBlock.Heading1">
+            <Style.Setters>
+                <Setter Property="FontSize"   Value="42" />
+                <Setter Property="Foreground" Value="#ff000000" />
+                <Setter Property="FontWeight" Value="Light" />
+            </Style.Setters>
+        </Style>
+
+        <Style Selector="ctxt|CTextBlock.Heading2">
+            <Style.Setters>
+                <Setter Property="FontSize"   Value="20" />
+                <Setter Property="Foreground" Value="#ff000000" />
+                <Setter Property="FontWeight" Value="Light" />
+            </Style.Setters>
+        </Style>
+
+        <Style Selector="ctxt|CTextBlock.Heading3">
+            <Style.Setters>
+                <Setter Property="FontSize"   Value="20" />
+                <Setter Property="Foreground" Value="#99000000" />
+                <Setter Property="FontWeight" Value="Light" />
+            </Style.Setters>
+        </Style>
+
+        <Style Selector="ctxt|CTextBlock.Heading4">
+            <Style.Setters>
+                <Setter Property="FontSize"   Value="14" />
+                <Setter Property="Foreground" Value="#99000000" />
+                <Setter Property="FontWeight" Value="Light" />
+            </Style.Setters>
+        </Style>
+
+        <Style Selector="ava|Border.CodeBlock">
+            <Style.Setters>
+                <Setter Property="BorderBrush"     Value="#DEDEDE"/>
+                <Setter Property="BorderThickness" Value="0,5,0,5"/>
+                <Setter Property="Margin"          Value="5,0,5,0"/>
+            </Style.Setters>
+        </Style>
+        <Style Selector="ctxt|CTextBlock.CodeBlock">
+            <Style.Setters>
+                <Setter Property="FontFamily"      Value="Courier New"/>
+                <Setter Property="Foreground"      Value="DarkBlue"/>
+                <Setter Property="Background"      Value="#EEEEEE"/>
+            </Style.Setters>
+        </Style>
+
+        <Style Selector="ava|Border.Note">
+            <Style.Setters>
+                <Setter Property="Margin"          Value="5,0,5,0"/>
+                <Setter Property="BorderBrush"     Value="#DEDEDE"/>
+                <Setter Property="BorderThickness" Value="3,3,3,3"/>
+            </Style.Setters>
+        </Style>
+        <Style Selector="ctxt|CTextBlock.Note">
+            <Style.Setters>
+                <Setter Property="Margin"         Value="10, 5"/>
+                <Setter Property="Background"      Value="#FAFAFA"/>
+            </Style.Setters>
+        </Style>
+
+        <!--
+            The Table's style don't seem to support border-collapse.
+            By making the ruled line width 0.5 and applying it to cell and table,
+            it looks like the ruled lines are not doubled.
+        -->
+      <Style Selector="ava|Border.Table">
+        <Style.Setters>
+          <Setter Property="Margin" Value="5"/>
+          <Setter Property="BorderThickness" Value="0.5"/>
+          <Setter Property="BorderBrush" Value="Gray"/>
+        </Style.Setters>
+      </Style>
+
+      <Style Selector="ava|Grid.Table > ava|Border">
+            <Style.Setters>
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="BorderThickness" Value="0.5"/>
+                <Setter Property="BorderBrush" Value="Gray"/>
+            </Style.Setters>
+        </Style>
+
+        <Style Selector="ava|Border.TableHeader">
+            <Style.Setters>
+                <Setter Property="Background" Value="LightGray"/>
+            </Style.Setters>
+        </Style>
+        <Style Selector="ava|Border.TableHeader ctxt|CTextBlock">
+            <Style.Setters>
+                <Setter Property="FontWeight" Value="DemiBold"/>
+            </Style.Setters>
+        </Style>
+
+        <Style Selector="ava|Border.OddTableRow">
+            <Style.Setters>
+                <Setter Property="Background" Value="White"/>
+            </Style.Setters>
+        </Style>
+
+        <Style Selector="ava|Border.EvenTableRow">
+            <Style.Setters>
+                <Setter Property="Background" Value="#F5F5F5"/>
+            </Style.Setters>
+        </Style>
+
+    </Styles>
+
+</controls:ResourceDictionary>

@@ -1,0 +1,41 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:Markdown.AvaloniaDemo.ViewModels;assembly=Markdown.AvaloniaDemo"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:markdown="clr-namespace:Markdown.Avalonia;assembly=Markdown.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
+        x:Class="Markdown.AvaloniaDemo.Views.MainWindow"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Markdown.AvaloniaDemo">
+
+  <Design.DataContext>
+    <vm:MainWindowViewModel/>
+  </Design.DataContext>
+
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="10*"/>
+      <ColumnDefinition Width="10*"/>
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="10*"/>
+    </Grid.RowDefinitions>
+
+    <TextBox
+      Grid.Row="0"
+      Grid.Column="0"
+      VerticalAlignment="Stretch"
+      AcceptsReturn="True"
+      Text="{Binding Text}"/>
+
+    <markdown:MarkdownScrollViewer
+      Grid.Row="0"
+      Grid.Column="1"
+      VerticalAlignment="Stretch"
+      Markdown="{Binding Text}">
+    </markdown:MarkdownScrollViewer>
+  </Grid>
+
+
+</Window>

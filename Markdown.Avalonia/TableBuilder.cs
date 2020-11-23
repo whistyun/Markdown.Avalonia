@@ -32,6 +32,7 @@ namespace Markdown.Avalonia
                 row.Select(txt => new MdTableCell(txt)).ToList()
             ).ToList();
 
+            // column-idx vs text-alignment
             Dictionary<int, TextAlignment> styleMt = styles
                     .Select((txt, idx) =>
                     {
@@ -59,8 +60,10 @@ namespace Markdown.Avalonia
             var headerColumnCount = 0;
             {
                 var colOffset = 0;
-                foreach (var cell in Header)
+                foreach (MdTableCell cell in Header)
                 {
+                    cell.ColumnIndex = colOffset;
+
                     // apply text align
                     if (styleMt.TryGetValue(colOffset, out var style))
                     {
@@ -73,28 +76,45 @@ namespace Markdown.Avalonia
                 headerColumnCount = colOffset;
             }
 
-
             // apply cell style to header
-            var detailsRowCount = new List<int>();
-            var detailsRowCountSummary = 1;
+            var colCntAtDetail = new List<int>();
+            var maxColCntInDetails = 1;
             {
-                var rowSpanLife = new Dictionary<int, MdSpan>();
+                var multiRowsAtColIdx = new Dictionary<int, MdSpan>();
                 for (var rowIdx = 0; rowIdx < Details.Count; ++rowIdx)
                 {
-                    var row = Details[rowIdx];
+                    List<MdTableCell> row = Details[rowIdx];
 
                     var hasAnyCell = false;
                     var colOffset = 0;
 
-                    var rowspansColOffset = rowSpanLife
+                    var rowspansColOffset = multiRowsAtColIdx
                         .Select(ent => ent.Value.ColSpan)
                         .Sum();
 
-                    if (rowspansColOffset < detailsRowCountSummary)
+                    /*
+                     * In this row, is space exists to insert cell?
+                     * 
+                     * eg. has space
+                     *    __________________________________
+                     *    | 2x1 cell | 1x1 cell | 1x1 cell |
+                     * -> |          |‾‾‾‾‾‾‾‾‾‾|‾‾‾‾‾‾‾‾‾‾|
+                     *    ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+                     *    
+                     * eg. has no space: multi-rows occupy all space in this row.
+                     *    __________________________________
+                     *    | 2x1 cell |      2x2 cell        |
+                     * -> |          |                      |
+                     *    ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+                     * 
+                     */
+                    if (rowspansColOffset < maxColCntInDetails)
                     {
                         for (var colIdx = 0; colIdx < row.Count;)
                         {
-                            var cell = row[colIdx];
+                            MdTableCell cell = row[colIdx];
+
+                            cell.ColumnIndex = colOffset;
 
                             // apply text align
                             if (!cell.Horizontal.HasValue
@@ -104,7 +124,7 @@ namespace Markdown.Avalonia
                             }
 
                             int colSpan;
-                            if (rowSpanLife.TryGetValue(colOffset, out var span))
+                            if (multiRowsAtColIdx.TryGetValue(colOffset, out var span))
                             {
                                 colSpan = span.ColSpan;
                             }
@@ -115,7 +135,7 @@ namespace Markdown.Avalonia
 
                                 if (cell.RowSpan > 1)
                                 {
-                                    rowSpanLife[colOffset] =
+                                    multiRowsAtColIdx[colOffset] =
                                         new MdSpan(cell.RowSpan, cell.ColSpan);
                                 }
 
@@ -126,21 +146,21 @@ namespace Markdown.Avalonia
                         }
                     }
 
-                    colOffset += rowSpanLife
+                    colOffset += multiRowsAtColIdx
                         .Where(ent => ent.Key >= colOffset)
                         .Select(ent => ent.Value.ColSpan)
                         .Sum();
 
-                    foreach (var spanEntry in rowSpanLife.ToArray())
+                    foreach (var spanEntry in multiRowsAtColIdx.ToArray())
                     {
                         if (--spanEntry.Value.Life == 0)
                         {
-                            rowSpanLife.Remove(spanEntry.Key);
+                            multiRowsAtColIdx.Remove(spanEntry.Key);
                         }
                     }
 
-                    detailsRowCount.Add(colOffset);
-                    detailsRowCountSummary = Math.Max(detailsRowCountSummary, colOffset);
+                    colCntAtDetail.Add(colOffset);
+                    maxColCntInDetails = Math.Max(maxColCntInDetails, colOffset);
 
                     if (!hasAnyCell)
                     {
@@ -148,35 +168,48 @@ namespace Markdown.Avalonia
                     }
                 }
 
-                while (rowSpanLife.Count > 0)
+                // if any multirow is left, insert an empty row.
+                while (multiRowsAtColIdx.Count > 0)
                 {
                     Details.Add(new List<MdTableCell>());
 
                     var colOffset = 0;
 
-                    foreach (var spanEntry in rowSpanLife.ToArray())
+                    foreach (var spanEntry in multiRowsAtColIdx.ToArray())
                     {
                         colOffset += spanEntry.Value.ColSpan;
 
                         if (--spanEntry.Value.Life == 0)
                         {
-                            rowSpanLife.Remove(spanEntry.Key);
+                            multiRowsAtColIdx.Remove(spanEntry.Key);
                         }
                     }
 
-                    detailsRowCount.Add(colOffset);
+                    colCntAtDetail.Add(colOffset);
                 }
             }
 
-            ColCount = Math.Max(Math.Max(headerColumnCount, styleColumnCount), detailsRowCountSummary);
+            ColCount = Math.Max(Math.Max(headerColumnCount, styleColumnCount), maxColCntInDetails);
             RowCount = Details.Count;
 
-            while (Header.Count < ColCount)
-                Header.Add(new MdTableCell(null));
+            // insert cell for the shortfall
+
+            for (var retry = Header.Sum(cell => cell.ColSpan); retry < ColCount; ++retry)
+            {
+                var cell = new MdTableCell(null);
+                cell.ColumnIndex = retry;
+                Header.Add(cell);
+            }
 
             for (var rowIdx = 0; rowIdx < Details.Count; ++rowIdx)
-                for (var retry = detailsRowCount[rowIdx]; retry < ColCount; ++retry)
-                    Details[rowIdx].Add(new MdTableCell(null));
+            {
+                for (var retry = colCntAtDetail[rowIdx]; retry < ColCount; ++retry)
+                {
+                    var cell = new MdTableCell(null);
+                    cell.ColumnIndex = retry;
+                    Details[rowIdx].Add(cell);
+                }
+            }
 
             //while (Header.Count < ColCount)
             //    Header.Add(new MdTableCell(""));
@@ -201,6 +234,8 @@ namespace Markdown.Avalonia
 
     class MdTableCell
     {
+        public int ColumnIndex { set; get; }
+
         public string RawText { get; }
         public string Text { get; }
         public int RowSpan { set; get; }

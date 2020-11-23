@@ -10,8 +10,8 @@
     <Copyright>Copyright (c) 2019 Bevan Arps, 2020 whistyun</Copyright>
     <PackageProjectUrl>https://github.com/whistyun/Markdown.Avalonia</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-	  <PackageTags>Markdown Avalniaui </PackageTags>
-	  <Configurations>Debug;Release</Configurations>
+    <PackageTags>Markdown Avalniaui </PackageTags>
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,10 +20,11 @@
 
   <ItemGroup>
     <None Remove="EmojiTable.txt" />
+    <None Remove="MarkdownStyle.xml" />
   </ItemGroup>
 
   <ItemGroup>
-    <Page Remove="MarkdownMigFree.Style.xaml" />
+    <EmbeddedResource Include="MarkdownStyle.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,7 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ColorText.Avalonia\ColorTextBlock.Avalonia\ColorTextBlock.Avalonia.csproj" />
     <ProjectReference Include="..\ColorTextBlock.Avalonia\ColorTextBlock.Avalonia.csproj" />
   </ItemGroup>
 </Project>
