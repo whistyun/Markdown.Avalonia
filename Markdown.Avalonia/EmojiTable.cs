@@ -5,11 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-#if MIG_FREE
-namespace Markdown.Xaml
-#else
-namespace MdXaml
-#endif
+namespace Markdown.Avalonia
 {
     public static class EmojiTable
     {
@@ -28,11 +24,8 @@ namespace MdXaml
         */
         static void LoadTxt()
         {
-#if MIG_FREE
-            var resourceName = "Markdown.Xaml.EmojiTable.txt";
-#else
-            var resourceName = "MdXaml.EmojiTable.txt";
-#endif
+            var resourceName = "Markdown.Avalonia.EmojiTable.txt";
+
             keywords = new ConcurrentDictionary<string, string>();
 
             Assembly asm = Assembly.GetCallingAssembly();

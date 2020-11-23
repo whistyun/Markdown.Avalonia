@@ -1,30 +1,24 @@
-﻿using System;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Layout;
+using Avalonia.Markup.Xaml;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Styling;
+using ColorTextBlock.Avalonia;
+using Markdown.Avalonia.Controls;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Cache;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Markup;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
-#if !MIG_FREE
-using ICSharpCode.AvalonEdit;
-using ICSharpCode.AvalonEdit.Highlighting;
-#endif
-
-#if MIG_FREE
-namespace Markdown.Xaml
-#else
-namespace MdXaml
-#endif
+namespace Markdown.Avalonia
 {
-    public class Markdown : DependencyObject, IUriContext
+    public class Markdown : AvaloniaObject, IUriContext
     {
         #region const
         /// <summary>
@@ -46,10 +40,14 @@ namespace MdXaml
         private const string TagCodeBlock = "CodeBlock";
         private const string TagBlockquote = "Blockquote";
         private const string TagNote = "Note";
+
+        private const string TagTable = "Table";
         private const string TagTableHeader = "TableHeader";
         private const string TagTableBody = "TableBody";
         private const string TagOddTableRow = "OddTableRow";
         private const string TagEvenTableRow = "EvenTableRow";
+
+        private const string TagList = "List";
 
         private const string TagBoldSpan = "Bold";
         private const string TagItalicSpan = "Italic";
@@ -68,19 +66,19 @@ namespace MdXaml
 
         public bool DisabledTootip { get; set; }
 
-        public bool DisabledLazyLoad { get; set; }
+        //public bool DisabledLazyLoad { get; set; }
 
         public string AssetPathRoot { get; set; }
 
-        public ICommand HyperlinkCommand { get; set; }
+        public Action<string> HyperlinkCommand { get; set; }
 
         public Uri BaseUri { get; set; }
 
         #region dependencyobject property
 
         // Using a DependencyProperty as the backing store for DocumentStyle.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty DocumentStyleProperty =
-            DependencyProperty.Register(nameof(DocumentStyle), typeof(Style), typeof(Markdown), new PropertyMetadata(null));
+        public static readonly AvaloniaProperty DocumentStyleProperty =
+            AvaloniaProperty.Register<Markdown, Style>(nameof(DocumentStyle), defaultValue: null);
 
         /// <summary>
         /// top-level flow document style
@@ -96,6 +94,10 @@ namespace MdXaml
 
         #region legacy property
 
+        /*
+         
+         TODO read https://github.com/AvaloniaUI/Avalonia/issues/2765
+         
         public Style Heading1Style { get; set; }
         public Style Heading2Style { get; set; }
         public Style Heading3Style { get; set; }
@@ -111,6 +113,7 @@ namespace MdXaml
         public Style TableHeaderStyle { get; set; }
         public Style TableBodyStyle { get; set; }
         public Style NoteStyle { get; set; }
+        */
 
         #endregion
 
@@ -122,11 +125,21 @@ namespace MdXaml
 
         public Markdown()
         {
-            HyperlinkCommand = NavigationCommands.GoToPage;
+            HyperlinkCommand = (url) =>
+            {
+                // https://github.com/dotnet/runtime/issues/17938
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    Process.Start(new ProcessStartInfo("cmd", $"/c start {url}"));
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    Process.Start("xdg-open", url);
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    Process.Start("open", url);
+            };
+
             AssetPathRoot = Environment.CurrentDirectory;
         }
 
-        public FlowDocument Transform(string text)
+        public Control Transform(string text)
         {
             if (text is null)
             {
@@ -134,9 +147,12 @@ namespace MdXaml
             }
 
             text = Normalize(text);
-            var document = Create<FlowDocument, Block>(RunBlockGamut(text, true));
 
-            document.SetBinding(FlowDocument.StyleProperty, new Binding(DocumentStyleProperty.Name) { Source = this });
+            var document = Create<StackPanel, Control>(RunBlockGamut(text, true));
+            document.Orientation = Orientation.Vertical;
+
+            // todo implements after
+            //            document.SetBinding(FlowDocument.StyleProperty, new Binding(DocumentStyleProperty.Name) { Source = this });
 
             return document;
         }
@@ -205,7 +221,7 @@ namespace MdXaml
         /// <summary>
         /// Perform transformations that form block-level tags like paragraphs, headers, and list items.
         /// </summary>
-        private IEnumerable<Block> RunBlockGamut(string text, bool supportTextAlignment)
+        private IEnumerable<Control> RunBlockGamut(string text, bool supportTextAlignment)
         {
             if (text is null)
             {
@@ -240,7 +256,7 @@ namespace MdXaml
         /// <summary>
         /// Perform transformations that occur *within* block-level tags like paragraphs, headers, and list items.
         /// </summary>
-        private IEnumerable<Inline> RunSpanGamut(string text)
+        private IEnumerable<CInline> RunSpanGamut(string text)
         {
             if (text is null)
             {
@@ -281,7 +297,7 @@ namespace MdXaml
         /// <summary>
         /// splits on two or more newlines, to form "paragraphs";    
         /// </summary>
-        private IEnumerable<Block> FormParagraphs(string text, bool supportTextAlignment)
+        private IEnumerable<Control> FormParagraphs(string text, bool supportTextAlignment)
         {
             if (text is null)
             {
@@ -289,47 +305,37 @@ namespace MdXaml
             }
 
             // split on two or more newlines
-            string[] grafs = _newlinesMultiple.Split(_newlinesLeadingTrailing.Replace(text, ""));
+            string[] lines = _newlinesMultiple.Split(_newlinesLeadingTrailing.Replace(text, ""));
 
-            foreach (var g in grafs)
+            // check text alignment
+            TextAlignment? indiAlignment = null;
+            string firstLine = lines[0];
+            var alignMatch = _align.Match(firstLine);
+            if (alignMatch.Success)
             {
-                var chip = g;
-
-                TextAlignment? indiAlignment = null;
-
-                if (supportTextAlignment)
+                firstLine = firstLine.Substring(alignMatch.Length);
+                lines[0] = firstLine;
+                switch (alignMatch.Groups[1].Value)
                 {
-                    var alignMatch = _align.Match(chip);
-                    if (alignMatch.Success)
-                    {
-                        chip = chip.Substring(alignMatch.Length);
-                        switch (alignMatch.Groups[1].Value)
-                        {
-                            case "<":
-                                indiAlignment = TextAlignment.Left;
-                                break;
-                            case ">":
-                                indiAlignment = TextAlignment.Right;
-                                break;
-                            case "=":
-                                indiAlignment = TextAlignment.Center;
-                                break;
-                        }
-                    }
+                    case "<":
+                        indiAlignment = TextAlignment.Left;
+                        break;
+                    case ">":
+                        indiAlignment = TextAlignment.Right;
+                        break;
+                    case "=":
+                        indiAlignment = TextAlignment.Center;
+                        break;
                 }
-
-                var block = Create<Paragraph, Inline>(RunSpanGamut(chip));
-                if (NormalParagraphStyle != null)
-                {
-                    block.Style = NormalParagraphStyle;
-                }
-                if (indiAlignment.HasValue)
-                {
-                    block.TextAlignment = indiAlignment.Value;
-                }
-
-                yield return block;
             }
+
+            var ctbox = new CTextBlock();
+            ctbox.Content = lines.SelectMany(ln => RunSpanGamut(ln).Concat(new[] { new CLineBreak() }));
+
+            if (indiAlignment.HasValue)
+                ctbox.TextAlignment = indiAlignment.Value;
+
+            yield return ctbox;
         }
 
         #endregion
@@ -365,7 +371,7 @@ namespace MdXaml
         /// <remarks>
         /// ![image alt](url) 
         /// </remarks>
-        private IEnumerable<Inline> DoImages(string text, Func<string, IEnumerable<Inline>> defaultHandler)
+        private IEnumerable<CInline> DoImages(string text, Func<string, IEnumerable<CInline>> defaultHandler)
         {
             if (text is null)
             {
@@ -376,7 +382,7 @@ namespace MdXaml
         }
 
 
-        private Inline ImageInlineEvaluator(Match match)
+        private CInline ImageInlineEvaluator(Match match)
         {
             if (match is null)
             {
@@ -394,7 +400,7 @@ namespace MdXaml
                 title = titleMatch.Groups[4].Value;
             }
 
-            BitmapImage imgSource = null;
+            Bitmap imgSource = null;
 
             // check embedded resoruce
             try
@@ -431,68 +437,22 @@ namespace MdXaml
             // error
             if (imgSource is null)
             {
-                return new Run("!" + url) { Foreground = Brushes.Red };
-            }
-
-
-            Image image = new Image { Source = imgSource, Tag = linkText };
-            if (ImageStyle is null)
-            {
-                image.Margin = new Thickness(0);
-            }
-            else
-            {
-                image.Style = ImageStyle;
-            }
-            if (!DisabledTootip && !string.IsNullOrWhiteSpace(title))
-            {
-                image.ToolTip = title;
-            }
-
-            // Bind size so document is updated when image is downloaded
-            if (imgSource.IsDownloading)
-            {
-                Binding binding = new Binding(nameof(BitmapImage.Width));
-                binding.Source = imgSource;
-                binding.Mode = BindingMode.OneWay;
-
-                BindingExpressionBase bindingExpression = BindingOperations.SetBinding(image, Image.WidthProperty, binding);
-                EventHandler downloadCompletedHandler = null;
-                downloadCompletedHandler = (sender, e) =>
+                return new CRun()
                 {
-                    imgSource.DownloadCompleted -= downloadCompletedHandler;
-                    imgSource.Freeze();
-                    bindingExpression.UpdateTarget();
+                    Text = "!" + url,
+                    Foreground = Brushes.Red
                 };
-                imgSource.DownloadCompleted += downloadCompletedHandler;
             }
             else
             {
-                image.Width = imgSource.Width;
+                return new CImage(imgSource);
             }
-
-            return new InlineUIContainer(image);
         }
 
-        private BitmapImage MakeImage(Uri url)
+        private Bitmap MakeImage(Uri url)
         {
-            if (DisabledLazyLoad)
-            {
-                return new BitmapImage(url);
-            }
-            else
-            {
-                var imgSource = new BitmapImage();
-                imgSource.BeginInit();
-                imgSource.CacheOption = BitmapCacheOption.None;
-                imgSource.UriCachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
-                imgSource.CacheOption = BitmapCacheOption.OnLoad;
-                imgSource.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
-                imgSource.UriSource = url;
-                imgSource.EndInit();
 
-                return imgSource;
-            }
+            return null;
         }
 
         #endregion
@@ -525,7 +485,7 @@ namespace MdXaml
         /// <remarks>
         /// [link text](url "title") 
         /// </remarks>
-        private IEnumerable<Inline> DoAnchors(string text, Func<string, IEnumerable<Inline>> defaultHandler)
+        private IEnumerable<CInline> DoAnchors(string text, Func<string, IEnumerable<CInline>> defaultHandler)
         {
             if (text is null)
             {
@@ -536,7 +496,7 @@ namespace MdXaml
             return Evaluate(text, _anchorInline, AnchorInlineEvaluator, defaultHandler);
         }
 
-        private Inline AnchorInlineEvaluator(Match match)
+        private CInline AnchorInlineEvaluator(Match match)
         {
             if (match is null)
             {
@@ -547,21 +507,16 @@ namespace MdXaml
             string url = match.Groups[3].Value;
             string title = match.Groups[6].Value;
 
-            var result = Create<Hyperlink, Inline>(RunSpanGamut(linkText));
+            var result = new CHyperlink(RunSpanGamut(linkText));
             result.Command = HyperlinkCommand;
             result.CommandParameter = url;
 
-            if (!DisabledTootip)
-            {
-                result.ToolTip = string.IsNullOrWhiteSpace(title) ?
-                    url :
-                    String.Format("\"{0}\"\r\n{1}", title, url);
-            }
-
-            if (LinkStyle != null)
-            {
-                result.Style = LinkStyle;
-            }
+            //if (!DisabledTootip)
+            //{
+            //    result.ToolTip = string.IsNullOrWhiteSpace(title) ?
+            //        url :
+            //        String.Format("\"{0}\"\r\n{1}", title, url);
+            //}
 
             return result;
         }
@@ -605,18 +560,18 @@ namespace MdXaml
         /// ...  
         /// ###### Header 6  
         /// </remarks>
-        private IEnumerable<Block> DoHeaders(string text, Func<string, IEnumerable<Block>> defaultHandler)
+        private IEnumerable<Control> DoHeaders(string text, Func<string, IEnumerable<Control>> defaultHandler)
         {
             if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
 
-            return Evaluate<Block>(text, _headerSetext, m => SetextHeaderEvaluator(m),
-                s => Evaluate<Block>(s, _headerAtx, m => AtxHeaderEvaluator(m), defaultHandler));
+            return Evaluate<Control>(text, _headerSetext, m => SetextHeaderEvaluator(m),
+                s => Evaluate<Control>(s, _headerAtx, m => AtxHeaderEvaluator(m), defaultHandler));
         }
 
-        private Block SetextHeaderEvaluator(Match match)
+        private CTextBlock SetextHeaderEvaluator(Match match)
         {
             if (match is null)
             {
@@ -630,7 +585,7 @@ namespace MdXaml
             return CreateHeader(level, RunSpanGamut(header.Trim()));
         }
 
-        private Block AtxHeaderEvaluator(Match match)
+        private CTextBlock AtxHeaderEvaluator(Match match)
         {
             if (match is null)
             {
@@ -642,63 +597,47 @@ namespace MdXaml
             return CreateHeader(level, RunSpanGamut(header));
         }
 
-        public Block CreateHeader(int level, IEnumerable<Inline> content)
+        public CTextBlock CreateHeader(int level, IEnumerable<CInline> content)
         {
             if (content is null)
             {
                 throw new ArgumentNullException(nameof(content));
             }
 
-            var block = Create<Paragraph, Inline>(content);
+            var heading = new CTextBlock() { Content = content };
 
             switch (level)
             {
                 case 1:
-                    if (Heading1Style != null)
-                    {
-                        block.Style = Heading1Style;
-                    }
                     if (!DisabledTag)
                     {
-                        block.Tag = TagHeading1;
+                        heading.Classes.Add(TagHeading1);
                     }
                     break;
 
                 case 2:
-                    if (Heading2Style != null)
-                    {
-                        block.Style = Heading2Style;
-                    }
                     if (!DisabledTag)
                     {
-                        block.Tag = TagHeading2;
+                        heading.Classes.Add(TagHeading2);
                     }
                     break;
 
                 case 3:
-                    if (Heading3Style != null)
-                    {
-                        block.Style = Heading3Style;
-                    }
                     if (!DisabledTag)
                     {
-                        block.Tag = TagHeading3;
+                        heading.Classes.Add(TagHeading3);
                     }
                     break;
 
                 case 4:
-                    if (Heading4Style != null)
-                    {
-                        block.Style = Heading4Style;
-                    }
                     if (!DisabledTag)
                     {
-                        block.Tag = TagHeading4;
+                        heading.Classes.Add(TagHeading4);
                     }
                     break;
             }
 
-            return block;
+            return heading;
         }
         #endregion
 
@@ -718,20 +657,20 @@ namespace MdXaml
         /// <remarks>
         /// < Note
         /// </remarks>
-        private IEnumerable<Block> DoNote(string text, bool supportTextAlignment,
-                Func<string, IEnumerable<Block>> defaultHandler)
+        private IEnumerable<Control> DoNote(string text, bool supportTextAlignment,
+                Func<string, IEnumerable<Control>> defaultHandler)
         {
             if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
 
-            return Evaluate<Block>(text, _note,
+            return Evaluate<Control>(text, _note,
                 m => NoteEvaluator(m, supportTextAlignment),
                 defaultHandler);
         }
 
-        private Block NoteEvaluator(Match match, bool supportTextAlignment)
+        private CTextBlock NoteEvaluator(Match match, bool supportTextAlignment)
         {
             if (match is null)
             {
@@ -766,28 +705,24 @@ namespace MdXaml
             return NoteComment(RunSpanGamut(text), indiAlignment);
         }
 
-        public Block NoteComment(IEnumerable<Inline> content, TextAlignment? indiAlignment)
+        public CTextBlock NoteComment(IEnumerable<CInline> content, TextAlignment? indiAlignment)
         {
             if (content is null)
             {
                 throw new ArgumentNullException(nameof(content));
             }
 
-            var block = Create<Paragraph, Inline>(content);
-            if (NoteStyle != null)
-            {
-                block.Style = NoteStyle;
-            }
+            var note = new CTextBlock() { Content = content };
             if (!DisabledTag)
             {
-                block.Tag = TagNote;
+                note.Tag = TagNote;
             }
             if (indiAlignment.HasValue)
             {
-                block.TextAlignment = indiAlignment.Value;
+                note.TextAlignment = indiAlignment.Value;
             }
 
-            return block;
+            return note;
         }
         #endregion
 
@@ -820,7 +755,7 @@ namespace MdXaml
         /// ---
         /// - - -
         /// </remarks>
-        private IEnumerable<Block> DoHorizontalRules(string text, Func<string, IEnumerable<Block>> defaultHandler)
+        private IEnumerable<Control> DoHorizontalRules(string text, Func<string, IEnumerable<Control>> defaultHandler)
         {
             if (text is null)
             {
@@ -836,104 +771,53 @@ namespace MdXaml
         /// <summary>
         /// Single line separator.
         /// </summary>
-        private Block RuleEvaluator(Match match)
+        private Rule RuleEvaluator(Match match)
         {
             if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
 
-            var sep = new Separator();
-            if (SeparatorStyle != null)
-                sep.Style = SeparatorStyle;
-
-            return new BlockUIContainer(sep);
+            return new Rule(RuleType.Single);
         }
 
         /// <summary>
         /// Two lines separator.
         /// </summary>
-        private Block TwoLinesRuleEvaluator(Match match)
+        private Rule TwoLinesRuleEvaluator(Match match)
         {
             if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
 
-            var stackPanel = new StackPanel();
-            for (int i = 0; i < 2; i++)
-            {
-                var sep = new Separator();
-                if (SeparatorStyle != null)
-                    sep.Style = SeparatorStyle;
-
-                stackPanel.Children.Add(sep);
-            }
-
-            var container = new BlockUIContainer(stackPanel);
-            return container;
+            return new Rule(RuleType.TwoLines);
         }
 
         /// <summary>
         /// Double line separator.
         /// </summary>
-        private Block BoldRuleEvaluator(Match match)
+        private Rule BoldRuleEvaluator(Match match)
         {
             if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
 
-            var stackPanel = new StackPanel();
-            for (int i = 0; i < 2; i++)
-            {
-                var sep = new Separator()
-                {
-                    Margin = new Thickness(0)
-                };
-
-                if (SeparatorStyle != null)
-                    sep.Style = SeparatorStyle;
-
-                stackPanel.Children.Add(sep);
-            }
-
-            var container = new BlockUIContainer(stackPanel);
-            return container;
+            return new Rule(RuleType.Bold);
         }
 
         /// <summary>
         /// Two lines separator consisting of a double line and a single line.
         /// </summary>
-        private Block BoldWithSingleRuleEvaluator(Match match)
+        private Rule BoldWithSingleRuleEvaluator(Match match)
         {
             if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
 
-            var stackPanel = new StackPanel();
-            for (int i = 0; i < 2; i++)
-            {
-                var sep = new Separator()
-                {
-                    Margin = new Thickness(0)
-                };
-
-                if (SeparatorStyle != null)
-                    sep.Style = SeparatorStyle;
-
-                stackPanel.Children.Add(sep);
-            }
-
-            var sepLst = new Separator();
-            if (SeparatorStyle != null)
-                sepLst.Style = SeparatorStyle;
-
-            stackPanel.Children.Add(sepLst);
-
-            var container = new BlockUIContainer(stackPanel);
-            return container;
+            return new Rule(RuleType.BoldWithSingle);
         }
 
         #endregion
@@ -993,7 +877,7 @@ namespace MdXaml
         /// <summary>
         /// Turn Markdown lists into HTML ul and ol and li tags
         /// </summary>
-        private IEnumerable<Block> DoLists(string text, Func<string, IEnumerable<Block>> defaultHandler)
+        private IEnumerable<Control> DoLists(string text, Func<string, IEnumerable<Control>> defaultHandler)
         {
             if (text is null)
             {
@@ -1008,7 +892,7 @@ namespace MdXaml
                 return Evaluate(text, _listTopLevel, ListEvaluator, defaultHandler);
         }
 
-        private Block ListEvaluator(Match match)
+        private Control ListEvaluator(Match match)
         {
             if (match is null)
             {
@@ -1025,18 +909,38 @@ namespace MdXaml
             // paragraph for the last item in a list, if necessary:
             list = Regex.Replace(list, @"\n{2,}", "\n\n\n");
 
-            var resultList = Create<List, ListItem>(ProcessListItems(list, listType == "ul" ? _markerUL : _markerOL));
+            IEnumerable<Control> listItems = ProcessListItems(list, listType == "ul" ? _markerUL : _markerOL);
 
-            resultList.MarkerStyle = textMarker;
 
-            return resultList;
+            var grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition());
+            grid.ColumnDefinitions.Add(new ColumnDefinition());
+
+            foreach (Tuple<Control, int> listItemTpl in listItems.Select((elm, idx) => Tuple.Create(elm, idx)))
+            {
+                var control = listItemTpl.Item1;
+                var index = listItemTpl.Item2;
+
+                grid.RowDefinitions.Add(new RowDefinition());
+                grid.Children.Add(control);
+
+                Grid.SetRow(control, index);
+                Grid.SetColumn(control, 1);
+            }
+
+            if (!DisabledTag)
+            {
+                grid.Classes.Add(TagList);
+            }
+
+            return grid;
         }
 
         /// <summary>
         /// Process the contents of a single ordered or unordered list, splitting it
         /// into individual list items.
         /// </summary>
-        private IEnumerable<ListItem> ProcessListItems(string list, string marker)
+        private IEnumerable<Control> ProcessListItems(string list, string marker)
         {
             // The listLevel global keeps track of when we're inside a list.
             // Each time we enter a list, we increment it; when we leave a list,
@@ -1086,7 +990,7 @@ namespace MdXaml
             }
         }
 
-        private ListItem ListItemEvaluator(Match match)
+        private Control ListItemEvaluator(Match match)
         {
             if (match is null)
             {
@@ -1098,11 +1002,12 @@ namespace MdXaml
 
             if (!String.IsNullOrEmpty(leadingLine) || Regex.IsMatch(item, @"\n{2,}"))
                 // we could correct any bad indentation here..
-                return Create<ListItem, Block>(RunBlockGamut(item, false));
+
+                return Create<Panel, Control>(RunBlockGamut(item, false));
             else
             {
                 // recursion for sub-lists
-                return Create<ListItem, Block>(RunBlockGamut(item, false));
+                return Create<Panel, Control>(RunBlockGamut(item, false));
             }
         }
 
@@ -1182,7 +1087,7 @@ namespace MdXaml
             )",
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
-        public IEnumerable<Block> DoTable(string text, Func<string, IEnumerable<Block>> defaultHandler)
+        public IEnumerable<Control> DoTable(string text, Func<string, IEnumerable<Control>> defaultHandler)
         {
             if (text is null)
             {
@@ -1192,7 +1097,7 @@ namespace MdXaml
             return Evaluate(text, _table, TableEvalutor, defaultHandler);
         }
 
-        private Block TableEvalutor(Match match)
+        private Grid TableEvalutor(Match match)
         {
             if (match is null)
             {
@@ -1227,80 +1132,70 @@ namespace MdXaml
                 }).ToList());
 
             // table
-            var table = new Table();
-            if (TableStyle != null)
-            {
-                table.Style = TableStyle;
-            }
+            var table = new Grid();
 
             // table columns
-            while (table.Columns.Count < mdtable.ColCount)
-                table.Columns.Add(new TableColumn());
+            while (table.ColumnDefinitions.Count < mdtable.ColCount)
+                table.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
 
             // table header
-            var tableHeaderRG = new TableRowGroup();
-            if (TableHeaderStyle != null)
+            table.RowDefinitions.Add(new RowDefinition());
+            foreach (Panel tableHeaderCell in CreateTableRow(mdtable.Header, 0))
             {
-                tableHeaderRG.Style = TableHeaderStyle;
-            }
-            if (!DisabledTag)
-            {
-                tableHeaderRG.Tag = TagTableHeader;
-            }
-
-            var tableHeader = CreateTableRow(mdtable.Header);
-            tableHeaderRG.Rows.Add(tableHeader);
-            table.RowGroups.Add(tableHeaderRG);
-
-            // row
-            var tableBodyRG = new TableRowGroup();
-            if (TableBodyStyle != null)
-            {
-                tableBodyRG.Style = TableBodyStyle;
-            }
-            if (!DisabledTag)
-            {
-                tableBodyRG.Tag = TagTableBody;
-            }
-
-            foreach (int rowIdx in Enumerable.Range(0, mdtable.Details.Count))
-            {
-                var tableBody = CreateTableRow(mdtable.Details[rowIdx]);
                 if (!DisabledTag)
                 {
-                    tableBody.Tag = (rowIdx & 1) == 0 ? TagOddTableRow : TagEvenTableRow;
+                    tableHeaderCell.Classes.Add(TagTableHeader);
                 }
-
-                tableBodyRG.Rows.Add(tableBody);
+                table.Children.Add(tableHeaderCell);
             }
-            table.RowGroups.Add(tableBodyRG);
+
+            // table cell
+            foreach (int rowIdx in Enumerable.Range(0, mdtable.Details.Count))
+            {
+                table.RowDefinitions.Add(new RowDefinition());
+                foreach (Panel cell in CreateTableRow(mdtable.Details[rowIdx], rowIdx + 1))
+                {
+                    if (!DisabledTag)
+                    {
+                        cell.Classes.Add((rowIdx & 1) == 0 ? TagOddTableRow : TagEvenTableRow);
+                    }
+
+                    table.Children.Add(cell);
+                }
+            }
+
+            if (!DisabledTag)
+            {
+                table.Classes.Add(TagTable);
+            }
 
             return table;
         }
 
-        private TableRow CreateTableRow(IList<MdTableCell> mdcells)
+        private IEnumerable<Panel> CreateTableRow(IList<MdTableCell> mdcells, int rowIdx)
         {
-            var tableRow = new TableRow();
+            int colIdx = 0;
 
             foreach (var mdcell in mdcells)
             {
-                TableCell cell = mdcell.Text is null ?
-                    new TableCell() :
-                    new TableCell(Create<Paragraph, Inline>(RunSpanGamut(mdcell.Text)));
+                var cell = new Panel();
 
-                if (mdcell.Horizontal.HasValue)
-                    cell.TextAlignment = mdcell.Horizontal.Value;
+                if (!(mdcell.Text is null))
+                {
+                    var txtbx = new CTextBlock() { Content = RunSpanGamut(mdcell.Text) };
+                    cell.Children.Add(txtbx);
 
-                if (mdcell.RowSpan != 1)
-                    cell.RowSpan = mdcell.RowSpan;
+                    if (mdcell.Horizontal.HasValue)
+                        txtbx.TextAlignment = mdcell.Horizontal.Value;
+                }
 
-                if (mdcell.ColSpan != 1)
-                    cell.ColumnSpan = mdcell.ColSpan;
+                Grid.SetRow(cell, rowIdx);
+                Grid.SetColumn(cell, colIdx++);
+                if (mdcell.RowSpan != 1) Grid.SetColumn(cell, mdcell.RowSpan);
+                if (mdcell.ColSpan != 1) Grid.SetColumn(cell, mdcell.ColSpan);
 
-                tableRow.Cells.Add(cell);
+                yield return cell;
             }
-
-            return tableRow;
         }
 
         #endregion
@@ -1329,7 +1224,7 @@ namespace MdXaml
                     \1
                     (?!`)[\r\n]+", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
 
-        private IEnumerable<Block> DoCodeBlocks(string text, Func<string, IEnumerable<Block>> defaultHandler)
+        private IEnumerable<Control> DoCodeBlocks(string text, Func<string, IEnumerable<Control>> defaultHandler)
         {
             if (text is null)
             {
@@ -1342,8 +1237,7 @@ namespace MdXaml
             );
         }
 
-#if MIG_FREE
-        private Block CodeBlocksEvaluator(Match match)
+        private CTextBlock CodeBlocksEvaluator(Match match)
         {
             if (match is null)
             {
@@ -1353,51 +1247,51 @@ namespace MdXaml
             string lang = match.Groups[2].Value;
             string code = match.Groups[3].Value;
 
-            var text = new Run(code);
-            var result = new Paragraph(text);
-            if (CodeBlockStyle != null)
-            {
-                result.Style = CodeBlockStyle;
-            }
+
+            var text = new CCode(new[] { new CRun() { Text = code } });
+
+            var result = new CTextBlock();
+            result.Content = new[] { text };
+
             if (!DisabledTag)
             {
-                result.Tag = TagCodeBlock;
+                result.Classes.Add(TagCodeBlock);
             }
 
             return result;
         }
-#else
-        private Block CodeBlocksEvaluator(Match match)
-        {
-            if (match is null)
-            {
-                throw new ArgumentNullException(nameof(match));
-            }
+        // Use AvalonEdit
+        //        private Block CodeBlocksEvaluator(Match match)
+        //        {
+        //            if (match is null)
+        //            {
+        //                throw new ArgumentNullException(nameof(match));
+        //            }
+        //
+        //            string lang = match.Groups[2].Value;
+        //            string code = match.Groups[3].Value;
+        //
+        //            var txtEdit = new TextEditor();
+        //            var highlight = HighlightingManager.Instance.GetDefinitionByExtension("." + lang);
+        //            txtEdit.SyntaxHighlighting = highlight;
+        //
+        //            txtEdit.Text = code;
+        //            txtEdit.HorizontalAlignment = HorizontalAlignment.Stretch;
+        //            txtEdit.IsReadOnly = true;
+        //
+        //            var result = new BlockUIContainer(txtEdit);
+        //            if (CodeBlockStyle != null)
+        //            {
+        //                result.Style = CodeBlockStyle;
+        //            }
+        //            if (!DisabledTag)
+        //            {
+        //                result.Tag = TagCodeBlock;
+        //            }
+        //
+        //            return result;
+        //        }
 
-            string lang = match.Groups[2].Value;
-            string code = match.Groups[3].Value;
-
-            var txtEdit = new TextEditor();
-            var highlight = HighlightingManager.Instance.GetDefinitionByExtension("." + lang);
-            txtEdit.SyntaxHighlighting = highlight;
-
-            txtEdit.Text = code;
-            txtEdit.HorizontalAlignment = HorizontalAlignment.Stretch;
-            txtEdit.IsReadOnly = true;
-
-            var result = new BlockUIContainer(txtEdit);
-            if (CodeBlockStyle != null)
-            {
-                result.Style = CodeBlockStyle;
-            }
-            if (!DisabledTag)
-            {
-                result.Tag = TagCodeBlock;
-            }
-
-            return result;
-        }
-#endif
 
         #endregion
 
@@ -1415,7 +1309,7 @@ namespace MdXaml
         /// <summary>
         /// Turn Markdown `code spans` into HTML code tags
         /// </summary>
-        private IEnumerable<Inline> DoCodeSpans(string text, Func<string, IEnumerable<Inline>> defaultHandler)
+        private IEnumerable<CInline> DoCodeSpans(string text, Func<string, IEnumerable<CInline>> defaultHandler)
         {
             if (text is null)
             {
@@ -1447,7 +1341,7 @@ namespace MdXaml
             return Evaluate(text, _codeSpan, CodeSpanEvaluator, defaultHandler);
         }
 
-        private Inline CodeSpanEvaluator(Match match)
+        private CCode CodeSpanEvaluator(Match match)
         {
             if (match is null)
             {
@@ -1458,15 +1352,11 @@ namespace MdXaml
             span = Regex.Replace(span, @"^[ ]*", ""); // leading whitespace
             span = Regex.Replace(span, @"[ ]*$", ""); // trailing whitespace
 
-            var result = new Run(span);
-            if (CodeStyle != null)
-            {
-                result.Style = CodeStyle;
-            }
-            if (!DisabledTag)
-            {
-                result.Tag = TagCode;
-            }
+            var result = new CCode(new[] { new CRun() { Text = span } });
+
+            // TODO use style selector
+            result.Foreground = new SolidColorBrush(Colors.DarkBlue);
+            result.Background = new SolidColorBrush(Colors.LightGray);
 
             return result;
         }
@@ -1490,7 +1380,7 @@ namespace MdXaml
         /// <summary>
         /// Turn Markdown *italics* and **bold** into HTML strong and em tags
         /// </summary>
-        private IEnumerable<Inline> DoTextDecorations(string text, Func<string, IEnumerable<Inline>> defaultHandler)
+        private IEnumerable<CInline> DoTextDecorations(string text, Func<string, IEnumerable<CInline>> defaultHandler)
         {
             if (text is null)
             {
@@ -1500,15 +1390,15 @@ namespace MdXaml
             // <strong> must go first, then <em>
             if (StrictBoldItalic)
             {
-                return Evaluate<Inline>(text, _strictBold, m => BoldEvaluator(m, 3),
-                    s1 => Evaluate<Inline>(s1, _strictItalic, m => ItalicEvaluator(m, 3),
-                    s2 => Evaluate<Inline>(s2, _strikethrough, m => StrikethroughEvaluator(m, 2),
-                    s3 => Evaluate<Inline>(s3, _underline, m => UnderlineEvaluator(m, 2),
+                return Evaluate<CInline>(text, _strictBold, m => BoldEvaluator(m, 3),
+                    s1 => Evaluate<CInline>(s1, _strictItalic, m => ItalicEvaluator(m, 3),
+                    s2 => Evaluate<CInline>(s2, _strikethrough, m => StrikethroughEvaluator(m, 2),
+                    s3 => Evaluate<CInline>(s3, _underline, m => UnderlineEvaluator(m, 2),
                     s4 => defaultHandler(s4)))));
             }
             else
             {
-                var rtn = new List<Inline>();
+                var rtn = new List<CInline>();
 
                 var buff = new StringBuilder();
 
@@ -1636,7 +1526,7 @@ namespace MdXaml
             }
         }
 
-        private Inline ParseAsUnderline(string text, ref int start)
+        private CUnderline ParseAsUnderline(string text, ref int start)
         {
             var bgnCnt = CountRepeat(text, start, '_');
 
@@ -1651,11 +1541,7 @@ namespace MdXaml
                 int end = last;
 
                 start = end + cnt - 1;
-                var span = Create<Underline, Inline>(RunSpanGamut(text.Substring(bgn, end - bgn)));
-                if (!DisabledTag)
-                {
-                    span.Tag = TagUnderlineSpan;
-                }
+                var span = new CUnderline(RunSpanGamut(text.Substring(bgn, end - bgn)));
                 return span;
             }
             else
@@ -1665,7 +1551,7 @@ namespace MdXaml
             }
         }
 
-        private Inline ParseAsStrikethrough(string text, ref int start)
+        private CStrikethrough ParseAsStrikethrough(string text, ref int start)
         {
             var bgnCnt = CountRepeat(text, start, '~');
 
@@ -1680,13 +1566,7 @@ namespace MdXaml
                 int end = last;
 
                 start = end + cnt - 1;
-                var span = Create<Span, Inline>(RunSpanGamut(text.Substring(bgn, end - bgn)));
-                span.TextDecorations = TextDecorations.Strikethrough;
-
-                if (!DisabledTag)
-                {
-                    span.Tag = TagStrikethroughSpan;
-                }
+                var span = new CStrikethrough(RunSpanGamut(text.Substring(bgn, end - bgn)));
                 return span;
             }
             else
@@ -1696,7 +1576,7 @@ namespace MdXaml
             }
         }
 
-        private Inline ParseAsBoldOrItalic(string text, ref int start)
+        private CInline ParseAsBoldOrItalic(string text, ref int start)
         {
             // count asterisk (bgn)
             var bgnCnt = CountRepeat(text, start, '*');
@@ -1717,21 +1597,13 @@ namespace MdXaml
                         {
                             start = end + cnt - 1;
 
-                            var span = Create<Italic, Inline>(RunSpanGamut(text.Substring(bgn, end - bgn)));
-                            if (!DisabledTag)
-                            {
-                                span.Tag = TagItalicSpan;
-                            }
+                            var span = new CItalic(RunSpanGamut(text.Substring(bgn, end - bgn)));
                             return span;
                         }
                     case 2: // bold
                         {
                             start = end + cnt - 1;
-                            var span = Create<Bold, Inline>(RunSpanGamut(text.Substring(bgn, end - bgn)));
-                            if (!DisabledTag)
-                            {
-                                span.Tag = TagBoldSpan;
-                            }
+                            var span = new CBold(RunSpanGamut(text.Substring(bgn, end - bgn)));
                             return span;
                         }
 
@@ -1740,17 +1612,8 @@ namespace MdXaml
                             bgn = start + 3;
                             start = end + 3 - 1;
 
-                            var inline = Create<Italic, Inline>(RunSpanGamut(text.Substring(bgn, end - bgn)));
-                            if (!DisabledTag)
-                            {
-                                inline.Tag = TagItalicSpan;
-                            }
-
-                            var span = new Bold(inline);
-                            if (!DisabledTag)
-                            {
-                                span.Tag = TagBoldSpan;
-                            }
+                            var inline = new CItalic(RunSpanGamut(text.Substring(bgn, end - bgn)));
+                            var span = new CBold(new[] { inline });
                             return span;
                         }
                 }
@@ -1762,7 +1625,7 @@ namespace MdXaml
             }
         }
 
-        private Inline ParseAsColor(string text, ref int start)
+        private CInline ParseAsColor(string text, ref int start)
         {
             var mch = _color.Match(text, start);
 
@@ -1771,17 +1634,15 @@ namespace MdXaml
                 int bgnIdx = start + mch.Value.Length;
                 int endIdx = EscapedIndexOf(text, bgnIdx, '%');
 
-                Span span;
+                CSpan span;
                 if (endIdx == -1)
                 {
                     endIdx = text.Length - 1;
-                    span = Create<Span, Inline>(
-                        RunSpanGamut(text.Substring(bgnIdx)));
+                    span = new CSpan(RunSpanGamut(text.Substring(bgnIdx)));
                 }
                 else
                 {
-                    span = Create<Span, Inline>(
-                        RunSpanGamut(text.Substring(bgnIdx, endIdx - bgnIdx)));
+                    span = new CSpan(RunSpanGamut(text.Substring(bgnIdx, endIdx - bgnIdx)));
                 }
 
                 var colorLbl = mch.Groups[1].Value;
@@ -1826,8 +1687,7 @@ namespace MdXaml
             return count;
         }
 
-
-        private Inline ItalicEvaluator(Match match, int contentGroup)
+        private CItalic ItalicEvaluator(Match match, int contentGroup)
         {
             if (match is null)
             {
@@ -1835,15 +1695,11 @@ namespace MdXaml
             }
 
             var content = match.Groups[contentGroup].Value;
-            var span = Create<Italic, Inline>(RunSpanGamut(content));
-            if (!DisabledTag)
-            {
-                span.Tag = TagItalicSpan;
-            }
-            return span;
+
+            return new CItalic(RunSpanGamut(content));
         }
 
-        private Inline BoldEvaluator(Match match, int contentGroup)
+        private CBold BoldEvaluator(Match match, int contentGroup)
         {
             if (match is null)
             {
@@ -1851,15 +1707,11 @@ namespace MdXaml
             }
 
             var content = match.Groups[contentGroup].Value;
-            var span = Create<Bold, Inline>(RunSpanGamut(content));
-            if (!DisabledTag)
-            {
-                span.Tag = TagBoldSpan;
-            }
-            return span;
+
+            return new CBold(RunSpanGamut(content));
         }
 
-        private Inline StrikethroughEvaluator(Match match, int contentGroup)
+        private CStrikethrough StrikethroughEvaluator(Match match, int contentGroup)
         {
             if (match is null)
             {
@@ -1868,16 +1720,10 @@ namespace MdXaml
 
             var content = match.Groups[contentGroup].Value;
 
-            var span = Create<Span, Inline>(RunSpanGamut(content));
-            span.TextDecorations = TextDecorations.Strikethrough;
-            if (!DisabledTag)
-            {
-                span.Tag = TagStrikethroughSpan;
-            }
-            return span;
+            return new CStrikethrough(RunSpanGamut(content));
         }
 
-        private Inline UnderlineEvaluator(Match match, int contentGroup)
+        private CUnderline UnderlineEvaluator(Match match, int contentGroup)
         {
             if (match is null)
             {
@@ -1885,12 +1731,8 @@ namespace MdXaml
             }
 
             var content = match.Groups[contentGroup].Value;
-            var span = Create<Underline, Inline>(RunSpanGamut(content));
-            if (!DisabledTag)
-            {
-                span.Tag = TagUnderlineSpan;
-            }
-            return span;
+
+            return new CUnderline(RunSpanGamut(content));
         }
 
         #endregion
@@ -1901,7 +1743,7 @@ namespace MdXaml
         private static Regex _eoln = new Regex("\\s+");
         private static Regex _lbrk = new Regex(@"\ {2,}\n");
 
-        public IEnumerable<Inline> DoText(string text)
+        public IEnumerable<CRun> DoText(string text)
         {
             if (text is null)
             {
@@ -1915,9 +1757,9 @@ namespace MdXaml
                 if (first)
                     first = false;
                 else
-                    yield return new LineBreak();
+                    yield return new CLineBreak();
                 var t = _eoln.Replace(line, " ");
-                yield return new Run(t);
+                yield return new CRun() { Text = t };
             }
         }
 
@@ -1940,7 +1782,7 @@ namespace MdXaml
             [\r\n]*
             ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        private IEnumerable<Block> DoBlockquotes(string text, Func<string, IEnumerable<Block>> defaultHandler)
+        private IEnumerable<Control> DoBlockquotes(string text, Func<string, IEnumerable<Control>> defaultHandler)
         {
             if (text is null)
             {
@@ -1953,7 +1795,7 @@ namespace MdXaml
             );
         }
 
-        private Section BlockquotesEvaluator(Match match)
+        private Panel BlockquotesEvaluator(Match match)
         {
             if (match is null)
             {
@@ -1976,14 +1818,10 @@ namespace MdXaml
             );
 
             var blocks = RunBlockGamut(Normalize(trimmedTxt), true);
-            var result = Create<Section, Block>(blocks);
-            if (BlockquoteStyle != null)
-            {
-                result.Style = BlockquoteStyle;
-            }
+            var result = Create<Panel, Control>(blocks);
             if (!DisabledTag)
             {
-                result.Tag = TagBlockquote;
+                result.Classes.Add(TagBlockquote);
             }
 
             return result;
@@ -2087,13 +1925,22 @@ namespace MdXaml
 
         #region helper - parse
 
+        private CTextBlock CreateTextBox(IEnumerable<CInline> inlines)
+        {
+            var txtBox = new CTextBlock();
+            txtBox.Content = inlines;
+            return txtBox;
+        }
+
+
         private TResult Create<TResult, TContent>(IEnumerable<TContent> content)
-            where TResult : IAddChild, new()
+            where TResult : IPanel, new()
+            where TContent : IControl
         {
             var result = new TResult();
             foreach (var c in content)
             {
-                result.AddChild(c);
+                result.Children.Add(c);
             }
 
             return result;

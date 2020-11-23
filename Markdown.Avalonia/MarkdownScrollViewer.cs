@@ -1,76 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Markup;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
+using Avalonia.Metadata;
 
-#if MIG_FREE
-using MdStyle = Markdown.Xaml.MarkdownStyle;
-namespace Markdown.Xaml
-#else
-using MdStyle = MdXaml.MarkdownStyle;
-namespace MdXaml
-#endif
+namespace Markdown.Avalonia
 {
-    [ContentProperty(nameof(HereMarkdown))]
-    public class MarkdownScrollViewer : FlowDocumentScrollViewer, IUriContext
+    public class MarkdownScrollViewer : ScrollViewer, IUriContext
     {
-        public static readonly DependencyProperty MarkdownProperty =
-            DependencyProperty.Register(
+        public static readonly AvaloniaProperty<string> MarkdownProperty =
+            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, string>(
                 nameof(Markdown),
-                typeof(string),
-                typeof(MarkdownScrollViewer),
-                new PropertyMetadata("", UpdateMarkdown));
-
-
-        public static readonly DependencyProperty MarkdownStyleProperty =
-            DependencyProperty.Register(
-                nameof(MarkdownStyle),
-                typeof(Style),
-                typeof(MarkdownScrollViewer),
-                new PropertyMetadata(null, UpdateStyle));
-
-        public static readonly DependencyProperty MarkdownStyleNameProperty =
-            DependencyProperty.Register(
-            nameof(MarkdownStyleName),
-            typeof(string),
-            typeof(MarkdownScrollViewer),
-            new PropertyMetadata(null, UpdateStyleName));
-
-        private static void UpdateMarkdown(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is MarkdownScrollViewer owner)
-            {
-                var doc = owner.Engine.Transform((string)e.NewValue ?? "");
-                owner.SetCurrentValue(DocumentProperty, doc);
-            }
-        }
-
-        private static void UpdateStyle(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is MarkdownScrollViewer owner)
-            {
-                owner.Engine.DocumentStyle = (Style)e.NewValue;
-            }
-        }
-
-        private static void UpdateStyleName(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is MarkdownScrollViewer owner)
-            {
-                var newName = (string)e.NewValue;
-
-                if (newName == null) return;
-
-                var prop = typeof(MarkdownStyle).GetProperty(newName);
-                if (prop == null) return;
-
-                owner.MarkdownStyle = (Style)prop.GetValue(null);
-            }
-        }
+                o => o.Markdown,
+                (o, v) => o.Markdown = v);
 
         public Markdown Engine
         {
@@ -90,6 +34,7 @@ namespace MdXaml
             get => Engine.AssetPathRoot;
         }
 
+        [Content]
         public string HereMarkdown
         {
             get { return Markdown; }
@@ -167,28 +112,24 @@ namespace MdXaml
             }
         }
 
+        private string _markdown;
         public string Markdown
         {
             get { return (string)GetValue(MarkdownProperty); }
-            set { SetValue(MarkdownProperty, value); }
-        }
-
-        public Style MarkdownStyle
-        {
-            get { return (Style)GetValue(MarkdownStyleProperty); }
-            set { SetValue(MarkdownStyleProperty, value); }
-        }
-
-        public string MarkdownStyleName
-        {
-            get { return (string)GetValue(MarkdownStyleNameProperty); }
-            set { SetValue(MarkdownStyleNameProperty, value); }
+            set
+            {
+                SetValue(MarkdownProperty, value);
+                if (SetAndRaise(MarkdownProperty, ref _markdown, value))
+                {
+                    var doc = Engine.Transform(value ?? "");
+                    Content = doc;
+                }
+            }
         }
 
         public MarkdownScrollViewer()
         {
             Engine = new Markdown();
-            MarkdownStyleName = nameof(MdStyle.Standard);
         }
     }
 }

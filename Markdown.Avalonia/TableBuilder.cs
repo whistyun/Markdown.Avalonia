@@ -2,14 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-using System.Windows;
-using System.Text.RegularExpressions;
+using Avalonia.Media;
+using Avalonia.Layout;
 
-#if MIG_FREE
-namespace Markdown.Xaml
-#else
-namespace MdXaml
-#endif
+namespace Markdown.Avalonia
 {
     class MdTable
     {
