@@ -48,38 +48,6 @@ namespace ColorTextBlock.Avalonia.Geometries
                 "", format);
         }
 
-        public static IEnumerable<TextGeometry> CreateFrom(
-            FormattedText format,
-            IBrush foreground, IBrush background,
-            bool isUnderline, bool isStrikethrough)
-        {
-            var lines = new List<TextGeometry>();
-
-            string text = format.Text;
-            double width = format.Bounds.Width;
-            int lineOffset = 0;
-
-            FormattedTextLine[] ftlines = format.GetLines().ToArray();
-
-            for (int idx = 0; idx < ftlines.Length; ++idx)
-            {
-                FormattedTextLine line = ftlines[idx];
-                bool isLast = idx == ftlines.Length - 1;
-
-                string chip = text.Substring(lineOffset, line.Length);
-                var geometry = new TextGeometry(
-                                        width, line.Height, !isLast,
-                                        foreground, background,
-                                        isUnderline, isStrikethrough,
-                                        chip, format);
-                lines.Add(geometry);
-
-                lineOffset += line.Length;
-            }
-
-            return lines;
-        }
-
         public override void Render(DrawingContext ctx)
         {
             var background = Background;

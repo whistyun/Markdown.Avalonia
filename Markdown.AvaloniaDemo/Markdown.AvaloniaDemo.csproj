@@ -15,4 +15,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Markdown.Avalonia\Markdown.Avalonia.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="MainWindow.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

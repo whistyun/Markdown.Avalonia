@@ -145,6 +145,12 @@ namespace ColorTextBlock.Avalonia
             }
         }
 
+        public CTextBlock() { }
+        public CTextBlock(string text)
+        {
+            Content = new[] { new CRun() { Text = text } };
+        }
+
         private void RegisterOrUnregister(CInline inline, bool unregister)
         {
             if (unregister)
@@ -183,62 +189,96 @@ namespace ColorTextBlock.Avalonia
         {
             metries = new List<CGeometry>();
 
-            double width = 0;
-            double height = 0;
-
-            double prevElmntWid = 0;
-            double prevElmntHei = 0;
-
-            int lineStartIndex = 0;
-
             double entireWidth = availableSize.Width;
             if (Double.IsInfinity(availableSize.Width) && Bounds.Width != 0)
                 entireWidth = Bounds.Width;
 
-            double remainWidth = entireWidth;
-            foreach (CInline inline in Content)
+            // measure & split by linebreak
+            var lineMetries = new List<Tuple<List<CGeometry>, Size>>();
             {
-                IEnumerable<CGeometry> inlineGeometry =
-                    inline.Measure(
-                        FontFamily,
-                        FontSize,
-                        FontStyle,
-                        FontWeight,
-                        Foreground,
-                        Background,
-                        false,
-                        false,
-                        entireWidth,
-                        remainWidth);
 
-                foreach (CGeometry metry in inlineGeometry)
+                double remainWidth = entireWidth;
+
+                var atlineWid = 0d;
+                var atlineHei = 0d;
+                var atline = new List<CGeometry>();
+                foreach (CInline inline in Content)
                 {
-                    metries.Add(metry);
+                    IEnumerable<CGeometry> inlineGeometry =
+                        inline.Measure(
+                            FontFamily, FontSize, FontStyle, FontWeight,
+                            Foreground, null, false, false, entireWidth, remainWidth);
 
-                    metry.Left = prevElmntWid;
-
-                    prevElmntWid += metry.Width;
-                    prevElmntHei = Math.Max(prevElmntHei, metry.Height);
-
-                    if (metry.LineBreak)
+                    foreach (CGeometry metry in inlineGeometry)
                     {
-                        foreach (CGeometry metryAtLine in metries.Skip(lineStartIndex))
-                            metryAtLine.Top = height + prevElmntHei - metryAtLine.Height;
+                        atline.Add(metry);
+                        atlineWid += metry.Width;
+                        atlineHei = Math.Max(metry.Height, atlineHei);
 
-                        width = Math.Max(width, prevElmntWid);
-                        height += prevElmntHei;
+                        remainWidth -= metry.Width;
 
-                        prevElmntWid = 0;
-                        prevElmntHei = 0;
-                        lineStartIndex = metries.Count;
+                        if (metry.LineBreak)
+                        {
+                            metries.AddRange(atline);
+
+                            lineMetries.Add(Tuple.Create(atline, new Size(atlineWid, atlineHei)));
+
+                            atline = new List<CGeometry>();
+                            atlineWid = 0d;
+                            atlineHei = 0d;
+
+                            remainWidth = entireWidth;
+                        }
                     }
+                }
+
+                if (atline.Count > 0)
+                {
+                    metries.AddRange(atline);
+
+                    lineMetries.Add(Tuple.Create(atline, new Size(atlineWid, atlineHei)));
+
+                    atline = new List<CGeometry>();
+                    atlineWid = 0d;
+                    atlineHei = 0d;
+
+                    remainWidth = entireWidth;
                 }
             }
 
-            if (prevElmntWid != 0)
+            double width = lineMetries.Count == 0 ? 0d : lineMetries.Max(tpl => tpl.Item2.Width);
+            double height = lineMetries.Count == 0 ? 0d : lineMetries.Sum(tpl => tpl.Item2.Height);
+
+            // set position
             {
-                width = Math.Max(width, prevElmntWid);
-                height += prevElmntHei;
+                var topOffset = 0d;
+                var leftOffset = 0d;
+
+                foreach (Tuple<List<CGeometry>, Size> lineMetry in lineMetries)
+                {
+                    switch (TextAlignment)
+                    {
+                        case TextAlignment.Left:
+                            leftOffset = 0d;
+                            break;
+                        case TextAlignment.Center:
+                            leftOffset = (entireWidth - lineMetry.Item2.Width) / 2;
+                            break;
+                        case TextAlignment.Right:
+                            leftOffset = entireWidth - lineMetry.Item2.Width;
+                            break;
+                    }
+
+                    topOffset += lineMetry.Item2.Height;
+
+                    foreach (CGeometry metry in lineMetry.Item1)
+                    {
+                        metry.Left = leftOffset;
+                        metry.Top = topOffset - metry.Height;
+
+                        leftOffset += metry.Width;
+                    }
+                }
             }
 
             return new Size(width, height);
@@ -246,6 +286,11 @@ namespace ColorTextBlock.Avalonia
 
         public override void Render(DrawingContext context)
         {
+            if (Background != null)
+            {
+                context.FillRectangle(Background, Bounds);
+            }
+
             foreach (var metry in metries)
             {
                 metry.Render(context);

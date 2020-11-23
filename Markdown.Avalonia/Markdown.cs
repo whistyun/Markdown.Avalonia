@@ -46,6 +46,7 @@ namespace Markdown.Avalonia
         private const string TableRowEvenClass = "EvenTableRow";
 
         private const string ListClass = "List";
+        private const string ListMarkerClass = "ListMarker";
 
         #endregion
 
@@ -295,38 +296,44 @@ namespace Markdown.Avalonia
                 throw new ArgumentNullException(nameof(text));
             }
 
-            // split on two or more newlines
-            string[] lines = _newlinesMultiple.Split(_newlinesLeadingTrailing.Replace(text, ""));
 
-            // check text alignment
-            TextAlignment? indiAlignment = null;
-            string firstLine = lines[0];
-            var alignMatch = _align.Match(firstLine);
-            if (alignMatch.Success)
+            string[] grafs = _newlinesMultiple.Split(_newlinesLeadingTrailing.Replace(text, ""));
+
+            foreach (var g in grafs)
             {
-                firstLine = firstLine.Substring(alignMatch.Length);
-                lines[0] = firstLine;
-                switch (alignMatch.Groups[1].Value)
+                var chip = g;
+
+                TextAlignment? indiAlignment = null;
+
+                if (supportTextAlignment)
                 {
-                    case "<":
-                        indiAlignment = TextAlignment.Left;
-                        break;
-                    case ">":
-                        indiAlignment = TextAlignment.Right;
-                        break;
-                    case "=":
-                        indiAlignment = TextAlignment.Center;
-                        break;
+                    var alignMatch = _align.Match(chip);
+                    if (alignMatch.Success)
+                    {
+                        chip = chip.Substring(alignMatch.Length);
+                        switch (alignMatch.Groups[1].Value)
+                        {
+                            case "<":
+                                indiAlignment = TextAlignment.Left;
+                                break;
+                            case ">":
+                                indiAlignment = TextAlignment.Right;
+                                break;
+                            case "=":
+                                indiAlignment = TextAlignment.Center;
+                                break;
+                        }
+                    }
                 }
+
+                var ctbox = new CTextBlock();
+                ctbox.Content = RunSpanGamut(chip).ToList();
+
+                if (indiAlignment.HasValue)
+                    ctbox.TextAlignment = indiAlignment.Value;
+
+                yield return ctbox;
             }
-
-            var ctbox = new CTextBlock();
-            ctbox.Content = lines.SelectMany(ln => RunSpanGamut(ln).Concat(new[] { new CLineBreak() })).ToList();
-
-            if (indiAlignment.HasValue)
-                ctbox.TextAlignment = indiAlignment.Value;
-
-            yield return ctbox;
         }
 
         #endregion
@@ -893,16 +900,71 @@ namespace Markdown.Avalonia
 
 
             var grid = new Grid();
-            grid.ColumnDefinitions.Add(new ColumnDefinition());
+            grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
             grid.ColumnDefinitions.Add(new ColumnDefinition());
 
             foreach (Tuple<Control, int> listItemTpl in listItems.Select((elm, idx) => Tuple.Create(elm, idx)))
             {
-                var control = listItemTpl.Item1;
                 var index = listItemTpl.Item2;
+                CTextBlock tbox;
+
+                switch (textMarker)
+                {
+                    default:
+                        goto case TextMarkerStyle.Disc;
+
+                    case TextMarkerStyle.None:
+                        tbox = new CTextBlock("");
+                        break;
+
+                    case TextMarkerStyle.Disc:
+                        tbox = new CTextBlock("•");
+                        break;
+
+                    case TextMarkerStyle.Box:
+                        tbox = new CTextBlock("▪");
+                        break;
+
+                    case TextMarkerStyle.Circle:
+                        tbox = new CTextBlock("○");
+                        break;
+
+                    case TextMarkerStyle.Square:
+                        tbox = new CTextBlock("❏");
+                        break;
+
+                    case TextMarkerStyle.Decimal:
+                        tbox = new CTextBlock((index + 1).ToString() + ".");
+                        break;
+
+                    case TextMarkerStyle.LowerLatin:
+                        tbox = new CTextBlock(NumberToOrder.ToLatin(index + 1).ToLower() + ".");
+                        break;
+
+                    case TextMarkerStyle.UpperLatin:
+                        tbox = new CTextBlock(NumberToOrder.ToLatin(index + 1) + ".");
+                        break;
+
+                    case TextMarkerStyle.LowerRoman:
+                        tbox = new CTextBlock(NumberToOrder.ToRoman(index + 1).ToLower() + ".");
+                        break;
+
+                    case TextMarkerStyle.UpperRoman:
+                        tbox = new CTextBlock(NumberToOrder.ToRoman(index + 1) + ".");
+                        break;
+                }
+
+
+                var control = listItemTpl.Item1;
 
                 grid.RowDefinitions.Add(new RowDefinition());
+                grid.Children.Add(tbox);
                 grid.Children.Add(control);
+
+                tbox.TextAlignment = TextAlignment.Right;
+                tbox.Classes.Add(ListMarkerClass);
+                Grid.SetRow(tbox, index);
+                Grid.SetColumn(tbox, 0);
 
                 Grid.SetRow(control, index);
                 Grid.SetColumn(control, 1);
@@ -1770,7 +1832,7 @@ namespace Markdown.Avalonia
             );
         }
 
-        private Panel BlockquotesEvaluator(Match match)
+        private Border BlockquotesEvaluator(Match match)
         {
             if (match is null)
             {
@@ -1793,8 +1855,14 @@ namespace Markdown.Avalonia
             );
 
             var blocks = RunBlockGamut(Normalize(trimmedTxt), true);
-            var result = Create<Panel, Control>(blocks);
+
+            var panel = Create<StackPanel, Control>(blocks);
+            panel.Orientation = Orientation.Vertical;
+            panel.Classes.Add(BlockquoteClass);
+
+            var result = new Border();
             result.Classes.Add(BlockquoteClass);
+            result.Child = panel;
 
             return result;
         }

@@ -1,7 +1,7 @@
 ﻿using ReactiveUI;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 
 namespace Markdown.AvaloniaDemo.ViewModels
 {
@@ -16,7 +16,11 @@ namespace Markdown.AvaloniaDemo.ViewModels
 
         public MainWindowViewModel()
         {
-            Text = "Avalonia  \r\n**two**";
+            using (var stream = new FileStream("MainWindow.md", FileMode.Open))
+            using (var reader = new StreamReader(stream))
+            {
+                Text = reader.ReadToEnd();
+            }
         }
     }
 }

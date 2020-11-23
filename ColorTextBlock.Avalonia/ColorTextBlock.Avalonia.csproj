@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net47</TargetFrameworks>
+    <PackageId>ColorTextBlock.Avalonia</PackageId>
+    <Authors>whistyun</Authors>
+    <Copyright>Copyright (c) 2020 whistyun</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

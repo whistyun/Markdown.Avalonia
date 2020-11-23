@@ -61,8 +61,16 @@ namespace ColorTextBlock.Avalonia
                 return infos;
             }
 
-            foreach (string txtChip in Regex.Split(Text, "\r\n|\r|\n"))
+            string[] txtChips = Regex.Split(Text, "\r\n|\r|\n");
+
+            Tuple<string, bool>[] txtChipsWithLineBreak =
+                txtChips.Select((t, i) => Tuple.Create(t, i < txtChips.Length - 1)).ToArray();
+
+            foreach (Tuple<string, bool> txtChipEntry in txtChipsWithLineBreak)
             {
+                string txtChip = txtChipEntry.Item1;
+                bool lineBreak = txtChipEntry.Item2;
+
                 if (string.IsNullOrEmpty(txtChip))
                 {
                     // linebreak;
@@ -101,41 +109,70 @@ namespace ColorTextBlock.Avalonia
                     FormattedTextLine[] lines = fmt.GetLines().ToArray();
                     FormattedTextLine firstLine = lines[0];
 
-                    string firstLineTxt = lineTxt.Substring(0, firstLine.Length);
+                    string firstLineTxt = fmt.Text.Substring(0, firstLine.Length);
 
                     if (lines.Length == 1)
                     {
-                        // 1行しか無い場合は、余計なスペースを排除して寸法情報生成
-                        fmt.Text = lineTxt;
+                        if (remainWidth < fmt.Bounds.Width)
+                        {
+                            // 指定条件を無視された場合(横幅が狭すぎる)は強制的に改行
+                            infos.Add(TextGeometry.NewLine(fmt));
+                            remainWidth = entireWidth;
+                        }
+                        else
+                        {
+                            // 1行しか無い場合は、余計なスペースを排除して寸法情報生成
+                            fmt.Text = lineTxt;
 
-                        infos.Add(new TextGeometry(
-                                        fmt.Bounds.Width, fmt.Bounds.Height, false,
-                                        foreground, background,
-                                        underline, strikethrough,
-                                        lineTxt, fmt));
-                        remainWidth -= fmt.Bounds.Width;
+                            infos.Add(new TextGeometry(
+                                            fmt.Bounds.Width, fmt.Bounds.Height, lineBreak,
+                                            foreground, background,
+                                            underline, strikethrough,
+                                            lineTxt, fmt));
+                            remainWidth -= fmt.Bounds.Width;
 
-                        continue;
+                            continue;
+                        }
                     }
                     else
                     {
+                        fmt.Text = firstLineTxt;
+
                         infos.Add(new TextGeometry(
                                         fmt.Bounds.Width, fmt.Bounds.Height, true,
                                         foreground, background,
                                         underline, strikethrough,
-                                        lineTxt, fmt));
+                                        firstLineTxt, fmt));
                         remainWidth = entireWidth;
 
-                        lineTxt = lineTxt.Substring(firstLineTxt.Length);
+                        lineTxt = lineTxt.Substring(firstLineTxt.Length - 1);
                     }
                 }
 
                 fmt.Text = lineTxt;
                 fmt.Constraint = new Size(entireWidth, Double.PositiveInfinity);
 
-                infos.AddRange(TextGeometry.CreateFrom(fmt, foreground, background, underline, strikethrough));
+                int lineOffset = 0;
+                FormattedTextLine[] ftlines = fmt.GetLines().ToArray();
+                for (int idx = 0; idx < ftlines.Length; ++idx)
+                {
+                    FormattedTextLine line = ftlines[idx];
 
-                // remainWidth = entireWidth;
+                    string chip = lineTxt.Substring(lineOffset, line.Length);
+
+                    fmt.Text = chip;
+                    double txtWid = fmt.Bounds.Width;
+
+                    infos.Add(new TextGeometry(
+                                        txtWid, line.Height, lineBreak || idx < ftlines.Length - 1,
+                                        foreground, background,
+                                        underline, strikethrough,
+                                        chip, fmt));
+
+                    lineOffset += line.Length;
+                }
+
+                remainWidth = entireWidth - infos.Last().Width;
             }
 
             return infos;
