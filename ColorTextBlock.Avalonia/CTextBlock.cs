@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Metadata;
 using ColorTextBlock.Avalonia.Geometries;
@@ -72,7 +73,7 @@ namespace ColorTextBlock.Avalonia
         }
 
         private IEnumerable<CInline> _content = new List<CInline>();
-        private List<CGeometry> metries;
+        private List<CGeometry> metries = new List<CGeometry>();
 
         public IBrush Background
         {
@@ -146,10 +147,55 @@ namespace ColorTextBlock.Avalonia
         }
 
         public CTextBlock() { }
+
         public CTextBlock(string text)
         {
             Content = new[] { new CRun() { Text = text } };
         }
+
+        #region pointer event
+
+        bool isPressed;
+
+
+        protected override void OnPointerPressed(PointerPressedEventArgs e)
+        {
+            base.OnPointerPressed(e);
+            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            {
+                isPressed = true;
+                e.Handled = true;
+            }
+        }
+
+        protected override void OnPointerReleased(PointerReleasedEventArgs e)
+        {
+            base.OnPointerReleased(e);
+
+            if (isPressed && e.InitialPressMouseButton == MouseButton.Left)
+            {
+                isPressed = false;
+                e.Handled = true;
+
+                Point point = e.GetPosition(this);
+
+                foreach (CGeometry metry in metries)
+                {
+                    var relX = point.X - metry.Left;
+                    var relY = point.Y - metry.Top;
+
+                    if (metry.OnClick != null
+                        && 0 <= relX && relX <= metry.Width
+                        && 0 <= relY && relY <= metry.Height)
+                    {
+                        metry.OnClick();
+                        break;
+                    }
+                }
+            }
+        }
+
+        #endregion
 
         private void RegisterOrUnregister(CInline inline, bool unregister)
         {

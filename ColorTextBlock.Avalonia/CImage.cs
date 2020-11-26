@@ -14,7 +14,7 @@ namespace ColorTextBlock.Avalonia
 
         public CImage(Bitmap bitmap)
         {
-            this.Image = Image;
+            this.Image = bitmap;
         }
 
         protected internal override IEnumerable<CGeometry> Measure(

@@ -6,6 +6,7 @@
              x:Class="Markdown.Avalonia.MarkdownScrollViewer">
   <ScrollViewer
     Name="Viewer"
+    Padding="5"
     HorizontalScrollBarVisibility="Disabled"
     VerticalScrollBarVisibility="Auto" />
 </UserControl>

@@ -16,6 +16,9 @@
     <ProjectReference Include="..\Markdown.Avalonia\Markdown.Avalonia.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="LocalPath.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="MainWindow.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

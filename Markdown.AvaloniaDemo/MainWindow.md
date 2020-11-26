@@ -1,4 +1,4 @@
-﻿# MdXaml #
+﻿# MdXaml (portted for AvaloniaUI) #
 
 MdXaml is a modify version of Markdown.Xaml.
 Markdown XAML is a port of the popular *MarkdownSharp* Markdown processor, but 
@@ -23,7 +23,7 @@ Links with title [Go to Google!](https://www.google.com "google.")
 ![imageleft](http://placehold.it/150x25/0000FF "blue")![imageright](http://placehold.it/150x25/00FFFF "cyan")
 #### Local and resource images ####
 ![localimage](LocalPath.png)
-![ResourceImage](Asset/ResourceImage.png)
+![ResourceImage](Assets/ResourceImage.png)
 
 ### List ###
 #### ul

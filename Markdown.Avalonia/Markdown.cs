@@ -4,21 +4,25 @@ using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using Avalonia.Styling;
 using ColorTextBlock.Avalonia;
 using Markdown.Avalonia.Controls;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net.Cache;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Markdown.Avalonia
 {
-    public class Markdown : AvaloniaObject, IUriContext
+    public class Markdown : AvaloniaObject
     {
         #region const
         /// <summary>
@@ -64,7 +68,8 @@ namespace Markdown.Avalonia
 
         public Action<string> HyperlinkCommand { get; set; }
 
-        public Uri BaseUri { get; set; }
+        private IAssetLoader AssetLoader { get; }
+        private string[] AssetAssemblyNames { get; }
 
         #region dependencyobject property
 
@@ -121,14 +126,31 @@ namespace Markdown.Avalonia
             {
                 // https://github.com/dotnet/runtime/issues/17938
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    Process.Start(new ProcessStartInfo("cmd", $"/c start {url}"));
+                    Process.Start(new ProcessStartInfo(url)
+                    {
+                        UseShellExecute = true,
+                        Verb = "open"
+                    });
+
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                     Process.Start("xdg-open", url);
+
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                     Process.Start("open", url);
             };
 
             AssetPathRoot = Environment.CurrentDirectory;
+
+            AssetLoader = AvaloniaLocator.Current.GetService<IAssetLoader>();
+
+            var myasm = Assembly.GetCallingAssembly();
+            var stack = new StackTrace();
+            AssetAssemblyNames = stack.GetFrames()
+                            .Select(frm => frm.GetMethod().DeclaringType.Assembly)
+                            .Where(asm => asm != myasm)
+                            .Select(asm => asm.GetName().Name)
+                            .Distinct()
+                            .ToArray();
         }
 
         public Control Transform(string text)
@@ -388,46 +410,70 @@ namespace Markdown.Avalonia
             }
 
             string linkText = match.Groups[2].Value;
-            string url = match.Groups[3].Value;
+            string urlTxt = match.Groups[3].Value;
             string title = null;
 
-            var titleMatch = _imageHrefWithTitle.Match(url);
+            var titleMatch = _imageHrefWithTitle.Match(urlTxt);
             if (titleMatch.Success)
             {
-                url = titleMatch.Groups[2].Value;
+                urlTxt = titleMatch.Groups[2].Value;
                 title = titleMatch.Groups[4].Value;
             }
 
             Bitmap imgSource = null;
 
-            // check embedded resoruce
-            try
-            {
-                Uri packUri;
-                if (!Uri.IsWellFormedUriString(url, UriKind.Absolute) && BaseUri != null)
-                {
-                    packUri = new Uri(BaseUri, url);
-                }
-                else
-                {
-                    packUri = new Uri(url);
-                }
-
-                imgSource = MakeImage(packUri);
-            }
-            catch { }
-
-            // check filesystem
-            if (imgSource is null)
+            if (Uri.TryCreate(urlTxt, UriKind.Absolute, out var url))
             {
                 try
                 {
-                    if (!Uri.IsWellFormedUriString(url, UriKind.Absolute) && !System.IO.Path.IsPathRooted(url))
+                    switch (url.Scheme)
                     {
-                        url = System.IO.Path.Combine(AssetPathRoot ?? string.Empty, url);
+                        case "http":
+                        case "https":
+                            using (var wc = new System.Net.WebClient())
+                            using (var strm = new MemoryStream(wc.DownloadData(url)))
+                                imgSource = new Bitmap(strm);
+                            break;
+
+                        case "file":
+                            using (var strm = File.OpenRead(url.LocalPath))
+                                imgSource = new Bitmap(strm);
+                            break;
                     }
 
-                    imgSource = MakeImage(new Uri(url, UriKind.RelativeOrAbsolute));
+
+                }
+                catch { }
+            }
+
+            // check embedded resoruce
+            if (imgSource is null)
+            {
+                foreach (var asmNm in AssetAssemblyNames)
+                {
+                    try
+                    {
+                        var assetUrl = new Uri($"avares://{asmNm}/{urlTxt}");
+
+                        using (var strm = AssetLoader.Open(assetUrl))
+                            imgSource = new Bitmap(strm);
+
+                        break;
+                    }
+                    catch (Exception e)
+                    {
+                        e.ToString();
+                    }
+                }
+            }
+
+            // check filesystem
+            if (imgSource is null && AssetPathRoot != null)
+            {
+                try
+                {
+                    using (var strm = File.OpenRead(Path.Combine(AssetPathRoot, urlTxt)))
+                        imgSource = new Bitmap(strm);
                 }
                 catch { }
             }
@@ -437,7 +483,7 @@ namespace Markdown.Avalonia
             {
                 return new CRun()
                 {
-                    Text = "!" + url,
+                    Text = "!" + urlTxt,
                     Foreground = Brushes.Red
                 };
             }
@@ -449,6 +495,7 @@ namespace Markdown.Avalonia
 
         private Bitmap MakeImage(Uri url)
         {
+
 
             return null;
         }
@@ -1284,11 +1331,10 @@ namespace Markdown.Avalonia
             string lang = match.Groups[2].Value;
             string code = match.Groups[3].Value;
 
-
-            var text = new CCode(new[] { new CRun() { Text = code } });
-
-            var ctxt = new CTextBlock();
-            ctxt.Content = new[] { text };
+            var ctxt = new TextBlock() { 
+                Text= code,
+                TextWrapping= TextWrapping.NoWrap
+            };
             ctxt.Classes.Add(CodeBlockClass);
 
             var result = new Border();

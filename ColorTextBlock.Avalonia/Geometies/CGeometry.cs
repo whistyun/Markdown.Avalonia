@@ -17,8 +17,8 @@ namespace ColorTextBlock.Avalonia.Geometries
         public double Height { get; }
         public bool LineBreak { get; }
 
-        public Action OnMouseEnter { get; set; }
-        public Action OnMouseExit { get; set; }
+        //public Action OnMouseEnter { get; set; }
+        //public Action OnMouseExit { get; set; }
         public Action OnClick { get; set; }
 
         public CGeometry(double width, double height, bool linebreak)
