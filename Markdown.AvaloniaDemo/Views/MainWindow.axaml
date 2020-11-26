@@ -27,7 +27,8 @@
       Grid.Column="0"
       VerticalAlignment="Stretch"
       AcceptsReturn="True"
-      Text="{Binding Text}"/>
+      Text="{Binding Text}"
+      TextWrapping="Wrap"/>
 
     <markdown:MarkdownScrollViewer
       Grid.Row="0"

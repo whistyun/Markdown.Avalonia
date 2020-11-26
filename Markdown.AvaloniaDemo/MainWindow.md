@@ -1,4 +1,4 @@
-﻿# MdXaml (portted for AvaloniaUI) #
+﻿# MdXaml #
 
 MdXaml is a modify version of Markdown.Xaml.
 Markdown XAML is a port of the popular *MarkdownSharp* Markdown processor, but 
