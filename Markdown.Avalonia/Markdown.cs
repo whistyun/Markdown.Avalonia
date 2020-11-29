@@ -278,10 +278,9 @@ namespace Markdown.Avalonia
             }
 
             return DoCodeSpans(text,
-                s0 => DoImages(s0,
-                s1 => DoAnchors(s1,
-                s2 => DoTextDecorations(s2,
-                s3 => DoText(s3)))));
+                s0 => DoImagesOrHrefs(s0,
+                s1 => DoTextDecorations(s1,
+                s2 => DoText(s2))));
 
             //text = EscapeSpecialCharsWithinTagAttributes(text);
             //text = EscapeBackslashes(text);
@@ -360,65 +359,79 @@ namespace Markdown.Avalonia
 
         #endregion
 
+        #region grammer - image or href
 
-        #region grammer - image
-
-        private static readonly Regex _imageInline = new Regex(string.Format(@"
+        private static readonly Regex _imageOrHrefInline = new Regex(string.Format(@"
                 (                           # wrap whole match in $1
-                    !\[
-                        ({0})               # link text = $2
+                    (!)?                    # image maker = $2
+                    \[
+                        ({0})               # link text = $3
                     \]
                     \(                      # literal paren
                         [ ]*
-                        ({1})               # href(with title) = $3
+                        ({1})               # href = $4
                         [ ]*
+                        (                   # $5
+                        (['""])             # quote char = $6
+                        (.*?)               # title = $7
+                        \6                  # matching quote
+                        [ ]*                # ignore any spaces between closing quote and )
+                        )?                  # title is optional
                     \)
-                )", GetNestedBracketsPattern(), GetNestedParensPatternWithWhiteSpace()),
+                )", GetNestedBracketsPattern(), GetNestedParensPattern()),
                   RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        private static readonly Regex _imageHrefWithTitle = new Regex(@"^
-                (                           # wrap whole match in $1
-                    (.+?)                   # url = $2
-                    [ ]+
-                    (['""])                 # quote char = $3
-                    (.*?)                   # title = $4
-                    \3
-                )$", RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        /// <summary>
-        /// Turn Markdown images into images
-        /// </summary>
-        /// <remarks>
-        /// ![image alt](url) 
-        /// </remarks>
-        private IEnumerable<CInline> DoImages(string text, Func<string, IEnumerable<CInline>> defaultHandler)
+        private IEnumerable<CInline> DoImagesOrHrefs(string text, Func<string, IEnumerable<CInline>> defaultHandler)
         {
             if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
 
-            return Evaluate(text, _imageInline, ImageInlineEvaluator, defaultHandler);
+            return Evaluate(text, _imageOrHrefInline, ImageOrHrefInlineEvaluator, defaultHandler);
         }
 
-
-        private CInline ImageInlineEvaluator(Match match)
+        private CInline ImageOrHrefInlineEvaluator(Match match)
         {
             if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
 
-            string linkText = match.Groups[2].Value;
-            string urlTxt = match.Groups[3].Value;
-            string title = null;
-
-            var titleMatch = _imageHrefWithTitle.Match(urlTxt);
-            if (titleMatch.Success)
+            if (String.IsNullOrEmpty(match.Groups[2].Value))
             {
-                urlTxt = titleMatch.Groups[2].Value;
-                title = titleMatch.Groups[4].Value;
+                return TreatsAsHref(match);
             }
+            else
+            {
+                return TreatsAsImage(match);
+            }
+        }
+
+        private CInline TreatsAsHref(Match match)
+        {
+            if (match is null)
+            {
+                throw new ArgumentNullException(nameof(match));
+            }
+
+            string linkText = match.Groups[3].Value;
+            string url = match.Groups[4].Value;
+            string title = match.Groups[7].Value;
+
+            var result = new CHyperlink(RunSpanGamut(linkText));
+            result.Command = HyperlinkCommand;
+            result.CommandParameter = url;
+
+            return result;
+        }
+
+        private CInline TreatsAsImage(Match match)
+        {
+            string linkText = match.Groups[3].Value;
+            string urlTxt = match.Groups[4].Value;
+            string title = match.Groups[7].Value;
 
             Bitmap imgSource = null;
 
@@ -493,81 +506,7 @@ namespace Markdown.Avalonia
             }
         }
 
-        private Bitmap MakeImage(Uri url)
-        {
-
-
-            return null;
-        }
-
         #endregion
-
-
-        #region grammer - anchor
-
-        private static readonly Regex _anchorInline = new Regex(string.Format(@"
-                (                           # wrap whole match in $1
-                    \[
-                        ({0})               # link text = $2
-                    \]
-                    \(                      # literal paren
-                        [ ]*
-                        ({1})               # href = $3
-                        [ ]*
-                        (                   # $4
-                        (['""])             # quote char = $5
-                        (.*?)               # title = $6
-                        \5                  # matching quote
-                        [ ]*                # ignore any spaces between closing quote and )
-                        )?                  # title is optional
-                    \)
-                )", GetNestedBracketsPattern(), GetNestedParensPattern()),
-                  RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        /// <summary>
-        /// Turn Markdown link shortcuts into hyperlinks
-        /// </summary>
-        /// <remarks>
-        /// [link text](url "title") 
-        /// </remarks>
-        private IEnumerable<CInline> DoAnchors(string text, Func<string, IEnumerable<CInline>> defaultHandler)
-        {
-            if (text is null)
-            {
-                throw new ArgumentNullException(nameof(text));
-            }
-
-            // Next, inline-style links: [link text](url "optional title") or [link text](url "optional title")
-            return Evaluate(text, _anchorInline, AnchorInlineEvaluator, defaultHandler);
-        }
-
-        private CInline AnchorInlineEvaluator(Match match)
-        {
-            if (match is null)
-            {
-                throw new ArgumentNullException(nameof(match));
-            }
-
-            string linkText = match.Groups[2].Value;
-            string url = match.Groups[3].Value;
-            string title = match.Groups[6].Value;
-
-            var result = new CHyperlink(RunSpanGamut(linkText));
-            result.Command = HyperlinkCommand;
-            result.CommandParameter = url;
-
-            //if (!DisabledTootip)
-            //{
-            //    result.ToolTip = string.IsNullOrWhiteSpace(title) ?
-            //        url :
-            //        String.Format("\"{0}\"\r\n{1}", title, url);
-            //}
-
-            return result;
-        }
-
-        #endregion
-
 
         #region grammer - header
 
@@ -1331,9 +1270,10 @@ namespace Markdown.Avalonia
             string lang = match.Groups[2].Value;
             string code = match.Groups[3].Value;
 
-            var ctxt = new TextBlock() { 
-                Text= code,
-                TextWrapping= TextWrapping.NoWrap
+            var ctxt = new TextBlock()
+            {
+                Text = code,
+                TextWrapping = TextWrapping.NoWrap
             };
             ctxt.Classes.Add(CodeBlockClass);
 
@@ -1966,30 +1906,6 @@ namespace Markdown.Avalonia
             return _nestedParensPattern;
         }
 
-        private static string _nestedParensPatternWithWhiteSpace;
-
-        /// <summary>
-        /// Reusable pattern to match balanced (parens), including whitespace. See Friedl's 
-        /// "Mastering Regular Expressions", 2nd Ed., pp. 328-331.
-        /// </summary>
-        private static string GetNestedParensPatternWithWhiteSpace()
-        {
-            // in other words (this) and (this(also)) and (this(also(too)))
-            // up to _nestDepth
-            if (_nestedParensPatternWithWhiteSpace is null)
-                _nestedParensPatternWithWhiteSpace =
-                    RepeatString(@"
-                    (?>              # Atomic matching
-                       [^()]+      # Anything other than parens
-                     |
-                       \(
-                           ", _nestDepth) + RepeatString(
-                    @" \)
-                    )*"
-                    , _nestDepth);
-            return _nestedParensPatternWithWhiteSpace;
-        }
-
         /// <summary>
         /// this is to emulate what's evailable in PHP
         /// </summary>
@@ -2010,14 +1926,6 @@ namespace Markdown.Avalonia
 
 
         #region helper - parse
-
-        private CTextBlock CreateTextBox(IEnumerable<CInline> inlines)
-        {
-            var txtBox = new CTextBlock();
-            txtBox.Content = inlines;
-            return txtBox;
-        }
-
 
         private TResult Create<TResult, TContent>(IEnumerable<TContent> content)
             where TResult : IPanel, new()

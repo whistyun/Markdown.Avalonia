@@ -47,6 +47,10 @@ namespace ColorTextBlock.Avalonia
             foreach (CGeometry metry in metrics)
             {
                 metry.OnClick = () => Command?.Invoke(CommandParameter);
+                if (metry is TextGeometry tmetry)
+                {
+                }
+
 
                 yield return metry;
             }

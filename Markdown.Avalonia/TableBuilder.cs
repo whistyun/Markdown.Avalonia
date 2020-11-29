@@ -112,17 +112,6 @@ namespace Markdown.Avalonia
                     {
                         for (var colIdx = 0; colIdx < row.Count;)
                         {
-                            MdTableCell cell = row[colIdx];
-
-                            cell.ColumnIndex = colOffset;
-
-                            // apply text align
-                            if (!cell.Horizontal.HasValue
-                                        && styleMt.TryGetValue(colOffset, out var style))
-                            {
-                                cell.Horizontal = style;
-                            }
-
                             int colSpan;
                             if (multiRowsAtColIdx.TryGetValue(colOffset, out var span))
                             {
@@ -130,8 +119,19 @@ namespace Markdown.Avalonia
                             }
                             else
                             {
-                                colSpan = cell.ColSpan;
                                 hasAnyCell = true;
+
+                                var cell = row[colIdx];
+                                cell.ColumnIndex = colOffset;
+
+                                // apply text align
+                                if (!cell.Horizontal.HasValue
+                                            && styleMt.TryGetValue(colOffset, out var style))
+                                {
+                                    cell.Horizontal = style;
+                                }
+
+                                colSpan = cell.ColSpan;
 
                                 if (cell.RowSpan > 1)
                                 {
