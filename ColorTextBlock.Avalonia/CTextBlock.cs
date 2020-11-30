@@ -156,7 +156,57 @@ namespace ColorTextBlock.Avalonia
         #region pointer event
 
         bool isPressed;
+        CGeometry entered;
 
+        protected override void OnPointerLeave(PointerEventArgs e)
+        {
+            base.OnPointerLeave(e);
+
+            if (entered != null)
+            {
+                entered.OnMouseLeave?.Invoke();
+                entered = null;
+            }
+        }
+
+        protected override void OnPointerMoved(PointerEventArgs e)
+        {
+            base.OnPointerMoved(e);
+
+            Point point = e.GetPosition(this);
+
+            bool isEntered(CGeometry metry)
+            {
+                var relX = point.X - metry.Left;
+                var relY = point.Y - metry.Top;
+
+                return 0 <= relX && relX <= metry.Width
+                    && 0 <= relY && relY <= metry.Height;
+            }
+
+            if (entered != null)
+            {
+                var relX = point.X - entered.Left;
+                var relY = point.Y - entered.Top;
+
+                if (!isEntered(entered))
+                {
+                    entered.OnMouseLeave?.Invoke();
+                    entered = null;
+                }
+                else return;
+            }
+
+            foreach (CGeometry metry in metries)
+            {
+                if (isEntered(metry))
+                {
+                    metry.OnMouseEnter?.Invoke();
+                    entered = metry;
+                    break;
+                }
+            }
+        }
 
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
@@ -184,11 +234,10 @@ namespace ColorTextBlock.Avalonia
                     var relX = point.X - metry.Left;
                     var relY = point.Y - metry.Top;
 
-                    if (metry.OnClick != null
-                        && 0 <= relX && relX <= metry.Width
+                    if (0 <= relX && relX <= metry.Width
                         && 0 <= relY && relY <= metry.Height)
                     {
-                        metry.OnClick();
+                        metry.OnClick?.Invoke();
                         break;
                     }
                 }
@@ -231,8 +280,15 @@ namespace ColorTextBlock.Avalonia
             InvalidateMeasure();
         }
 
+        private void RepaintRequested()
+        {
+            InvalidateVisual();
+        }
+
         protected override Size MeasureOverride(Size availableSize)
         {
+            foreach (CGeometry metry in metries) metry.RepaintRequested -= RepaintRequested;
+
             metries = new List<CGeometry>();
 
             double entireWidth = availableSize.Width;
@@ -326,6 +382,8 @@ namespace ColorTextBlock.Avalonia
                     }
                 }
             }
+
+            foreach (CGeometry metry in metries) metry.RepaintRequested += RepaintRequested;
 
             return new Size(width, height);
         }

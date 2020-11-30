@@ -44,11 +44,16 @@ namespace ColorTextBlock.Avalonia
                 entireWidth,
                 remainWidth);
 
+            var redBrush = new SolidColorBrush(Colors.Red);
+
             foreach (CGeometry metry in metrics)
             {
                 metry.OnClick = () => Command?.Invoke(CommandParameter);
+
                 if (metry is TextGeometry tmetry)
                 {
+                    tmetry.OnMouseEnter = () => tmetry.TemporaryForeground = redBrush;
+                    tmetry.OnMouseLeave = () => tmetry.TemporaryForeground = null;
                 }
 
 

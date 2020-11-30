@@ -17,8 +17,10 @@ namespace ColorTextBlock.Avalonia.Geometries
         public double Height { get; }
         public bool LineBreak { get; }
 
-        //public Action OnMouseEnter { get; set; }
-        //public Action OnMouseExit { get; set; }
+        public event Action RepaintRequested;
+
+        public Action OnMouseEnter { get; set; }
+        public Action OnMouseLeave { get; set; }
         public Action OnClick { get; set; }
 
         public CGeometry(double width, double height, bool linebreak)
@@ -29,5 +31,7 @@ namespace ColorTextBlock.Avalonia.Geometries
         }
 
         public abstract void Render(DrawingContext ctx);
+
+        protected void RequestRepaint() => RepaintRequested?.Invoke();
     }
 }

@@ -16,6 +16,28 @@ namespace ColorTextBlock.Avalonia.Geometries
     {
         public string Text { get; }
 
+        private IBrush _TemporaryForeground;
+        public IBrush TemporaryForeground
+        {
+            get => _TemporaryForeground;
+            set
+            {
+                _TemporaryForeground = value;
+                RequestRepaint();
+            }
+        }
+
+        private IBrush _TemporaryBackground;
+        public IBrush TemporaryBackground
+        {
+            get => _TemporaryBackground;
+            set
+            {
+                _TemporaryBackground = value;
+                RequestRepaint();
+            }
+        }
+
         public IBrush Foreground { get; set; }
         public IBrush Background { get; set; }
         public bool IsUnderline { get; set; }
@@ -50,17 +72,18 @@ namespace ColorTextBlock.Avalonia.Geometries
 
         public override void Render(DrawingContext ctx)
         {
-            var background = Background;
+            var foreground = _TemporaryForeground ?? Foreground;
+            var background = _TemporaryBackground ?? Background;
             if (background != null)
             {
                 ctx.FillRectangle(background, new Rect(Left, Top, Width, Height));
             }
 
-            var pen = new Pen(Foreground);
+            var pen = new Pen(foreground);
 
 
             Format.Text = Text;
-            ctx.DrawText(Foreground, new Point(Left, Top), Format);
+            ctx.DrawText(foreground, new Point(Left, Top), Format);
 
             if (IsUnderline)
             {
