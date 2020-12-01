@@ -19,6 +19,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Markdown.Avalonia
 {
@@ -64,12 +65,17 @@ namespace Markdown.Avalonia
 
         //public bool DisabledLazyLoad { get; set; }
 
-        public string AssetPathRoot { get; set; }
+        public string AssetPathRoot
+        {
+            get => Loader.AssetPathRoot;
+            set => Loader.AssetPathRoot = value;
+        }
 
         public Action<string> HyperlinkCommand { get; set; }
 
-        private IAssetLoader AssetLoader { get; }
-        private string[] AssetAssemblyNames { get; }
+        private BitmapLoader Loader { get; }
+
+        private Bitmap ImageNotFound { get; }
 
         #region dependencyobject property
 
@@ -114,7 +120,6 @@ namespace Markdown.Avalonia
 
         #endregion
 
-
         #region regex pattern
 
 
@@ -139,18 +144,11 @@ namespace Markdown.Avalonia
                     Process.Start("open", url);
             };
 
-            AssetPathRoot = Environment.CurrentDirectory;
+            Loader = new BitmapLoader(Environment.CurrentDirectory);
 
-            AssetLoader = AvaloniaLocator.Current.GetService<IAssetLoader>();
-
-            var myasm = Assembly.GetCallingAssembly();
-            var stack = new StackTrace();
-            AssetAssemblyNames = stack.GetFrames()
-                            .Select(frm => frm.GetMethod().DeclaringType.Assembly)
-                            .Where(asm => asm != myasm)
-                            .Select(asm => asm.GetName().Name)
-                            .Distinct()
-                            .ToArray();
+            var assetLoader = AvaloniaLocator.Current.GetService<IAssetLoader>();
+            using (var strm = assetLoader.Open(new Uri($"avares://Markdown.Avalonia/Assets/ImageNotFound.bmp")))
+                ImageNotFound = new Bitmap(strm);
         }
 
         public Control Transform(string text)
@@ -433,77 +431,10 @@ namespace Markdown.Avalonia
             string urlTxt = match.Groups[4].Value;
             string title = match.Groups[7].Value;
 
-            Bitmap imgSource = null;
 
-            if (Uri.TryCreate(urlTxt, UriKind.Absolute, out var url))
-            {
-                try
-                {
-                    switch (url.Scheme)
-                    {
-                        case "http":
-                        case "https":
-                            using (var wc = new System.Net.WebClient())
-                            using (var strm = new MemoryStream(wc.DownloadData(url)))
-                                imgSource = new Bitmap(strm);
-                            break;
-
-                        case "file":
-                            using (var strm = File.OpenRead(url.LocalPath))
-                                imgSource = new Bitmap(strm);
-                            break;
-                    }
-
-
-                }
-                catch { }
-            }
-
-            // check embedded resoruce
-            if (imgSource is null)
-            {
-                foreach (var asmNm in AssetAssemblyNames)
-                {
-                    try
-                    {
-                        var assetUrl = new Uri($"avares://{asmNm}/{urlTxt}");
-
-                        using (var strm = AssetLoader.Open(assetUrl))
-                            imgSource = new Bitmap(strm);
-
-                        break;
-                    }
-                    catch (Exception e)
-                    {
-                        e.ToString();
-                    }
-                }
-            }
-
-            // check filesystem
-            if (imgSource is null && AssetPathRoot != null)
-            {
-                try
-                {
-                    using (var strm = File.OpenRead(Path.Combine(AssetPathRoot, urlTxt)))
-                        imgSource = new Bitmap(strm);
-                }
-                catch { }
-            }
-
-            // error
-            if (imgSource is null)
-            {
-                return new CRun()
-                {
-                    Text = "!" + urlTxt,
-                    Foreground = Brushes.Red
-                };
-            }
-            else
-            {
-                return new CImage(imgSource);
-            }
+            return new CImageLazy(
+                Loader.GetAsync(urlTxt),
+                ImageNotFound);
         }
 
         #endregion

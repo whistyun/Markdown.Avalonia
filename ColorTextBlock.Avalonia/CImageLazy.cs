@@ -2,17 +2,20 @@
 using Avalonia.Media.Imaging;
 using ColorTextBlock.Avalonia.Geometries;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ColorTextBlock.Avalonia
 {
-    public class CImage : CInline
+    public class CImageLazy : CInline
     {
+        public Bitmap Result { get; private set; }
+        public Task<Bitmap> Task { get; }
+        private Bitmap WhenError { get; }
 
-        public Bitmap Image { get; }
-
-        public CImage(Bitmap bitmap)
+        public CImageLazy(Task<Bitmap> task, Bitmap whenError)
         {
-            this.Image = bitmap;
+            this.Task = task;
+            this.WhenError = whenError;
         }
 
         protected internal override IEnumerable<CGeometry> Measure(
@@ -21,7 +24,13 @@ namespace ColorTextBlock.Avalonia
             bool parentUnderline, bool parentStrikethough,
             double entireWidth, double remainWidth)
         {
-            yield return new BitmapGeometry(Image);
+            if (Result is null)
+            {
+                Task.Wait();
+                Result = Task.IsFaulted ? WhenError : Task.Result ?? WhenError;
+            }
+
+            yield return new BitmapGeometry(Result);
         }
     }
 }
