@@ -1,13 +1,15 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
+using Avalonia.Metadata;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Markdown.Avalonia
 {
-    public class MarkdownScrollViewer : UserControl
+    public class MarkdownScrollViewer : Control
     {
         public static readonly AvaloniaProperty<string> MarkdownProperty =
             AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, string>(
@@ -26,9 +28,15 @@ namespace Markdown.Avalonia
 
         private void InitializeComponent()
         {
-            AvaloniaXamlLoader.Load(this);
+            _viewer = new ScrollViewer()
+            {
+                Padding = new Thickness(5),
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            };
 
-            _viewer = this.FindControl<ScrollViewer>("Viewer");
+            VisualChildren.Add(_viewer);
+            LogicalChildren.Add(_viewer);
         }
 
         public Markdown Engine
@@ -43,7 +51,7 @@ namespace Markdown.Avalonia
             get => Engine.AssetPathRoot;
         }
 
-        //[Content]
+        [Content]
         public string HereMarkdown
         {
             get { return Markdown; }
