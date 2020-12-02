@@ -188,7 +188,6 @@ namespace ColorTextBlock.Avalonia
         {
             var typeface = new Typeface(
                     FontFamily ?? parentFontFamily,
-                    FontSize.HasValue ? FontSize.Value : parentFontSize,
                     FontStyle.HasValue ? FontStyle.Value : parentFontStyle,
                     FontWeight.HasValue ? FontWeight.Value : parentFontWeight);
 
@@ -196,9 +195,10 @@ namespace ColorTextBlock.Avalonia
             {
                 Constraint = constraint,
                 Typeface = typeface,
+                FontSize = FontSize.HasValue ? FontSize.Value : parentFontSize,
                 Text = Text ?? string.Empty,
                 TextAlignment = TextAlignment.Left,
-                Wrapping = parentWrapping
+                TextWrapping = parentWrapping,
             };
         }
     }

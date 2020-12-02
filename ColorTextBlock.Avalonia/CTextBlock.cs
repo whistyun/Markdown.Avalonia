@@ -62,7 +62,7 @@ namespace ColorTextBlock.Avalonia
                 FontSizeProperty,
                 FontStyleProperty);
 
-            Observable.Merge(
+            Observable.Merge<AvaloniaPropertyChangedEventArgs>(
                 ContentProperty.Changed,
                 FontSizeProperty.Changed,
                 FontStyleProperty.Changed,

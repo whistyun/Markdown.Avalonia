@@ -22,7 +22,7 @@ namespace ColorTextBlock.Avalonia.Geometries
         public override void Render(DrawingContext ctx)
         {
             ctx.DrawImage(
-                Bitmap, 1,
+                Bitmap,
                 new Rect(Bitmap.Size),
                 new Rect(Left, Top, Bitmap.Size.Width, Bitmap.Size.Height)
                 );

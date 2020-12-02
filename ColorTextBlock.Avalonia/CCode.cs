@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using FStyle = Avalonia.Media.FontStyle;
-using FWeight = Avalonia.Media.FontWeight;
-using FFamily = Avalonia.Media.FontFamily;
 using System.Linq;
 using Avalonia.Media;
 
@@ -25,11 +22,12 @@ namespace ColorTextBlock.Avalonia
                 "droid sans fallback"
             };
 
-            Monospace = FFamily.SystemFontFamilies
-                .Where(family => family.FamilyNames.Any(name => RequestFamilies.Any(reqNm => name.ToLower().Contains(reqNm))))
-                .FirstOrDefault();
-        }
+            var monospaceName = FontManager.Current.GetInstalledFontFamilyNames()
+                                           .Where(name=> RequestFamilies.Any(reqNm => name.ToLower().Contains(reqNm)))
+                                           .FirstOrDefault();
 
+            Monospace = new FontFamily(monospaceName);
+        }
 
         public CCode(IEnumerable<CInline> inlines) : base(inlines)
         {

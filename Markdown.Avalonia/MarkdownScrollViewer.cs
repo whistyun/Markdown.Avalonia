@@ -146,6 +146,18 @@ namespace Markdown.Avalonia
             }
         }
 
+        private void ReInitializeStyle(StyledElement target, Styles source)
+        {
+            target.Styles.Clear();
+
+            foreach (Style newStyle in source)
+            {
+                target.Styles.Add(newStyle);
+            }
+
+        }
+
+
         private string _markdown;
         public string Markdown
         {
@@ -155,7 +167,10 @@ namespace Markdown.Avalonia
                 if (SetAndRaise(MarkdownProperty, ref _markdown, value))
                 {
                     var doc = Engine.Transform(value ?? "");
-                    doc.Styles = MarkdownStyle ?? MdStyle.Standard;
+                    var newStyles = MarkdownStyle ?? MdStyle.Standard;
+
+                    ReInitializeStyle(doc, newStyles);
+
                     _viewer.Content = doc;
                 }
             }
@@ -171,7 +186,7 @@ namespace Markdown.Avalonia
 
                 if (_viewer.Content is Control ctrl)
                 {
-                    ctrl.Styles = value ?? MdStyle.Standard;
+                    ReInitializeStyle(ctrl, value ?? MdStyle.Standard);
 
                     // i have no idea to reflect style changed
                     _viewer.Content = null;

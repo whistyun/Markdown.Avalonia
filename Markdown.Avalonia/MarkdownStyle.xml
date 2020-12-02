@@ -1,6 +1,5 @@
 ﻿<controls:ResourceDictionary
         xmlns="clr-namespace:Avalonia.Styling;assembly=Avalonia.Styling"
-
         xmlns:ava="https://github.com/avaloniaui"
         xmlns:ctxt="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"

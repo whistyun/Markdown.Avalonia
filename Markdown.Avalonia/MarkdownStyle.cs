@@ -3,6 +3,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Text;
 
@@ -10,20 +11,14 @@ namespace Markdown.Avalonia
 {
     public static class MarkdownStyle
     {
-        static MarkdownStyle()
-        {
-            LoadXaml();
-        }
 
         static void LoadXaml()
         {
-            var resourceName = "Markdown.Avalonia.MarkdownStyle.xml";
-
-            Assembly asm = Assembly.GetCallingAssembly();
-            using (var stream = asm.GetManifestResourceStream(resourceName))
+            var asm = Assembly.GetExecutingAssembly();
+            using (var stream = asm.GetManifestResourceStream("Markdown.Avalonia.MarkdownStyle.xml"))
+            using (var text = new StreamReader(stream))
             {
-                var loader = new AvaloniaXamlLoader();
-                var resources = (ResourceDictionary)loader.Load(stream, null);
+                var resources = (ResourceDictionary)AvaloniaRuntimeXamlLoader.Load(text.ReadToEnd());
                 _standard = (Styles)resources["DocumentStyleStandard"];
                 _githublike = (Styles)resources["DocumentStyleGithubLike"];
             }
