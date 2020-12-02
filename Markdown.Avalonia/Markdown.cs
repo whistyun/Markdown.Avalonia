@@ -45,6 +45,8 @@ namespace Markdown.Avalonia
         private const string BlockquoteClass = "Blockquote";
         private const string NoteClass = "Note";
 
+        private const string ParagraphClass = "Paragraph";
+
         private const string TableClass = "Table";
         private const string TableHeaderClass = "TableHeader";
         private const string TableRowOddClass = "OddTableRow";
@@ -350,6 +352,8 @@ namespace Markdown.Avalonia
 
                 if (indiAlignment.HasValue)
                     ctbox.TextAlignment = indiAlignment.Value;
+
+                ctbox.Classes.Add(ParagraphClass);
 
                 yield return ctbox;
             }

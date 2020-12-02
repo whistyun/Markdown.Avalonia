@@ -3,9 +3,12 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
 using Avalonia.Metadata;
+using Avalonia.Styling;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using MdStyle = Markdown.Avalonia.MarkdownStyle;
 
 namespace Markdown.Avalonia
 {
@@ -17,6 +20,18 @@ namespace Markdown.Avalonia
                 o => o.Markdown,
                 (o, v) => o.Markdown = v);
 
+        public static readonly AvaloniaProperty<Styles> MarkdownStyleProperty =
+            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, Styles>(
+                nameof(MarkdownStyle),
+                o => o.MarkdownStyle,
+                (o, v) => o.MarkdownStyle = v);
+
+        public static readonly AvaloniaProperty<string> MarkdownStyleNameProperty =
+            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, string>(
+                nameof(MarkdownStyleName),
+                o => o.MarkdownStyleName,
+                (o, v) => o.MarkdownStyleName = v);
+
         private ScrollViewer _viewer;
 
         public MarkdownScrollViewer()
@@ -24,6 +39,8 @@ namespace Markdown.Avalonia
             Engine = new Markdown();
 
             this.InitializeComponent();
+
+            MarkdownStyleName = nameof(MdStyle.Standard);
         }
 
         private void InitializeComponent()
@@ -138,11 +155,52 @@ namespace Markdown.Avalonia
                 if (SetAndRaise(MarkdownProperty, ref _markdown, value))
                 {
                     var doc = Engine.Transform(value ?? "");
-                    doc.Styles = MarkdownStyle.Standard;
+                    doc.Styles = MarkdownStyle ?? MdStyle.Standard;
                     _viewer.Content = doc;
                 }
             }
         }
 
+        private Styles _markdownStyle;
+        public Styles MarkdownStyle
+        {
+            get { return _markdownStyle; }
+            set
+            {
+                _markdownStyle = value;
+
+                if (_viewer.Content is Control ctrl)
+                {
+                    ctrl.Styles = value ?? MdStyle.Standard;
+
+                    // i have no idea to reflect style changed
+                    _viewer.Content = null;
+                    Thread.MemoryBarrier();
+                    _viewer.Content = ctrl;
+                }
+            }
+        }
+
+        private string _markdownStyleName;
+        public string MarkdownStyleName
+        {
+            get { return _markdownStyleName; }
+            set
+            {
+                _markdownStyleName = value;
+
+                if (_markdownStyleName is null)
+                {
+                    MarkdownStyle = MdStyle.Standard;
+                }
+                else
+                {
+                    var prop = typeof(MarkdownStyle).GetProperty(_markdownStyleName);
+                    if (prop == null) return;
+
+                    MarkdownStyle = (Styles)prop.GetValue(null);
+                }
+            }
+        }
     }
 }

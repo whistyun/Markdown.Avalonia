@@ -25,10 +25,12 @@ namespace Markdown.Avalonia
                 var loader = new AvaloniaXamlLoader();
                 var resources = (ResourceDictionary)loader.Load(stream, null);
                 _standard = (Styles)resources["DocumentStyleStandard"];
+                _githublike = (Styles)resources["DocumentStyleGithubLike"];
             }
         }
 
         private static Styles _standard;
+        private static Styles _githublike;
 
         public static Styles Standard
         {
@@ -36,6 +38,15 @@ namespace Markdown.Avalonia
             {
                 if (_standard == null) LoadXaml();
                 return _standard;
+            }
+        }
+
+        public static Styles GithubLike
+        {
+            get
+            {
+                if (_githublike == null) LoadXaml();
+                return _githublike;
             }
         }
     }

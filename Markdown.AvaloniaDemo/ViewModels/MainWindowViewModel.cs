@@ -1,4 +1,6 @@
-﻿using ReactiveUI;
+﻿using Avalonia.Controls;
+using Markdown.Avalonia;
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +16,13 @@ namespace Markdown.AvaloniaDemo.ViewModels
             set => this.RaiseAndSetIfChanged(ref _text, value);
         }
 
+        private ComboBoxItem _styleName;
+        public ComboBoxItem StyleName
+        {
+            get => _styleName;
+            set => this.RaiseAndSetIfChanged(ref _styleName, value);
+        }
+
         public MainWindowViewModel()
         {
             using (var stream = new FileStream("MainWindow.md", FileMode.Open))
@@ -21,6 +30,8 @@ namespace Markdown.AvaloniaDemo.ViewModels
             {
                 Text = reader.ReadToEnd();
             }
+
+            StyleName = new ComboBoxItem() { Content = nameof(MarkdownStyle.Standard) };
         }
     }
 }

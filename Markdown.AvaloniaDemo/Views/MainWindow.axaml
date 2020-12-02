@@ -1,6 +1,7 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:Markdown.AvaloniaDemo.ViewModels;assembly=Markdown.AvaloniaDemo"
+        xmlns:local="clr-namespace:Markdown.AvaloniaDemo;assembly=Markdown.AvaloniaDemo"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:markdown="clr-namespace:Markdown.Avalonia;assembly=Markdown.Avalonia"
@@ -9,34 +10,49 @@
         Icon="/Assets/avalonia-logo.ico"
         Title="Markdown.AvaloniaDemo">
 
+  <Window.Resources>
+    <local:MyConverter x:Key="myConverter"/>
+  </Window.Resources>
+
   <Design.DataContext>
     <vm:MainWindowViewModel/>
   </Design.DataContext>
 
-  <Grid>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="10*"/>
-      <ColumnDefinition Width="10*"/>
-    </Grid.ColumnDefinitions>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="10*"/>
-    </Grid.RowDefinitions>
+  <DockPanel LastChildFill="True">
 
-    <TextBox
-      Grid.Row="0"
-      Grid.Column="0"
-      VerticalAlignment="Stretch"
-      AcceptsReturn="True"
-      Text="{Binding Text}"
-      TextWrapping="Wrap"/>
+    <ComboBox
+        DockPanel.Dock="Top"
+        SelectedItem="{Binding StyleName}">
+      <ComboBoxItem IsSelected="True">Standard</ComboBoxItem>
+      <ComboBoxItem>GithubLike</ComboBoxItem>
+    </ComboBox>
 
-    <markdown:MarkdownScrollViewer
-      Grid.Row="0"
-      Grid.Column="1"
-      VerticalAlignment="Stretch"
-      Markdown="{Binding Text}">
-    </markdown:MarkdownScrollViewer>
-  </Grid>
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="10*"/>
+        <ColumnDefinition Width="10*"/>
+      </Grid.ColumnDefinitions>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="10*"/>
+      </Grid.RowDefinitions>
 
+      <TextBox
+        Grid.Row="0"
+        Grid.Column="0"
+        VerticalAlignment="Stretch"
+        AcceptsReturn="True"
+        Text="{Binding Text}"
+        TextWrapping="Wrap"/>
+
+      <markdown:MarkdownScrollViewer
+        Grid.Row="0"
+        Grid.Column="1"
+        VerticalAlignment="Stretch"
+        MarkdownStyleName="{Binding StyleName, Converter={StaticResource myConverter} }"
+        Markdown="{Binding Text}">
+      </markdown:MarkdownScrollViewer>
+    </Grid>
+
+  </DockPanel>
 
 </Window>
