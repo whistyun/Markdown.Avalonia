@@ -3,7 +3,7 @@
     <OutputType>Library</OutputType>
     <TargetFrameworks>netcoreapp3.1;net47</TargetFrameworks>
     <PackageId>Markdown.Avalonia</PackageId>
-    <Version>0.10.0-preview6</Version>
+    <Version>0.10.0-a1</Version>
     <Authors>Bevan Arps(original); whistyun</Authors>
     <Company />
     <Description>Markdown processor for Avalonia</Description>
