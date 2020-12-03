@@ -16,6 +16,7 @@
 
       <Style Selector="ctxt|CTextBlock.Heading1">
         <Setter Property="Foreground" Value="Red"/>
+        <Setter Property="Background" Value="Yellow"/>
         <Setter Property="TextAlignment" Value="Center"/>
       </Style>
 
