@@ -37,9 +37,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ColorTextBlock.Avalonia\ColorTextBlock.Avalonia.csproj" />
+    <ProjectReference Include="..\ColorTextBlock.Avalonia\ColorTextBlock.Avalonia.csproj" PrivateAssets="All"/>
   </ItemGroup>
 
+  <!-- see https://stackoverflow.com/questions/41979310/including-referenced-project-dlls-in-nuget-package-net-core-rc3-csproj-file -->
   <PropertyGroup>
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
