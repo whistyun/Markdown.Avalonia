@@ -11,6 +11,10 @@ It can render Markdown with avalonia.
 ![img1](docs/img.demo/scrn3.png)  
 ![img1](docs/img.demo/scrn4.png)  
 
+## Nuget
+
+https://www.nuget.org/packages/Markdown.Avalonia/
+
 
 ## License
 
