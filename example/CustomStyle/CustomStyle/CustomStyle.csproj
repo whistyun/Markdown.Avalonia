@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="0.10.0-preview6" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.0-preview6" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Markdown.Avalonia\Markdown.Avalonia.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="UseEmbeddedStyle.axaml.cs">
+      <DependentUpon>UseEmbeddedStyle.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+</Project>
