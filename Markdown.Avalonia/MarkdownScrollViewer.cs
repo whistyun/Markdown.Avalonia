@@ -155,7 +155,6 @@ namespace Markdown.Avalonia
                 if (SetAndRaise(MarkdownProperty, ref _markdown, value))
                 {
                     var doc = Engine.Transform(value ?? "");
-                    doc.Styles = MarkdownStyle ?? MdStyle.Standard;
                     _viewer.Content = doc;
                 }
             }
@@ -167,17 +166,21 @@ namespace Markdown.Avalonia
             get { return _markdownStyle; }
             set
             {
-                _markdownStyle = value;
-
-                if (_viewer.Content is Control ctrl)
+                if (_markdownStyle != value)
                 {
-                    ctrl.Styles = value ?? MdStyle.Standard;
+                    if (_markdownStyle != null)
+                        Styles.Remove(_markdownStyle);
+
+                    Styles.Insert(0, value);
 
                     // i have no idea to reflect style changed
+                    var ctrl = _viewer.Content;
                     _viewer.Content = null;
                     Thread.MemoryBarrier();
                     _viewer.Content = ctrl;
                 }
+
+                _markdownStyle = value;
             }
         }
 

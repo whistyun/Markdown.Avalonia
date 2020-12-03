@@ -1,8 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net47</TargetFrameworks>
     <PackageId>ColorTextBlock.Avalonia</PackageId>
+    <Version>0.9.0-a1</Version>
     <Authors>whistyun</Authors>
     <Copyright>Copyright (c) 2020 whistyun</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

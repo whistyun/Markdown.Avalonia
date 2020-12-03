@@ -10,12 +10,7 @@ namespace Markdown.Avalonia
 {
     public static class MarkdownStyle
     {
-        static MarkdownStyle()
-        {
-            LoadXaml();
-        }
-
-        static void LoadXaml()
+        static Styles LoadXaml(string name)
         {
             var resourceName = "Markdown.Avalonia.MarkdownStyle.xml";
 
@@ -24,30 +19,18 @@ namespace Markdown.Avalonia
             {
                 var loader = new AvaloniaXamlLoader();
                 var resources = (ResourceDictionary)loader.Load(stream, null);
-                _standard = (Styles)resources["DocumentStyleStandard"];
-                _githublike = (Styles)resources["DocumentStyleGithubLike"];
+                return (Styles)resources[name];
             }
         }
 
-        private static Styles _standard;
-        private static Styles _githublike;
-
         public static Styles Standard
         {
-            get
-            {
-                if (_standard == null) LoadXaml();
-                return _standard;
-            }
+            get => LoadXaml("DocumentStyleStandard");
         }
 
         public static Styles GithubLike
         {
-            get
-            {
-                if (_githublike == null) LoadXaml();
-                return _githublike;
-            }
+            get => LoadXaml("DocumentStyleGithubLike");
         }
     }
 }

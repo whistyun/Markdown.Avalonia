@@ -1,0 +1,58 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             
+             xmlns:md="clr-namespace:Markdown.Avalonia;assembly=Markdown.Avalonia"
+             xmlns:ctxt="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia"
+
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CustomStyle.SetStyles">
+
+  <md:MarkdownScrollViewer>
+    <md:MarkdownScrollViewer.Styles>
+
+      <!-- overwrite a style in some parts. -->
+
+      <Style Selector="ctxt|CTextBlock.Heading1">
+        <Setter Property="Foreground" Value="Red"/>
+        <Setter Property="Background" Value="Yellow"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+      </Style>
+
+      <Style Selector="ctxt|CTextBlock.ListMarker">
+        <Setter Property="Foreground" Value="Blue"/>
+      </Style>
+
+      <Style Selector="Border.Blockquote ctxt|CTextBlock.Heading1">
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="TextAlignment" Value="Left"/>
+        <Setter Property="FontSize" Value="14"/>
+      </Style>
+
+    </md:MarkdownScrollViewer.Styles>
+
+    # Heading1
+    ## Heading2
+    ### Heading3
+    #### Heading4
+
+    some text, any text.
+    
+    * listitem1
+    * listitem2
+
+    | col1 | col2 | col3 |
+    |------|------|------|
+    | one  |------|------|
+    | two  |------|------|
+    | three|------|------|
+    
+
+    > #blockquote
+    >
+    > p>. and enhance syntax 
+  </md:MarkdownScrollViewer>
+
+
+</UserControl>
