@@ -11,38 +11,25 @@ namespace Markdown.Avalonia
 {
     public static class MarkdownStyle
     {
-
-        static void LoadXaml()
+        static Styles LoadXaml(string name)
         {
             var asm = Assembly.GetExecutingAssembly();
             using (var stream = asm.GetManifestResourceStream("Markdown.Avalonia.MarkdownStyle.xml"))
             using (var text = new StreamReader(stream))
             {
                 var resources = (ResourceDictionary)AvaloniaRuntimeXamlLoader.Load(text.ReadToEnd());
-                _standard = (Styles)resources["DocumentStyleStandard"];
-                _githublike = (Styles)resources["DocumentStyleGithubLike"];
+                return (Styles)resources[name];
             }
         }
 
-        private static Styles _standard;
-        private static Styles _githublike;
-
         public static Styles Standard
         {
-            get
-            {
-                if (_standard == null) LoadXaml();
-                return _standard;
-            }
+            get => LoadXaml("DocumentStyleStandard");
         }
 
         public static Styles GithubLike
         {
-            get
-            {
-                if (_githublike == null) LoadXaml();
-                return _githublike;
-            }
+            get => LoadXaml("DocumentStyleGithubLike");
         }
     }
 }
