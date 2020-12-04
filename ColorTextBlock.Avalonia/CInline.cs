@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace ColorTextBlock.Avalonia
 {
-    public abstract class CInline : AvaloniaObject
+    public abstract class CInline : StyledElement
     {
         public static readonly StyledProperty<IBrush> BackgroundProperty =
             AvaloniaProperty.Register<CInline, IBrush>(nameof(Foreground));
