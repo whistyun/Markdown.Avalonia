@@ -1329,10 +1329,6 @@ namespace Markdown.Avalonia
 
             var result = new CCode(new[] { new CRun() { Text = span } });
 
-            // TODO use style selector
-            result.Foreground = new SolidColorBrush(Colors.DarkBlue);
-            result.Background = new SolidColorBrush(Colors.LightGray);
-
             return result;
         }
 
