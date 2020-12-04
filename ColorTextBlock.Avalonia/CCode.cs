@@ -33,7 +33,10 @@ namespace ColorTextBlock.Avalonia
 
         public CCode(IEnumerable<CInline> inlines) : base(inlines)
         {
-            FontFamily = Monospace;
+            if (Monospace != null)
+            {
+                FontFamily = Monospace;
+            }
         }
     }
 }
