@@ -441,7 +441,7 @@ namespace ColorTextBlock.Avalonia
         {
             if (Background != null)
             {
-                context.FillRectangle(Background, Bounds);
+                context.FillRectangle(Background, new Rect(0, 0, Bounds.Width, Bounds.Height));
             }
 
             foreach (var metry in metries)
