@@ -32,6 +32,6 @@ namespace ColorTextBlock.Avalonia.Geometries
 
         public abstract void Render(DrawingContext ctx);
 
-        protected void RequestRepaint() => RepaintRequested?.Invoke();
+        internal void RequestRepaint() => RepaintRequested?.Invoke();
     }
 }

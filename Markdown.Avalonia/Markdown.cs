@@ -41,6 +41,9 @@ namespace Markdown.Avalonia
         private const string Heading2Class = "Heading2";
         private const string Heading3Class = "Heading3";
         private const string Heading4Class = "Heading4";
+        private const string Heading5Class = "Heading5";
+        private const string Heading6Class = "Heading6";
+
         private const string CodeBlockClass = "CodeBlock";
         private const string BlockquoteClass = "Blockquote";
         private const string NoteClass = "Note";
@@ -347,8 +350,7 @@ namespace Markdown.Avalonia
                     }
                 }
 
-                var ctbox = new CTextBlock();
-                ctbox.Content = RunSpanGamut(chip).ToList();
+                var ctbox = new CTextBlock(RunSpanGamut(chip));
 
                 if (indiAlignment.HasValue)
                     ctbox.TextAlignment = indiAlignment.Value;
@@ -431,14 +433,21 @@ namespace Markdown.Avalonia
 
         private CInline TreatsAsImage(Match match)
         {
-            string linkText = match.Groups[3].Value;
+            string altText = match.Groups[3].Value;
             string urlTxt = match.Groups[4].Value;
             string title = match.Groups[7].Value;
 
-
-            return new CImageLazy(
+            var image = new CImage(
                 Loader.GetAsync(urlTxt),
                 ImageNotFound);
+
+            if (!String.IsNullOrEmpty(title)
+                && !title.Any(ch => !Char.IsLetterOrDigit(ch)))
+            {
+                image.Classes.Add(title);
+            }
+
+            return image;
         }
 
         #endregion
@@ -523,7 +532,7 @@ namespace Markdown.Avalonia
                 throw new ArgumentNullException(nameof(content));
             }
 
-            var heading = new CTextBlock() { Content = content.ToList() };
+            var heading = new CTextBlock(content);
 
             switch (level)
             {
@@ -541,6 +550,14 @@ namespace Markdown.Avalonia
 
                 case 4:
                     heading.Classes.Add(Heading4Class);
+                    break;
+
+                case 5:
+                    heading.Classes.Add(Heading5Class);
+                    break;
+
+                case 6:
+                    heading.Classes.Add(Heading6Class);
                     break;
             }
 
@@ -619,7 +636,7 @@ namespace Markdown.Avalonia
                 throw new ArgumentNullException(nameof(content));
             }
 
-            var note = new CTextBlock() { Content = content.ToList() };
+            var note = new CTextBlock(content);
             note.Classes.Add(NoteClass);
             if (indiAlignment.HasValue)
             {
@@ -1136,7 +1153,7 @@ namespace Markdown.Avalonia
 
                 if (!(mdcell.Text is null))
                 {
-                    var txtbx = new CTextBlock() { Content = RunSpanGamut(mdcell.Text).ToList() };
+                    var txtbx = new CTextBlock(RunSpanGamut(mdcell.Text));
                     cell.Child = txtbx;
 
                     if (mdcell.Horizontal.HasValue)
@@ -1311,10 +1328,6 @@ namespace Markdown.Avalonia
             span = Regex.Replace(span, @"[ ]*$", ""); // trailing whitespace
 
             var result = new CCode(new[] { new CRun() { Text = span } });
-
-            // TODO use style selector
-            result.Foreground = new SolidColorBrush(Colors.DarkBlue);
-            result.Background = new SolidColorBrush(Colors.LightGray);
 
             return result;
         }

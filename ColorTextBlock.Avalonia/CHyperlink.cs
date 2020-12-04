@@ -1,4 +1,5 @@
-﻿using Avalonia.Media;
+﻿using Avalonia;
+using Avalonia.Media;
 using ColorTextBlock.Avalonia.Geometries;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,24 @@ namespace ColorTextBlock.Avalonia
 {
     public class CHyperlink : CSpan
     {
+        public static readonly StyledProperty<IBrush> HoverBackgroundProperty =
+            AvaloniaProperty.Register<CHyperlink, IBrush>(nameof(Foreground));
+
+        public static readonly StyledProperty<IBrush> HoverForegroundProperty =
+            AvaloniaProperty.Register<CHyperlink, IBrush>(nameof(Foreground));
+
+        public IBrush HoverBackground
+        {
+            get { return GetValue(HoverBackgroundProperty); }
+            set { SetValue(HoverBackgroundProperty, value); }
+        }
+
+        public IBrush HoverForeground
+        {
+            get { return GetValue(HoverForegroundProperty); }
+            set { SetValue(HoverForegroundProperty, value); }
+        }
+
         public Action<string> Command { get; set; }
         public string CommandParameter { get; set; }
 
@@ -17,6 +36,7 @@ namespace ColorTextBlock.Avalonia
         {
             IsUnderline = true;
             Foreground = new SolidColorBrush(Colors.Blue);
+            HoverForeground = new SolidColorBrush(Colors.Red);
         }
 
 
@@ -44,16 +64,23 @@ namespace ColorTextBlock.Avalonia
                 entireWidth,
                 remainWidth);
 
-            var redBrush = new SolidColorBrush(Colors.Red);
-
             foreach (CGeometry metry in metrics)
             {
                 metry.OnClick = () => Command?.Invoke(CommandParameter);
 
                 if (metry is TextGeometry tmetry)
                 {
-                    tmetry.OnMouseEnter = () => tmetry.TemporaryForeground = redBrush;
-                    tmetry.OnMouseLeave = () => tmetry.TemporaryForeground = null;
+                    tmetry.OnMouseEnter = () =>
+                    {
+                        tmetry.TemporaryForeground = HoverForeground;
+                        tmetry.TemporaryBackground = HoverBackground;
+                    };
+
+                    tmetry.OnMouseLeave = () =>
+                    {
+                        tmetry.TemporaryForeground = null;
+                        tmetry.TemporaryBackground = null;
+                    };
                 }
 
 

@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
@@ -6,6 +7,7 @@ using Avalonia.Metadata;
 using ColorTextBlock.Avalonia.Geometries;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
@@ -15,33 +17,26 @@ namespace ColorTextBlock.Avalonia
     public class CTextBlock : Control
     {
         public static readonly StyledProperty<IBrush> BackgroundProperty =
-         Border.BackgroundProperty.AddOwner<CTextBlock>();
+            Border.BackgroundProperty.AddOwner<CTextBlock>();
 
-        public static readonly StyledProperty<IBrush> ForegroundProperty =
-            AvaloniaProperty.Register<CTextBlock, IBrush>(
-                nameof(Foreground), defaultValue: Brushes.Black);
+        public static readonly AttachedProperty<IBrush> ForegroundProperty =
+            TextBlock.ForegroundProperty.AddOwner<CTextBlock>();
 
-        public static readonly StyledProperty<FontFamily> FontFamilyProperty =
-            AvaloniaProperty.Register<CTextBlock, FontFamily>(
-                nameof(FontFamily), defaultValue: FontFamily.Default);
+        public static readonly AttachedProperty<FontWeight> FontWeightProperty =
+            TextBlock.FontWeightProperty.AddOwner<CTextBlock>();
 
-        public static readonly StyledProperty<double> FontSizeProperty =
-            AvaloniaProperty.Register<CTextBlock, double>(
-                nameof(FontSize), defaultValue: 12);
+        public static readonly AttachedProperty<double> FontSizeProperty =
+            TextBlock.FontSizeProperty.AddOwner<CTextBlock>();
 
-        public static readonly StyledProperty<FontStyle> FontStyleProperty =
-            AvaloniaProperty.Register<CTextBlock, FontStyle>(
-                nameof(FontStyle), defaultValue: FontStyle.Normal);
+        public static readonly AttachedProperty<FontStyle> FontStyleProperty =
+            TextBlock.FontStyleProperty.AddOwner<CTextBlock>();
 
-        public static readonly StyledProperty<FontWeight> FontWeightProperty =
-            AvaloniaProperty.Register<CTextBlock, FontWeight>(
-                nameof(FontWeight), defaultValue: FontWeight.Normal);
 
         public static readonly StyledProperty<TextWrapping> TextWrappingProperty =
             AvaloniaProperty.Register<CTextBlock, TextWrapping>(nameof(TextWrapping));
 
-        public static readonly DirectProperty<CTextBlock, IEnumerable<CInline>> ContentProperty =
-            AvaloniaProperty.RegisterDirect<CTextBlock, IEnumerable<CInline>>(
+        public static readonly DirectProperty<CTextBlock, AvaloniaList<CInline>> ContentProperty =
+            AvaloniaProperty.RegisterDirect<CTextBlock, AvaloniaList<CInline>>(
                 nameof(Content),
                     o => o.Content,
                     (o, v) => o.Content = v);
@@ -57,23 +52,23 @@ namespace ColorTextBlock.Avalonia
 
             AffectsRender<CTextBlock>(
                 BackgroundProperty,
-                ForegroundProperty,
-                FontWeightProperty,
-                FontSizeProperty,
-                FontStyleProperty);
+                TextBlock.ForegroundProperty,
+                TextBlock.FontWeightProperty,
+                TextBlock.FontSizeProperty,
+                TextBlock.FontStyleProperty);
 
             Observable.Merge<AvaloniaPropertyChangedEventArgs>(
                 ContentProperty.Changed,
-                FontSizeProperty.Changed,
-                FontStyleProperty.Changed,
-                FontWeightProperty.Changed,
+                TextBlock.FontSizeProperty.Changed,
+                TextBlock.FontStyleProperty.Changed,
+                TextBlock.FontWeightProperty.Changed,
                 TextWrappingProperty.Changed,
                 BoundsProperty.Changed
             ).AddClassHandler<CTextBlock>((x, _) => x.OnMeasureSourceChanged());
         }
 
-        private IEnumerable<CInline> _content = new List<CInline>();
-        private List<CGeometry> metries = new List<CGeometry>();
+        private AvaloniaList<CInline> _content;
+        private List<CGeometry> metries;
 
         public IBrush Background
         {
@@ -83,32 +78,32 @@ namespace ColorTextBlock.Avalonia
 
         public IBrush Foreground
         {
-            get { return GetValue(ForegroundProperty); }
-            set { SetValue(ForegroundProperty, value); }
+            get { return TextBlock.GetForeground(this); }
+            set { TextBlock.SetForeground(this, value); }
         }
 
         public FontFamily FontFamily
         {
-            get { return GetValue(FontFamilyProperty); }
-            set { SetValue(FontFamilyProperty, value); }
+            get { return TextBlock.GetFontFamily(this); }
+            set { TextBlock.SetFontFamily(this, value); }
         }
 
         public double FontSize
         {
-            get { return GetValue(FontSizeProperty); }
-            set { SetValue(FontSizeProperty, value); }
+            get { return TextBlock.GetFontSize(this); }
+            set { TextBlock.SetFontSize(this, value); }
         }
 
         public FontStyle FontStyle
         {
-            get { return GetValue(FontStyleProperty); }
-            set { SetValue(FontStyleProperty, value); }
+            get { return TextBlock.GetFontStyle(this); }
+            set { TextBlock.SetFontStyle(this, value); }
         }
 
         public FontWeight FontWeight
         {
-            get { return GetValue(FontWeightProperty); }
-            set { SetValue(FontWeightProperty, value); }
+            get { return TextBlock.GetFontWeight(this); }
+            set { TextBlock.SetFontWeight(this, value); }
         }
 
         public TextWrapping TextWrapping
@@ -124,7 +119,7 @@ namespace ColorTextBlock.Avalonia
         }
 
         [Content]
-        public IEnumerable<CInline> Content
+        public AvaloniaList<CInline> Content
         {
 
             get => _content;
@@ -142,16 +137,32 @@ namespace ColorTextBlock.Avalonia
                     // set change listener
                     foreach (var newrun in _content)
                         RegisterOrUnregister(newrun, false);
+
+
+                    olds.CollectionChanged -= ContentCollectionChangedd;
+                    _content.CollectionChanged += ContentCollectionChangedd;
                 }
             }
         }
 
-        public CTextBlock() { }
-
-        public CTextBlock(string text)
+        public CTextBlock()
         {
-            Content = new[] { new CRun() { Text = text } };
+            _content = new AvaloniaList<CInline>();
+            _content.CollectionChanged += ContentCollectionChangedd;
+
+            metries = new List<CGeometry>();
         }
+
+        public CTextBlock(string text) : this()
+        {
+            _content.Add(new CRun() { Text = text });
+        }
+
+        public CTextBlock(IEnumerable<CInline> inlines) : this()
+        {
+            _content.AddRange(inlines);
+        }
+
 
         #region pointer event
 
@@ -249,15 +260,51 @@ namespace ColorTextBlock.Avalonia
         private void RegisterOrUnregister(CInline inline, bool unregister)
         {
             if (unregister)
+            {
                 inline.PropertyChanged -= OnTextStructureChanged;
+                LogicalChildren.Remove(inline);
+            }
+
             else
+            {
                 inline.PropertyChanged += OnTextStructureChanged;
+                LogicalChildren.Add(inline);
+            }
 
             if (inline is CSpan span)
                 foreach (CInline spanCnt in span.Content)
                     RegisterOrUnregister(spanCnt, unregister);
         }
 
+        private void ContentCollectionChangedd(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            void Attach(IEnumerable<CInline> newItems)
+            {
+                foreach (CInline item in newItems) RegisterOrUnregister(item, false);
+            }
+
+            void Detach(IEnumerable<CInline> removeItems)
+            {
+                foreach (CInline item in removeItems) RegisterOrUnregister(item, true);
+            }
+
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Reset:
+                case NotifyCollectionChangedAction.Remove:
+                    Detach(e.OldItems.Cast<CInline>());
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+                    Detach(e.OldItems.Cast<CInline>());
+                    Attach(e.NewItems.Cast<CInline>());
+                    break;
+
+                case NotifyCollectionChangedAction.Add:
+                    Attach(e.NewItems.Cast<CInline>());
+                    break;
+            }
+        }
 
 
         private void OnTextStructureChanged(object sender, AvaloniaPropertyChangedEventArgs args)
@@ -269,7 +316,9 @@ namespace ColorTextBlock.Avalonia
                 || prop == CInline.FontStyleProperty
                 || prop == CInline.FontWeightProperty
                 || prop == CRun.TextProperty
-                || prop == CSpan.ContentProperty)
+                || prop == CSpan.ContentProperty
+                || prop == CImage.LayoutHeightProperty
+                || prop == CImage.LayoutWidthProperty)
             {
                 OnMeasureSourceChanged();
             }
@@ -392,7 +441,7 @@ namespace ColorTextBlock.Avalonia
         {
             if (Background != null)
             {
-                context.FillRectangle(Background, Bounds);
+                context.FillRectangle(Background, new Rect(0, 0, Bounds.Width, Bounds.Height));
             }
 
             foreach (var metry in metries)
