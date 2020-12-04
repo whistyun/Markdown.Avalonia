@@ -63,6 +63,13 @@
       </Style.Setters>
     </Style>
 
+    <Style Selector="ctxt|CCode">
+      <Style.Setters>
+        <Setter Property="Foreground" Value="DarkBlue" />
+        <Setter Property="Background" Value="LightGray" />
+      </Style.Setters>
+    </Style>
+
     <Style Selector="Border.Note">
       <Style.Setters>
         <Setter Property="Margin"          Value="5,0,5,0"/>
@@ -212,6 +219,13 @@
         <Setter Property="Foreground"  Value="#ff000000" />
         <Setter Property="FontSize"    Value="14"/>
         <Setter Property="FontWeight"  Value="Bold" />
+      </Style.Setters>
+    </Style>
+
+    <Style Selector="ctxt|CCode">
+      <Style.Setters>
+        <Setter Property="Foreground" Value="DarkBlue" />
+        <Setter Property="Background" Value="LightGray" />
       </Style.Setters>
     </Style>
 
