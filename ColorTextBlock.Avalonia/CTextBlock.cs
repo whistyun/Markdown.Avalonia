@@ -22,6 +22,9 @@ namespace ColorTextBlock.Avalonia
         public static readonly AttachedProperty<IBrush> ForegroundProperty =
             TextBlock.ForegroundProperty.AddOwner<CTextBlock>();
 
+        public static readonly AttachedProperty<FontFamily> FontFamilyProperty =
+            TextBlock.FontFamilyProperty.AddOwner<CTextBlock>();
+
         public static readonly AttachedProperty<FontWeight> FontWeightProperty =
             TextBlock.FontWeightProperty.AddOwner<CTextBlock>();
 
