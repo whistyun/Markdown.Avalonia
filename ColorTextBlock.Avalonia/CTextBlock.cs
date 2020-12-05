@@ -33,7 +33,7 @@ namespace ColorTextBlock.Avalonia
 
 
         public static readonly StyledProperty<TextWrapping> TextWrappingProperty =
-            AvaloniaProperty.Register<CTextBlock, TextWrapping>(nameof(TextWrapping));
+            AvaloniaProperty.Register<CTextBlock, TextWrapping>(nameof(TextWrapping), defaultValue: TextWrapping.Wrap);
 
         public static readonly DirectProperty<CTextBlock, AvaloniaList<CInline>> ContentProperty =
             AvaloniaProperty.RegisterDirect<CTextBlock, AvaloniaList<CInline>>(
@@ -358,7 +358,9 @@ namespace ColorTextBlock.Avalonia
                     IEnumerable<CGeometry> inlineGeometry =
                         inline.Measure(
                             FontFamily, FontSize, FontStyle, FontWeight,
-                            Foreground, null, false, false, entireWidth, remainWidth);
+                            Foreground, null, false, false,
+                            (TextWrapping == TextWrapping.NoWrap) ? Double.PositiveInfinity : entireWidth,
+                            (TextWrapping == TextWrapping.NoWrap) ? Double.PositiveInfinity : remainWidth);
 
                     foreach (CGeometry metry in inlineGeometry)
                     {

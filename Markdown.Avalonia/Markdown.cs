@@ -850,7 +850,7 @@ namespace Markdown.Avalonia
             foreach (Tuple<Control, int> listItemTpl in listItems.Select((elm, idx) => Tuple.Create(elm, idx)))
             {
                 var index = listItemTpl.Item2;
-                CTextBlock tbox;
+                CTextBlock markerTxt;
 
                 switch (textMarker)
                 {
@@ -858,43 +858,43 @@ namespace Markdown.Avalonia
                         goto case TextMarkerStyle.Disc;
 
                     case TextMarkerStyle.None:
-                        tbox = new CTextBlock("");
+                        markerTxt = new CTextBlock("");
                         break;
 
                     case TextMarkerStyle.Disc:
-                        tbox = new CTextBlock("•");
+                        markerTxt = new CTextBlock("•");
                         break;
 
                     case TextMarkerStyle.Box:
-                        tbox = new CTextBlock("▪");
+                        markerTxt = new CTextBlock("▪");
                         break;
 
                     case TextMarkerStyle.Circle:
-                        tbox = new CTextBlock("○");
+                        markerTxt = new CTextBlock("○");
                         break;
 
                     case TextMarkerStyle.Square:
-                        tbox = new CTextBlock("❏");
+                        markerTxt = new CTextBlock("❏");
                         break;
 
                     case TextMarkerStyle.Decimal:
-                        tbox = new CTextBlock((index + 1).ToString() + ".");
+                        markerTxt = new CTextBlock((index + 1).ToString() + ".");
                         break;
 
                     case TextMarkerStyle.LowerLatin:
-                        tbox = new CTextBlock(NumberToOrder.ToLatin(index + 1).ToLower() + ".");
+                        markerTxt = new CTextBlock(NumberToOrder.ToLatin(index + 1).ToLower() + ".");
                         break;
 
                     case TextMarkerStyle.UpperLatin:
-                        tbox = new CTextBlock(NumberToOrder.ToLatin(index + 1) + ".");
+                        markerTxt = new CTextBlock(NumberToOrder.ToLatin(index + 1) + ".");
                         break;
 
                     case TextMarkerStyle.LowerRoman:
-                        tbox = new CTextBlock(NumberToOrder.ToRoman(index + 1).ToLower() + ".");
+                        markerTxt = new CTextBlock(NumberToOrder.ToRoman(index + 1).ToLower() + ".");
                         break;
 
                     case TextMarkerStyle.UpperRoman:
-                        tbox = new CTextBlock(NumberToOrder.ToRoman(index + 1) + ".");
+                        markerTxt = new CTextBlock(NumberToOrder.ToRoman(index + 1) + ".");
                         break;
                 }
 
@@ -902,13 +902,14 @@ namespace Markdown.Avalonia
                 var control = listItemTpl.Item1;
 
                 grid.RowDefinitions.Add(new RowDefinition());
-                grid.Children.Add(tbox);
+                grid.Children.Add(markerTxt);
                 grid.Children.Add(control);
 
-                tbox.TextAlignment = TextAlignment.Right;
-                tbox.Classes.Add(ListMarkerClass);
-                Grid.SetRow(tbox, index);
-                Grid.SetColumn(tbox, 0);
+                markerTxt.TextAlignment = TextAlignment.Right;
+                markerTxt.TextWrapping = TextWrapping.NoWrap;
+                markerTxt.Classes.Add(ListMarkerClass);
+                Grid.SetRow(markerTxt, index);
+                Grid.SetColumn(markerTxt, 0);
 
                 Grid.SetRow(control, index);
                 Grid.SetColumn(control, 1);
