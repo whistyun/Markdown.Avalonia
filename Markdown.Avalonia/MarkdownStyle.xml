@@ -154,6 +154,14 @@
         <Setter Property="Margin" Value="10, 5"/>
       </Style.Setters>
     </Style>
+
+    <Style Selector="ctxt|CHyperlink">
+      <Style.Setters>
+        <Setter Property="IsUnderline" Value="true"/>
+        <Setter Property="Foreground" Value="Blue"/>
+        <Setter Property="HoverForeground" Value="Red"/>
+      </Style.Setters>
+    </Style>
   </Styles>
 
   <Styles x:Key="DocumentStyleGithubLike">
@@ -305,6 +313,14 @@
     <Style Selector="ava|Border.EvenTableRow">
       <Style.Setters>
         <Setter Property="Background" Value="#F6F8FA"/>
+      </Style.Setters>
+    </Style>
+
+    <Style Selector="ctxt|CHyperlink">
+      <Style.Setters>
+        <Setter Property="IsUnderline" Value="true"/>
+        <Setter Property="Foreground" Value="Blue"/>
+        <Setter Property="HoverForeground" Value="Red"/>
       </Style.Setters>
     </Style>
   </Styles>

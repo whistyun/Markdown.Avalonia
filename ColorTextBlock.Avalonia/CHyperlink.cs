@@ -34,9 +34,6 @@ namespace ColorTextBlock.Avalonia
 
         public CHyperlink(IEnumerable<CInline> inlines) : base(inlines)
         {
-            IsUnderline = true;
-            Foreground = new SolidColorBrush(Colors.Blue);
-            HoverForeground = new SolidColorBrush(Colors.Red);
         }
 
 
