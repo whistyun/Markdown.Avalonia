@@ -424,11 +424,17 @@ namespace Markdown.Avalonia
             string url = match.Groups[4].Value;
             string title = match.Groups[7].Value;
 
-            var result = new CHyperlink(RunSpanGamut(linkText));
-            result.Command = HyperlinkCommand;
-            result.CommandParameter = url;
+            var link = new CHyperlink(RunSpanGamut(linkText));
+            link.Command = HyperlinkCommand;
+            link.CommandParameter = url;
 
-            return result;
+            if (!String.IsNullOrEmpty(title)
+                && !title.Any(ch => !Char.IsLetterOrDigit(ch)))
+            {
+                link.Classes.Add(title);
+            }
+
+            return link;
         }
 
         private CInline TreatsAsImage(Match match)
