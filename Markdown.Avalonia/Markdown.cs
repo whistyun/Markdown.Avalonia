@@ -980,11 +980,11 @@ namespace Markdown.Avalonia
             if (!String.IsNullOrEmpty(leadingLine) || Regex.IsMatch(item, @"\n{2,}"))
                 // we could correct any bad indentation here..
 
-                return Create<Panel, Control>(RunBlockGamut(item, false));
+                return Create<StackPanel, Control>(RunBlockGamut(item, false));
             else
             {
                 // recursion for sub-lists
-                return Create<Panel, Control>(RunBlockGamut(item, false));
+                return Create<StackPanel, Control>(RunBlockGamut(item, false));
             }
         }
 
