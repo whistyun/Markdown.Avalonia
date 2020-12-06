@@ -13,9 +13,38 @@ namespace Markdown.Avalonia.Controls
 {
     public class Rule : UserControl
     {
-        const double SingleLineWidth = 1;
-        const double BoldLineWidth = 2;
-        const double LineMargin = 1;
+        const double _SingleLineWidth = 1;
+        const double _BoldLineWidth = 2;
+        const double _LineMargin = 1;
+
+        public static readonly StyledProperty<double> SingleLineWidthProperty =
+            AvaloniaProperty.Register<Rule, double>(nameof(SingleLineWidth), defaultValue: _SingleLineWidth);
+
+        public static readonly StyledProperty<double> BoldLineWidthProperty =
+            AvaloniaProperty.Register<Rule, double>(nameof(SingleLineWidth), defaultValue: _BoldLineWidth);
+
+        public static readonly StyledProperty<double> LineMarginProperty =
+            AvaloniaProperty.Register<Rule, double>(nameof(LineMargin), defaultValue: _LineMargin);
+
+
+        public double SingleLineWidth
+        {
+            get { return GetValue(SingleLineWidthProperty); }
+            set { SetValue(SingleLineWidthProperty, value); }
+        }
+
+        public double BoldLineWidth
+        {
+            get { return GetValue(BoldLineWidthProperty); }
+            set { SetValue(BoldLineWidthProperty, value); }
+        }
+
+        public double LineMargin
+        {
+            get { return GetValue(LineMarginProperty); }
+            set { SetValue(LineMarginProperty, value); }
+        }
+
 
         public RuleType Type
         {
@@ -27,6 +56,8 @@ namespace Markdown.Avalonia.Controls
             this.Type = ruleType;
             this.HorizontalAlignment = HAlign.Stretch;
             this.VerticalAlignment = VAlign.Center;
+
+            this.Classes.Add(Enum.GetName(typeof(RuleType), ruleType));
         }
 
         protected override Size MeasureOverride(Size availableSize)
@@ -52,7 +83,7 @@ namespace Markdown.Avalonia.Controls
 
         public override void Render(DrawingContext context)
         {
-            var brush = new SolidColorBrush(Colors.Black);
+            var brush = Foreground;
             var single = new Pen(brush, SingleLineWidth);
             var bold = new Pen(brush, BoldLineWidth);
 
