@@ -11,20 +11,19 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Markdown.Avalonia
+namespace Markdown.Avalonia.Utils
 {
-    public class BitmapLoader
+    public class DefaultBitmapLoader : IBitmapLoader
     {
-        public string AssetPathRoot { set; get; }
+        public string AssetPathRoot { set; private get; }
         private IAssetLoader AssetLoader { get; }
         private string[] AssetAssemblyNames { get; }
 
         private ConcurrentDictionary<Uri, WeakReference<Bitmap>> Cache;
 
-        public BitmapLoader(string assetpathroot)
+        public DefaultBitmapLoader()
         {
-            this.AssetPathRoot = assetpathroot;
-            this.AssetLoader = AvaloniaLocator.Current.GetService<IAssetLoader>();
+            AssetLoader = AvaloniaLocator.Current.GetService<IAssetLoader>();
 
             var myasm = Assembly.GetCallingAssembly();
             var stack = new StackTrace();
