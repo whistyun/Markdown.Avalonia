@@ -8,6 +8,7 @@ using Avalonia.Platform;
 using Avalonia.Styling;
 using ColorTextBlock.Avalonia;
 using Markdown.Avalonia.Controls;
+using Markdown.Avalonia.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,6 +21,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace Markdown.Avalonia
 {
@@ -70,15 +72,28 @@ namespace Markdown.Avalonia
 
         //public bool DisabledLazyLoad { get; set; }
 
+        private string _assetPathRoot;
         public string AssetPathRoot
         {
-            get => Loader.AssetPathRoot;
-            set => Loader.AssetPathRoot = value;
+            get => _assetPathRoot;
+            set => BitmapLoader.AssetPathRoot = _assetPathRoot = value;
         }
 
-        public Action<string> HyperlinkCommand { get; set; }
+        public ICommand HyperlinkCommand { get; set; }
 
-        private BitmapLoader Loader { get; }
+        private IBitmapLoader _loader;
+        public IBitmapLoader BitmapLoader
+        {
+            get => _loader;
+            set
+            {
+                _loader = value;
+                if (_loader != null)
+                {
+                    _loader.AssetPathRoot = _assetPathRoot;
+                }
+            }
+        }
 
         private Bitmap ImageNotFound { get; }
 
@@ -87,6 +102,16 @@ namespace Markdown.Avalonia
         // Using a DependencyProperty as the backing store for DocumentStyle.  This enables animation, styling, binding, etc...
         public static readonly AvaloniaProperty DocumentStyleProperty =
             AvaloniaProperty.Register<Markdown, Style>(nameof(DocumentStyle), defaultValue: null);
+
+        public static readonly DirectProperty<Markdown, ICommand> HyperlinkCommandProperty =
+            AvaloniaProperty.RegisterDirect<Markdown, ICommand>(nameof(HyperlinkCommand),
+                mdEng => mdEng.HyperlinkCommand,
+                (mdEng, command) => mdEng.HyperlinkCommand = command);
+
+        public static readonly DirectProperty<Markdown, IBitmapLoader> BitmapLoaderProperty =
+            AvaloniaProperty.RegisterDirect<Markdown, IBitmapLoader>(nameof(BitmapLoader),
+                mdEng => mdEng.BitmapLoader,
+                (mdEng, loader) => mdEng.BitmapLoader = loader);
 
         /// <summary>
         /// top-level flow document style
@@ -132,24 +157,10 @@ namespace Markdown.Avalonia
 
         public Markdown()
         {
-            HyperlinkCommand = (url) =>
-            {
-                // https://github.com/dotnet/runtime/issues/17938
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    Process.Start(new ProcessStartInfo(url)
-                    {
-                        UseShellExecute = true,
-                        Verb = "open"
-                    });
+            _assetPathRoot = Environment.CurrentDirectory;
 
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                    Process.Start("xdg-open", url);
-
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                    Process.Start("open", url);
-            };
-
-            Loader = new BitmapLoader(Environment.CurrentDirectory);
+            HyperlinkCommand = new DefaultHyperlinkCommand();
+            BitmapLoader = new DefaultBitmapLoader();
 
             var assetLoader = AvaloniaLocator.Current.GetService<IAssetLoader>();
             using (var strm = assetLoader.Open(new Uri($"avares://Markdown.Avalonia/Assets/ImageNotFound.bmp")))
@@ -425,7 +436,14 @@ namespace Markdown.Avalonia
             string title = match.Groups[7].Value;
 
             var link = new CHyperlink(RunSpanGamut(linkText));
-            link.Command = HyperlinkCommand;
+            link.Command = (urlTxt) =>
+            {
+                if (HyperlinkCommand != null && HyperlinkCommand.CanExecute(urlTxt))
+                {
+                    HyperlinkCommand.Execute(urlTxt);
+                }
+            };
+
             link.CommandParameter = url;
 
             if (!String.IsNullOrEmpty(title)
@@ -444,7 +462,7 @@ namespace Markdown.Avalonia
             string title = match.Groups[7].Value;
 
             var image = new CImage(
-                Loader.GetAsync(urlTxt),
+                Task.Run(() => BitmapLoader?.Get(urlTxt)),
                 ImageNotFound);
 
             if (!String.IsNullOrEmpty(title)

@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown.Avalonia", "Markdo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ColorTextBlock.Avalonia", "ColorTextBlock.Avalonia\ColorTextBlock.Avalonia.csproj", "{E4F9286F-A812-476E-A37D-EE2B8ED5D958}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Markdown.AvaloniaDemo", "Markdown.AvaloniaDemo\Markdown.AvaloniaDemo.csproj", "{51318A0F-CB37-4DA2-8AE1-BB985B0A4028}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown.AvaloniaDemo", "Markdown.AvaloniaDemo\Markdown.AvaloniaDemo.csproj", "{51318A0F-CB37-4DA2-8AE1-BB985B0A4028}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
