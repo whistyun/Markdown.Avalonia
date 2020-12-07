@@ -88,7 +88,10 @@ namespace Markdown.Avalonia
             set
             {
                 _loader = value;
-                _loader.AssetPathRoot = _assetPathRoot;
+                if (_loader != null)
+                {
+                    _loader.AssetPathRoot = _assetPathRoot;
+                }
             }
         }
 
@@ -459,7 +462,7 @@ namespace Markdown.Avalonia
             string title = match.Groups[7].Value;
 
             var image = new CImage(
-                Task.Run(() => BitmapLoader.Get(urlTxt)),
+                Task.Run(() => BitmapLoader?.Get(urlTxt)),
                 ImageNotFound);
 
             if (!String.IsNullOrEmpty(title)
