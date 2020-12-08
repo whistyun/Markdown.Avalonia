@@ -799,7 +799,7 @@ namespace Markdown.Avalonia
 
         private static readonly string _wholeList = string.Format(@"
             (                               # $1 = whole list
-              (                             # $2
+              (                             # $2 = list marker with indent
                 [ ]{{0,{1}}}
                 ({0})                       # $3 = first list item marker
                 [ ]+
@@ -849,16 +849,15 @@ namespace Markdown.Avalonia
             }
 
             string list = match.Groups[1].Value;
-            string listType = Regex.IsMatch(match.Groups[3].Value, _markerUL) ? "ul" : "ol";
 
             // Set text marker style.
-            TextMarkerStyle textMarker = GetTextMarkerStyle(listType, match);
+            (TextMarkerStyle textMarker, string markerPattern) = GetTextMarkerStyle(match.Groups[3].Value);
 
             // Turn double returns into triple returns, so that we can make a
             // paragraph for the last item in a list, if necessary:
             list = Regex.Replace(list, @"\n{2,}", "\n\n\n");
 
-            IEnumerable<Control> listItems = ProcessListItems(list, listType == "ul" ? _markerUL : _markerOL);
+            IEnumerable<Control> listItems = ProcessListItems(list, markerPattern);
 
 
             var grid = new Grid();
@@ -868,54 +867,7 @@ namespace Markdown.Avalonia
             foreach (Tuple<Control, int> listItemTpl in listItems.Select((elm, idx) => Tuple.Create(elm, idx)))
             {
                 var index = listItemTpl.Item2;
-                CTextBlock markerTxt;
-
-                switch (textMarker)
-                {
-                    default:
-                        goto case TextMarkerStyle.Disc;
-
-                    case TextMarkerStyle.None:
-                        markerTxt = new CTextBlock("");
-                        break;
-
-                    case TextMarkerStyle.Disc:
-                        markerTxt = new CTextBlock("•");
-                        break;
-
-                    case TextMarkerStyle.Box:
-                        markerTxt = new CTextBlock("▪");
-                        break;
-
-                    case TextMarkerStyle.Circle:
-                        markerTxt = new CTextBlock("○");
-                        break;
-
-                    case TextMarkerStyle.Square:
-                        markerTxt = new CTextBlock("❏");
-                        break;
-
-                    case TextMarkerStyle.Decimal:
-                        markerTxt = new CTextBlock((index + 1).ToString() + ".");
-                        break;
-
-                    case TextMarkerStyle.LowerLatin:
-                        markerTxt = new CTextBlock(NumberToOrder.ToLatin(index + 1).ToLower() + ".");
-                        break;
-
-                    case TextMarkerStyle.UpperLatin:
-                        markerTxt = new CTextBlock(NumberToOrder.ToLatin(index + 1) + ".");
-                        break;
-
-                    case TextMarkerStyle.LowerRoman:
-                        markerTxt = new CTextBlock(NumberToOrder.ToRoman(index + 1).ToLower() + ".");
-                        break;
-
-                    case TextMarkerStyle.UpperRoman:
-                        markerTxt = new CTextBlock(NumberToOrder.ToRoman(index + 1) + ".");
-                        break;
-                }
-
+                CTextBlock markerTxt = new CTextBlock(textMarker.CreateMakerText(index));
 
                 var control = listItemTpl.Item1;
 
@@ -1017,52 +969,50 @@ namespace Markdown.Avalonia
         /// Get the text marker style based on a specific regex.
         /// </summary>
         /// <param name="listType">Specify what kind of list: ul, ol.</param>
-        private static TextMarkerStyle GetTextMarkerStyle(string listType, Match match)
+        /// <returns>
+        ///     1; return Type. 
+        ///     2: match regex pattern
+        /// </returns>
+        private static (TextMarkerStyle, string) GetTextMarkerStyle(string markerText)
         {
-            switch (listType)
+            if (Regex.IsMatch(markerText, _markerUL_Disc))
             {
-                case "ul":
-                    if (Regex.IsMatch(match.Groups[3].Value, _markerUL_Disc))
-                    {
-                        return TextMarkerStyle.Disc;
-                    }
-                    else if (Regex.IsMatch(match.Groups[3].Value, _markerUL_Box))
-                    {
-                        return TextMarkerStyle.Box;
-                    }
-                    else if (Regex.IsMatch(match.Groups[3].Value, _markerUL_Circle))
-                    {
-                        return TextMarkerStyle.Circle;
-                    }
-                    else if (Regex.IsMatch(match.Groups[3].Value, _markerUL_Square))
-                    {
-                        return TextMarkerStyle.Square;
-                    }
-                    break;
-                case "ol":
-                    if (Regex.IsMatch(match.Groups[3].Value, _markerOL_Number))
-                    {
-                        return TextMarkerStyle.Decimal;
-                    }
-                    else if (Regex.IsMatch(match.Groups[3].Value, _markerOL_LetterLower))
-                    {
-                        return TextMarkerStyle.LowerLatin;
-                    }
-                    else if (Regex.IsMatch(match.Groups[3].Value, _markerOL_LetterUpper))
-                    {
-                        return TextMarkerStyle.UpperLatin;
-                    }
-                    else if (Regex.IsMatch(match.Groups[3].Value, _markerOL_RomanLower))
-                    {
-                        return TextMarkerStyle.LowerRoman;
-                    }
-                    else if (Regex.IsMatch(match.Groups[3].Value, _markerOL_RomanUpper))
-                    {
-                        return TextMarkerStyle.UpperRoman;
-                    }
-                    break;
+                return (TextMarkerStyle.Disc, _markerUL_Disc);
             }
-            return TextMarkerStyle.None;
+            else if (Regex.IsMatch(markerText, _markerUL_Box))
+            {
+                return (TextMarkerStyle.Box, _markerUL_Box);
+            }
+            else if (Regex.IsMatch(markerText, _markerUL_Circle))
+            {
+                return (TextMarkerStyle.Circle, _markerUL_Circle);
+            }
+            else if (Regex.IsMatch(markerText, _markerUL_Square))
+            {
+                return (TextMarkerStyle.Square, _markerUL_Square);
+            }
+            else if (Regex.IsMatch(markerText, _markerOL_Number))
+            {
+                return (TextMarkerStyle.Decimal, _markerOL_Number);
+            }
+            else if (Regex.IsMatch(markerText, _markerOL_LetterLower))
+            {
+                return (TextMarkerStyle.LowerLatin, _markerOL_LetterLower);
+            }
+            else if (Regex.IsMatch(markerText, _markerOL_LetterUpper))
+            {
+                return (TextMarkerStyle.UpperLatin, _markerOL_LetterUpper);
+            }
+            else if (Regex.IsMatch(markerText, _markerOL_RomanLower))
+            {
+                return (TextMarkerStyle.LowerRoman, _markerOL_LetterUpper);
+            }
+            else if (Regex.IsMatch(markerText, _markerOL_RomanUpper))
+            {
+                return (TextMarkerStyle.UpperRoman, _markerOL_RomanUpper);
+            }
+
+            throw new InvalidOperationException("sorry library manager forget to modify about listmerker.");
         }
 
         #endregion
@@ -1911,6 +1861,40 @@ namespace Markdown.Avalonia
             }
 
             return result;
+        }
+        private IEnumerable<T> Evaluate<T>(string text, Regex expression, Func<Match, IEnumerable<T>> build, Func<string, IEnumerable<T>> rest)
+        {
+            if (text is null)
+            {
+                throw new ArgumentNullException(nameof(text));
+            }
+
+            var matches = expression.Matches(text);
+            var index = 0;
+            foreach (Match m in matches)
+            {
+                if (m.Index > index)
+                {
+                    var prefix = text.Substring(index, m.Index - index);
+                    foreach (var t in rest(prefix))
+                    {
+                        yield return t;
+                    }
+                }
+
+                foreach (var part in build(m)) yield return part;
+
+                index = m.Index + m.Length;
+            }
+
+            if (index < text.Length)
+            {
+                var suffix = text.Substring(index, text.Length - index);
+                foreach (var t in rest(suffix))
+                {
+                    yield return t;
+                }
+            }
         }
 
         private IEnumerable<T> Evaluate<T>(string text, Regex expression, Func<Match, T> build, Func<string, IEnumerable<T>> rest)
