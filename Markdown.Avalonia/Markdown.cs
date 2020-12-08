@@ -878,11 +878,11 @@ namespace Markdown.Avalonia
                             var targetMarkerMch = Regex.Match(stripedLine, markerPattern);
                             if (targetMarkerMch.Success && targetMarkerMch.Index == 0)
                             {
-                                listBulder.Append(line).Append("\n");
+                                listBulder.Append(stripedLine).Append("\n");
                             }
                             else isInOuterList = true;
                         }
-                        else listBulder.Append(line).Append("\n");
+                        else listBulder.Append(stripedLine).Append("\n");
                     }
                     else isInOuterList = true;
                 }
@@ -931,8 +931,12 @@ namespace Markdown.Avalonia
 
             yield return grid;
 
-            foreach (var ctrl in RunBlockGamut(outerListBuildre.ToString(), true))
-                yield return ctrl;
+
+            if (outerListBuildre.Length != 0)
+            {
+                foreach (var ctrl in RunBlockGamut(outerListBuildre.ToString(), true))
+                    yield return ctrl;
+            }
         }
 
         /// <summary>
