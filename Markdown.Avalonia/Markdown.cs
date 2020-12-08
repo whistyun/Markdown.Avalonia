@@ -841,17 +841,59 @@ namespace Markdown.Avalonia
                 return Evaluate(text, _listTopLevel, ListEvaluator, defaultHandler);
         }
 
-        private Control ListEvaluator(Match match)
+        private IEnumerable<Control> ListEvaluator(Match match)
         {
             if (match is null)
             {
                 throw new ArgumentNullException(nameof(match));
             }
 
-            string list = match.Groups[1].Value;
-
-            // Set text marker style.
+            // Check text marker style.
             (TextMarkerStyle textMarker, string markerPattern) = GetTextMarkerStyle(match.Groups[3].Value);
+
+            // count indent from first marker with indent
+            int countIndent = IndentUtil.CountIndent(match.Groups[2].Value);
+
+            // whole list
+            string[] whileListLins = match.Groups[1].Value.Split('\n');
+
+            // cllect detendentable line
+            var listBulder = new StringBuilder();
+            var outerListBuildre = new StringBuilder();
+            var isInOuterList = false;
+            foreach (var line in whileListLins)
+            {
+                if (!isInOuterList)
+                {
+                    if (String.IsNullOrEmpty(line))
+                    {
+                        listBulder.Append("").Append("\n");
+                    }
+                    else if (IndentUtil.TryDetendLine(line, countIndent, out var stripedLine))
+                    {
+                        // is it had list marker?
+                        var someMarkerMch = Regex.Match(stripedLine, $"{_markerUL}|{_markerOL}");
+                        if (someMarkerMch.Success && someMarkerMch.Index == 0)
+                        {
+                            var targetMarkerMch = Regex.Match(stripedLine, markerPattern);
+                            if (targetMarkerMch.Success && targetMarkerMch.Index == 0)
+                            {
+                                listBulder.Append(line).Append("\n");
+                            }
+                            else isInOuterList = true;
+                        }
+                        else listBulder.Append(line).Append("\n");
+                    }
+                    else isInOuterList = true;
+                }
+
+                if (isInOuterList)
+                {
+                    outerListBuildre.Append(line).Append("\n");
+                }
+            }
+
+            string list = listBulder.ToString();
 
             // Turn double returns into triple returns, so that we can make a
             // paragraph for the last item in a list, if necessary:
@@ -887,7 +929,10 @@ namespace Markdown.Avalonia
 
             grid.Classes.Add(ListClass);
 
-            return grid;
+            yield return grid;
+
+            foreach (var ctrl in RunBlockGamut(outerListBuildre.ToString(), true))
+                yield return ctrl;
         }
 
         /// <summary>
@@ -1005,7 +1050,7 @@ namespace Markdown.Avalonia
             }
             else if (Regex.IsMatch(markerText, _markerOL_RomanLower))
             {
-                return (TextMarkerStyle.LowerRoman, _markerOL_LetterUpper);
+                return (TextMarkerStyle.LowerRoman, _markerOL_RomanLower);
             }
             else if (Regex.IsMatch(markerText, _markerOL_RomanUpper))
             {
