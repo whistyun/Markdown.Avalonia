@@ -85,29 +85,12 @@ namespace Markdown.Avalonia
                     // the amount of whitespace to strip from each line 
                     var lines = Regex.Split(value, "\r\n|\r|\n", RegexOptions.Multiline);
 
-                    int CountIndent(string line)
-                    {
-                        var count = 0;
-                        foreach (var c in line)
-                        {
-                            if (c == ' ') count += 1;
-                            else if (c == '\t')
-                            {
-                                // In default in vs, tab is treated as four-spaces.
-                                count = ((count >> 2) + 1) << 2;
-                            }
-                            else break;
-                        }
-                        return count;
-                    }
-
-
                     // count last line indent
-                    int lastIdtCnt = CountIndent(lines.Last());
+                    int lastIdtCnt = IndentUtil.CountIndent(lines.Last());
                     // count full indent
                     int someIdtCnt = lines
                         .Where(line => !String.IsNullOrWhiteSpace(line))
-                        .Select(line => CountIndent(line))
+                        .Select(line => IndentUtil.CountIndent(line))
                         .Min();
 
                     var indentCount = Math.Max(lastIdtCnt, someIdtCnt);
