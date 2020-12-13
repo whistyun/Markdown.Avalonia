@@ -65,7 +65,7 @@ namespace ColorTextBlock.Avalonia
                     PseudoClasses.Add(":hover");
 
                     TextGeometry tmetry =
-                            (metry is DecolatedGeometry d) ?
+                            (metry is DecoratorGeometry d) ?
                             d.Target as TextGeometry :
                             metry as TextGeometry;
 
@@ -84,7 +84,7 @@ namespace ColorTextBlock.Avalonia
                     PseudoClasses.Remove(":hover");
 
                     TextGeometry tmetry =
-                         (metry is DecolatedGeometry d) ?
+                         (metry is DecoratorGeometry d) ?
                             d.Target as TextGeometry :
                             metry as TextGeometry;
 

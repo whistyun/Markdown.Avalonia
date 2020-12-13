@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ColorTextBlock.Avalonia.Geometries
 {
-    class DecolatedGeometry : CGeometry
+    class DecoratorGeometry : CGeometry
     {
         public CSpan Owner { get; }
         public CGeometry Target { get; }
@@ -65,7 +65,7 @@ namespace ColorTextBlock.Avalonia.Geometries
             set => _OnClick = value;
         }
 
-        public DecolatedGeometry(
+        public DecoratorGeometry(
             CSpan owner,
             CGeometry target,
             Border decorate)
