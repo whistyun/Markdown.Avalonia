@@ -23,7 +23,6 @@ namespace ColorTextBlock.Avalonia.Geometries
             set
             {
                 _TemporaryForeground = value;
-                RequestRepaint();
             }
         }
 
@@ -34,7 +33,6 @@ namespace ColorTextBlock.Avalonia.Geometries
             set
             {
                 _TemporaryBackground = value;
-                RequestRepaint();
             }
         }
 

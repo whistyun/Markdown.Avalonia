@@ -16,7 +16,7 @@ namespace Markdown.AvaloniaDemo
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
-                .LogToTrace()
+                //.LogToTrace()
                 .UseReactiveUI();
     }
 }

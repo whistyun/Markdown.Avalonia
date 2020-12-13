@@ -1,8 +1,10 @@
 ﻿using Avalonia;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Styling;
 using ColorTextBlock.Avalonia.Geometries;
 using System.Collections.Generic;
+using System.Reactive.Linq;
 
 namespace ColorTextBlock.Avalonia
 {
@@ -32,6 +34,26 @@ namespace ColorTextBlock.Avalonia
         public static readonly StyledProperty<bool> IsStrikethroughProperty =
             AvaloniaProperty.Register<CInline, bool>(nameof(IsStrikethrough));
 
+        static CInline()
+        {
+            Observable.Merge<AvaloniaPropertyChangedEventArgs>(
+                BackgroundProperty.Changed,
+                ForegroundProperty.Changed,
+                FontFamilyProperty.Changed,
+                FontSizeProperty.Changed,
+                FontStyleProperty.Changed,
+                FontWeightProperty.Changed,
+                IsUnderlineProperty.Changed,
+                IsStrikethroughProperty.Changed
+            ).AddClassHandler<CInline>((x, _) => x.RequestRender());
+
+            Observable.Merge<AvaloniaPropertyChangedEventArgs>(
+                FontFamilyProperty.Changed,
+                FontSizeProperty.Changed,
+                FontStyleProperty.Changed,
+                FontWeightProperty.Changed
+            ).AddClassHandler<CInline>((x, _) => x.RequestMeasure());
+        }
 
         public IBrush Background
         {
@@ -81,6 +103,29 @@ namespace ColorTextBlock.Avalonia
             set { SetValue(IsStrikethroughProperty, value); }
         }
 
+        protected void RequestMeasure()
+        {
+            if (Parent is CInline cline)
+            {
+                cline.RequestMeasure();
+            }
+            if (Parent is Layoutable layout)
+            {
+                layout.InvalidateMeasure();
+            }
+        }
+
+        protected void RequestRender()
+        {
+            if (Parent is CInline cline)
+            {
+                cline.RequestRender();
+            }
+            if (Parent is Layoutable layout)
+            {
+                layout.InvalidateVisual();
+            }
+        }
 
         protected internal abstract IEnumerable<CGeometry> Measure(
             FontFamily parentFontFamily,
