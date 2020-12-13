@@ -32,10 +32,13 @@ namespace ColorTextBlock.Avalonia
         {
             Observable.Merge<AvaloniaPropertyChangedEventArgs>(
                 BorderThicknessProperty.Changed,
-                BorderBrushProperty.Changed,
                 CornerRadiusProperty.Changed,
                 PaddingProperty.Changed
-            ).AddClassHandler<CSpan>((x, _) => x.OnBorderPropertyChanged());
+            ).AddClassHandler<CSpan>((x, _) => x.OnBorderPropertyChanged(true));
+
+            Observable.Merge<AvaloniaPropertyChangedEventArgs>(
+                BorderBrushProperty.Changed
+            ).AddClassHandler<CSpan>((x, _) => x.OnBorderPropertyChanged(false));
 
             ContentProperty.Changed.AddClassHandler<CSpan>(
                 (x, e) =>
@@ -48,7 +51,7 @@ namespace ColorTextBlock.Avalonia
                     if (e.NewValue is IEnumerable<CInline> newlines)
                     {
                         foreach (var child in newlines)
-                            x.LogicalChildren.Remove(child);
+                            x.LogicalChildren.Add(child);
                     }
                 });
         }
@@ -88,7 +91,7 @@ namespace ColorTextBlock.Avalonia
             Content = inlines.ToArray();
         }
 
-        private void OnBorderPropertyChanged()
+        private void OnBorderPropertyChanged(bool requestMeasure)
         {
             bool borderEnabled =
                 BorderThickness != default(Thickness) ||
@@ -99,7 +102,12 @@ namespace ColorTextBlock.Avalonia
 
             if (borderEnabled)
             {
-                _border = _border ?? new Border();
+                if (_border is null)
+                {
+                    _border = new Border();
+                    LogicalChildren.Add(_border);
+                }
+
                 _border.BorderThickness = BorderThickness;
                 _border.BorderBrush = BorderBrush;
                 _border.CornerRadius = CornerRadius;
@@ -107,25 +115,26 @@ namespace ColorTextBlock.Avalonia
             }
             else
             {
+                LogicalChildren.Remove(_border);
                 _border = null;
             }
+
+            if (requestMeasure) RequestMeasure();
+            else RequestRender();
         }
 
         protected internal override IEnumerable<CGeometry> Measure(
-            FontFamily parentFontFamily,
-            double parentFontSize,
-            FontStyle parentFontStyle,
-            FontWeight parentFontWeight,
-            IBrush parentForeground,
-            IBrush parentBackground,
-            bool parentUnderline,
-            bool parentStrikethough,
             double entireWidth,
             double remainWidth)
         {
-            if (_border != null)
+            bool applyDeco = _border != null;
+
+            if (applyDeco)
             {
                 _border.Measure(Size.Infinity);
+
+                entireWidth -= _border.DesiredSize.Width;
+                remainWidth -= _border.DesiredSize.Width;
             }
 
 
@@ -133,17 +142,26 @@ namespace ColorTextBlock.Avalonia
 
             foreach (CInline inline in Content)
             {
-                metries.AddRange(inline.Measure(
-                        FontFamily ?? parentFontFamily,
-                        FontSize.HasValue ? FontSize.Value : parentFontSize,
-                        FontStyle.HasValue ? FontStyle.Value : parentFontStyle,
-                        FontWeight.HasValue ? FontWeight.Value : parentFontWeight,
-                        Foreground ?? parentForeground,
-                        Background ?? parentBackground,
-                        IsUnderline || parentUnderline,
-                        IsStrikethrough || parentStrikethough,
-                        entireWidth,
-                        remainWidth));
+                if (applyDeco)
+                {
+                    metries.AddRange(
+                        inline.Measure(entireWidth, remainWidth)
+                              .Select(metry =>
+                              {
+                                  if (metry is DecolatedGeometry)
+                                      return metry;
+                                  if (metry is TextGeometry tmetry && String.IsNullOrWhiteSpace(tmetry.Text))
+                                      return metry;
+                                  return new DecolatedGeometry(this, metry, _border);
+                              })
+                    );
+                }
+                else
+                {
+                    metries.AddRange(
+                        inline.Measure(entireWidth, remainWidth)
+                    );
+                }
 
                 CGeometry last = metries[metries.Count - 1];
 

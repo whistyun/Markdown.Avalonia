@@ -165,6 +165,7 @@ namespace ColorTextBlock.Avalonia
 
         bool isPressed;
         CGeometry entered;
+        CGeometry pressed;
 
         protected override void OnPointerLeave(PointerEventArgs e)
         {
@@ -223,6 +224,27 @@ namespace ColorTextBlock.Avalonia
             {
                 isPressed = true;
                 e.Handled = true;
+
+                Point point = e.GetPosition(this);
+
+                bool isEntered(CGeometry metry)
+                {
+                    var relX = point.X - metry.Left;
+                    var relY = point.Y - metry.Top;
+
+                    return 0 <= relX && relX <= metry.Width
+                        && 0 <= relY && relY <= metry.Height;
+                }
+
+                foreach (CGeometry metry in metries)
+                {
+                    if (isEntered(metry))
+                    {
+                        metry.OnMousePressed?.Invoke();
+                        pressed = metry;
+                        break;
+                    }
+                }
             }
         }
 
@@ -234,6 +256,13 @@ namespace ColorTextBlock.Avalonia
             {
                 isPressed = false;
                 e.Handled = true;
+
+                if (pressed != null)
+                {
+                    pressed.OnMouseReleased?.Invoke();
+                    pressed = null;
+                }
+
 
                 Point point = e.GetPosition(this);
 
@@ -338,8 +367,6 @@ namespace ColorTextBlock.Avalonia
                 {
                     IEnumerable<CGeometry> inlineGeometry =
                         inline.Measure(
-                            FontFamily, FontSize, FontStyle, FontWeight,
-                            Foreground, null, false, false,
                             (TextWrapping == TextWrapping.NoWrap) ? Double.PositiveInfinity : entireWidth,
                             (TextWrapping == TextWrapping.NoWrap) ? Double.PositiveInfinity : remainWidth);
 
