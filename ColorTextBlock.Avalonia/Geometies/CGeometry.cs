@@ -19,9 +19,11 @@ namespace ColorTextBlock.Avalonia.Geometries
 
         public event Action RepaintRequested;
 
-        public Action OnMouseEnter { get; set; }
-        public Action OnMouseLeave { get; set; }
-        public Action OnClick { get; set; }
+        public virtual Action OnMouseEnter { get; set; }
+        public virtual Action OnMouseLeave { get; set; }
+        public virtual Action OnMousePressed { get; set; }
+        public virtual Action OnMouseReleased { get; set; }
+        public virtual Action OnClick { get; set; }
 
         public CGeometry(double width, double height, bool linebreak)
         {

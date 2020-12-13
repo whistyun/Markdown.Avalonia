@@ -12,7 +12,7 @@ using System.Text;
 
 namespace ColorTextBlock.Avalonia.Geometries
 {
-    public class TextGeometry : CGeometry
+    class TextGeometry : CGeometry
     {
         public string Text { get; }
 
@@ -36,26 +36,36 @@ namespace ColorTextBlock.Avalonia.Geometries
             }
         }
 
-        public IBrush Foreground { get; set; }
-        public IBrush Background { get; set; }
-        public bool IsUnderline { get; set; }
-        public bool IsStrikethrough { get; set; }
+        private CInline Owner;
+
+        public IBrush Foreground
+        {
+            get => Owner?.Foreground;
+        }
+        public IBrush Background
+        {
+            get => Owner?.Background;
+        }
+        public bool IsUnderline
+        {
+            get => Owner is null ? false : Owner.IsUnderline;
+        }
+        public bool IsStrikethrough
+        {
+            get => Owner is null ? false : Owner.IsStrikethrough;
+        }
 
         private FormattedText Format;
 
         public TextGeometry(
             double width, double height, bool linebreak,
-            IBrush foreground, IBrush background,
-            bool isUnderline, bool isStrikethrough,
+            CInline owner,
             string text, FormattedText format) : base(width, height, linebreak)
         {
             this.Text = text;
             this.Format = format;
 
-            this.Foreground = foreground;
-            this.Background = background;
-            this.IsUnderline = isUnderline;
-            this.IsStrikethrough = isStrikethrough;
+            this.Owner = owner;
         }
 
 
@@ -63,8 +73,7 @@ namespace ColorTextBlock.Avalonia.Geometries
         {
             return new TextGeometry(
                 0, format.Bounds.Height, true,
-                null, null,
-                false, false,
+                null,
                 "", format);
         }
 

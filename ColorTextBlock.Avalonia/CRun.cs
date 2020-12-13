@@ -23,25 +23,17 @@ namespace ColorTextBlock.Avalonia
         }
 
         protected internal override IEnumerable<CGeometry> Measure(
-            FontFamily parentFontFamily,
-            double parentFontSize,
-            FontStyle parentFontStyle,
-            FontWeight parentFontWeight,
-            IBrush parentForeground,
-            IBrush parentBackground,
-            bool parentUnderline,
-            bool parentStrikethough,
             double entireWidth,
             double remainWidth)
         {
-            var family = FontFamily ?? parentFontFamily;
-            var size = FontSize.HasValue ? FontSize.Value : parentFontSize;
-            var style = FontStyle.HasValue ? FontStyle.Value : parentFontStyle;
-            var weight = FontWeight.HasValue ? FontWeight.Value : parentFontWeight;
-            var foreground = Foreground ?? parentForeground;
-            var background = Background ?? parentBackground;
-            var underline = IsUnderline || parentUnderline;
-            var strikethrough = IsStrikethrough || parentStrikethough;
+            var family = FontFamily;
+            var size = FontSize;
+            var style = FontStyle;
+            var weight = FontWeight;
+            var foreground = Foreground;
+            var background = Background;
+            var underline = IsUnderline;
+            var strikethrough = IsStrikethrough;
 
 
             var infos = new List<TextGeometry>();
@@ -54,8 +46,7 @@ namespace ColorTextBlock.Avalonia
 
                 infos.Add(new TextGeometry(
                     0, fmt.Bounds.Height, false,
-                    foreground, background,
-                    underline, strikethrough,
+                    this,
                     "", fmt));
 
                 return infos;
@@ -126,8 +117,7 @@ namespace ColorTextBlock.Avalonia
 
                             infos.Add(new TextGeometry(
                                             fmt.Bounds.Width, fmt.Bounds.Height, lineBreak,
-                                            foreground, background,
-                                            underline, strikethrough,
+                                            this,
                                             lineTxt, fmt));
                             remainWidth -= fmt.Bounds.Width;
 
@@ -140,8 +130,7 @@ namespace ColorTextBlock.Avalonia
 
                         infos.Add(new TextGeometry(
                                         fmt.Bounds.Width, fmt.Bounds.Height, true,
-                                        foreground, background,
-                                        underline, strikethrough,
+                                        this,
                                         firstLineTxt, fmt));
                         remainWidth = entireWidth;
 
@@ -165,8 +154,7 @@ namespace ColorTextBlock.Avalonia
 
                     infos.Add(new TextGeometry(
                                         txtWid, line.Height, lineBreak || idx < ftlines.Length - 1,
-                                        foreground, background,
-                                        underline, strikethrough,
+                                        this,
                                         chip, fmt));
 
                     lineOffset += line.Length;
@@ -187,15 +175,15 @@ namespace ColorTextBlock.Avalonia
             TextWrapping parentWrapping)
         {
             var typeface = new Typeface(
-                    FontFamily ?? parentFontFamily,
-                    FontStyle.HasValue ? FontStyle.Value : parentFontStyle,
-                    FontWeight.HasValue ? FontWeight.Value : parentFontWeight);
+                    parentFontFamily,
+                    parentFontStyle,
+                    parentFontWeight);
 
             return new FormattedText
             {
                 Constraint = constraint,
                 Typeface = typeface,
-                FontSize = FontSize.HasValue ? FontSize.Value : parentFontSize,
+                FontSize = parentFontSize,
                 Text = Text ?? string.Empty,
                 TextAlignment = TextAlignment.Left,
                 TextWrapping = parentWrapping,

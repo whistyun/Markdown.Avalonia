@@ -48,9 +48,6 @@ namespace ColorTextBlock.Avalonia
         }
 
         protected internal override IEnumerable<CGeometry> Measure(
-            FontFamily parentFontFamily, double parentFontSize, FontStyle parentFontStyle, FontWeight parentFontWeight,
-            IBrush parentForeground, IBrush parentBackground,
-            bool parentUnderline, bool parentStrikethough,
             double entireWidth, double remainWidth)
         {
             if (Image is null)

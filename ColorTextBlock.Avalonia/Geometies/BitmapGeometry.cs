@@ -10,7 +10,7 @@ using System.Text;
 
 namespace ColorTextBlock.Avalonia.Geometries
 {
-    public class BitmapGeometry : CGeometry
+    class BitmapGeometry : CGeometry
     {
         public new double Width { get; }
         public new double Height { get; }
