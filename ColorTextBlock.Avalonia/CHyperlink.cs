@@ -38,26 +38,10 @@ namespace ColorTextBlock.Avalonia
 
 
         protected internal override IEnumerable<CGeometry> Measure(
-            FontFamily parentFontFamily,
-            double parentFontSize,
-            FontStyle parentFontStyle,
-            FontWeight parentFontWeight,
-            IBrush parentForeground,
-            IBrush parentBackground,
-            bool parentUnderline,
-            bool parentStrikethough,
             double entireWidth,
             double remainWidth)
         {
             var metrics = base.Measure(
-                parentFontFamily,
-                parentFontSize,
-                parentFontStyle,
-                parentFontWeight,
-                parentForeground,
-                parentBackground,
-                parentUnderline,
-                parentStrikethough,
                 entireWidth,
                 remainWidth);
 
@@ -65,21 +49,52 @@ namespace ColorTextBlock.Avalonia
             {
                 metry.OnClick = () => Command?.Invoke(CommandParameter);
 
-                if (metry is TextGeometry tmetry)
+                metry.OnMousePressed = () =>
                 {
-                    tmetry.OnMouseEnter = () =>
+                    PseudoClasses.Add(":pressed");
+                };
+
+                metry.OnMouseReleased = () =>
+                {
+                    PseudoClasses.Remove(":pressed");
+                };
+
+                metry.OnMouseEnter = () =>
+                {
+                    PseudoClasses.Add(":pointerover");
+                    PseudoClasses.Add(":hover");
+
+                    TextGeometry tmetry =
+                            (metry is DecolatedGeometry d) ?
+                            d.Target as TextGeometry :
+                            metry as TextGeometry;
+
+                    if (tmetry != null)
                     {
                         tmetry.TemporaryForeground = HoverForeground;
                         tmetry.TemporaryBackground = HoverBackground;
-                    };
+                        RequestRender();
+                    }
 
-                    tmetry.OnMouseLeave = () =>
+                };
+
+                metry.OnMouseLeave = () =>
+                {
+                    PseudoClasses.Remove(":pointerover");
+                    PseudoClasses.Remove(":hover");
+
+                    TextGeometry tmetry =
+                         (metry is DecolatedGeometry d) ?
+                            d.Target as TextGeometry :
+                            metry as TextGeometry;
+
+                    if (tmetry != null)
                     {
                         tmetry.TemporaryForeground = null;
                         tmetry.TemporaryBackground = null;
-                    };
-                }
-
+                        RequestRender();
+                    }
+                };
 
                 yield return metry;
             }
