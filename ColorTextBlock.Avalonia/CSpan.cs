@@ -148,11 +148,11 @@ namespace ColorTextBlock.Avalonia
                         inline.Measure(entireWidth, remainWidth)
                               .Select(metry =>
                               {
-                                  if (metry is DecolatedGeometry)
+                                  if (metry is DecoratorGeometry)
                                       return metry;
                                   if (metry is TextGeometry tmetry && String.IsNullOrWhiteSpace(tmetry.Text))
                                       return metry;
-                                  return new DecolatedGeometry(this, metry, _border);
+                                  return new DecoratorGeometry(this, metry, _border);
                               })
                     );
                 }
