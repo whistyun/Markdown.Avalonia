@@ -71,12 +71,14 @@ namespace ColorTextBlock.Avalonia
                     {
                         tmetry.TemporaryForeground = HoverForeground;
                         tmetry.TemporaryBackground = HoverBackground;
+                        RequestRender();
                     };
 
                     tmetry.OnMouseLeave = () =>
                     {
                         tmetry.TemporaryForeground = null;
                         tmetry.TemporaryBackground = null;
+                        RequestRender();
                     };
                 }
 
