@@ -14,8 +14,13 @@ It can render Markdown with avalonia.
 ## Nuget
 
 https://www.nuget.org/packages/Markdown.Avalonia/
-* ver0.9.x works with 'Avalonia 0.9.11.'
-* ver0.10.x works with 'Avalonia 0.10.0-preview6'
+
+The table of compability with Avalonia's version
+| AvaloniaUI      | Markdown.Avalonia |
+|-----------------|-------------------|
+| 0.10.0-rc1      | 0.10.0-a5         |
+| 0.10.0-preview6 | 0.10.0-a1～a4     |
+| 0.9.11          | 0.9.0-a1～a4      |
 
 ## [How to use](https://github.com/whistyun/Markdown.Avalonia/wiki/How-to-use)
 
