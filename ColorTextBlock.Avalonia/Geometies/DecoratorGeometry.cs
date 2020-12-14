@@ -91,7 +91,7 @@ namespace ColorTextBlock.Avalonia.Geometries
 
             // I'm not sure it is correct.
             Target.Left = Left + Decorate.BorderThickness.Left + Decorate.Padding.Left;
-            Target.Top = Top + Decorate.BorderThickness.Left + Decorate.Padding.Left;
+            Target.Top = Top + Decorate.BorderThickness.Top + Decorate.Padding.Top;
             Target.Render(ctx);
         }
     }
