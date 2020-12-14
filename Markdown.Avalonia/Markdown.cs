@@ -1868,12 +1868,12 @@ namespace Markdown.Avalonia
                 _nestedParensPattern =
                     RepeatString(@"
                     (?>              # Atomic matching
-                       [^()\s]+      # Anything other than parens or whitespace
+                       [^()\r\n\t]+? # Anything other than parens or whitespace
                      |
                        \(
                            ", _nestDepth) + RepeatString(
                     @" \)
-                    )*"
+                    )*?"
                     , _nestDepth);
             return _nestedParensPattern;
         }
