@@ -79,6 +79,12 @@ namespace ColorTextBlock.Avalonia
             set => SetValue(PaddingProperty, value);
         }
 
+        internal bool HasBorderProperty
+        {
+            get => _border != null;
+        }
+
+
         [Content]
         public IEnumerable<CInline> Content
         {
@@ -97,8 +103,6 @@ namespace ColorTextBlock.Avalonia
                 BorderThickness != default(Thickness) ||
                 Padding != default(Thickness) ||
                 CornerRadius != default(CornerRadius);
-
-            bool borderEnabledChanged = (_border != null) == borderEnabled;
 
             if (borderEnabled)
             {
@@ -127,7 +131,18 @@ namespace ColorTextBlock.Avalonia
             double entireWidth,
             double remainWidth)
         {
-            bool applyDeco = _border != null;
+            bool applyDeco = HasBorderProperty;
+
+            var parent = Parent;
+            while (parent is CSpan parentSpan)
+            {
+                if (parentSpan.HasBorderProperty)
+                {
+                    applyDeco = false;
+                    break;
+                }
+                else parent = parent.Parent;
+            }
 
             if (applyDeco)
             {
@@ -142,31 +157,32 @@ namespace ColorTextBlock.Avalonia
 
             foreach (CInline inline in Content)
             {
+                var adding = inline.Measure(entireWidth, remainWidth);
+
                 if (applyDeco)
                 {
-                    metries.AddRange(
-                        inline.Measure(entireWidth, remainWidth)
-                              .Select(metry =>
-                              {
-                                  if (metry is DecoratorGeometry)
-                                      return metry;
-                                  if (metry is TextGeometry tmetry && String.IsNullOrWhiteSpace(tmetry.Text))
-                                      return metry;
-                                  return new DecoratorGeometry(this, metry, _border);
-                              })
-                    );
+                    adding = adding.Select(metry =>
+                    {
+                        if (metry is DecoratorGeometry)
+                            // It's not called, 
+                            throw new InvalidOperationException();
+
+                        if (metry is TextGeometry tmetry && String.IsNullOrWhiteSpace(tmetry.Text))
+                            return metry;
+
+                        return new DecoratorGeometry(this, metry, _border);
+                    });
                 }
-                else
-                {
-                    metries.AddRange(
-                        inline.Measure(entireWidth, remainWidth)
-                    );
-                }
+
+                var preCnt = metries.Count();
+                metries.AddRange(adding);
+                var pstCnt = metries.Count();
 
                 CGeometry last = metries[metries.Count - 1];
 
-                remainWidth = last.LineBreak ?
-                    entireWidth : entireWidth - last.Width;
+                remainWidth = last.LineBreak ? entireWidth :
+                               pstCnt - preCnt > 1 ? entireWidth - last.Width :
+                               remainWidth - last.Width;
             }
 
             return metries;
