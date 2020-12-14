@@ -167,11 +167,11 @@ namespace ColorTextBlock.Avalonia
 
             foreach (CInline inline in Content)
             {
-                var adding = inline.Measure(entireWidth, remainWidth);
+                var addings = inline.Measure(entireWidth, remainWidth);
 
                 if (applyDeco)
                 {
-                    adding = adding.Select(metry =>
+                    addings = addings.Select(metry =>
                     {
                         if (metry is DecoratorGeometry)
                             // It's not called, 
@@ -184,15 +184,12 @@ namespace ColorTextBlock.Avalonia
                     });
                 }
 
-                var preCnt = metries.Count();
-                metries.AddRange(adding);
-                var pstCnt = metries.Count();
-
-                CGeometry last = metries[metries.Count - 1];
-
-                remainWidth = last.LineBreak ? entireWidth :
-                               pstCnt - preCnt > 1 ? entireWidth - last.Width :
-                               remainWidth - last.Width;
+                foreach (var add in addings)
+                {
+                    metries.Add(add);
+                    if (add.LineBreak) remainWidth = entireWidth;
+                    else remainWidth -= add.Width;
+                }
             }
 
             return metries;
