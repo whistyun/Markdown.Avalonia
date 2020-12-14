@@ -32,6 +32,12 @@ namespace Markdown.Avalonia
                 o => o.MarkdownStyleName,
                 (o, v) => o.MarkdownStyleName = v);
 
+        public static readonly AvaloniaProperty<string> AssetPathRootProperty =
+            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, string>(
+                nameof(AssetPathRoot),
+                o => o.AssetPathRoot,
+                (o, v) => o.AssetPathRoot = v);
+
         private ScrollViewer _viewer;
 
         public MarkdownScrollViewer()
@@ -56,16 +62,37 @@ namespace Markdown.Avalonia
             LogicalChildren.Add(_viewer);
         }
 
-        public Markdown Engine
+        private void UpdateMarkdown()
         {
-            set;
-            get;
+            var doc = Engine.Transform(Markdown ?? "");
+            _viewer.Content = doc;
         }
 
+        private Markdown _engine;
+        public Markdown Engine
+        {
+            set
+            {
+                _engine = value;
+
+                if (AssetPathRoot != null)
+                    _engine.AssetPathRoot = AssetPathRoot;
+            }
+            get => _engine;
+        }
+
+        private string _AssetPathRoot;
         public string AssetPathRoot
         {
-            set { Engine.AssetPathRoot = value; }
-            get => Engine.AssetPathRoot;
+            set
+            {
+                if (value != null)
+                {
+                    Engine.AssetPathRoot = _AssetPathRoot = value;
+                    UpdateMarkdown();
+                }
+            }
+            get => _AssetPathRoot;
         }
 
         [Content]
@@ -137,8 +164,7 @@ namespace Markdown.Avalonia
             {
                 if (SetAndRaise(MarkdownProperty, ref _markdown, value))
                 {
-                    var doc = Engine.Transform(value ?? "");
-                    _viewer.Content = doc;
+                    UpdateMarkdown();
                 }
             }
         }
