@@ -93,7 +93,7 @@ namespace ColorTextBlock.Avalonia.Geometries
 
         public override void Render(DrawingContext ctx)
         {
-            using (ctx.PushPreTransform(Matrix.CreateTranslation(Left, Top)))
+            using (ctx.PushPreTransform(Matrix.CreateTranslation(Left + Decorate.Margin.Left, Top + Decorate.Margin.Top)))
             {
                 Decorate.Background = Owner.Background;
                 Decorate.Arrange(new Rect(0, 0, Width, Height));
@@ -101,8 +101,8 @@ namespace ColorTextBlock.Avalonia.Geometries
 
             }
 
-            var left = Left + Decorate.BorderThickness.Left + Decorate.Padding.Left;
-            var top = Top + Height - Decorate.BorderThickness.Bottom + Decorate.Padding.Bottom;
+            var left = Left + Decorate.BorderThickness.Left + Decorate.Padding.Left + Decorate.Margin.Left;
+            var top = Top + Height - Decorate.BorderThickness.Bottom + Decorate.Padding.Bottom - Decorate.Margin.Bottom;
 
             foreach (var target in Targets)
             {

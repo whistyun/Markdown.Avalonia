@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Metadata;
 using ColorTextBlock.Avalonia.Geometries;
@@ -28,6 +29,9 @@ namespace ColorTextBlock.Avalonia
         public static readonly StyledProperty<Thickness> PaddingProperty =
             AvaloniaProperty.Register<CSpan, Thickness>(nameof(Padding));
 
+        public static readonly StyledProperty<Thickness> MarginProperty =
+            InputElement.MarginProperty.AddOwner<CSpan>();
+
         public static readonly StyledProperty<IEnumerable<CInline>> ContentProperty =
             AvaloniaProperty.Register<CSpan, IEnumerable<CInline>>(nameof(Content));
 
@@ -37,7 +41,8 @@ namespace ColorTextBlock.Avalonia
                 BorderThicknessProperty.Changed,
                 CornerRadiusProperty.Changed,
                 BoxShadowProperty.Changed,
-                PaddingProperty.Changed
+                PaddingProperty.Changed,
+                MarginProperty.Changed
             ).AddClassHandler<CSpan>((x, _) => x.OnBorderPropertyChanged(true));
 
             Observable.Merge<AvaloniaPropertyChangedEventArgs>(
@@ -87,6 +92,11 @@ namespace ColorTextBlock.Avalonia
             get => GetValue(PaddingProperty);
             set => SetValue(PaddingProperty, value);
         }
+        public Thickness Margin
+        {
+            get => GetValue(MarginProperty);
+            set => SetValue(MarginProperty, value);
+        }
 
         internal bool HasBorderProperty
         {
@@ -111,7 +121,8 @@ namespace ColorTextBlock.Avalonia
             bool borderEnabled =
                 BorderThickness != default(Thickness) ||
                 Padding != default(Thickness) ||
-                CornerRadius != default(CornerRadius);
+                CornerRadius != default(CornerRadius) ||
+                Margin != default(Thickness);
 
             if (borderEnabled)
             {
@@ -126,6 +137,7 @@ namespace ColorTextBlock.Avalonia
                 _border.CornerRadius = CornerRadius;
                 _border.BoxShadow = BoxShadow;
                 _border.Padding = Padding;
+                _border.Margin = Margin;
             }
             else
             {
