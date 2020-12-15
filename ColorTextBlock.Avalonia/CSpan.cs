@@ -157,21 +157,38 @@ namespace ColorTextBlock.Avalonia
 
             foreach (CInline inline in Content)
             {
-                var addings = inline.Measure(entireWidth, remainWidth);
+                IEnumerable<CGeometry> addings = inline.Measure(entireWidth, remainWidth);
 
                 if (applyDeco)
                 {
-                    addings = addings.Select(metry =>
+                    var newaddings = new List<CGeometry>();
+
+                    var buffer = new List<CGeometry>();
+                    foreach (var adding in addings)
                     {
-                        if (metry is DecoratorGeometry)
-                            // It's not called, 
-                            throw new InvalidOperationException();
+                        if (adding is TextGeometry t
+                                && String.IsNullOrWhiteSpace(t.Text)
+                                && buffer.Count == 0)
+                        {
+                            newaddings.Add(adding);
+                            continue;
+                        }
 
-                        if (metry is TextGeometry tmetry && String.IsNullOrWhiteSpace(tmetry.Text))
-                            return metry;
+                        buffer.Add(adding);
 
-                        return new DecoratorGeometry(this, metry, _border);
-                    });
+                        if (adding.LineBreak)
+                        {
+                            newaddings.Add(new DecoratorGeometry(this, buffer, _border));
+                            buffer.Clear();
+                        }
+                    }
+
+                    if (buffer.Count != 0)
+                    {
+                        newaddings.Add(new DecoratorGeometry(this, buffer, _border));
+                    }
+
+                    addings = newaddings;
                 }
 
                 foreach (var add in addings)
