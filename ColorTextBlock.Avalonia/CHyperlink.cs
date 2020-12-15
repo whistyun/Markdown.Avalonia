@@ -64,18 +64,20 @@ namespace ColorTextBlock.Avalonia
                     PseudoClasses.Add(":pointerover");
                     PseudoClasses.Add(":hover");
 
-                    TextGeometry tmetry =
-                            (metry is DecoratorGeometry d) ?
-                            d.Target as TextGeometry :
-                            metry as TextGeometry;
 
-                    if (tmetry != null)
+                    IEnumerable<TextGeometry> tmetries =
+                        (metry is DecoratorGeometry d) ?
+                            d.Targets.OfType<TextGeometry>() :
+                            new[] { metry as TextGeometry };
+                    if (tmetries != null)
                     {
-                        tmetry.TemporaryForeground = HoverForeground;
-                        tmetry.TemporaryBackground = HoverBackground;
+                        foreach (var tmetry in tmetries)
+                        {
+                            tmetry.TemporaryForeground = HoverForeground;
+                            tmetry.TemporaryBackground = HoverBackground;
+                        }
                         RequestRender();
                     }
-
                 };
 
                 metry.OnMouseLeave = () =>
@@ -83,15 +85,17 @@ namespace ColorTextBlock.Avalonia
                     PseudoClasses.Remove(":pointerover");
                     PseudoClasses.Remove(":hover");
 
-                    TextGeometry tmetry =
-                         (metry is DecoratorGeometry d) ?
-                            d.Target as TextGeometry :
-                            metry as TextGeometry;
-
-                    if (tmetry != null)
+                    IEnumerable<TextGeometry> tmetries =
+                        (metry is DecoratorGeometry d) ?
+                            d.Targets.OfType<TextGeometry>() :
+                            new[] { metry as TextGeometry };
+                    if (tmetries != null)
                     {
-                        tmetry.TemporaryForeground = null;
-                        tmetry.TemporaryBackground = null;
+                        foreach (var tmetry in tmetries)
+                        {
+                            tmetry.TemporaryForeground = null;
+                            tmetry.TemporaryBackground = null;
+                        }
                         RequestRender();
                     }
                 };
