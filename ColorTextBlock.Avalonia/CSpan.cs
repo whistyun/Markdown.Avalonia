@@ -164,51 +164,48 @@ namespace ColorTextBlock.Avalonia
                 remainWidth -= _border.DesiredSize.Width;
             }
 
-
             var metries = new List<CGeometry>();
-
             foreach (CInline inline in Content)
             {
                 IEnumerable<CGeometry> addings = inline.Measure(entireWidth, remainWidth);
-
-                if (applyDeco)
-                {
-                    var newaddings = new List<CGeometry>();
-
-                    var buffer = new List<CGeometry>();
-                    foreach (var adding in addings)
-                    {
-                        if (adding is TextGeometry t
-                                && String.IsNullOrWhiteSpace(t.Text)
-                                && buffer.Count == 0)
-                        {
-                            newaddings.Add(adding);
-                            continue;
-                        }
-
-                        buffer.Add(adding);
-
-                        if (adding.LineBreak)
-                        {
-                            newaddings.Add(new DecoratorGeometry(this, buffer, _border));
-                            buffer.Clear();
-                        }
-                    }
-
-                    if (buffer.Count != 0)
-                    {
-                        newaddings.Add(new DecoratorGeometry(this, buffer, _border));
-                    }
-
-                    addings = newaddings;
-                }
-
                 foreach (var add in addings)
                 {
                     metries.Add(add);
                     if (add.LineBreak) remainWidth = entireWidth;
                     else remainWidth -= add.Width;
                 }
+            }
+
+            if (applyDeco)
+            {
+                var renew = new List<CGeometry>();
+
+                var buffer = new List<CGeometry>();
+                foreach (var adding in metries)
+                {
+                    if (adding is TextGeometry t
+                            && String.IsNullOrWhiteSpace(t.Text)
+                            && buffer.Count == 0)
+                    {
+                        renew.Add(adding);
+                        continue;
+                    }
+
+                    buffer.Add(adding);
+
+                    if (adding.LineBreak)
+                    {
+                        renew.Add(new DecoratorGeometry(this, buffer, _border));
+                        buffer.Clear();
+                    }
+                }
+
+                if (buffer.Count != 0)
+                {
+                    renew.Add(new DecoratorGeometry(this, buffer, _border));
+                }
+
+                metries = renew;
             }
 
             return metries;

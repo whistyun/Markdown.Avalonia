@@ -102,7 +102,7 @@ namespace ColorTextBlock.Avalonia.Geometries
             }
 
             var left = Left + Decorate.BorderThickness.Left + Decorate.Padding.Left + Decorate.Margin.Left;
-            var top = Top + Height - Decorate.BorderThickness.Bottom + Decorate.Padding.Bottom - Decorate.Margin.Bottom;
+            var top = Top + Height - Decorate.BorderThickness.Bottom - Decorate.Padding.Bottom - Decorate.Margin.Bottom;
 
             foreach (var target in Targets)
             {
