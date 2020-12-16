@@ -68,7 +68,10 @@ namespace ColorTextBlock.Avalonia
                     IEnumerable<TextGeometry> tmetries =
                         (metry is DecoratorGeometry d) ?
                             d.Targets.OfType<TextGeometry>() :
-                            new[] { metry as TextGeometry };
+                        (metry is TextGeometry t) ?
+                            new[] { t } :
+                            new TextGeometry[0];
+
                     if (tmetries != null)
                     {
                         foreach (var tmetry in tmetries)
@@ -88,7 +91,10 @@ namespace ColorTextBlock.Avalonia
                     IEnumerable<TextGeometry> tmetries =
                         (metry is DecoratorGeometry d) ?
                             d.Targets.OfType<TextGeometry>() :
-                            new[] { metry as TextGeometry };
+                        (metry is TextGeometry t) ?
+                            new[] { t } :
+                            new TextGeometry[0];
+
                     if (tmetries != null)
                     {
                         foreach (var tmetry in tmetries)
