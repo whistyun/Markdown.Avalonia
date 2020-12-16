@@ -155,18 +155,6 @@ namespace ColorTextBlock.Avalonia
             double remainWidth)
         {
             bool applyDeco = HasBorderProperty;
-
-            var parent = Parent;
-            while (parent is CSpan parentSpan)
-            {
-                if (parentSpan.HasBorderProperty)
-                {
-                    applyDeco = false;
-                    break;
-                }
-                else parent = parent.Parent;
-            }
-
             if (applyDeco)
             {
                 _border.Measure(Size.Infinity);
