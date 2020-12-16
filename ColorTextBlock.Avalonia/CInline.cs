@@ -12,7 +12,7 @@ namespace ColorTextBlock.Avalonia
     public abstract class CInline : StyledElement
     {
         public static readonly StyledProperty<IBrush> BackgroundProperty =
-            Border.BackgroundProperty.AddOwner<CInline>();
+            AvaloniaProperty.Register<CInline, IBrush>(nameof(Background), inherits: true);
 
         public static readonly AttachedProperty<IBrush> ForegroundProperty =
             TextBlock.ForegroundProperty.AddOwner<CInline>();
