@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ColorTextBlock.Avalonia.Geometries
@@ -10,7 +11,7 @@ namespace ColorTextBlock.Avalonia.Geometries
     class DecoratorGeometry : CGeometry
     {
         public CSpan Owner { get; }
-        public CGeometry Target { get; }
+        public CGeometry[] Targets { get; }
         public Border Decorate { get; }
 
         private Action _OnMouseEnter;
@@ -24,7 +25,8 @@ namespace ColorTextBlock.Avalonia.Geometries
             get => () =>
             {
                 _OnMouseEnter?.Invoke();
-                Target.OnMouseEnter?.Invoke();
+                foreach (var target in Targets)
+                    target.OnMouseEnter?.Invoke();
             };
             set => _OnMouseEnter = value;
         }
@@ -33,7 +35,8 @@ namespace ColorTextBlock.Avalonia.Geometries
             get => () =>
             {
                 _OnMouseLeave?.Invoke();
-                Target.OnMouseLeave?.Invoke();
+                foreach (var target in Targets)
+                    target.OnMouseLeave?.Invoke();
             };
             set => _OnMouseLeave = value;
         }
@@ -42,7 +45,8 @@ namespace ColorTextBlock.Avalonia.Geometries
             get => () =>
             {
                 _OnMousePressed?.Invoke();
-                Target.OnMousePressed?.Invoke();
+                foreach (var target in Targets)
+                    target.OnMousePressed?.Invoke();
             };
             set => _OnMousePressed = value;
         }
@@ -51,7 +55,8 @@ namespace ColorTextBlock.Avalonia.Geometries
             get => () =>
             {
                 _OnMouseReleased?.Invoke();
-                Target.OnMouseReleased?.Invoke();
+                foreach (var target in Targets)
+                    target.OnMouseReleased?.Invoke();
             };
             set => _OnMouseReleased = value;
         }
@@ -60,28 +65,35 @@ namespace ColorTextBlock.Avalonia.Geometries
             get => () =>
             {
                 _OnClick?.Invoke();
-                Target.OnClick?.Invoke();
+                foreach (var target in Targets)
+                    target.OnClick?.Invoke();
             };
             set => _OnClick = value;
         }
 
         public DecoratorGeometry(
             CSpan owner,
-            CGeometry target,
+            IEnumerable<CGeometry> targets,
+            Border decorate) : this(owner, targets.ToArray(), decorate)
+        { }
+
+        public DecoratorGeometry(
+            CSpan owner,
+            CGeometry[] targets,
             Border decorate)
             : base(
-                  target.Width + decorate.DesiredSize.Width,
-                  target.Height + decorate.DesiredSize.Height,
-                  target.LineBreak)
+                  targets.Sum(t => t.Width) + decorate.DesiredSize.Width,
+                  targets.Max(t => t.Height) + decorate.DesiredSize.Height,
+                  targets.Last().LineBreak)
         {
             this.Owner = owner;
-            this.Target = target;
+            this.Targets = targets;
             this.Decorate = decorate;
         }
 
         public override void Render(DrawingContext ctx)
         {
-            using (ctx.PushPreTransform(Matrix.CreateTranslation(Left, Top)))
+            using (ctx.PushPreTransform(Matrix.CreateTranslation(Left + Decorate.Margin.Left, Top + Decorate.Margin.Top)))
             {
                 Decorate.Background = Owner.Background;
                 Decorate.Arrange(new Rect(0, 0, Width, Height));
@@ -89,10 +101,18 @@ namespace ColorTextBlock.Avalonia.Geometries
 
             }
 
-            // I'm not sure it is correct.
-            Target.Left = Left + Decorate.BorderThickness.Left + Decorate.Padding.Left;
-            Target.Top = Top + Decorate.BorderThickness.Top + Decorate.Padding.Top;
-            Target.Render(ctx);
+            var left = Left + Decorate.BorderThickness.Left + Decorate.Padding.Left + Decorate.Margin.Left;
+            var top = Top + Height - Decorate.BorderThickness.Bottom + Decorate.Padding.Bottom - Decorate.Margin.Bottom;
+
+            foreach (var target in Targets)
+            {
+                // I'm not sure it is correct.
+                target.Left = left;
+                target.Top = top - target.Height;
+                target.Render(ctx);
+
+                left += target.Width;
+            }
         }
     }
 }
