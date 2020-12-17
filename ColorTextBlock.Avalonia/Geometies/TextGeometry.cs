@@ -68,6 +68,13 @@ namespace ColorTextBlock.Avalonia.Geometries
             this.Owner = owner;
         }
 
+        public static TextGeometry NewLine()
+        {
+            return new TextGeometry(
+                0, 0, true,
+                null,
+                "", null);
+        }
 
         public static TextGeometry NewLine(FormattedText format)
         {
@@ -79,6 +86,9 @@ namespace ColorTextBlock.Avalonia.Geometries
 
         public override void Render(DrawingContext ctx)
         {
+            if (Format is null && Width == 0 && Height == 0)
+                return;
+
             var foreground = _TemporaryForeground ?? Foreground;
             var background = _TemporaryBackground ?? Background;
             if (background != null)

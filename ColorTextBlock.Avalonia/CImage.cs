@@ -16,6 +16,17 @@ namespace ColorTextBlock.Avalonia
         public static readonly StyledProperty<double?> LayoutHeightProperty =
             AvaloniaProperty.Register<CImage, double?>(nameof(LayoutHeight));
 
+        public static readonly StyledProperty<double?> RelativeWidthProperty =
+            AvaloniaProperty.Register<CImage, double?>(nameof(RelativeWidth));
+
+        /// <summary>
+        /// Determine wheither image auto fitting or protrude outside Control
+        /// when image is too width to be rendered in control.
+        /// If you set 'true', Image is fitted to control width.
+        /// </summary>
+        public static readonly StyledProperty<bool> FittingWhenProtrudeProperty =
+            AvaloniaProperty.Register<CImage, bool>(nameof(FittingWhenProtrude), defaultValue: true);
+
         public double? LayoutWidth
         {
             get { return GetValue(LayoutWidthProperty); }
@@ -25,6 +36,18 @@ namespace ColorTextBlock.Avalonia
         {
             get { return GetValue(LayoutHeightProperty); }
             set { SetValue(LayoutHeightProperty, value); }
+        }
+
+        public double? RelativeWidth
+        {
+            get { return GetValue(RelativeWidthProperty); }
+            set { SetValue(RelativeWidthProperty, value); }
+        }
+
+        public bool FittingWhenProtrude
+        {
+            get { return GetValue(FittingWhenProtrudeProperty); }
+            set { SetValue(FittingWhenProtrudeProperty, value); }
         }
 
         public Task<Bitmap> Task { get; }
@@ -56,10 +79,42 @@ namespace ColorTextBlock.Avalonia
                 Image = Task.IsFaulted ? WhenError : Task.Result ?? WhenError;
             }
 
-            yield return new BitmapGeometry(
-                Image,
-                LayoutWidth.HasValue ? LayoutWidth.Value : Image.Size.Width,
-                LayoutHeight.HasValue ? LayoutHeight.Value : Image.Size.Height);
+            double imageWidth = Image.Size.Width;
+            double imageHeight = Image.Size.Height;
+
+            if (RelativeWidth.HasValue)
+            {
+                var aspect = imageHeight / imageWidth;
+                imageWidth = RelativeWidth.Value * entireWidth;
+                imageHeight = aspect * imageWidth;
+            }
+
+            if (LayoutWidth.HasValue)
+            {
+                imageWidth = LayoutWidth.Value;
+            }
+
+            if (LayoutHeight.HasValue)
+            {
+                imageHeight = LayoutHeight.Value;
+            }
+
+            if (imageWidth > remainWidth)
+            {
+                if (entireWidth != remainWidth)
+                {
+                    yield return TextGeometry.NewLine();
+                }
+
+                if (FittingWhenProtrude && imageWidth > entireWidth)
+                {
+                    var aspect = imageHeight / imageWidth;
+                    imageWidth = entireWidth;
+                    imageHeight = aspect * imageWidth;
+                }
+            }
+
+            yield return new BitmapGeometry(Image, imageWidth, imageHeight);
         }
     }
 }
