@@ -1,59 +1,133 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="clr-namespace:Markdown.AvaloniaDemo.ViewModels;assembly=Markdown.AvaloniaDemo"
-        xmlns:local="clr-namespace:Markdown.AvaloniaDemo;assembly=Markdown.AvaloniaDemo"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+
+        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+        xmlns:vm="clr-namespace:Markdown.AvaloniaDemo.ViewModels;assembly=Markdown.AvaloniaDemo"
+        xmlns:local="clr-namespace:Markdown.AvaloniaDemo;assembly=Markdown.AvaloniaDemo"
+
         xmlns:md="clr-namespace:Markdown.Avalonia;assembly=Markdown.Avalonia"
 
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
         x:Class="Markdown.AvaloniaDemo.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Markdown.AvaloniaDemo">
-
-  <Window.Resources>
-    <local:MyConverter x:Key="myConverter"/>
-  </Window.Resources>
+        Title="Markdown.AvaloniaDemo"
+        
+        local:ThemeBehavior.StyleUri="{Binding SelectedTheme.Source}"
+        >
 
   <Design.DataContext>
     <vm:MainWindowViewModel/>
   </Design.DataContext>
 
-  <DockPanel LastChildFill="True">
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="10*"/>
+      <ColumnDefinition Width="10*"/>
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="10*"/>
+    </Grid.RowDefinitions>
 
-    <ComboBox
-        DockPanel.Dock="Top"
-        SelectedItem="{Binding StyleName}">
-      <ComboBoxItem IsSelected="True">Standard</ComboBoxItem>
-      <ComboBoxItem>GithubLike</ComboBoxItem>
-    </ComboBox>
+    <TabControl
+      Grid.Row="0"
+      Grid.Column="0"
+      VerticalAlignment="Stretch">
 
-    <Grid>
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="10*"/>
-        <ColumnDefinition Width="10*"/>
-      </Grid.ColumnDefinitions>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="10*"/>
-      </Grid.RowDefinitions>
+      <TabItem
+          Header="Source"
+          Grid.Row="0"
+          Grid.Column="0"
+          >
 
-      <TextBox
-        Grid.Row="0"
-        Grid.Column="0"
-        VerticalAlignment="Stretch"
-        AcceptsReturn="True"
-        Text="{Binding Text}"
-        TextWrapping="Wrap"/>
+        <TextBox
+          VerticalAlignment="Stretch"
+          AcceptsReturn="True"
+          Text="{Binding Text}"
+          TextWrapping="Wrap"
+          />
 
-      <md:MarkdownScrollViewer
-        Grid.Row="0"
-        Grid.Column="1"
-        VerticalAlignment="Stretch"
-        MarkdownStyleName="{Binding StyleName, Converter={StaticResource myConverter} }"
-        Markdown="{Binding Text}">
-      </md:MarkdownScrollViewer>
-    </Grid>
+      </TabItem>
 
-  </DockPanel>
+      <TabItem Header="Style">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="10*"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10*"/>
+          </Grid.RowDefinitions>
+
+          <TextBlock
+              Grid.Row="0"
+              Grid.Column="0"
+              VerticalAlignment="Center"
+              Text="Theme"/>
+
+          <TextBlock
+              Grid.Row="1"
+              Grid.Column="0"
+              VerticalAlignment="Center"
+              Text="Markdown Style"/>
+
+          <ComboBox
+              Grid.Row="0"
+              Grid.Column="1"
+              SelectedItem="{Binding SelectedTheme}"
+              Items="{Binding Themes}"
+              >
+            <ComboBox.ItemTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding Name}"/>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+
+          <ComboBox
+              Grid.Row="1"
+              Grid.Column="1"
+              SelectedItem="{Binding SelectedStyle}"
+              Items="{Binding Styles}"
+              >
+            <ComboBox.ItemTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding Name}"/>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+
+          <Border
+              Grid.Row="2"
+              Grid.Column="0"
+              Grid.ColumnSpan="2"
+              Padding="1"
+              Margin="1"
+              BorderThickness="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}">
+
+            <DockPanel LastChildFill="True">
+              <TextBlock DockPanel.Dock="Top">Append Styles</TextBlock>
+              <TextBox
+                  AcceptsReturn="True"
+                  TextWrapping="NoWrap"
+                  />
+            </DockPanel>
+          </Border>
+        </Grid>
+      </TabItem>
+
+    </TabControl>
+
+    <md:MarkdownScrollViewer
+      Grid.Row="0"
+      Grid.Column="1"
+      VerticalAlignment="Stretch"
+      MarkdownStyleName="{Binding SelectedStyle.Name}"
+      Markdown="{Binding Text}">
+    </md:MarkdownScrollViewer>
+  </Grid>
 
 </Window>
