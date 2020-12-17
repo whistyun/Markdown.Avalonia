@@ -20,7 +20,7 @@ namespace Markdown.Avalonia.Controls
         string BrushName;
         float Alpha;
 
-        public AlphaExtension(string colorKey) : this(colorKey, 100f) { }
+        public AlphaExtension(string colorKey) : this(colorKey, 1f) { }
 
         public AlphaExtension(string colorKey, float alpha)
         {
@@ -68,7 +68,7 @@ namespace Markdown.Avalonia.Controls
 
             return new SolidColorBrush(
                         Color.FromArgb(
-                            (byte)(c.A / 255f * Alpha / 100f * 255f),
+                            (byte)(c.A / 255f * Alpha * 255f),
                             c.R, c.G, c.B));
         }
     }

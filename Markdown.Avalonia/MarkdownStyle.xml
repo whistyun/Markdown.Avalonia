@@ -169,19 +169,19 @@
   <Styles x:Key="DocumentStyleStandard">
     <Style Selector="ctxt|CTextBlock">
       <Style.Setters>
-        <Setter Property="FontSize"   Value="13" />
+        <Setter Property="FontSize"   Value="{mdc:Multiply FontSizeNormal}" />
         <Setter Property="Margin"     Value="0,5" />
       </Style.Setters>
     </Style>
     <Style Selector="ava|TextBlock">
       <Style.Setters>
-        <Setter Property="FontSize"   Value="13" />
+        <Setter Property="FontSize"   Value="{mdc:Multiply FontSizeNormal}" />
       </Style.Setters>
     </Style>
 
     <Style Selector="ctxt|CTextBlock.Heading1">
       <Style.Setters>
-        <Setter Property="FontSize"   Value="42" />
+        <Setter Property="FontSize"   Value="{mdc:Multiply FontSizeNormal, 4}" />
         <Setter Property="Foreground" Value="{mdc:Alpha ThemeForegroundColor}" />
         <Setter Property="FontWeight" Value="Light" />
       </Style.Setters>
@@ -189,7 +189,7 @@
 
     <Style Selector="ctxt|CTextBlock.Heading2">
       <Style.Setters>
-        <Setter Property="FontSize"   Value="20" />
+        <Setter Property="FontSize"   Value="{mdc:Multiply FontSizeNormal, 2}" />
         <Setter Property="Foreground" Value="{mdc:Alpha ThemeForegroundColor}" />
         <Setter Property="FontWeight" Value="Light" />
       </Style.Setters>
@@ -197,16 +197,16 @@
 
     <Style Selector="ctxt|CTextBlock.Heading3">
       <Style.Setters>
-        <Setter Property="FontSize"   Value="20" />
-        <Setter Property="Foreground" Value="{mdc:Alpha ThemeForegroundColor, 70}" />
+        <Setter Property="FontSize"   Value="{mdc:Multiply FontSizeNormal, 2}" />
+        <Setter Property="Foreground" Value="{mdc:Alpha ThemeForegroundColor, 0.7}" />
         <Setter Property="FontWeight" Value="Light" />
       </Style.Setters>
     </Style>
 
     <Style Selector="ctxt|CTextBlock.Heading4">
       <Style.Setters>
-        <Setter Property="FontSize"   Value="14" />
-        <Setter Property="Foreground" Value="{mdc:Alpha ThemeForegroundColor, 70}" />
+        <Setter Property="FontSize"   Value="{mdc:Multiply FontSizeNormal, 1.2}" />
+        <Setter Property="Foreground" Value="{mdc:Alpha ThemeForegroundColor, 0.7}" />
         <Setter Property="FontWeight" Value="Light" />
       </Style.Setters>
     </Style>
@@ -266,7 +266,7 @@
       <Style.Setters>
         <Setter Property="Margin" Value="5"/>
         <Setter Property="BorderThickness" Value="0.5"/>
-        <Setter Property="BorderBrush" Value="{mdc:Alpha ThemeControlHighColor}"/>
+        <Setter Property="BorderBrush" Value="{mdc:Alpha ThemeBorderHighColor}"/>
       </Style.Setters>
     </Style>
 
@@ -274,14 +274,14 @@
       <Style.Setters>
         <Setter Property="Margin" Value="0"/>
         <Setter Property="BorderThickness" Value="0.5"/>
-        <Setter Property="BorderBrush" Value="{mdc:Alpha ThemeControlHighColor}"/>
+        <Setter Property="BorderBrush" Value="{mdc:Alpha ThemeBorderHighColor}"/>
         <Setter Property="Padding" Value="2"/>
       </Style.Setters>
     </Style>
 
     <Style Selector="ava|Border.TableHeader">
       <Style.Setters>
-        <Setter Property="Background" Value="{mdc:Alpha ThemeControlHighlightMidColor}"/>
+        <Setter Property="Background" Value="{mdc:Alpha ThemeForegroundColor, 0.3}"/>
       </Style.Setters>
     </Style>
     <Style Selector="ava|Border.TableHeader ctxt|CTextBlock">
@@ -292,7 +292,7 @@
 
     <Style Selector="ava|Border.EvenTableRow">
       <Style.Setters>
-        <Setter Property="Background" Value="{mdc:Alpha ThemeControlHighlightLowColor}"/>
+        <Setter Property="Background" Value="{mdc:Alpha ThemeForegroundColor, 0.12}"/>
       </Style.Setters>
     </Style>
 
