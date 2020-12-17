@@ -10,7 +10,7 @@
     <Copyright>Copyright (c) 2019 Bevan Arps, 2020 whistyun</Copyright>
     <PackageProjectUrl>https://github.com/whistyun/Markdown.Avalonia</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>Markdown Avalniaui </PackageTags>
+    <PackageTags>Markdown Avalonia Avaloniaui</PackageTags>
     <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
