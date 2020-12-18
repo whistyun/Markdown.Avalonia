@@ -22,8 +22,6 @@ The table of compability with Avalonia's version
 | 0.10.0-preview6 | 0.10.0-a1～a4     |
 | 0.9.11          | 0.9.0-a1～a7      |
 
-I 
-
 ## [How to use](https://github.com/whistyun/Markdown.Avalonia/wiki/How-to-use)
 
 I make some document in [wiki](https://github.com/whistyun/Markdown.Avalonia/wiki)
