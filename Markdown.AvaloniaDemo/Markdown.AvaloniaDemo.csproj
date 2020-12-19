@@ -8,9 +8,12 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.9.12" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.9.12" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.9.12" />
+    <None Remove="Assets\XamlTemplate.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="0.9.11" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.9.11" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.9.11" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Markdown.Avalonia\Markdown.Avalonia.csproj" />
