@@ -182,6 +182,7 @@ namespace Markdown.Avalonia
 
                     Styles.Insert(0, value);
 
+                    ResetContent();
                 }
 
                 _markdownStyle = value;
