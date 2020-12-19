@@ -13,7 +13,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Markdown.Avalonia.Controls
+namespace Markdown.Avalonia.Extensions
 {
     public class MultiplyExtension : MarkupExtension
     {
@@ -45,35 +45,35 @@ namespace Markdown.Avalonia.Controls
         {
             return (T)serviceProvider.GetService(typeof(T));
         }
-    }
 
-    class MultiplyConverter : IMultiValueConverter
-    {
-        public double Scale { get; }
-
-        public MultiplyConverter(double scale)
+        class MultiplyConverter : IMultiValueConverter
         {
-            Scale = scale;
-        }
+            public double Scale { get; }
 
-        public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
-        {
-            switch (values[0])
+            public MultiplyConverter(double scale)
             {
-                case short s:
-                    return (short)(s * Scale);
-                case int i:
-                    return (int)(i * Scale);
-                case long l:
-                    return (long)(l * Scale);
+                Scale = scale;
+            }
 
-                case float f:
-                    return (float)(f * Scale);
-                case double d:
-                    return (double)(d * Scale);
+            public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
+            {
+                switch (values[0])
+                {
+                    case short s:
+                        return (short)(s * Scale);
+                    case int i:
+                        return (int)(i * Scale);
+                    case long l:
+                        return (long)(l * Scale);
 
-                default:
-                    return values[0];
+                    case float f:
+                        return (float)(f * Scale);
+                    case double d:
+                        return (double)(d * Scale);
+
+                    default:
+                        return values[0];
+                }
             }
         }
     }
