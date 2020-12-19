@@ -30,13 +30,13 @@ namespace Markdown.Avalonia.Extensions
 
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-            var fgExt = new DynamicResourceExtension(ResourceKey);
+            var dyExt = new DynamicResourceExtension(ResourceKey);
 
-            var fgBrush = fgExt.ProvideValue(serviceProvider);
+            var brush = dyExt.ProvideValue(serviceProvider);
 
             return new MultiBinding()
             {
-                Bindings = new IBinding[] { fgBrush },
+                Bindings = new IBinding[] { brush },
                 Converter = new MultiplyConverter(Scale)
             };
         }

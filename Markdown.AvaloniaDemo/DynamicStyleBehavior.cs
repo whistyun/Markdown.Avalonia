@@ -43,7 +43,7 @@ namespace Markdown.AvaloniaDemo
                                 ctrl.Styles.Remove(exists);
 
                     ctrl.Styles.Add(style);
-                    ctrl.Rebuild();
+                    ctrl.ResetContent();
                 }
 
                 var resultMsgr = ctrl.GetValue(ValidationResultProperty);

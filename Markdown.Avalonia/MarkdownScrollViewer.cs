@@ -157,7 +157,7 @@ namespace Markdown.Avalonia
                     Styles.Insert(0, value);
 
                     // i have no idea to reflect style changed
-                    Rebuild();
+                    ResetContent();
                 }
 
                 _markdownStyle = value;
@@ -187,7 +187,7 @@ namespace Markdown.Avalonia
         }
 
 
-        public void Rebuild()
+        public void ResetContent()
         {
             var ctrl = _viewer.Content;
             _viewer.Content = null;
