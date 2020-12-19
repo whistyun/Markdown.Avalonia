@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Markdown.AvaloniaDemo.ViewModels
+namespace Markdown.AvaloniaFluentDemo.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
@@ -81,21 +81,18 @@ namespace Markdown.AvaloniaDemo.ViewModels
             Themes = new List<ThemeViewModel>();
             Themes.Add(new ThemeViewModel()
             {
-                Name = "BaseLight",
-                Source = new Uri("avares://Avalonia.Themes.Default/Accents/BaseLight.xaml")
+                Name = "FluentLight",
+                Source = new Uri("avares://Avalonia.Themes.Fluent/FluentLight.xaml")
             });
 
             Themes.Add(new ThemeViewModel()
             {
-                Name = "BaseDark",
-                Source = new Uri("avares://Avalonia.Themes.Default/Accents/BaseDark.xaml")
+                Name = "FluentDark",
+                Source = new Uri("avares://Avalonia.Themes.Fluent/FluentDark.xaml")
             });
 
-            SelectedTheme = Themes[0];
-
-
             var loader = AvaloniaLocator.Current.GetService<IAssetLoader>();
-            using (var strm = loader.Open(new Uri("avares://Markdown.AvaloniaDemo/Assets/XamlTemplate.txt")))
+            using (var strm = loader.Open(new Uri("avares://Markdown.AvaloniaFluentDemo/Assets/XamlTemplate.txt")))
             using (var reader = new StreamReader(strm))
             {
                 EdittingStyleXamlText = reader.ReadToEnd();
