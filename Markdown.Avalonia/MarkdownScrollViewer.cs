@@ -3,8 +3,10 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
 using Avalonia.Metadata;
+using Avalonia.Platform;
 using Avalonia.Styling;
 using System;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -165,6 +167,46 @@ namespace Markdown.Avalonia
                 if (SetAndRaise(MarkdownProperty, ref _markdown, value))
                 {
                     UpdateMarkdown();
+                }
+            }
+        }
+
+        private Uri _source;
+        public Uri Source
+        {
+            get { return _source; }
+            set
+            {
+                if (!value.IsAbsoluteUri)
+                    throw new ArgumentException("it is not absolute.");
+
+                _source = value;
+
+                switch (_source.Scheme)
+                {
+                    case "http":
+                    case "https":
+                        using (var wc = new System.Net.WebClient())
+                        using (var strm = new MemoryStream(wc.DownloadData(_source)))
+                        using (var reader = new StreamReader(strm, true))
+                            Markdown = reader.ReadToEnd();
+                        break;
+
+                    case "file":
+                        using (var strm = File.OpenRead(_source.LocalPath))
+                        using (var reader = new StreamReader(strm, true))
+                            Markdown = reader.ReadToEnd();
+                        break;
+
+                    case "avares":
+                        var loader = AvaloniaLocator.Current.GetService<IAssetLoader>();
+                        using (var strm = loader.Open(_source))
+                        using (var reader = new StreamReader(strm, true))
+                            Markdown = reader.ReadToEnd();
+                        break;
+
+                    default:
+                        throw new ArgumentException($"unsupport schema {_source.Scheme}");
                 }
             }
         }
