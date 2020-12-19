@@ -13,7 +13,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Markdown.Avalonia.Controls
+namespace Markdown.Avalonia.Extensions
 {
     public class AlphaExtension : MarkupExtension
     {
@@ -45,31 +45,31 @@ namespace Markdown.Avalonia.Controls
         {
             return (T)serviceProvider.GetService(typeof(T));
         }
-    }
 
-    class AlphaConverter : IMultiValueConverter
-    {
-        public float Alpha { get; }
-
-        public AlphaConverter(float alpha)
+        class AlphaConverter : IMultiValueConverter
         {
-            Alpha = alpha;
-        }
+            public float Alpha { get; }
 
-        public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
-        {
-            Color c;
-            if (values[0] is ISolidColorBrush b)
-                c = b.Color;
-            else if (values[0] is Color col)
-                c = col;
-            else
-                return values[0];
+            public AlphaConverter(float alpha)
+            {
+                Alpha = alpha;
+            }
 
-            return new SolidColorBrush(
-                        Color.FromArgb(
-                            (byte)(c.A / 255f * Alpha * 255f),
-                            c.R, c.G, c.B));
+            public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
+            {
+                Color c;
+                if (values[0] is ISolidColorBrush b)
+                    c = b.Color;
+                else if (values[0] is Color col)
+                    c = col;
+                else
+                    return values[0];
+
+                return new SolidColorBrush(
+                            Color.FromArgb(
+                                (byte)(c.A / 255f * Alpha * 255f),
+                                c.R, c.G, c.B));
+            }
         }
     }
 }

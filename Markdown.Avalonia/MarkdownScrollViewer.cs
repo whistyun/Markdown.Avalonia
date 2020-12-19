@@ -46,7 +46,7 @@ namespace Markdown.Avalonia
 
             this.InitializeComponent();
 
-            MarkdownStyleName = nameof(MdStyle.Standard);
+            MarkdownStyleName = nameof(MdStyle.Standard2);
         }
 
         private void InitializeComponent()
@@ -183,10 +183,7 @@ namespace Markdown.Avalonia
                     Styles.Insert(0, value);
 
                     // i have no idea to reflect style changed
-                    var ctrl = _viewer.Content;
-                    _viewer.Content = null;
-                    Thread.MemoryBarrier();
-                    _viewer.Content = ctrl;
+                    Rebuild();
                 }
 
                 _markdownStyle = value;
@@ -203,7 +200,7 @@ namespace Markdown.Avalonia
 
                 if (_markdownStyleName is null)
                 {
-                    MarkdownStyle = MdStyle.Standard;
+                    MarkdownStyle = MdStyle.Standard2;
                 }
                 else
                 {
@@ -213,6 +210,15 @@ namespace Markdown.Avalonia
                     MarkdownStyle = (Styles)prop.GetValue(null);
                 }
             }
+        }
+
+
+        public void Rebuild()
+        {
+            var ctrl = _viewer.Content;
+            _viewer.Content = null;
+            Thread.MemoryBarrier();
+            _viewer.Content = ctrl;
         }
     }
 }

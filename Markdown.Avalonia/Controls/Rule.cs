@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Reactive.Linq;
 using System.Text;
 using HAlign = Avalonia.Layout.HorizontalAlignment;
 using VAlign = Avalonia.Layout.VerticalAlignment;
@@ -25,6 +26,19 @@ namespace Markdown.Avalonia.Controls
 
         public static readonly StyledProperty<double> LineMarginProperty =
             AvaloniaProperty.Register<Rule, double>(nameof(LineMargin), defaultValue: _LineMargin);
+
+        static Rule()
+        {
+            AffectsRender<Rule>(
+                BackgroundProperty,
+                ForegroundProperty);
+
+            Observable.Merge(
+                SingleLineWidthProperty.Changed,
+                BoldLineWidthProperty.Changed,
+                LineMarginProperty.Changed
+            ).AddClassHandler<Rule>((x, _) => x.InvalidateMeasure());
+        }
 
 
         public double SingleLineWidth
