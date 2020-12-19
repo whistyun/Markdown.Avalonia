@@ -1,9 +1,15 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Styling;
+using Markdown.Avalonia;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
+using System.Windows.Input;
 
 namespace Markdown.AvaloniaDemo
 {

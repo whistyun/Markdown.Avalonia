@@ -1,5 +1,7 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Platform;
 using Avalonia.Styling;
 using Markdown.Avalonia;
 using ReactiveUI;
@@ -18,6 +20,20 @@ namespace Markdown.AvaloniaDemo.ViewModels
             set => this.RaiseAndSetIfChanged(ref _text, value);
         }
 
+        private string _edittingStyleXamlText;
+        public string EdittingStyleXamlText
+        {
+            get => _edittingStyleXamlText;
+            set => this.RaiseAndSetIfChanged(ref _edittingStyleXamlText, value);
+        }
+
+        private string _appendStyleXamlText;
+        public string AppendStyleXamlText
+        {
+            get => _appendStyleXamlText;
+            set => this.RaiseAndSetIfChanged(ref _appendStyleXamlText, value);
+        }
+
         private StyleViewModel _selectedStyle;
         public StyleViewModel SelectedStyle
         {
@@ -32,8 +48,19 @@ namespace Markdown.AvaloniaDemo.ViewModels
             set => this.RaiseAndSetIfChanged(ref _selectedTheme, value);
         }
 
+        private string _ErrorInfo;
+        public string ErrorInfo
+        {
+            get => _ErrorInfo;
+            set => this.RaiseAndSetIfChanged(ref _ErrorInfo, value);
+        }
+
         public List<StyleViewModel> Styles { set; get; }
         public List<ThemeViewModel> Themes { set; get; }
+
+        public void XamlParseResult(string result) => ErrorInfo = result;
+
+        public void TryParse() => AppendStyleXamlText = EdittingStyleXamlText;
 
         public MainWindowViewModel()
         {
@@ -45,9 +72,10 @@ namespace Markdown.AvaloniaDemo.ViewModels
 
             Styles = new List<StyleViewModel>();
             Styles.Add(new StyleViewModel() { Name = nameof(MarkdownStyle.Standard) });
+            Styles.Add(new StyleViewModel() { Name = nameof(MarkdownStyle.Standard2) });
             Styles.Add(new StyleViewModel() { Name = nameof(MarkdownStyle.GithubLike) });
 
-            SelectedStyle = Styles[0];
+            SelectedStyle = Styles[1];
 
 
             Themes = new List<ThemeViewModel>();
@@ -64,6 +92,14 @@ namespace Markdown.AvaloniaDemo.ViewModels
             });
 
             SelectedTheme = Themes[0];
+
+
+            var loader = AvaloniaLocator.Current.GetService<IAssetLoader>();
+            using (var strm = loader.Open(new Uri("avares://Markdown.AvaloniaDemo/Assets/XamlTemplate.txt")))
+            using (var reader = new StreamReader(strm))
+            {
+                EdittingStyleXamlText = reader.ReadToEnd();
+            }
         }
     }
 

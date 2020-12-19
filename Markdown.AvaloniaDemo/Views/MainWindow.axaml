@@ -109,10 +109,19 @@
               BorderThickness="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}">
 
             <DockPanel LastChildFill="True">
-              <TextBlock DockPanel.Dock="Top">Append Styles</TextBlock>
+              <DockPanel DockPanel.Dock="Top" LastChildFill="False">
+                <TextBlock DockPanel.Dock="Left">Append Styles</TextBlock>
+                <Button DockPanel.Dock="Right" Content="Parse" Command="{Binding TryParse}"/>
+              </DockPanel>
+
+              <Expander Header="Error" DockPanel.Dock="Bottom" IsExpanded="True">
+                <TextBlock Foreground="Red"
+                           Text="{Binding ErrorInfo}"/>
+              </Expander>
               <TextBox
                   AcceptsReturn="True"
                   TextWrapping="NoWrap"
+                  Text="{Binding EdittingStyleXamlText}"
                   />
             </DockPanel>
           </Border>
@@ -126,7 +135,11 @@
       Grid.Column="1"
       VerticalAlignment="Stretch"
       MarkdownStyleName="{Binding SelectedStyle.Name}"
-      Markdown="{Binding Text}">
+      Markdown="{Binding Text}"
+      
+      local:DynamicStyleBehavior.XamlText="{Binding AppendStyleXamlText}"
+      local:DynamicStyleBehavior.ValidationResult="{Binding XamlParseResult}"
+      >
     </md:MarkdownScrollViewer>
   </Grid>
 
