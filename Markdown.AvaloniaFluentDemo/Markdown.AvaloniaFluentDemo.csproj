@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFrameworks>netcoreapp3.1;net461;netcoreapp2.0</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="0.10.0-rc1" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.0-rc1" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0-rc1" />
+    <None Remove="Assets\XamlTemplate.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Markdown.Avalonia\Markdown.Avalonia.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="LocalPath.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="MainWindow.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>
