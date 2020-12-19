@@ -22,7 +22,7 @@ namespace Markdown.AvaloniaDemo
         public static Uri Validate(IAvaloniaObject obj, Uri src)
         {
             var ctrl = obj as Control;
-            var style = new StyleInclude(new Uri("resm:Styles?assembly=Markdown.AvaloniaDemo"))
+            var style = new StyleInclude(new Uri("avares://Markdown.AvaloniaDemo/Styles"))
             {
                 Source = src
             };

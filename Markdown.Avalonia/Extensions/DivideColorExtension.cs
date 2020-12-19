@@ -28,22 +28,22 @@ namespace Markdown.Avalonia.Extensions
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
             IBinding left;
-            try
+            if (Color.TryParse(FrmKey, out var leftColor))
             {
-                left = new StaticBinding(Color.Parse(FrmKey));
+                left = new StaticBinding(leftColor);
             }
-            catch
+            else
             {
                 var lftExt = new DynamicResourceExtension(FrmKey);
                 left = lftExt.ProvideValue(serviceProvider);
             }
 
             IBinding right;
-            try
+            if (Color.TryParse(ToKey, out var rightColor))
             {
-                right = new StaticBinding(Color.Parse(ToKey));
+                right = new StaticBinding(rightColor);
             }
-            catch
+            else
             {
                 var rgtExt = new DynamicResourceExtension(ToKey);
                 right = rgtExt.ProvideValue(serviceProvider);

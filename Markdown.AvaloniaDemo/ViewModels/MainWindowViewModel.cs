@@ -82,13 +82,13 @@ namespace Markdown.AvaloniaDemo.ViewModels
             Themes.Add(new ThemeViewModel()
             {
                 Name = "BaseLight",
-                Source = new Uri("resm:Avalonia.Themes.Default.Accents.BaseLight.xaml?assembly=Avalonia.Themes.Default")
+                Source = new Uri("avares://Avalonia.Themes.Default/Accents/BaseLight.xaml")
             });
 
             Themes.Add(new ThemeViewModel()
             {
                 Name = "BaseDark",
-                Source = new Uri("resm:Avalonia.Themes.Default.Accents.BaseDark.xaml?assembly=Avalonia.Themes.Default")
+                Source = new Uri("avares://Avalonia.Themes.Default/Accents/BaseDark.xaml")
             });
 
             SelectedTheme = Themes[0];
