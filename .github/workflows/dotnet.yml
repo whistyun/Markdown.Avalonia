@@ -19,8 +19,8 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.301
-    - name: Restore dependencies
-      run: dotnet restore
+    - name: Clean package cache as a temporary workaround for actions/setup-dotnet#155
+      run: dotnet clean && dotnet nuget locals all --clear
     - name: Build
       run: dotnet build --no-restore
     - name: Test
