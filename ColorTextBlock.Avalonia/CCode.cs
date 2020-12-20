@@ -23,10 +23,18 @@ namespace ColorTextBlock.Avalonia
             };
 
             var monospaceName = FontManager.Current.GetInstalledFontFamilyNames()
-                                           .Where(name=> RequestFamilies.Any(reqNm => name.ToLower().Contains(reqNm)))
+                                           .Where(name => RequestFamilies.Any(reqNm => name.ToLower().Contains(reqNm)))
                                            .FirstOrDefault();
 
-            Monospace = new FontFamily(monospaceName);
+            if (String.IsNullOrEmpty(monospaceName))
+            {
+                // giveup
+                Monospace = null;
+            }
+            else
+            {
+                Monospace = new FontFamily(monospaceName);
+            }
         }
 
         public CCode(IEnumerable<CInline> inlines) : base(inlines)
