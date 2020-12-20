@@ -21,20 +21,20 @@ namespace Markdown.AvaloniaFluentDemo
 
         public static Uri Validate(IAvaloniaObject obj, Uri src)
         {
-            var ctrl = obj as Control;
             var style = new StyleInclude(new Uri("avares://Markdown.AvaloniaFluentDemo/Styles"))
             {
                 Source = src
             };
 
 
-            if (ctrl.Styles.Count == 0)
+            var app = Application.Current;
+            if (app.Styles.Count == 0)
             {
-                ctrl.Styles.Add(style);
+                app.Styles.Add(style);
             }
             else
             {
-                ctrl.Styles[0] = style;
+                app.Styles[0] = style;
             }
 
             return src;

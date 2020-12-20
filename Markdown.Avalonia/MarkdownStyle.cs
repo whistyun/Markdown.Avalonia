@@ -27,9 +27,14 @@ namespace Markdown.Avalonia
             get => LoadXaml("DocumentStyleStandard");
         }
 
-        public static Styles Standard2
+        public static Styles DefaultTheme
         {
-            get => LoadXaml("DocumentStyleStandard2");
+            get => LoadXaml("DocumentStyleDefaultTheme");
+        }
+
+        public static Styles FluentTheme
+        {
+            get => LoadXaml("DocumentStyleFluentTheme");
         }
 
         public static Styles GithubLike

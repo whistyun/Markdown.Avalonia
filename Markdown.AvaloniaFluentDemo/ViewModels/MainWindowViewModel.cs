@@ -34,13 +34,6 @@ namespace Markdown.AvaloniaFluentDemo.ViewModels
             set => this.RaiseAndSetIfChanged(ref _appendStyleXamlText, value);
         }
 
-        private StyleViewModel _selectedStyle;
-        public StyleViewModel SelectedStyle
-        {
-            get => _selectedStyle;
-            set => this.RaiseAndSetIfChanged(ref _selectedStyle, value);
-        }
-
         private ThemeViewModel _selectedTheme;
         public ThemeViewModel SelectedTheme
         {
@@ -55,7 +48,6 @@ namespace Markdown.AvaloniaFluentDemo.ViewModels
             set => this.RaiseAndSetIfChanged(ref _ErrorInfo, value);
         }
 
-        public List<StyleViewModel> Styles { set; get; }
         public List<ThemeViewModel> Themes { set; get; }
 
         public void XamlParseResult(string result) => ErrorInfo = result;
@@ -69,14 +61,6 @@ namespace Markdown.AvaloniaFluentDemo.ViewModels
             {
                 Text = reader.ReadToEnd();
             }
-
-            Styles = new List<StyleViewModel>();
-            Styles.Add(new StyleViewModel() { Name = nameof(MarkdownStyle.Standard) });
-            Styles.Add(new StyleViewModel() { Name = nameof(MarkdownStyle.Standard2) });
-            Styles.Add(new StyleViewModel() { Name = nameof(MarkdownStyle.GithubLike) });
-
-            SelectedStyle = Styles[1];
-
 
             Themes = new List<ThemeViewModel>();
             Themes.Add(new ThemeViewModel()
@@ -98,11 +82,6 @@ namespace Markdown.AvaloniaFluentDemo.ViewModels
                 EdittingStyleXamlText = reader.ReadToEnd();
             }
         }
-    }
-
-    public class StyleViewModel
-    {
-        public string Name { get; set; }
     }
 
     public class ThemeViewModel

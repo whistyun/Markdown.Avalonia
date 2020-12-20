@@ -58,7 +58,6 @@
           </Grid.ColumnDefinitions>
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="10*"/>
           </Grid.RowDefinitions>
 
@@ -67,12 +66,6 @@
               Grid.Column="0"
               VerticalAlignment="Center"
               Text="Theme"/>
-
-          <TextBlock
-              Grid.Row="1"
-              Grid.Column="0"
-              VerticalAlignment="Center"
-              Text="Markdown Style"/>
 
           <ComboBox
               Grid.Row="0"
@@ -87,21 +80,8 @@
             </ComboBox.ItemTemplate>
           </ComboBox>
 
-          <ComboBox
-              Grid.Row="1"
-              Grid.Column="1"
-              SelectedItem="{Binding SelectedStyle}"
-              Items="{Binding Styles}"
-              >
-            <ComboBox.ItemTemplate>
-              <DataTemplate>
-                <TextBlock Text="{Binding Name}"/>
-              </DataTemplate>
-            </ComboBox.ItemTemplate>
-          </ComboBox>
-
           <Border
-              Grid.Row="2"
+              Grid.Row="1"
               Grid.Column="0"
               Grid.ColumnSpan="2"
               Padding="1"
@@ -134,7 +114,6 @@
       Grid.Row="0"
       Grid.Column="1"
       VerticalAlignment="Stretch"
-      MarkdownStyleName="{Binding SelectedStyle.Name}"
       Markdown="{Binding Text}"
       
       local:DynamicStyleBehavior.XamlText="{Binding AppendStyleXamlText}"

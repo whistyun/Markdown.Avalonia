@@ -5,6 +5,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Metadata;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using Markdown.Avalonia.Utils;
 using System;
 using System.IO;
 using System.Linq;
@@ -48,7 +49,12 @@ namespace Markdown.Avalonia
 
             this.InitializeComponent();
 
-            MarkdownStyleName = nameof(MdStyle.Standard2);
+            bool nvl(bool? vl) => vl.HasValue && vl.Value;
+
+            MarkdownStyleName =
+                nvl(ThemeDetector.IsFluentUsed) ? nameof(MdStyle.FluentTheme) :
+                nvl(ThemeDetector.IsDefaultUsed) ? nameof(MdStyle.DefaultTheme) :
+                nameof(MdStyle.Standard);
         }
 
         private void InitializeComponent()
@@ -241,7 +247,12 @@ namespace Markdown.Avalonia
 
                 if (_markdownStyleName is null)
                 {
-                    MarkdownStyle = MdStyle.Standard2;
+                    bool nvl(bool? vl) => vl.HasValue && vl.Value;
+
+                    MarkdownStyle =
+                        nvl(ThemeDetector.IsFluentUsed) ? MdStyle.FluentTheme :
+                        nvl(ThemeDetector.IsDefaultUsed) ? MdStyle.DefaultTheme :
+                        MdStyle.Standard;
                 }
                 else
                 {
@@ -252,7 +263,6 @@ namespace Markdown.Avalonia
                 }
             }
         }
-
 
         public void ResetContent()
         {
