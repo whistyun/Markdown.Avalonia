@@ -110,7 +110,8 @@ namespace Markdown.Avalonia
                      */
                     if (rowspansColOffset < maxColCntInDetails)
                     {
-                        for (var colIdx = 0; colIdx < row.Count;)
+                        int colIdx;
+                        for (colIdx = 0; colIdx < row.Count;)
                         {
                             int colSpan;
                             if (multiRowsAtColIdx.TryGetValue(colOffset, out var span))
@@ -144,6 +145,19 @@ namespace Markdown.Avalonia
 
                             colOffset += colSpan;
                         }
+
+                        foreach (var left in multiRowsAtColIdx.Where(tpl => tpl.Key >= colOffset)
+                                                              .OrderBy(tpl => tpl.Key))
+                        {
+                            while (colOffset < left.Key)
+                            {
+                                var cell = new MdTableCell(null);
+                                cell.ColumnIndex = colOffset++;
+                                row.Add(cell);
+
+                            }
+                            colOffset += left.Value.ColSpan;
+                        }
                     }
 
                     colOffset += multiRowsAtColIdx
@@ -171,12 +185,21 @@ namespace Markdown.Avalonia
                 // if any multirow is left, insert an empty row.
                 while (multiRowsAtColIdx.Count > 0)
                 {
-                    Details.Add(new List<MdTableCell>());
+                    var row = new List<MdTableCell>();
+                    Details.Add(row);
 
                     var colOffset = 0;
 
-                    foreach (var spanEntry in multiRowsAtColIdx.ToArray())
+                    foreach (var spanEntry in multiRowsAtColIdx.OrderBy(tpl => tpl.Key))
                     {
+                        while (colOffset < spanEntry.Key)
+                        {
+                            var cell = new MdTableCell(null);
+                            cell.ColumnIndex = colOffset++;
+                            row.Add(cell);
+
+                        }
+
                         colOffset += spanEntry.Value.ColSpan;
 
                         if (--spanEntry.Value.Life == 0)
@@ -210,14 +233,7 @@ namespace Markdown.Avalonia
                     Details[rowIdx].Add(cell);
                 }
             }
-
-            //while (Header.Count < ColCount)
-            //    Header.Add(new MdTableCell(""));
-            //
-            //foreach (var row in Details)
-            //    while (row.Count < ColCount)
-            //        row.Add(new MdTableCell(""));
-        }   //
+        }
     }
 
     class MdSpan
