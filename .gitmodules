@@ -1,0 +1,3 @@
+[submodule "UnitTestForMarkdownAvalonia"]
+	path = UnitTestForMarkdownAvalonia
+	url = https://github.com/whistyun/UnitTestForMarkdownAvalonia.git
