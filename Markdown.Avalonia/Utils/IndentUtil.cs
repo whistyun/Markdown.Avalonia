@@ -24,6 +24,35 @@ namespace Markdown.Avalonia
             return count;
         }
 
+        public static string DetentBestEffort(string line, int indentCount)
+        {
+            // this index count tab as 1: for String.Substring
+            var realIdx = 0;
+            // this index count tab as 4: for human (I think most text-editor treats tab as 4spaces)
+            var viewIdx = 0;
+
+            while (viewIdx < indentCount && realIdx < line.Length)
+            {
+                var c = line[realIdx];
+                if (c == ' ')
+                {
+                    realIdx += 1;
+                    viewIdx += 1;
+                }
+                else if (c == '\t')
+                {
+                    realIdx += 1;
+                    // when mixing space and tab (ex: space space tab), some space should be ignored.
+                    viewIdx = ((viewIdx >> 2) + 1) << 2;
+                }
+
+                // give up ded
+                else break;
+            }
+
+            return line.Substring(realIdx);
+        }
+
         public static bool TryDetendLine(string line, int indentCount, out string detendedLine)
         {
             // this index count tab as 1: for String.Substring

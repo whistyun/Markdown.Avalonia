@@ -264,8 +264,9 @@ namespace Markdown.Avalonia
                     s4 => DoLists(s4,
                     s5 => DoTable(s5,
                     s6 => DoNote(s6, supportTextAlignment,
+                    s7 => DoIndentCodeBlock(s7,
                     sn => FormParagraphs(sn, supportTextAlignment
-                    ))))))));
+                    )))))))));
 
             //text = DoCodeBlocks(text);
             //text = DoBlockQuotes(text);
@@ -795,7 +796,7 @@ namespace Markdown.Avalonia
         /// Maximum number of levels a single list can have.
         /// In other words, _listDepth - 1 is the maximum number of nested lists.
         /// </summary>
-        private const int _listDepth = 6;
+        private const int _listDepth = 4;
 
         private static readonly string _wholeList = string.Format(@"
             (                               # $1 = whole list
@@ -849,7 +850,8 @@ namespace Markdown.Avalonia
             }
 
             // Check text marker style.
-            (TextMarkerStyle textMarker, string markerPattern) = GetTextMarkerStyle(match.Groups[3].Value);
+            (TextMarkerStyle textMarker, string markerPattern, int indentAppending)
+                = GetTextMarkerStyle(match.Groups[3].Value);
 
             // count indent from first marker with indent
             int countIndent = IndentUtil.CountIndent(match.Groups[2].Value);
@@ -857,7 +859,7 @@ namespace Markdown.Avalonia
             // whole list
             string[] whileListLins = match.Groups[1].Value.Split('\n');
 
-            // cllect detendentable line
+            // collect detendentable line
             var listBulder = new StringBuilder();
             var outerListBuildre = new StringBuilder();
             var isInOuterList = false;
@@ -875,6 +877,7 @@ namespace Markdown.Avalonia
                         var someMarkerMch = Regex.Match(stripedLine, $"{_markerUL}|{_markerOL}");
                         if (someMarkerMch.Success && someMarkerMch.Index == 0)
                         {
+                            // is it same marker as now processed?
                             var targetMarkerMch = Regex.Match(stripedLine, markerPattern);
                             if (targetMarkerMch.Success && targetMarkerMch.Index == 0)
                             {
@@ -882,7 +885,11 @@ namespace Markdown.Avalonia
                             }
                             else isInOuterList = true;
                         }
-                        else listBulder.Append(stripedLine).Append("\n");
+                        else
+                        {
+                            var detentedline = IndentUtil.DetentBestEffort(stripedLine, indentAppending);
+                            listBulder.Append(detentedline).Append("\n");
+                        }
                     }
                     else isInOuterList = true;
                 }
@@ -1017,48 +1024,49 @@ namespace Markdown.Avalonia
         /// <summary>
         /// Get the text marker style based on a specific regex.
         /// </summary>
-        /// <param name="listType">Specify what kind of list: ul, ol.</param>
+        /// <param name="markerText">list maker (eg. * + 1. a. </param>
         /// <returns>
         ///     1; return Type. 
         ///     2: match regex pattern
+        ///     3: char length of listmaker
         /// </returns>
-        private static (TextMarkerStyle, string) GetTextMarkerStyle(string markerText)
+        private static (TextMarkerStyle, string, int) GetTextMarkerStyle(string markerText)
         {
             if (Regex.IsMatch(markerText, _markerUL_Disc))
             {
-                return (TextMarkerStyle.Disc, _markerUL_Disc);
+                return (TextMarkerStyle.Disc, _markerUL_Disc, 2);
             }
             else if (Regex.IsMatch(markerText, _markerUL_Box))
             {
-                return (TextMarkerStyle.Box, _markerUL_Box);
+                return (TextMarkerStyle.Box, _markerUL_Box, 2);
             }
             else if (Regex.IsMatch(markerText, _markerUL_Circle))
             {
-                return (TextMarkerStyle.Circle, _markerUL_Circle);
+                return (TextMarkerStyle.Circle, _markerUL_Circle, 2);
             }
             else if (Regex.IsMatch(markerText, _markerUL_Square))
             {
-                return (TextMarkerStyle.Square, _markerUL_Square);
+                return (TextMarkerStyle.Square, _markerUL_Square, 2);
             }
             else if (Regex.IsMatch(markerText, _markerOL_Number))
             {
-                return (TextMarkerStyle.Decimal, _markerOL_Number);
+                return (TextMarkerStyle.Decimal, _markerOL_Number, 3);
             }
             else if (Regex.IsMatch(markerText, _markerOL_LetterLower))
             {
-                return (TextMarkerStyle.LowerLatin, _markerOL_LetterLower);
+                return (TextMarkerStyle.LowerLatin, _markerOL_LetterLower, 3);
             }
             else if (Regex.IsMatch(markerText, _markerOL_LetterUpper))
             {
-                return (TextMarkerStyle.UpperLatin, _markerOL_LetterUpper);
+                return (TextMarkerStyle.UpperLatin, _markerOL_LetterUpper, 3);
             }
             else if (Regex.IsMatch(markerText, _markerOL_RomanLower))
             {
-                return (TextMarkerStyle.LowerRoman, _markerOL_RomanLower);
+                return (TextMarkerStyle.LowerRoman, _markerOL_RomanLower, 3);
             }
             else if (Regex.IsMatch(markerText, _markerOL_RomanUpper))
             {
-                return (TextMarkerStyle.UpperRoman, _markerOL_RomanUpper);
+                return (TextMarkerStyle.UpperRoman, _markerOL_RomanUpper, 3);
             }
 
             throw new InvalidOperationException("sorry library manager forget to modify about listmerker.");
@@ -1202,9 +1210,9 @@ namespace Markdown.Avalonia
 
         #region grammer - code block
 
-        private static Regex _codeBlock = new Regex(@"
-                    (?<=\n)          # Character before opening
-                    [ \r\n]*
+        private static Regex _codeBlockFirst = new Regex(@"
+                    ^          # Character before opening
+                    [ ]*
                     (`+)             # $1 = Opening run of `
                     ([^\r\n`]*)      # $2 = The code lang
                     \r?\n
@@ -1213,15 +1221,11 @@ namespace Markdown.Avalonia
                     \1
                     (?!`)[\r\n]+", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
 
-        private static Regex _codeBlockFirst = new Regex(@"
-                    ^          # Character before opening
-                    (`+)             # $1 = Opening run of `
-                    ([^\r\n`]*)      # $2 = The code lang
-                    \r?\n
-                    ((.|\n)+?)       # $3 = The code block
-                    \n[ ]*
-                    \1
-                    (?!`)[\r\n]+", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
+        private static Regex _indentCodeBlock = new Regex(@"
+                    ^
+                    (([ ]{4}.+\n?)+)
+                    ", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
+
 
         private IEnumerable<Control> DoCodeBlocks(string text, Func<string, IEnumerable<Control>> defaultHandler)
         {
@@ -1230,22 +1234,28 @@ namespace Markdown.Avalonia
                 throw new ArgumentNullException(nameof(text));
             }
 
-            return Evaluate(
-                text, _codeBlockFirst, CodeBlocksEvaluator,
-                sn => Evaluate(sn, _codeBlock, CodeBlocksEvaluator, defaultHandler)
-            );
+            return Evaluate(text, _codeBlockFirst, CodeBlocksWithLangEvaluator, defaultHandler);
         }
 
-        private Border CodeBlocksEvaluator(Match match)
+        private IEnumerable<Control> DoIndentCodeBlock(string text, Func<string, IEnumerable<Control>> defaultHandler)
         {
-            if (match is null)
+            if (text is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                throw new ArgumentNullException(nameof(text));
             }
 
-            string lang = match.Groups[2].Value;
-            string code = match.Groups[3].Value;
+            return Evaluate(text, _indentCodeBlock, CodeBlocksWithoutLangEvaluator, defaultHandler);
+        }
 
+        private Border CodeBlocksWithLangEvaluator(Match match)
+            => CodeBlocksEvaluator(match.Groups[2].Value, match.Groups[3].Value);
+
+        private Border CodeBlocksWithoutLangEvaluator(Match match)
+            => CodeBlocksEvaluator(null, IndentUtil.DetentBestEffort(match.Groups[1].Value, 4));
+
+
+        private Border CodeBlocksEvaluator(string lang, string code)
+        {
             var ctxt = new TextBlock()
             {
                 Text = code,
