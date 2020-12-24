@@ -774,8 +774,14 @@ namespace Markdown.Avalonia
 
 
         #region grammer - list
-        private const string _markerUL = @"[*+=-]";
-        private const string _markerOL = @"\d+[.]|\p{L}+[.,]";
+
+        // `alphabet order` and `roman number` must start 'a.'～'c.' and 'i,'～'iii,'.
+        // This restrict is avoid to treat "Yes," as list marker.
+        private const string _firstListMaker = @"(?:[*+=-]|\d+[.]|[a-c][.]|[i]{1,3}[,]|[A-C][.]|[I]{1,3}[,])";
+        private const string _subseqListMaker = @"(?:[*+=-]|\d+[.]|[a-c][.]|[cdilmvx]+[,]|[A-C][.]|[CDILMVX]+[,])";
+
+        //private const string _markerUL = @"[*+=-]";
+        //private const string _markerOL = @"\d+[.]|\p{L}+[.,]";
 
         // Unordered List
         private const string _markerUL_Disc = @"[*]";
@@ -785,10 +791,10 @@ namespace Markdown.Avalonia
 
         // Ordered List
         private const string _markerOL_Number = @"\d+[.]";
-        private const string _markerOL_LetterLower = @"\p{Ll}+[.]";
-        private const string _markerOL_LetterUpper = @"\p{Lu}+[.]";
-        private const string _markerOL_RomanLower = @"\p{Ll}+[,]";
-        private const string _markerOL_RomanUpper = @"\p{Lu}+[,]";
+        private const string _markerOL_LetterLower = @"[a-c][.]";
+        private const string _markerOL_LetterUpper = @"[A-C][.]";
+        private const string _markerOL_RomanLower = @"[cdilmvx]+[,]";
+        private const string _markerOL_RomanUpper = @"[CDILMVX]+[,]";
 
         private int _listLevel;
 
@@ -801,7 +807,7 @@ namespace Markdown.Avalonia
         private static readonly string _wholeList = string.Format(@"
             (                               # $1 = whole list
               (                             # $2 = list marker with indent
-                [ ]{{0,{1}}}
+                [ ]{{0,{2}}}
                 ({0})                       # $3 = first list item marker
                 [ ]+
               )
@@ -813,10 +819,10 @@ namespace Markdown.Avalonia
                   (?=\S)
                   (?!                       # Negative lookahead for another list item marker
                     [ ]*
-                    {0}[ ]+
+                    {1}[ ]+
                   )
               )
-            )", string.Format("(?:{0}|{1})", _markerUL, _markerOL), _listDepth - 1);
+            )", _firstListMaker, _subseqListMaker, _listDepth - 1);
 
         private static readonly Regex _listNested = new Regex(@"^" + _wholeList,
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
@@ -874,7 +880,7 @@ namespace Markdown.Avalonia
                     else if (IndentUtil.TryDetendLine(line, countIndent, out var stripedLine))
                     {
                         // is it had list marker?
-                        var someMarkerMch = Regex.Match(stripedLine, $"{_markerUL}|{_markerOL}");
+                        var someMarkerMch = Regex.Match(stripedLine, _subseqListMaker);
                         if (someMarkerMch.Success && someMarkerMch.Index == 0)
                         {
                             // is it same marker as now processed?
