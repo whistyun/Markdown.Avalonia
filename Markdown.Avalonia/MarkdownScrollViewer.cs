@@ -230,7 +230,7 @@ namespace Markdown.Avalonia
 
                     Styles.Insert(0, value);
 
-                    ResetContent();
+                    //ResetContent();
                 }
 
                 _markdownStyle = value;
@@ -264,12 +264,12 @@ namespace Markdown.Avalonia
             }
         }
 
-        public void ResetContent()
-        {
-            var ctrl = _viewer.Content;
-            _viewer.Content = null;
-            Thread.MemoryBarrier();
-            _viewer.Content = ctrl;
-        }
+        //public void ResetContent()
+        //{
+        //    var ctrl = _viewer.Content;
+        //    _viewer.Content = null;
+        //    Thread.MemoryBarrier();
+        //    _viewer.Content = ctrl;
+        //}
     }
 }

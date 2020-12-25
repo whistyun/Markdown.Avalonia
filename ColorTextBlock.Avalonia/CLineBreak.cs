@@ -14,7 +14,7 @@ namespace ColorTextBlock.Avalonia
             Text = "\n";
         }
 
-        protected internal override IEnumerable<CGeometry> Measure(
+        protected override IEnumerable<CGeometry> MeasureOverride(
             double entireWidth,
             double remainWidth)
         {

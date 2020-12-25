@@ -128,7 +128,20 @@ namespace ColorTextBlock.Avalonia
             }
         }
 
-        protected internal abstract IEnumerable<CGeometry> Measure(
+        internal IEnumerable<CGeometry> Measure(double entireWidth, double remainWidth)
+        {
+            /*
+             * This is Imitation of Layoutable.MeasureCore.
+             * If parent style is changed, StyledElement.InvalidedStyles is called.
+             * This method clear all applied styles, 
+             * so we should reapply style after style change.
+             */
+            ApplyStyling();
+
+            return MeasureOverride(entireWidth, remainWidth);
+        }
+
+        protected abstract IEnumerable<CGeometry> MeasureOverride(
             double entireWidth,
             double remainWidth);
     }

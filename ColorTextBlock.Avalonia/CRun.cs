@@ -22,7 +22,7 @@ namespace ColorTextBlock.Avalonia
             set { SetValue(TextProperty, value); }
         }
 
-        protected internal override IEnumerable<CGeometry> Measure(
+        protected override IEnumerable<CGeometry> MeasureOverride(
             double entireWidth,
             double remainWidth)
         {

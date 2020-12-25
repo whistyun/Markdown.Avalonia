@@ -70,7 +70,7 @@ namespace ColorTextBlock.Avalonia
             this.Image = bitmap;
         }
 
-        protected internal override IEnumerable<CGeometry> Measure(
+        protected override IEnumerable<CGeometry> MeasureOverride(
             double entireWidth, double remainWidth)
         {
             if (Image is null)
