@@ -2,47 +2,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Media;
+using Avalonia;
+using ColorTextBlock.Avalonia.Fonts;
 
 namespace ColorTextBlock.Avalonia
 {
     public class CCode : CSpan
     {
-        private readonly static FontFamily Monospace;
-
-        static CCode()
-        {
-            string[] RequestFamilies = {
-                "menlo",
-                "monaco",
-                "consolas",
-                "droid sans mono",
-                "inconsolata",
-                "courier new",
-                "monospace",
-                "droid sans fallback"
-            };
-
-            var monospaceName = FontManager.Current.GetInstalledFontFamilyNames()
-                                           .Where(name => RequestFamilies.Any(reqNm => name.ToLower().Contains(reqNm)))
-                                           .FirstOrDefault();
-
-            if (String.IsNullOrEmpty(monospaceName))
-            {
-                // giveup
-                Monospace = null;
-            }
-            else
-            {
-                Monospace = new FontFamily(monospaceName);
-            }
-        }
+        public static readonly StyledProperty<FontFamily> MonospaceFontFamilyProperty =
+            AvaloniaProperty.Register<CCode, FontFamily>(
+                nameof(MonospaceFontFamily),
+                defaultValue: FontFamilyCollecter.TryGetMonospace() ?? FontFamily.Default,
+                inherits: true);
 
         public CCode(IEnumerable<CInline> inlines) : base(inlines)
         {
-            if (Monospace != null)
-            {
-                FontFamily = Monospace;
-            }
+            var obsvr = this.GetBindingObservable(MonospaceFontFamilyProperty);
+            Bind(FontFamilyProperty, obsvr);
+        }
+
+        public FontFamily MonospaceFontFamily
+        {
+            get { return GetValue(MonospaceFontFamilyProperty); }
+            set { SetValue(MonospaceFontFamilyProperty, value); }
         }
     }
 }
