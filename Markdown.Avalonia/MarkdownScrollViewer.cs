@@ -76,8 +76,8 @@ namespace Markdown.Avalonia
             _viewer.Content = doc;
         }
 
-        private Markdown _engine;
-        public Markdown Engine
+        private IMarkdownEngine _engine;
+        public IMarkdownEngine Engine
         {
             set
             {
@@ -121,11 +121,11 @@ namespace Markdown.Avalonia
                     var lines = Regex.Split(value, "\r\n|\r|\n", RegexOptions.Multiline);
 
                     // count last line indent
-                    int lastIdtCnt = IndentUtil.CountIndent(lines.Last());
+                    int lastIdtCnt = TextUtil.CountIndent(lines.Last());
                     // count full indent
                     int someIdtCnt = lines
                         .Where(line => !String.IsNullOrWhiteSpace(line))
-                        .Select(line => IndentUtil.CountIndent(line))
+                        .Select(line => TextUtil.CountIndent(line))
                         .Min();
 
                     var indentCount = Math.Max(lastIdtCnt, someIdtCnt);

@@ -25,7 +25,7 @@ using System.Windows.Input;
 
 namespace Markdown.Avalonia
 {
-    public class Markdown : AvaloniaObject
+    public class Markdown : AvaloniaObject, IMarkdownEngine
     {
         #region const
         /// <summary>
@@ -39,26 +39,26 @@ namespace Markdown.Avalonia
         /// </summary>
         private const int _tabWidth = 4;
 
-        private const string Heading1Class = "Heading1";
-        private const string Heading2Class = "Heading2";
-        private const string Heading3Class = "Heading3";
-        private const string Heading4Class = "Heading4";
-        private const string Heading5Class = "Heading5";
-        private const string Heading6Class = "Heading6";
+        public const string Heading1Class = "Heading1";
+        public const string Heading2Class = "Heading2";
+        public const string Heading3Class = "Heading3";
+        public const string Heading4Class = "Heading4";
+        public const string Heading5Class = "Heading5";
+        public const string Heading6Class = "Heading6";
 
-        private const string CodeBlockClass = "CodeBlock";
-        private const string BlockquoteClass = "Blockquote";
-        private const string NoteClass = "Note";
+        public const string CodeBlockClass = "CodeBlock";
+        public const string BlockquoteClass = "Blockquote";
+        public const string NoteClass = "Note";
 
-        private const string ParagraphClass = "Paragraph";
+        public const string ParagraphClass = "Paragraph";
 
-        private const string TableClass = "Table";
-        private const string TableHeaderClass = "TableHeader";
-        private const string TableRowOddClass = "OddTableRow";
-        private const string TableRowEvenClass = "EvenTableRow";
+        public const string TableClass = "Table";
+        public const string TableHeaderClass = "TableHeader";
+        public const string TableRowOddClass = "OddTableRow";
+        public const string TableRowEvenClass = "EvenTableRow";
 
-        private const string ListClass = "List";
-        private const string ListMarkerClass = "ListMarker";
+        public const string ListClass = "List";
+        public const string ListMarkerClass = "ListMarker";
 
         #endregion
 
@@ -99,10 +99,6 @@ namespace Markdown.Avalonia
 
         #region dependencyobject property
 
-        // Using a DependencyProperty as the backing store for DocumentStyle.  This enables animation, styling, binding, etc...
-        public static readonly AvaloniaProperty DocumentStyleProperty =
-            AvaloniaProperty.Register<Markdown, Style>(nameof(DocumentStyle), defaultValue: null);
-
         public static readonly DirectProperty<Markdown, ICommand> HyperlinkCommandProperty =
             AvaloniaProperty.RegisterDirect<Markdown, ICommand>(nameof(HyperlinkCommand),
                 mdEng => mdEng.HyperlinkCommand,
@@ -112,15 +108,6 @@ namespace Markdown.Avalonia
             AvaloniaProperty.RegisterDirect<Markdown, IBitmapLoader>(nameof(BitmapLoader),
                 mdEng => mdEng.BitmapLoader,
                 (mdEng, loader) => mdEng.BitmapLoader = loader);
-
-        /// <summary>
-        /// top-level flow document style
-        /// </summary>
-        public Style DocumentStyle
-        {
-            get { return (Style)GetValue(DocumentStyleProperty); }
-            set { SetValue(DocumentStyleProperty, value); }
-        }
 
         #endregion
 
@@ -174,7 +161,7 @@ namespace Markdown.Avalonia
                 throw new ArgumentNullException(nameof(text));
             }
 
-            text = Normalize(text);
+            text = TextUtil.Normalize(text, _tabWidth);
 
             var document = Create<StackPanel, Control>(RunBlockGamut(text, true));
             document.Orientation = Orientation.Vertical;
@@ -183,67 +170,6 @@ namespace Markdown.Avalonia
             //            document.SetBinding(FlowDocument.StyleProperty, new Binding(DocumentStyleProperty.Name) { Source = this });
 
             return document;
-        }
-
-        /// <summary>
-        /// convert all tabs to _tabWidth spaces; 
-        /// standardizes line endings from DOS (CR LF) or Mac (CR) to UNIX (LF); 
-        /// makes sure text ends with a couple of newlines; 
-        /// removes any blank lines (only spaces) in the text
-        /// </summary>
-        private string Normalize(string text)
-        {
-            if (text is null)
-            {
-                throw new ArgumentNullException(nameof(text));
-            }
-
-            var output = new StringBuilder(text.Length);
-            var line = new StringBuilder();
-            bool valid = false;
-
-            for (int i = 0; i < text.Length; i++)
-            {
-                switch (text[i])
-                {
-                    case '\n':
-                        if (valid)
-                            output.Append(line);
-                        output.Append('\n');
-                        line.Length = 0;
-                        valid = false;
-                        break;
-                    case '\r':
-                        if ((i < text.Length - 1) && (text[i + 1] != '\n'))
-                        {
-                            if (valid)
-                                output.Append(line);
-                            output.Append('\n');
-                            line.Length = 0;
-                            valid = false;
-                        }
-                        break;
-                    case '\t':
-                        int width = (_tabWidth - line.Length % _tabWidth);
-                        for (int k = 0; k < width; k++)
-                            line.Append(' ');
-                        break;
-                    case '\x1A':
-                        break;
-                    default:
-                        if (!valid && text[i] != ' ')
-                            valid = true;
-                        line.Append(text[i]);
-                        break;
-                }
-            }
-
-            if (valid)
-                output.Append(line);
-            output.Append('\n');
-
-            // add two newlines to the end before return
-            return output.Append("\n\n").ToString();
         }
 
         /// <summary>
@@ -860,7 +786,7 @@ namespace Markdown.Avalonia
                 = GetTextMarkerStyle(match.Groups[3].Value);
 
             // count indent from first marker with indent
-            int countIndent = IndentUtil.CountIndent(match.Groups[2].Value);
+            int countIndent = TextUtil.CountIndent(match.Groups[2].Value);
 
             // whole list
             string[] whileListLins = match.Groups[1].Value.Split('\n');
@@ -877,7 +803,7 @@ namespace Markdown.Avalonia
                     {
                         listBulder.Append("").Append("\n");
                     }
-                    else if (IndentUtil.TryDetendLine(line, countIndent, out var stripedLine))
+                    else if (TextUtil.TryDetendLine(line, countIndent, out var stripedLine))
                     {
                         // is it had list marker?
                         var someMarkerMch = Regex.Match(stripedLine, _subseqListMaker);
@@ -893,7 +819,7 @@ namespace Markdown.Avalonia
                         }
                         else
                         {
-                            var detentedline = IndentUtil.DetentBestEffort(stripedLine, indentAppending);
+                            var detentedline = TextUtil.DetentBestEffort(stripedLine, indentAppending);
                             listBulder.Append(detentedline).Append("\n");
                         }
                     }
@@ -1085,18 +1011,18 @@ namespace Markdown.Avalonia
 
         private static readonly Regex _table = new Regex(@"
             (                               # whole table
-                [ \r\n]*
+                [ \n]*
                 (?<hdr>                     # table header
-                    ([^\r\n\|]*\|[^\r\n]+)
+                    ([^\n\|]*\|[^\n]+)
                 )
-                [ ]*\r?\n[ ]*
+                [ ]*\n[ ]*
                 (?<col>                     # column style
                     \|?([ ]*:?-+:?[ ]*(\||$))+
                 )
                 (?<row>                     # table row
                     (
-                        [ ]*\r?\n[ ]*
-                        ([^\r\n\|]*\|[^\r\n]+)
+                        [ ]*\n[ ]*
+                        ([^\n\|]*\|[^\n]+)
                     )+
                 )
             )",
@@ -1220,12 +1146,12 @@ namespace Markdown.Avalonia
                     ^          # Character before opening
                     [ ]*
                     (`+)             # $1 = Opening run of `
-                    ([^\r\n`]*)      # $2 = The code lang
-                    \r?\n
+                    ([^\n`]*)      # $2 = The code lang
+                    \n
                     ((.|\n)+?)       # $3 = The code block
                     \n[ ]*
                     \1
-                    (?!`)[\r\n]+", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
+                    (?!`)[\n]+", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
 
         private static Regex _indentCodeBlock = new Regex(@"
                     ^
@@ -1257,7 +1183,7 @@ namespace Markdown.Avalonia
             => CodeBlocksEvaluator(match.Groups[2].Value, match.Groups[3].Value);
 
         private Border CodeBlocksWithoutLangEvaluator(Match match)
-            => CodeBlocksEvaluator(null, IndentUtil.DetentBestEffort(match.Groups[1].Value, 4));
+            => CodeBlocksEvaluator(null, TextUtil.DetentBestEffort(match.Groups[1].Value, 4));
 
 
         private Border CodeBlocksEvaluator(string lang, string code)
@@ -1780,17 +1706,17 @@ namespace Markdown.Avalonia
 
         private static Regex _blockquote = new Regex(@"
             (?<=\n)
-            [\r\n]*
+            [\n]*
             ([>].*)
-            (\r?\n[>].*)*
-            [\r\n]*
+            (\n[>].*)*
+            [\n]*
             ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static Regex _blockquoteFirst = new Regex(@"
             ^
             ([>].*)
-            (\r?\n[>].*)*
-            [\r\n]*
+            (\n[>].*)*
+            [\n]*
             ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private IEnumerable<Control> DoBlockquotes(string text, Func<string, IEnumerable<Control>> defaultHandler)
@@ -1814,10 +1740,9 @@ namespace Markdown.Avalonia
             }
 
             // trim '>'
-            var ln = new Regex("\r?\n");
             var trimmedTxt = string.Join(
                     "\n",
-                    ln.Split(match.Value.Trim())
+                    match.Value.Trim().Split('\n')
                         .Select(txt =>
                         {
                             if (txt.Length <= 1) return string.Empty;
@@ -1828,7 +1753,7 @@ namespace Markdown.Avalonia
                         .ToArray()
             );
 
-            var blocks = RunBlockGamut(Normalize(trimmedTxt), true);
+            var blocks = RunBlockGamut(trimmedTxt, true);
 
             var panel = Create<StackPanel, Control>(blocks);
             panel.Orientation = Orientation.Vertical;
@@ -1884,7 +1809,7 @@ namespace Markdown.Avalonia
                 _nestedParensPattern =
                     RepeatString(@"
                     (?>              # Atomic matching
-                       [^()\r\n\t]+? # Anything other than parens or whitespace
+                       [^()\n\t]+? # Anything other than parens or whitespace
                      |
                        \(
                            ", _nestDepth) + RepeatString(
