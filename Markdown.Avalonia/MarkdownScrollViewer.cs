@@ -5,6 +5,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Metadata;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using Markdown.Avalonia.Utils;
 using System;
 using System.IO;
 using System.Linq;
@@ -58,10 +59,23 @@ namespace Markdown.Avalonia
             LogicalChildren.Add(_viewer);
         }
 
-        public Markdown Engine
+        private void UpdateMarkdown()
         {
-            set;
-            get;
+            var doc = Engine.Transform(Markdown ?? "");
+            _viewer.Content = doc;
+        }
+
+        private IMarkdownEngine _engine;
+        public IMarkdownEngine Engine
+        {
+            set
+            {
+                _engine = value;
+
+                if (AssetPathRoot != null)
+                    _engine.AssetPathRoot = AssetPathRoot;
+            }
+            get => _engine;
         }
 
         public string AssetPathRoot
@@ -88,11 +102,11 @@ namespace Markdown.Avalonia
                     var lines = Regex.Split(value, "\r\n|\r|\n", RegexOptions.Multiline);
 
                     // count last line indent
-                    int lastIdtCnt = IndentUtil.CountIndent(lines.Last());
+                    int lastIdtCnt = TextUtil.CountIndent(lines.Last());
                     // count full indent
                     int someIdtCnt = lines
                         .Where(line => !String.IsNullOrWhiteSpace(line))
-                        .Select(line => IndentUtil.CountIndent(line))
+                        .Select(line => TextUtil.CountIndent(line))
                         .Min();
 
                     var indentCount = Math.Max(lastIdtCnt, someIdtCnt);
