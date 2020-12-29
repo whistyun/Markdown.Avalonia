@@ -58,29 +58,43 @@ namespace ColorTextBlock.Avalonia.Geometries
         private FormattedText Format;
 
         public TextGeometry(
-            double width, double height, bool linebreak,
-            CInline owner,
-            string text, FormattedText format) : base(width, height, linebreak)
+            double width, double height,
+            TextVerticalAlignment alignment,
+            bool linebreak,
+            string text, FormattedText format) :
+            base(width, height, height, alignment, linebreak)
         {
             this.Text = text;
             this.Format = format;
+        }
 
+        public TextGeometry(
+            double width, double height,
+            bool linebreak,
+            CInline owner,
+            string text, FormattedText format) :
+            base(width, height, height, owner.TextVerticalAlignment, linebreak)
+        {
+            this.Text = text;
+            this.Format = format;
             this.Owner = owner;
         }
 
         public static TextGeometry NewLine()
         {
             return new TextGeometry(
-                0, 0, true,
-                null,
+                0, 0,
+                TextVerticalAlignment.Descent,
+                true,
                 "", null);
         }
 
         public static TextGeometry NewLine(FormattedText format)
         {
             return new TextGeometry(
-                0, format.Bounds.Height, true,
-                null,
+                0, format.Bounds.Height,
+                TextVerticalAlignment.Descent,
+                true,
                 "", format);
         }
 

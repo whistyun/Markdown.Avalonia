@@ -114,7 +114,8 @@ namespace ColorTextBlock.Avalonia
                 }
             }
 
-            yield return new BitmapGeometry(Image, imageWidth, imageHeight);
+            yield return new BitmapGeometry(Image, imageWidth, imageHeight,
+                TextVerticalAlignment);
         }
     }
 }

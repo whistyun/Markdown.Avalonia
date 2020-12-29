@@ -15,7 +15,9 @@ namespace ColorTextBlock.Avalonia.Geometries
         public double Top { get; set; }
         public double Width { get; }
         public double Height { get; }
+        public double LineHeight { get; }
         public bool LineBreak { get; }
+        public TextVerticalAlignment TextVerticalAlignment { get; }
 
         public event Action RepaintRequested;
 
@@ -25,10 +27,15 @@ namespace ColorTextBlock.Avalonia.Geometries
         public virtual Action OnMouseReleased { get; set; }
         public virtual Action OnClick { get; set; }
 
-        public CGeometry(double width, double height, bool linebreak)
+        public CGeometry(
+            double width, double height, double lineHeight,
+            TextVerticalAlignment textVerticalAlignment,
+            bool linebreak)
         {
             this.Width = width;
             this.Height = height;
+            this.LineHeight = lineHeight;
+            this.TextVerticalAlignment = textVerticalAlignment;
             this.LineBreak = linebreak;
         }
 

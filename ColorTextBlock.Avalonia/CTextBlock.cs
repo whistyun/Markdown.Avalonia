@@ -34,6 +34,11 @@ namespace ColorTextBlock.Avalonia
         public static readonly AttachedProperty<FontStyle> FontStyleProperty =
             TextBlock.FontStyleProperty.AddOwner<CTextBlock>();
 
+        public static readonly StyledProperty<TextVerticalAlignment> TextVerticalAlignmentProperty =
+            AvaloniaProperty.Register<CTextBlock, TextVerticalAlignment>(
+                nameof(TextVerticalAlignment),
+                defaultValue: TextVerticalAlignment.Descent,
+                inherits: true);
 
         public static readonly StyledProperty<TextWrapping> TextWrappingProperty =
             AvaloniaProperty.Register<CTextBlock, TextWrapping>(nameof(TextWrapping), defaultValue: TextWrapping.Wrap);
@@ -119,6 +124,12 @@ namespace ColorTextBlock.Avalonia
         {
             get { return GetValue(TextAlignmentProperty); }
             set { SetValue(TextAlignmentProperty, value); }
+        }
+
+        public TextVerticalAlignment TextVerticalAlignment
+        {
+            get { return GetValue(TextVerticalAlignmentProperty); }
+            set { SetValue(TextVerticalAlignmentProperty, value); }
         }
 
         [Content]
@@ -346,23 +357,23 @@ namespace ColorTextBlock.Avalonia
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            foreach (CGeometry metry in metries) metry.RepaintRequested -= RepaintRequested;
-
-            metries = new List<CGeometry>();
+            metries.Clear();
 
             double entireWidth = availableSize.Width;
             if (Double.IsInfinity(availableSize.Width) && Bounds.Width != 0)
                 entireWidth = Bounds.Width;
 
+
+            double width = 0;
+            double height = 0;
+
             // measure & split by linebreak
-            var lineMetries = new List<Tuple<List<CGeometry>, Size>>();
+            var lines = new List<LineInfo>();
             {
+                LineInfo now = null;
 
                 double remainWidth = entireWidth;
 
-                var atlineWid = 0d;
-                var atlineHei = 0d;
-                var atline = new List<CGeometry>();
                 foreach (CInline inline in Content)
                 {
                     IEnumerable<CGeometry> inlineGeometry =
@@ -372,50 +383,33 @@ namespace ColorTextBlock.Avalonia
 
                     foreach (CGeometry metry in inlineGeometry)
                     {
-                        atline.Add(metry);
-                        atlineWid += metry.Width;
-                        atlineHei = Math.Max(metry.Height, atlineHei);
+                        if (now is null) lines.Add(now = new LineInfo());
 
-                        remainWidth -= metry.Width;
-
-                        if (metry.LineBreak)
+                        if (now.Add(metry))
                         {
-                            metries.AddRange(atline);
+                            width = Math.Max(width, now.Width);
+                            height += now.Height;
 
-                            lineMetries.Add(Tuple.Create(atline, new Size(atlineWid, atlineHei)));
-
-                            atline = new List<CGeometry>();
-                            atlineWid = 0d;
-                            atlineHei = 0d;
-
+                            now = null;
                             remainWidth = entireWidth;
                         }
+                        else remainWidth -= metry.Width;
                     }
                 }
 
-                if (atline.Count > 0)
+                if (now != null)
                 {
-                    metries.AddRange(atline);
-
-                    lineMetries.Add(Tuple.Create(atline, new Size(atlineWid, atlineHei)));
-
-                    atline = new List<CGeometry>();
-                    atlineWid = 0d;
-                    atlineHei = 0d;
-
-                    remainWidth = entireWidth;
+                    width = Math.Max(width, now.Width);
+                    height += now.Height;
                 }
             }
-
-            double width = lineMetries.Count == 0 ? 0d : lineMetries.Max(tpl => tpl.Item2.Width);
-            double height = lineMetries.Count == 0 ? 0d : lineMetries.Sum(tpl => tpl.Item2.Height);
 
             // set position
             {
                 var topOffset = 0d;
                 var leftOffset = 0d;
 
-                foreach (Tuple<List<CGeometry>, Size> lineMetry in lineMetries)
+                foreach (LineInfo lineInf in lines)
                 {
                     switch (TextAlignment)
                     {
@@ -423,22 +417,38 @@ namespace ColorTextBlock.Avalonia
                             leftOffset = 0d;
                             break;
                         case TextAlignment.Center:
-                            leftOffset = (entireWidth - lineMetry.Item2.Width) / 2;
+                            leftOffset = (entireWidth - lineInf.Width) / 2;
                             break;
                         case TextAlignment.Right:
-                            leftOffset = entireWidth - lineMetry.Item2.Width;
+                            leftOffset = entireWidth - lineInf.Width;
                             break;
                     }
 
-                    topOffset += lineMetry.Item2.Height;
-
-                    foreach (CGeometry metry in lineMetry.Item1)
+                    foreach (CGeometry metry in lineInf.Metries)
                     {
                         metry.Left = leftOffset;
-                        metry.Top = topOffset - metry.Height;
+                        switch (metry.TextVerticalAlignment)
+                        {
+                            case TextVerticalAlignment.Top:
+                                metry.Top = topOffset - metry.Height;
+                                break;
+                            case TextVerticalAlignment.Center:
+                                metry.Top = topOffset + (lineInf.Height - metry.Height) / 2;
+                                break;
+                            case TextVerticalAlignment.Bottom:
+                                metry.Top = topOffset + lineInf.Height - metry.Height;
+                                break;
+                            case TextVerticalAlignment.Descent:
+                                metry.Top = topOffset + lineInf.LineHeight - metry.LineHeight;
+                                break;
+                        }
 
                         leftOffset += metry.Width;
+
+                        metries.Add(metry);
                     }
+
+                    topOffset += lineInf.Height;
                 }
             }
 
@@ -459,5 +469,56 @@ namespace ColorTextBlock.Avalonia
                 metry.Render(context);
             }
         }
+    }
+
+    class LineInfo
+    {
+        public List<CGeometry> Metries = new List<CGeometry>();
+
+        public double LineHeight1;
+        public double LineHeight2;
+        public double LineHeight3;
+
+        public double Width;
+        public double Height;
+        public double LineHeight =>
+                LineHeight1 != 0 ? LineHeight1 :
+                LineHeight2 != 0 ? LineHeight2 :
+                LineHeight3;
+
+        public bool Add(CGeometry metry)
+        {
+            Metries.Add(metry);
+
+            Width += metry.Width;
+
+            switch (metry.TextVerticalAlignment)
+            {
+                case TextVerticalAlignment.Descent:
+                case TextVerticalAlignment.Top:
+                    Max(ref LineHeight1, metry.LineHeight);
+                    Max(ref Height, metry.Height);
+                    break;
+
+                case TextVerticalAlignment.Center:
+                    Max(ref LineHeight2, metry.LineHeight);
+                    Max(ref Height, metry.Height);
+                    break;
+
+                case TextVerticalAlignment.Bottom:
+                    Max(ref LineHeight3, metry.LineHeight);
+                    Max(ref Height, metry.Height);
+                    break;
+
+                default:
+                    Throw("sorry library manager forget to modify.");
+                    break;
+            }
+
+            return metry.LineBreak;
+        }
+
+        private static void Max(ref double v1, double v2) => v1 = Math.Max(v1, v2);
+        private static void Throw(string msg) => throw new InvalidOperationException(msg);
     }
 }

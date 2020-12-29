@@ -16,14 +16,8 @@ namespace ColorTextBlock.Avalonia.Geometries
         public new double Height { get; }
         public Bitmap Bitmap { get; }
 
-        public BitmapGeometry(Bitmap bitmap) : this(bitmap, bitmap.Size.Width, bitmap.Size.Height)
-        {
-            this.Bitmap = bitmap;
-            this.Width = bitmap.Size.Width;
-            this.Height = bitmap.Size.Height;
-        }
-
-        public BitmapGeometry(Bitmap bitmap, double width, double height) : base(width, height, false)
+        public BitmapGeometry(Bitmap bitmap, double width, double height,
+            TextVerticalAlignment alignment) : base(width, height, height, alignment, false)
         {
             this.Bitmap = bitmap;
             this.Width = width;
