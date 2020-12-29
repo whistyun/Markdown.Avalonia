@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-16"?>
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+  <c:CTextBlock Classes="Paragraph">
+    <c:CRun Text="Just a " />
+    <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="/url/">
+      <c:CRun Text="URL" />
+    </c:CHyperlink>
+    <c:CRun Text="." />
+  </c:CTextBlock>
+  <c:CTextBlock Classes="Paragraph">
+    <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="/url/" Classes="title">
+      <c:CRun Text="URL and title" />
+    </c:CHyperlink>
+    <c:CRun Text="." />
+  </c:CTextBlock>
+  <c:CTextBlock Classes="Paragraph">
+    <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="/url/">
+      <c:CRun Text="URL and title" />
+    </c:CHyperlink>
+    <c:CRun Text="." />
+  </c:CTextBlock>
+  <c:CTextBlock Classes="Paragraph">
+    <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="/url/">
+      <c:CRun Text="URL and title" />
+    </c:CHyperlink>
+    <c:CRun Text="." />
+  </c:CTextBlock>
+  <c:CTextBlock Classes="Paragraph">
+    <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="/url/">
+      <c:CRun Text="URL and title" />
+    </c:CHyperlink>
+    <c:CRun Text="." />
+  </c:CTextBlock>
+  <c:CTextBlock Classes="Paragraph">
+    <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="&lt;/url/&gt;">
+      <c:CRun Text="URL wrapped in angle brackets" />
+    </c:CHyperlink>
+    <c:CRun Text="." />
+  </c:CTextBlock>
+  <c:CTextBlock Classes="Paragraph">
+    <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="&lt;/url/&gt;">
+      <c:CRun Text="URL w/ angle brackets + title" />
+    </c:CHyperlink>
+    <c:CRun Text="." />
+  </c:CTextBlock>
+  <c:CTextBlock Classes="Paragraph">
+    <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="">
+      <c:CRun Text="Empty" />
+    </c:CHyperlink>
+    <c:CRun Text="." />
+  </c:CTextBlock>
+  <c:CTextBlock Classes="Paragraph">
+    <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="http://en.wikipedia.org/wiki/WIMP_(computing)">
+      <c:CRun Text="With parens in the URL" />
+    </c:CHyperlink>
+  </c:CTextBlock>
+  <c:CTextBlock Classes="Paragraph">
+    <c:CRun Text="(With outer parens and " />
+    <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="/foo(bar)">
+      <c:CRun Text="parens in url" />
+    </c:CHyperlink>
+    <c:CRun Text=")" />
+  </c:CTextBlock>
+  <c:CTextBlock Classes="Paragraph">
+    <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="/foo(bar)">
+      <c:CRun Text="With parens in the URL" />
+    </c:CHyperlink>
+  </c:CTextBlock>
+  <c:CTextBlock Classes="Paragraph">
+    <c:CRun Text="(With outer parens and " />
+    <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="/foo(bar)">
+      <c:CRun Text="parens in url" />
+    </c:CHyperlink>
+    <c:CRun Text=")" />
+  </c:CTextBlock>
+</StackPanel>
