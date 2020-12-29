@@ -158,7 +158,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             text = TextUtil.Normalize(text, _tabWidth);
@@ -179,7 +179,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return
@@ -215,7 +215,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return DoCodeSpans(text,
@@ -255,7 +255,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
 
@@ -328,7 +328,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return Evaluate(text, _imageOrHrefInline, ImageOrHrefInlineEvaluator, defaultHandler);
@@ -338,7 +338,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             if (String.IsNullOrEmpty(match.Groups[2].Value))
@@ -355,7 +355,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             string linkText = match.Groups[3].Value;
@@ -443,7 +443,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return Evaluate<Control>(text, _headerSetext, m => SetextHeaderEvaluator(m),
@@ -454,7 +454,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             string header = match.Groups[1].Value;
@@ -468,7 +468,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             string header = match.Groups[2].Value;
@@ -480,7 +480,7 @@ namespace Markdown.Avalonia
         {
             if (content is null)
             {
-                throw new ArgumentNullException(nameof(content));
+                Helper.ThrowArgNull(nameof(content));
             }
 
             var heading = new CTextBlock(content);
@@ -537,7 +537,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return Evaluate<Control>(text, _note,
@@ -549,7 +549,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             string text = match.Groups[2].Value;
@@ -584,7 +584,7 @@ namespace Markdown.Avalonia
         {
             if (content is null)
             {
-                throw new ArgumentNullException(nameof(content));
+                Helper.ThrowArgNull(nameof(content));
             }
 
             var note = new CTextBlock(content);
@@ -635,7 +635,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return Evaluate(text, _horizontalRules, RuleEvaluator,
@@ -651,7 +651,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             return new Rule(RuleType.Single);
@@ -664,7 +664,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             return new Rule(RuleType.TwoLines);
@@ -677,7 +677,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             return new Rule(RuleType.Bold);
@@ -690,7 +690,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             return new Rule(RuleType.BoldWithSingle);
@@ -763,7 +763,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             // We use a different prefix before nested lists than top-level lists.
@@ -778,7 +778,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             // Check text marker style.
@@ -936,7 +936,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             string item = match.Groups[4].Value;
@@ -1001,7 +1001,9 @@ namespace Markdown.Avalonia
                 return (TextMarkerStyle.UpperRoman, _markerOL_RomanUpper, 3);
             }
 
-            throw new InvalidOperationException("sorry library manager forget to modify about listmerker.");
+            Helper.ThrowInvalidOperation("sorry library manager forget to modify about listmerker.");
+            // dummy
+            return (TextMarkerStyle.Disc, _markerUL_Disc, 2);
         }
 
         #endregion
@@ -1032,7 +1034,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return Evaluate(text, _table, TableEvalutor, defaultHandler);
@@ -1042,7 +1044,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             var headerTxt = match.Groups["hdr"].Value.Trim();
@@ -1163,7 +1165,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return Evaluate(text, _codeBlockFirst, CodeBlocksWithLangEvaluator, defaultHandler);
@@ -1173,7 +1175,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return Evaluate(text, _indentCodeBlock, CodeBlocksWithoutLangEvaluator, defaultHandler);
@@ -1254,7 +1256,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             //    * You can use multiple backticks as the delimiters if you want to
@@ -1286,7 +1288,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             string span = match.Groups[2].Value;
@@ -1321,7 +1323,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             // <strong> must go first, then <em>
@@ -1628,7 +1630,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             var content = match.Groups[contentGroup].Value;
@@ -1640,7 +1642,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             var content = match.Groups[contentGroup].Value;
@@ -1652,7 +1654,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             var content = match.Groups[contentGroup].Value;
@@ -1664,7 +1666,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             var content = match.Groups[contentGroup].Value;
@@ -1684,7 +1686,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             var lines = _lbrk.Split(text);
@@ -1723,7 +1725,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return Evaluate(
@@ -1736,7 +1738,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             // trim '>'
@@ -1826,7 +1828,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             var sb = new StringBuilder(text.Length * count);
@@ -1856,7 +1858,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             var matches = expression.Matches(text);
@@ -1891,7 +1893,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             var matches = expression.Matches(text);

@@ -29,6 +29,9 @@ namespace ColorTextBlock.Avalonia
         public static readonly AttachedProperty<FontStyle> FontStyleProperty =
             TextBlock.FontStyleProperty.AddOwner<CInline>();
 
+        public static readonly StyledProperty<TextVerticalAlignment> TextVerticalAlignmentProperty =
+            CTextBlock.TextVerticalAlignmentProperty.AddOwner<CInline>();
+
         public static readonly StyledProperty<bool> IsUnderlineProperty =
             AvaloniaProperty.Register<CInline, bool>(nameof(IsUnderline), inherits: true);
 
@@ -102,6 +105,12 @@ namespace ColorTextBlock.Avalonia
         {
             get { return GetValue(IsStrikethroughProperty); }
             set { SetValue(IsStrikethroughProperty, value); }
+        }
+
+        public TextVerticalAlignment TextVerticalAlignment
+        {
+            get { return GetValue(TextVerticalAlignmentProperty); }
+            set { SetValue(TextVerticalAlignmentProperty, value); }
         }
 
         protected void RequestMeasure()

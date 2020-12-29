@@ -194,14 +194,14 @@ namespace ColorTextBlock.Avalonia
 
                     if (adding.LineBreak)
                     {
-                        renew.Add(new DecoratorGeometry(this, buffer, _border));
+                        renew.Add(DecoratorGeometry.New(this, buffer, _border));
                         buffer.Clear();
                     }
                 }
 
                 if (buffer.Count != 0)
                 {
-                    renew.Add(new DecoratorGeometry(this, buffer, _border));
+                    renew.Add(DecoratorGeometry.New(this, buffer, _border));
                 }
 
                 metries = renew;
