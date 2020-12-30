@@ -35,6 +35,23 @@ namespace Markdown.Avalonia
                 o => o.MarkdownStyleName,
                 (o, v) => o.MarkdownStyleName = v);
 
+        public static readonly AvaloniaProperty<string> AssetPathRootProperty =
+            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, string>(
+                nameof(AssetPathRoot),
+                o => o.AssetPathRoot,
+                (o, v) => o.AssetPathRoot = v);
+
+        public static readonly StyledPropertyBase<bool> SaveScrollValueWhenContentUpdatedProperty =
+            AvaloniaProperty.Register<MarkdownScrollViewer, bool>(
+                nameof(SaveScrollValueWhenContentUpdated),
+                defaultValue: false);
+
+        public static readonly AvaloniaProperty<Vector> ScrollValueProperty =
+            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, Vector>(
+                nameof(ScrollValue),
+                owner => owner.ScrollValue,
+                (owner, v) => owner.ScrollValue = v);
+
         private ScrollViewer _viewer;
 
         public MarkdownScrollViewer()
@@ -62,7 +79,12 @@ namespace Markdown.Avalonia
         private void UpdateMarkdown()
         {
             var doc = Engine.Transform(Markdown ?? "");
+
+            var ofst = _viewer.Offset;
             _viewer.Content = doc;
+
+            if (SaveScrollValueWhenContentUpdated)
+                _viewer.Offset = ofst;
         }
 
         private IMarkdownEngine _engine;
@@ -78,10 +100,30 @@ namespace Markdown.Avalonia
             get => _engine;
         }
 
+        private string _AssetPathRoot;
         public string AssetPathRoot
         {
-            set { Engine.AssetPathRoot = value; }
-            get => Engine.AssetPathRoot;
+            set
+            {
+                if (value != null)
+                {
+                    Engine.AssetPathRoot = _AssetPathRoot = value;
+                    UpdateMarkdown();
+                }
+            }
+            get => _AssetPathRoot;
+        }
+
+        public bool SaveScrollValueWhenContentUpdated
+        {
+            set { SetValue(SaveScrollValueWhenContentUpdatedProperty, value); }
+            get { return GetValue(SaveScrollValueWhenContentUpdatedProperty); }
+        }
+
+        public Vector ScrollValue
+        {
+            set { _viewer.Offset = value; }
+            get { return _viewer.Offset; }
         }
 
         [Content]
@@ -153,8 +195,7 @@ namespace Markdown.Avalonia
             {
                 if (SetAndRaise(MarkdownProperty, ref _markdown, value))
                 {
-                    var doc = Engine.Transform(value ?? "");
-                    _viewer.Content = doc;
+                    UpdateMarkdown();
                 }
             }
         }
