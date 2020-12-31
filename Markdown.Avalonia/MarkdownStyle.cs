@@ -1,6 +1,8 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Styling;
+using Markdown.Avalonia.StyleCollections;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,35 +13,32 @@ namespace Markdown.Avalonia
 {
     public static class MarkdownStyle
     {
-        static Styles LoadXaml(string name)
+        static IStyle LoadXaml(string name)
         {
-            var asm = Assembly.GetExecutingAssembly();
-            using (var stream = asm.GetManifestResourceStream("Markdown.Avalonia.MarkdownStyle.xml"))
-            using (var text = new StreamReader(stream))
+            return new StyleInclude(new Uri("avares://Markdown.Avalonia/"))
             {
-                var resources = (ResourceDictionary)AvaloniaRuntimeXamlLoader.Load(text.ReadToEnd());
-                return (Styles)resources[name];
-            }
+                Source = new Uri("avares://Markdown.Avalonia/" + name)
+            };
         }
 
         public static Styles Standard
         {
-            get => LoadXaml("DocumentStyleStandard");
+            get => new MarkdownStyleStandard();
         }
 
         public static Styles DefaultTheme
         {
-            get => LoadXaml("DocumentStyleDefaultTheme");
+            get => new MarkdownStyleDefaultTheme();
         }
 
         public static Styles FluentTheme
         {
-            get => LoadXaml("DocumentStyleFluentTheme");
+            get => new MarkdownStyleFluentTheme();
         }
 
         public static Styles GithubLike
         {
-            get => LoadXaml("DocumentStyleGithubLike");
+            get => new MarkdownStyleGithubLike();
         }
     }
 }
