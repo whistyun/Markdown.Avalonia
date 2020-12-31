@@ -4,11 +4,10 @@ using Avalonia.Media;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace ColorTextBlock.Avalonia.Geometries
 {
-    class DecoratorGeometry : CGeometry
+    public class DecoratorGeometry : CGeometry
     {
         public CSpan Owner { get; }
         public CGeometry[] Targets { get; }
@@ -71,20 +70,77 @@ namespace ColorTextBlock.Avalonia.Geometries
             set => _OnClick = value;
         }
 
-        public DecoratorGeometry(
+        internal static DecoratorGeometry New(
             CSpan owner,
-            IEnumerable<CGeometry> targets,
-            Border decorate) : this(owner, targets.ToArray(), decorate)
-        { }
+            IEnumerable<CGeometry> oneline,
+            Border decorate)
+        {
+            double width = 0;
+            double height = 0;
 
-        public DecoratorGeometry(
+            double descentHeightTop = 0;
+            double descentHeightBtm = 0;
+
+            double lineHeight = 0;
+            double lineHeight2 = 0;
+
+            void Max(ref double v1, double v2) => v1 = Math.Max(v1, v2);
+
+            foreach (var one in oneline)
+            {
+                width += one.Width;
+
+                switch (one.TextVerticalAlignment)
+                {
+                    case TextVerticalAlignment.Descent:
+                        Max(ref lineHeight, one.LineHeight);
+
+                        Max(ref descentHeightTop, one.LineHeight);
+                        Max(ref descentHeightBtm, one.Height - one.LineHeight);
+                        break;
+
+                    case TextVerticalAlignment.Top:
+                        Max(ref lineHeight, one.LineHeight);
+                        Max(ref height, one.Height);
+                        break;
+
+                    case TextVerticalAlignment.Center:
+                        Max(ref lineHeight, one.Height / 2);
+                        Max(ref height, one.Height);
+                        break;
+
+                    case TextVerticalAlignment.Bottom:
+                        Max(ref lineHeight2, one.LineHeight);
+                        Max(ref height, one.Height);
+                        break;
+
+                    default:
+                        throw new InvalidOperationException("sorry library manager forget to modify.");
+                }
+
+            }
+
+            Max(ref height, descentHeightTop + descentHeightBtm);
+
+            lineHeight = lineHeight != 0 ? lineHeight : lineHeight2;
+
+            return new DecoratorGeometry(
+                width + decorate.DesiredSize.Width,
+                height + decorate.DesiredSize.Height,
+                lineHeight + decorate.Margin.Top + decorate.BorderThickness.Top + decorate.Padding.Top,
+                owner,
+                oneline.ToArray(),
+                decorate);
+        }
+
+        internal DecoratorGeometry(
+            double w, double h, double lh,
             CSpan owner,
             CGeometry[] targets,
-            Border decorate)
-            : base(
-                  targets.Sum(t => t.Width) + decorate.DesiredSize.Width,
-                  targets.Max(t => t.Height) + decorate.DesiredSize.Height,
-                  targets.Last().LineBreak)
+            Border decorate) : base(
+                w, h, lh,
+                owner.TextVerticalAlignment,
+                targets[targets.Length - 1].LineBreak)
         {
             this.Owner = owner;
             this.Targets = targets;
@@ -102,13 +158,33 @@ namespace ColorTextBlock.Avalonia.Geometries
             }
 
             var left = Left + Decorate.BorderThickness.Left + Decorate.Padding.Left + Decorate.Margin.Left;
-            var top = Top + Height - Decorate.BorderThickness.Bottom - Decorate.Padding.Bottom - Decorate.Margin.Bottom;
+
+            var top = Top + Decorate.BorderThickness.Top + Decorate.Padding.Top + Decorate.Margin.Top;
+            var btm = Top + Height - Decorate.BorderThickness.Bottom - Decorate.Padding.Bottom - Decorate.Margin.Bottom;
 
             foreach (var target in Targets)
             {
-                // I'm not sure it is correct.
                 target.Left = left;
-                target.Top = top - target.Height;
+
+                switch (target.TextVerticalAlignment)
+                {
+                    case TextVerticalAlignment.Top:
+                        target.Top = top;
+                        break;
+
+                    case TextVerticalAlignment.Center:
+                        target.Top = (top + btm - target.Height) / 2;
+                        break;
+
+                    case TextVerticalAlignment.Bottom:
+                        target.Top = btm - target.Height;
+                        break;
+
+                    case TextVerticalAlignment.Descent:
+                        target.Top = Top + LineHeight - target.LineHeight;
+                        break;
+                }
+
                 target.Render(ctx);
 
                 left += target.Width;

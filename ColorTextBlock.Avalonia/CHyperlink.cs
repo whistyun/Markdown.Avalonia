@@ -4,8 +4,6 @@ using ColorTextBlock.Avalonia.Geometries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using FStyle = Avalonia.Media.FontStyle;
 
 namespace ColorTextBlock.Avalonia
 {
@@ -31,6 +29,8 @@ namespace ColorTextBlock.Avalonia
 
         public Action<string> Command { get; set; }
         public string CommandParameter { get; set; }
+
+        public CHyperlink() { }
 
         public CHyperlink(IEnumerable<CInline> inlines) : base(inlines)
         {

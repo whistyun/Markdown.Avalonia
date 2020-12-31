@@ -1,18 +1,9 @@
 ﻿using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Media;
-using Avalonia.Styling;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Text;
 
 namespace ColorTextBlock.Avalonia.Geometries
 {
-    class TextGeometry : CGeometry
+    public class TextGeometry : CGeometry
     {
         public string Text { get; }
 
@@ -55,39 +46,54 @@ namespace ColorTextBlock.Avalonia.Geometries
             get => Owner is null ? false : Owner.IsStrikethrough;
         }
 
+        public bool IsLineBreakMarker => Format is null && Width == 0;
+
         private FormattedText Format;
 
-        public TextGeometry(
-            double width, double height, bool linebreak,
-            CInline owner,
-            string text, FormattedText format) : base(width, height, linebreak)
+        internal TextGeometry(
+            double width, double height,
+            TextVerticalAlignment alignment,
+            bool linebreak,
+            string text, FormattedText format) :
+            base(width, height, height, alignment, linebreak)
         {
             this.Text = text;
             this.Format = format;
+        }
 
+        internal TextGeometry(
+            double width, double height,
+            bool linebreak,
+            CInline owner,
+            string text, FormattedText format) :
+            base(width, height, height, owner.TextVerticalAlignment, linebreak)
+        {
+            this.Text = text;
+            this.Format = format;
             this.Owner = owner;
         }
 
-        public static TextGeometry NewLine()
+        internal static TextGeometry NewLine()
         {
             return new TextGeometry(
-                0, 0, true,
-                null,
+                0, 0,
+                TextVerticalAlignment.Descent,
+                true,
                 "", null);
         }
 
-        public static TextGeometry NewLine(FormattedText format)
+        internal static TextGeometry NewLine(FormattedText format)
         {
             return new TextGeometry(
-                0, format.Bounds.Height, true,
-                null,
-                "", format);
+                0, format.Bounds.Height,
+                TextVerticalAlignment.Descent,
+                true,
+                "", null);
         }
 
         public override void Render(DrawingContext ctx)
         {
-            if (Format is null && Width == 0 && Height == 0)
-                return;
+            if (IsLineBreakMarker) return;
 
             var foreground = _TemporaryForeground ?? Foreground;
             var background = _TemporaryBackground ?? Background;
