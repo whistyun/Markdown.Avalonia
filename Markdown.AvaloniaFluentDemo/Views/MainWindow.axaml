@@ -114,6 +114,7 @@
       Grid.Row="0"
       Grid.Column="1"
       VerticalAlignment="Stretch"
+      SaveScrollValueWhenContentUpdated="True"
       Markdown="{Binding Text}"
       
       local:DynamicStyleBehavior.XamlText="{Binding AppendStyleXamlText}"
