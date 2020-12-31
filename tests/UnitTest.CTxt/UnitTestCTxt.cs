@@ -2,12 +2,21 @@ using ApprovalTests;
 using ApprovalTests.Core;
 using ApprovalTests.Reporters;
 using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Rendering;
+using Avalonia.VisualTree;
 using ColorTextBlock.Avalonia;
+using Markdown.Avalonia;
 using NUnit.Framework;
+using System;
+using System.Linq;
+using System.Reflection;
 using UnitTest.Base;
+using UnitTest.Base.Apps;
 using UnitTest.Base.Utils;
 using UnitTest.CTxt.Utils;
 using UnitTest.CTxt.Xamls;
@@ -115,6 +124,38 @@ namespace UnitTest.CTxt
                 Approvals.GetDefaultNamer(),
                 new DiffToolReporter(DiffEngine.DiffTool.WinMerge));
         }
+
+        [Test]
+        [RunOnUI]
+        public void GivenTest4_generatesExpectedResult()
+        {
+            var text = Util.LoadText("MainWindow.md");
+
+            var markdown = new Markdown.Avalonia.Markdown();
+            var control = markdown.Transform(text);
+
+            control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Default/"))
+            {
+                Source = new Uri("avares://Avalonia.Themes.Default/DefaultTheme.xaml")
+            });
+            control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Default/"))
+            {
+                Source = new Uri("avares://Avalonia.Themes.Default/Accents/BaseLight.xaml")
+            });
+            control.Styles.Add(MarkdownStyle.DefaultTheme);
+            control.Resources.Add("FontSizeNormal", 16d);
+
+            var umefont = new FontFamily(new Uri("avares://UnitTest.CTxt/Assets/Fonts/ume-ugo4.ttf"), "Ume UI Gothic");
+            TextBlock.SetFontFamily(control, umefont);
+
+            var info = new MetryHolder(control, 500, 10000);
+
+            Approvals.Verify(
+                new ApprovalImageWriter(info.Image),
+                Approvals.GetDefaultNamer(),
+                new DiffToolReporter(DiffEngine.DiffTool.WinMerge));
+        }
+
     }
 
     class MetryHolder : AvaloniaObject
@@ -123,23 +164,71 @@ namespace UnitTest.CTxt
 
         public Bitmap Image { get; set; }
 
-        public MetryHolder(CTextBlock ctxt, int width = 400, int height = 1000)
+        //public MetryHolder(CTextBlock ctxt, int width = 400, int height = 1000)
+        //{
+        //    var reqSz = new Size(width, height);
+        //
+        //    ctxt.Measure(reqSz);
+        //    ctxt.Arrange(new Rect(0, 0, width, ctxt.DesiredSize.Height == 0 ? height : ctxt.DesiredSize.Height));
+        //    ctxt.Measure(reqSz);
+        //
+        //    var newReqSz = new Size(
+        //        ctxt.DesiredSize.Width == 0 ? reqSz.Width : ctxt.DesiredSize.Width,
+        //        ctxt.DesiredSize.Height == 0 ? reqSz.Height : ctxt.DesiredSize.Height);
+        //    ctxt.Arrange(new Rect(0, 0, newReqSz.Width, newReqSz.Height));
+        //
+        //    var bitmap = new RenderTargetBitmap(PixelSize.FromSizeWithDpi(newReqSz, Dpi), Dpi);
+        //
+        //    using (var icontext = bitmap.CreateDrawingContext(null))
+        //    using (var context = new DrawingContext(icontext))
+        //    {
+        //        ctxt.Render(context);
+        //    }
+        //
+        //    Image = bitmap;
+        //}
+
+        public MetryHolder(Control ctxt, int width = 400, int height = 1000)
         {
             var reqSz = new Size(width, height);
-
             ctxt.Measure(reqSz);
-            ctxt.Arrange(new Rect(0, 0, width, ctxt.DesiredSize.Height));
+            ctxt.Arrange(new Rect(0, 0, width, ctxt.DesiredSize.Height == 0 ? height : ctxt.DesiredSize.Height));
             ctxt.Measure(reqSz);
 
-            var bitmap = new RenderTargetBitmap(PixelSize.FromSizeWithDpi(ctxt.DesiredSize, Dpi), Dpi);
+            var newReqSz = new Size(
+                ctxt.DesiredSize.Width == 0 ? reqSz.Width : ctxt.DesiredSize.Width,
+                ctxt.DesiredSize.Height == 0 ? reqSz.Height : ctxt.DesiredSize.Height);
+            ctxt.Arrange(new Rect(0, 0, newReqSz.Width, newReqSz.Height));
+
+            var bitmap = new RenderTargetBitmap(PixelSize.FromSizeWithDpi(newReqSz, Dpi), Dpi);
 
             using (var icontext = bitmap.CreateDrawingContext(null))
             using (var context = new DrawingContext(icontext))
             {
-                ctxt.Render(context);
+                RenderHelper(ctxt, context);
             }
-
             Image = bitmap;
+        }
+
+        private void RenderHelper(IVisual vis, DrawingContext ctx)
+        {
+            var sz = new Rect(vis.Bounds.Size);
+            var bnd = vis.Bounds;
+
+            using (ctx.PushPostTransform(Matrix.CreateTranslation(vis.Bounds.Position)))
+            using (ctx.PushOpacity(vis.Opacity))
+            using (vis.OpacityMask != null ? ctx.PushOpacityMask(vis.OpacityMask, sz) : default(DrawingContext.PushedState))
+            {
+                vis.Render(ctx);
+
+                var childrenProp = typeof(Visual).GetProperties(BindingFlags.NonPublic | BindingFlags.Instance)
+                                            .Where(fld => fld.Name == "VisualChildren")
+                                            .First();
+
+                var children = (IAvaloniaList<IVisual>)childrenProp.GetValue(vis);
+                foreach (var child in children)
+                    RenderHelper(child, ctx);
+            }
         }
     }
 }

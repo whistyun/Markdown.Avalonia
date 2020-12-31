@@ -7,6 +7,7 @@
   <ItemGroup>
     <AvaloniaResource Include="Assets\Fonts\license.html" />
     <AvaloniaResource Include="Assets\Fonts\ume-ugo4.ttf" />
+    <EmbeddedResource Include="Texts\*" />
   </ItemGroup>
 
   <Import Project="..\UnitTest.props" />
@@ -17,9 +18,4 @@
     <ProjectReference Include="..\UnitTest.Base\UnitTest.Base.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Xamls\Test3.axaml.cs">
-      <DependentUpon>Test3.axaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
 </Project>
