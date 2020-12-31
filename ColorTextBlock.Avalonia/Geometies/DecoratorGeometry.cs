@@ -4,11 +4,10 @@ using Avalonia.Media;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace ColorTextBlock.Avalonia.Geometries
 {
-    class DecoratorGeometry : CGeometry
+    public class DecoratorGeometry : CGeometry
     {
         public CSpan Owner { get; }
         public CGeometry[] Targets { get; }
@@ -71,16 +70,19 @@ namespace ColorTextBlock.Avalonia.Geometries
             set => _OnClick = value;
         }
 
-        public static DecoratorGeometry New(
+        internal static DecoratorGeometry New(
             CSpan owner,
             IEnumerable<CGeometry> oneline,
             Border decorate)
         {
             double width = 0;
             double height = 0;
+
+            double descentHeightTop = 0;
+            double descentHeightBtm = 0;
+
             double lineHeight = 0;
             double lineHeight2 = 0;
-            double lineHeight3 = 0;
 
             void Max(ref double v1, double v2) => v1 = Math.Max(v1, v2);
 
@@ -91,18 +93,24 @@ namespace ColorTextBlock.Avalonia.Geometries
                 switch (one.TextVerticalAlignment)
                 {
                     case TextVerticalAlignment.Descent:
+                        Max(ref lineHeight, one.LineHeight);
+
+                        Max(ref descentHeightTop, one.LineHeight);
+                        Max(ref descentHeightBtm, one.Height - one.LineHeight);
+                        break;
+
                     case TextVerticalAlignment.Top:
                         Max(ref lineHeight, one.LineHeight);
                         Max(ref height, one.Height);
                         break;
 
                     case TextVerticalAlignment.Center:
-                        Max(ref lineHeight2, one.LineHeight);
+                        Max(ref lineHeight, one.Height / 2);
                         Max(ref height, one.Height);
                         break;
 
                     case TextVerticalAlignment.Bottom:
-                        Max(ref lineHeight3, one.LineHeight);
+                        Max(ref lineHeight2, one.LineHeight);
                         Max(ref height, one.Height);
                         break;
 
@@ -112,21 +120,20 @@ namespace ColorTextBlock.Avalonia.Geometries
 
             }
 
-            lineHeight =
-                lineHeight != 0 ? lineHeight :
-                lineHeight2 != 0 ? lineHeight2 :
-                lineHeight3;
+            Max(ref height, descentHeightTop + descentHeightBtm);
+
+            lineHeight = lineHeight != 0 ? lineHeight : lineHeight2;
 
             return new DecoratorGeometry(
-                width + decorate.Width,
-                height + decorate.Height,
+                width + decorate.DesiredSize.Width,
+                height + decorate.DesiredSize.Height,
                 lineHeight + decorate.Margin.Top + decorate.BorderThickness.Top + decorate.Padding.Top,
                 owner,
                 oneline.ToArray(),
                 decorate);
         }
 
-        public DecoratorGeometry(
+        internal DecoratorGeometry(
             double w, double h, double lh,
             CSpan owner,
             CGeometry[] targets,
@@ -174,7 +181,7 @@ namespace ColorTextBlock.Avalonia.Geometries
                         break;
 
                     case TextVerticalAlignment.Descent:
-                        target.Top = top + LineHeight - target.LineHeight;
+                        target.Top = Top + LineHeight - target.LineHeight;
                         break;
                 }
 

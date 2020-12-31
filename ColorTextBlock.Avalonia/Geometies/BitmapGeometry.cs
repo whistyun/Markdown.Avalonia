@@ -10,13 +10,13 @@ using System.Text;
 
 namespace ColorTextBlock.Avalonia.Geometries
 {
-    class BitmapGeometry : CGeometry
+    public class BitmapGeometry : CGeometry
     {
         public new double Width { get; }
         public new double Height { get; }
         public Bitmap Bitmap { get; }
 
-        public BitmapGeometry(Bitmap bitmap, double width, double height,
+        internal BitmapGeometry(Bitmap bitmap, double width, double height,
             TextVerticalAlignment alignment) : base(width, height, height, alignment, false)
         {
             this.Bitmap = bitmap;

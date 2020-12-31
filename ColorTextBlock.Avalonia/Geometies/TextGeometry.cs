@@ -1,18 +1,9 @@
 ﻿using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Media;
-using Avalonia.Styling;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Text;
 
 namespace ColorTextBlock.Avalonia.Geometries
 {
-    class TextGeometry : CGeometry
+    public class TextGeometry : CGeometry
     {
         public string Text { get; }
 
@@ -57,7 +48,7 @@ namespace ColorTextBlock.Avalonia.Geometries
 
         private FormattedText Format;
 
-        public TextGeometry(
+        internal TextGeometry(
             double width, double height,
             TextVerticalAlignment alignment,
             bool linebreak,
@@ -68,7 +59,7 @@ namespace ColorTextBlock.Avalonia.Geometries
             this.Format = format;
         }
 
-        public TextGeometry(
+        internal TextGeometry(
             double width, double height,
             bool linebreak,
             CInline owner,
@@ -80,7 +71,7 @@ namespace ColorTextBlock.Avalonia.Geometries
             this.Owner = owner;
         }
 
-        public static TextGeometry NewLine()
+        internal static TextGeometry NewLine()
         {
             return new TextGeometry(
                 0, 0,
@@ -89,7 +80,7 @@ namespace ColorTextBlock.Avalonia.Geometries
                 "", null);
         }
 
-        public static TextGeometry NewLine(FormattedText format)
+        internal static TextGeometry NewLine(FormattedText format)
         {
             return new TextGeometry(
                 0, format.Bounds.Height,

@@ -1,9 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Media;
 using ColorTextBlock.Avalonia.Geometries;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace ColorTextBlock.Avalonia
 {

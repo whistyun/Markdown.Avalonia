@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
 
 namespace ColorTextBlock.Avalonia
 {
@@ -430,7 +429,7 @@ namespace ColorTextBlock.Avalonia
                         switch (metry.TextVerticalAlignment)
                         {
                             case TextVerticalAlignment.Top:
-                                metry.Top = topOffset - metry.Height;
+                                metry.Top = topOffset;
                                 break;
                             case TextVerticalAlignment.Center:
                                 metry.Top = topOffset + (lineInf.Height - metry.Height) / 2;
@@ -477,14 +476,14 @@ namespace ColorTextBlock.Avalonia
 
         public double LineHeight1;
         public double LineHeight2;
-        public double LineHeight3;
+
+        public double _height;
+        public double _dheightTop;
+        public double _dheightBtm;
 
         public double Width;
-        public double Height;
-        public double LineHeight =>
-                LineHeight1 != 0 ? LineHeight1 :
-                LineHeight2 != 0 ? LineHeight2 :
-                LineHeight3;
+        public double Height => Math.Max(_height, _dheightTop + _dheightBtm);
+        public double LineHeight => LineHeight1 != 0 ? LineHeight1 : LineHeight2;
 
         public bool Add(CGeometry metry)
         {
@@ -495,19 +494,24 @@ namespace ColorTextBlock.Avalonia
             switch (metry.TextVerticalAlignment)
             {
                 case TextVerticalAlignment.Descent:
+                    Max(ref LineHeight1, metry.LineHeight);
+                    Max(ref _dheightTop, metry.LineHeight);
+                    Max(ref _dheightBtm, metry.Height - metry.LineHeight);
+                    break;
+
                 case TextVerticalAlignment.Top:
                     Max(ref LineHeight1, metry.LineHeight);
-                    Max(ref Height, metry.Height);
+                    Max(ref _height, metry.Height);
                     break;
 
                 case TextVerticalAlignment.Center:
-                    Max(ref LineHeight2, metry.LineHeight);
-                    Max(ref Height, metry.Height);
+                    Max(ref LineHeight1, metry.Height / 2);
+                    Max(ref _height, metry.Height);
                     break;
 
                 case TextVerticalAlignment.Bottom:
-                    Max(ref LineHeight3, metry.LineHeight);
-                    Max(ref Height, metry.Height);
+                    Max(ref LineHeight2, metry.LineHeight);
+                    Max(ref _height, metry.Height);
                     break;
 
                 default:
