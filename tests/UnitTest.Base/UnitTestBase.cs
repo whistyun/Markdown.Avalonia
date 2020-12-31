@@ -15,6 +15,7 @@ namespace UnitTest.Base
         {
             var fwNm = Util.GetRuntimeName();
             Approvals.RegisterDefaultNamerCreation(() => new ChangeOutputPathNamer("Out"));
+
         }
 
         IDisposable disposable;

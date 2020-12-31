@@ -22,11 +22,26 @@ namespace UnitTest.Base.Utils
 
             public override TestResult Execute(TestExecutionContext context)
             {
-                var resultTask = Dispatcher.UIThread.InvokeAsync<TestResult>(() => innerCommand.Execute(context));
+                var resultTask = Dispatcher.UIThread.InvokeAsync<object>(() => RunTest(context));
 
                 resultTask.Wait();
 
-                return resultTask.Result;
+                if (resultTask.Result is Exception ex)
+                    throw ex;
+
+                return (TestResult)resultTask.Result;
+            }
+
+            private object RunTest(TestExecutionContext context)
+            {
+                try
+                {
+                    return innerCommand.Execute(context);
+                }
+                catch (Exception e)
+                {
+                    return e;
+                }
             }
         }
     }
