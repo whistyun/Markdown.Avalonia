@@ -56,7 +56,8 @@ namespace ColorTextBlock.Avalonia
                 FontFamilyProperty.Changed,
                 FontSizeProperty.Changed,
                 FontStyleProperty.Changed,
-                FontWeightProperty.Changed
+                FontWeightProperty.Changed,
+                TextVerticalAlignmentProperty.Changed
             ).AddClassHandler<CInline>((x, _) => x.RequestMeasure());
         }
 
@@ -119,6 +120,10 @@ namespace ColorTextBlock.Avalonia
             if (Parent is CInline cline)
             {
                 cline.RequestMeasure();
+            }
+            if (Parent is CTextBlock ctxt)
+            {
+                ctxt.OnMeasureSourceChanged(true);
             }
             if (Parent is Layoutable layout)
             {
