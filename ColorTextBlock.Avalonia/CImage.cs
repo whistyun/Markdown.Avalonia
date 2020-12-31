@@ -1,5 +1,4 @@
 ﻿using Avalonia;
-using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using ColorTextBlock.Avalonia.Geometries;
 using System;
@@ -114,7 +113,8 @@ namespace ColorTextBlock.Avalonia
                 }
             }
 
-            yield return new BitmapGeometry(Image, imageWidth, imageHeight);
+            yield return new BitmapGeometry(Image, imageWidth, imageHeight,
+                TextVerticalAlignment);
         }
     }
 }

@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\Fonts\license.html" />
+    <AvaloniaResource Include="Assets\Fonts\ume-ugo4.ttf" />
+    <EmbeddedResource Include="Texts\*" />
+  </ItemGroup>
+
+  <Import Project="..\UnitTest.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\ColorTextBlock.Avalonia\ColorTextBlock.Avalonia.csproj" />
+    <ProjectReference Include="..\..\Markdown.Avalonia\Markdown.Avalonia.csproj" />
+    <ProjectReference Include="..\UnitTest.Base\UnitTest.Base.csproj" />
+  </ItemGroup>
+
+</Project>

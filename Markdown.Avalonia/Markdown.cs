@@ -25,7 +25,7 @@ using System.Windows.Input;
 
 namespace Markdown.Avalonia
 {
-    public class Markdown : AvaloniaObject
+    public class Markdown : AvaloniaObject, IMarkdownEngine
     {
         #region const
         /// <summary>
@@ -39,26 +39,26 @@ namespace Markdown.Avalonia
         /// </summary>
         private const int _tabWidth = 4;
 
-        private const string Heading1Class = "Heading1";
-        private const string Heading2Class = "Heading2";
-        private const string Heading3Class = "Heading3";
-        private const string Heading4Class = "Heading4";
-        private const string Heading5Class = "Heading5";
-        private const string Heading6Class = "Heading6";
+        public const string Heading1Class = "Heading1";
+        public const string Heading2Class = "Heading2";
+        public const string Heading3Class = "Heading3";
+        public const string Heading4Class = "Heading4";
+        public const string Heading5Class = "Heading5";
+        public const string Heading6Class = "Heading6";
 
-        private const string CodeBlockClass = "CodeBlock";
-        private const string BlockquoteClass = "Blockquote";
-        private const string NoteClass = "Note";
+        public const string CodeBlockClass = "CodeBlock";
+        public const string BlockquoteClass = "Blockquote";
+        public const string NoteClass = "Note";
 
-        private const string ParagraphClass = "Paragraph";
+        public const string ParagraphClass = "Paragraph";
 
-        private const string TableClass = "Table";
-        private const string TableHeaderClass = "TableHeader";
-        private const string TableRowOddClass = "OddTableRow";
-        private const string TableRowEvenClass = "EvenTableRow";
+        public const string TableClass = "Table";
+        public const string TableHeaderClass = "TableHeader";
+        public const string TableRowOddClass = "OddTableRow";
+        public const string TableRowEvenClass = "EvenTableRow";
 
-        private const string ListClass = "List";
-        private const string ListMarkerClass = "ListMarker";
+        public const string ListClass = "List";
+        public const string ListMarkerClass = "ListMarker";
 
         #endregion
 
@@ -99,10 +99,6 @@ namespace Markdown.Avalonia
 
         #region dependencyobject property
 
-        // Using a DependencyProperty as the backing store for DocumentStyle.  This enables animation, styling, binding, etc...
-        public static readonly AvaloniaProperty DocumentStyleProperty =
-            AvaloniaProperty.Register<Markdown, Style>(nameof(DocumentStyle), defaultValue: null);
-
         public static readonly DirectProperty<Markdown, ICommand> HyperlinkCommandProperty =
             AvaloniaProperty.RegisterDirect<Markdown, ICommand>(nameof(HyperlinkCommand),
                 mdEng => mdEng.HyperlinkCommand,
@@ -112,15 +108,6 @@ namespace Markdown.Avalonia
             AvaloniaProperty.RegisterDirect<Markdown, IBitmapLoader>(nameof(BitmapLoader),
                 mdEng => mdEng.BitmapLoader,
                 (mdEng, loader) => mdEng.BitmapLoader = loader);
-
-        /// <summary>
-        /// top-level flow document style
-        /// </summary>
-        public Style DocumentStyle
-        {
-            get { return (Style)GetValue(DocumentStyleProperty); }
-            set { SetValue(DocumentStyleProperty, value); }
-        }
 
         #endregion
 
@@ -171,10 +158,10 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
-            text = Normalize(text);
+            text = TextUtil.Normalize(text, _tabWidth);
 
             var document = Create<StackPanel, Control>(RunBlockGamut(text, true));
             document.Orientation = Orientation.Vertical;
@@ -186,74 +173,13 @@ namespace Markdown.Avalonia
         }
 
         /// <summary>
-        /// convert all tabs to _tabWidth spaces; 
-        /// standardizes line endings from DOS (CR LF) or Mac (CR) to UNIX (LF); 
-        /// makes sure text ends with a couple of newlines; 
-        /// removes any blank lines (only spaces) in the text
-        /// </summary>
-        private string Normalize(string text)
-        {
-            if (text is null)
-            {
-                throw new ArgumentNullException(nameof(text));
-            }
-
-            var output = new StringBuilder(text.Length);
-            var line = new StringBuilder();
-            bool valid = false;
-
-            for (int i = 0; i < text.Length; i++)
-            {
-                switch (text[i])
-                {
-                    case '\n':
-                        if (valid)
-                            output.Append(line);
-                        output.Append('\n');
-                        line.Length = 0;
-                        valid = false;
-                        break;
-                    case '\r':
-                        if ((i < text.Length - 1) && (text[i + 1] != '\n'))
-                        {
-                            if (valid)
-                                output.Append(line);
-                            output.Append('\n');
-                            line.Length = 0;
-                            valid = false;
-                        }
-                        break;
-                    case '\t':
-                        int width = (_tabWidth - line.Length % _tabWidth);
-                        for (int k = 0; k < width; k++)
-                            line.Append(' ');
-                        break;
-                    case '\x1A':
-                        break;
-                    default:
-                        if (!valid && text[i] != ' ')
-                            valid = true;
-                        line.Append(text[i]);
-                        break;
-                }
-            }
-
-            if (valid)
-                output.Append(line);
-            output.Append('\n');
-
-            // add two newlines to the end before return
-            return output.Append("\n\n").ToString();
-        }
-
-        /// <summary>
         /// Perform transformations that form block-level tags like paragraphs, headers, and list items.
         /// </summary>
         private IEnumerable<Control> RunBlockGamut(string text, bool supportTextAlignment)
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return
@@ -289,7 +215,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return DoCodeSpans(text,
@@ -329,7 +255,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
 
@@ -402,7 +328,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return Evaluate(text, _imageOrHrefInline, ImageOrHrefInlineEvaluator, defaultHandler);
@@ -412,7 +338,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             if (String.IsNullOrEmpty(match.Groups[2].Value))
@@ -429,7 +355,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             string linkText = match.Groups[3].Value;
@@ -517,7 +443,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return Evaluate<Control>(text, _headerSetext, m => SetextHeaderEvaluator(m),
@@ -528,7 +454,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             string header = match.Groups[1].Value;
@@ -542,7 +468,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             string header = match.Groups[2].Value;
@@ -554,7 +480,7 @@ namespace Markdown.Avalonia
         {
             if (content is null)
             {
-                throw new ArgumentNullException(nameof(content));
+                Helper.ThrowArgNull(nameof(content));
             }
 
             var heading = new CTextBlock(content);
@@ -611,7 +537,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return Evaluate<Control>(text, _note,
@@ -623,7 +549,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             string text = match.Groups[2].Value;
@@ -658,7 +584,7 @@ namespace Markdown.Avalonia
         {
             if (content is null)
             {
-                throw new ArgumentNullException(nameof(content));
+                Helper.ThrowArgNull(nameof(content));
             }
 
             var note = new CTextBlock(content);
@@ -709,7 +635,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return Evaluate(text, _horizontalRules, RuleEvaluator,
@@ -725,7 +651,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             return new Rule(RuleType.Single);
@@ -738,7 +664,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             return new Rule(RuleType.TwoLines);
@@ -751,7 +677,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             return new Rule(RuleType.Bold);
@@ -764,7 +690,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             return new Rule(RuleType.BoldWithSingle);
@@ -837,7 +763,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             // We use a different prefix before nested lists than top-level lists.
@@ -852,7 +778,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             // Check text marker style.
@@ -860,7 +786,7 @@ namespace Markdown.Avalonia
                 = GetTextMarkerStyle(match.Groups[3].Value);
 
             // count indent from first marker with indent
-            int countIndent = IndentUtil.CountIndent(match.Groups[2].Value);
+            int countIndent = TextUtil.CountIndent(match.Groups[2].Value);
 
             // whole list
             string[] whileListLins = match.Groups[1].Value.Split('\n');
@@ -877,7 +803,7 @@ namespace Markdown.Avalonia
                     {
                         listBulder.Append("").Append("\n");
                     }
-                    else if (IndentUtil.TryDetendLine(line, countIndent, out var stripedLine))
+                    else if (TextUtil.TryDetendLine(line, countIndent, out var stripedLine))
                     {
                         // is it had list marker?
                         var someMarkerMch = Regex.Match(stripedLine, _subseqListMaker);
@@ -893,7 +819,7 @@ namespace Markdown.Avalonia
                         }
                         else
                         {
-                            var detentedline = IndentUtil.DetentBestEffort(stripedLine, indentAppending);
+                            var detentedline = TextUtil.DetentBestEffort(stripedLine, indentAppending);
                             listBulder.Append(detentedline).Append("\n");
                         }
                     }
@@ -914,10 +840,26 @@ namespace Markdown.Avalonia
 
             IEnumerable<Control> listItems = ProcessListItems(list, markerPattern);
 
-
             var grid = new Grid();
             grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
             grid.ColumnDefinitions.Add(new ColumnDefinition());
+
+            CTextBlock FindFirstFrom(IControl ctrl)
+            {
+                if (ctrl is IPanel pnl)
+                {
+                    foreach (var chld in pnl.Children)
+                    {
+                        var res = FindFirstFrom(chld);
+                        if (res != null) return res;
+                    }
+                }
+                if (ctrl is CTextBlock ctxt)
+                {
+                    return ctxt;
+                }
+                return null;
+            }
 
             foreach (Tuple<Control, int> listItemTpl in listItems.Select((elm, idx) => Tuple.Create(elm, idx)))
             {
@@ -925,6 +867,9 @@ namespace Markdown.Avalonia
                 CTextBlock markerTxt = new CTextBlock(textMarker.CreateMakerText(index));
 
                 var control = listItemTpl.Item1;
+                CTextBlock controlTxt = FindFirstFrom(control);
+
+                markerTxt.ObserveLineHeightOf(controlTxt);
 
                 grid.RowDefinitions.Add(new RowDefinition());
                 grid.Children.Add(markerTxt);
@@ -1010,7 +955,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             string item = match.Groups[4].Value;
@@ -1075,7 +1020,9 @@ namespace Markdown.Avalonia
                 return (TextMarkerStyle.UpperRoman, _markerOL_RomanUpper, 3);
             }
 
-            throw new InvalidOperationException("sorry library manager forget to modify about listmerker.");
+            Helper.ThrowInvalidOperation("sorry library manager forget to modify about listmerker.");
+            // dummy
+            return (TextMarkerStyle.Disc, _markerUL_Disc, 2);
         }
 
         #endregion
@@ -1085,18 +1032,18 @@ namespace Markdown.Avalonia
 
         private static readonly Regex _table = new Regex(@"
             (                               # whole table
-                [ \r\n]*
+                [ \n]*
                 (?<hdr>                     # table header
-                    ([^\r\n\|]*\|[^\r\n]+)
+                    ([^\n\|]*\|[^\n]+)
                 )
-                [ ]*\r?\n[ ]*
+                [ ]*\n[ ]*
                 (?<col>                     # column style
                     \|?([ ]*:?-+:?[ ]*(\||$))+
                 )
                 (?<row>                     # table row
                     (
-                        [ ]*\r?\n[ ]*
-                        ([^\r\n\|]*\|[^\r\n]+)
+                        [ ]*\n[ ]*
+                        ([^\n\|]*\|[^\n]+)
                     )+
                 )
             )",
@@ -1106,7 +1053,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return Evaluate(text, _table, TableEvalutor, defaultHandler);
@@ -1116,7 +1063,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             var headerTxt = match.Groups["hdr"].Value.Trim();
@@ -1220,12 +1167,12 @@ namespace Markdown.Avalonia
                     ^          # Character before opening
                     [ ]*
                     (`+)             # $1 = Opening run of `
-                    ([^\r\n`]*)      # $2 = The code lang
-                    \r?\n
+                    ([^\n`]*)      # $2 = The code lang
+                    \n
                     ((.|\n)+?)       # $3 = The code block
                     \n[ ]*
                     \1
-                    (?!`)[\r\n]+", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
+                    (?!`)[\n]+", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
 
         private static Regex _indentCodeBlock = new Regex(@"
                     ^
@@ -1237,7 +1184,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return Evaluate(text, _codeBlockFirst, CodeBlocksWithLangEvaluator, defaultHandler);
@@ -1247,7 +1194,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return Evaluate(text, _indentCodeBlock, CodeBlocksWithoutLangEvaluator, defaultHandler);
@@ -1257,7 +1204,7 @@ namespace Markdown.Avalonia
             => CodeBlocksEvaluator(match.Groups[2].Value, match.Groups[3].Value);
 
         private Border CodeBlocksWithoutLangEvaluator(Match match)
-            => CodeBlocksEvaluator(null, IndentUtil.DetentBestEffort(match.Groups[1].Value, 4));
+            => CodeBlocksEvaluator(null, TextUtil.DetentBestEffort(match.Groups[1].Value, 4));
 
 
         private Border CodeBlocksEvaluator(string lang, string code)
@@ -1328,7 +1275,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             //    * You can use multiple backticks as the delimiters if you want to
@@ -1360,7 +1307,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             string span = match.Groups[2].Value;
@@ -1395,7 +1342,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             // <strong> must go first, then <em>
@@ -1412,6 +1359,15 @@ namespace Markdown.Avalonia
                 var rtn = new List<CInline>();
 
                 var buff = new StringBuilder();
+
+                void HandleBefore()
+                {
+                    if (buff.Length > 0)
+                    {
+                        rtn.AddRange(defaultHandler(buff.ToString()));
+                        buff.Clear();
+                    }
+                }
 
                 for (var i = 0; i < text.Length; ++i)
                 {
@@ -1468,9 +1424,8 @@ namespace Markdown.Avalonia
                                 }
                                 else
                                 {
-                                    rtn.AddRange(defaultHandler(buff.ToString()));
+                                    HandleBefore();
                                     rtn.Add(inline);
-                                    buff.Clear();
                                 }
                                 break;
                             }
@@ -1485,9 +1440,8 @@ namespace Markdown.Avalonia
                                 }
                                 else
                                 {
-                                    rtn.AddRange(defaultHandler(buff.ToString()));
+                                    HandleBefore();
                                     rtn.Add(inline);
-                                    buff.Clear();
                                 }
                                 break;
                             }
@@ -1502,9 +1456,8 @@ namespace Markdown.Avalonia
                                 }
                                 else
                                 {
-                                    rtn.AddRange(defaultHandler(buff.ToString()));
+                                    HandleBefore();
                                     rtn.Add(inline);
-                                    buff.Clear();
                                 }
                                 break;
                             }
@@ -1519,9 +1472,8 @@ namespace Markdown.Avalonia
                                 }
                                 else
                                 {
-                                    rtn.AddRange(defaultHandler(buff.ToString()));
+                                    HandleBefore();
                                     rtn.Add(inline);
-                                    buff.Clear();
                                 }
                                 break;
                             }
@@ -1702,7 +1654,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             var content = match.Groups[contentGroup].Value;
@@ -1714,7 +1666,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             var content = match.Groups[contentGroup].Value;
@@ -1726,7 +1678,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             var content = match.Groups[contentGroup].Value;
@@ -1738,7 +1690,7 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             var content = match.Groups[contentGroup].Value;
@@ -1758,7 +1710,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             var lines = _lbrk.Split(text);
@@ -1780,24 +1732,24 @@ namespace Markdown.Avalonia
 
         private static Regex _blockquote = new Regex(@"
             (?<=\n)
-            [\r\n]*
+            [\n]*
             ([>].*)
-            (\r?\n[>].*)*
-            [\r\n]*
+            (\n[>].*)*
+            [\n]*
             ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static Regex _blockquoteFirst = new Regex(@"
             ^
             ([>].*)
-            (\r?\n[>].*)*
-            [\r\n]*
+            (\n[>].*)*
+            [\n]*
             ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private IEnumerable<Control> DoBlockquotes(string text, Func<string, IEnumerable<Control>> defaultHandler)
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             return Evaluate(
@@ -1810,14 +1762,13 @@ namespace Markdown.Avalonia
         {
             if (match is null)
             {
-                throw new ArgumentNullException(nameof(match));
+                Helper.ThrowArgNull(nameof(match));
             }
 
             // trim '>'
-            var ln = new Regex("\r?\n");
             var trimmedTxt = string.Join(
                     "\n",
-                    ln.Split(match.Value.Trim())
+                    match.Value.Trim().Split('\n')
                         .Select(txt =>
                         {
                             if (txt.Length <= 1) return string.Empty;
@@ -1828,7 +1779,7 @@ namespace Markdown.Avalonia
                         .ToArray()
             );
 
-            var blocks = RunBlockGamut(Normalize(trimmedTxt), true);
+            var blocks = RunBlockGamut(trimmedTxt, true);
 
             var panel = Create<StackPanel, Control>(blocks);
             panel.Orientation = Orientation.Vertical;
@@ -1884,7 +1835,7 @@ namespace Markdown.Avalonia
                 _nestedParensPattern =
                     RepeatString(@"
                     (?>              # Atomic matching
-                       [^()\r\n\t]+? # Anything other than parens or whitespace
+                       [^()\n\t]+? # Anything other than parens or whitespace
                      |
                        \(
                            ", _nestDepth) + RepeatString(
@@ -1901,7 +1852,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             var sb = new StringBuilder(text.Length * count);
@@ -1931,7 +1882,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             var matches = expression.Matches(text);
@@ -1966,7 +1917,7 @@ namespace Markdown.Avalonia
         {
             if (text is null)
             {
-                throw new ArgumentNullException(nameof(text));
+                Helper.ThrowArgNull(nameof(text));
             }
 
             var matches = expression.Matches(text);

@@ -2,13 +2,14 @@
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Avalonia.Styling;
 using ColorTextBlock.Avalonia.Geometries;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reactive.Linq;
 
 namespace ColorTextBlock.Avalonia
 {
+    [TypeConverter(typeof(StringToRunConverter))]
     public abstract class CInline : StyledElement
     {
         public static readonly StyledProperty<IBrush> BackgroundProperty =
@@ -28,6 +29,9 @@ namespace ColorTextBlock.Avalonia
 
         public static readonly AttachedProperty<FontStyle> FontStyleProperty =
             TextBlock.FontStyleProperty.AddOwner<CInline>();
+
+        public static readonly StyledProperty<TextVerticalAlignment> TextVerticalAlignmentProperty =
+            CTextBlock.TextVerticalAlignmentProperty.AddOwner<CInline>();
 
         public static readonly StyledProperty<bool> IsUnderlineProperty =
             AvaloniaProperty.Register<CInline, bool>(nameof(IsUnderline), inherits: true);
@@ -52,7 +56,8 @@ namespace ColorTextBlock.Avalonia
                 FontFamilyProperty.Changed,
                 FontSizeProperty.Changed,
                 FontStyleProperty.Changed,
-                FontWeightProperty.Changed
+                FontWeightProperty.Changed,
+                TextVerticalAlignmentProperty.Changed
             ).AddClassHandler<CInline>((x, _) => x.RequestMeasure());
         }
 
@@ -104,11 +109,21 @@ namespace ColorTextBlock.Avalonia
             set { SetValue(IsStrikethroughProperty, value); }
         }
 
+        public TextVerticalAlignment TextVerticalAlignment
+        {
+            get { return GetValue(TextVerticalAlignmentProperty); }
+            set { SetValue(TextVerticalAlignmentProperty, value); }
+        }
+
         protected void RequestMeasure()
         {
             if (Parent is CInline cline)
             {
                 cline.RequestMeasure();
+            }
+            if (Parent is CTextBlock ctxt)
+            {
+                ctxt.OnMeasureSourceChanged();
             }
             if (Parent is Layoutable layout)
             {

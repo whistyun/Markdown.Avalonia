@@ -10,12 +10,14 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
 
 namespace ColorTextBlock.Avalonia
 {
     public class CTextBlock : Control
     {
+        private static readonly StyledProperty<double> LineHeightProperty =
+            AvaloniaProperty.Register<CTextBlock, double>("LineHeight");
+
         public static readonly StyledProperty<IBrush> BackgroundProperty =
             Border.BackgroundProperty.AddOwner<CTextBlock>();
 
@@ -34,6 +36,11 @@ namespace ColorTextBlock.Avalonia
         public static readonly AttachedProperty<FontStyle> FontStyleProperty =
             TextBlock.FontStyleProperty.AddOwner<CTextBlock>();
 
+        public static readonly StyledProperty<TextVerticalAlignment> TextVerticalAlignmentProperty =
+            AvaloniaProperty.Register<CTextBlock, TextVerticalAlignment>(
+                nameof(TextVerticalAlignment),
+                defaultValue: TextVerticalAlignment.Descent,
+                inherits: true);
 
         public static readonly StyledProperty<TextWrapping> TextWrappingProperty =
             AvaloniaProperty.Register<CTextBlock, TextWrapping>(nameof(TextWrapping), defaultValue: TextWrapping.Wrap);
@@ -66,10 +73,16 @@ namespace ColorTextBlock.Avalonia
                 TextBlock.FontStyleProperty.Changed,
                 TextBlock.FontWeightProperty.Changed,
                 TextWrappingProperty.Changed,
-                BoundsProperty.Changed
+                BoundsProperty.Changed,
+                TextVerticalAlignmentProperty.Changed
             ).AddClassHandler<CTextBlock>((x, _) => x.OnMeasureSourceChanged());
+
+            Observable.Merge<AvaloniaPropertyChangedEventArgs>(
+                LineHeightProperty.Changed
+            ).AddClassHandler<CTextBlock>((x, _) => x.CheckHaveToMeasure());
         }
 
+        private double computedLineHeight;
         private AvaloniaList<CInline> _content;
         private List<CGeometry> metries;
 
@@ -121,6 +134,12 @@ namespace ColorTextBlock.Avalonia
             set { SetValue(TextAlignmentProperty, value); }
         }
 
+        public TextVerticalAlignment TextVerticalAlignment
+        {
+            get { return GetValue(TextVerticalAlignmentProperty); }
+            set { SetValue(TextVerticalAlignmentProperty, value); }
+        }
+
         [Content]
         public AvaloniaList<CInline> Content
         {
@@ -159,7 +178,6 @@ namespace ColorTextBlock.Avalonia
         {
             _content.AddRange(inlines);
         }
-
 
         #region pointer event
 
@@ -283,6 +301,10 @@ namespace ColorTextBlock.Avalonia
 
         #endregion
 
+        public void ObserveLineHeightOf(CTextBlock target)
+        {
+            this.Bind(LineHeightProperty, target.GetBindingObservable(LineHeightProperty));
+        }
 
         private void ContentCollectionChangedd(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -316,26 +338,16 @@ namespace ColorTextBlock.Avalonia
             }
         }
 
-
-        private void OnTextStructureChanged(object sender, AvaloniaPropertyChangedEventArgs args)
+        private void CheckHaveToMeasure()
         {
-            var prop = args.Property;
-
-            if (prop == CInline.FontFamilyProperty
-                || prop == CInline.FontSizeProperty
-                || prop == CInline.FontStyleProperty
-                || prop == CInline.FontWeightProperty
-                || prop == CRun.TextProperty
-                || prop == CSpan.ContentProperty
-                || prop == CImage.LayoutHeightProperty
-                || prop == CImage.LayoutWidthProperty)
-            {
-                OnMeasureSourceChanged();
-            }
+            if (computedLineHeight != GetValue(LineHeightProperty))
+                InvalidateMeasure();
         }
 
-        private void OnMeasureSourceChanged()
+
+        internal void OnMeasureSourceChanged()
         {
+            ClearValue(LineHeightProperty);
             InvalidateMeasure();
         }
 
@@ -346,23 +358,24 @@ namespace ColorTextBlock.Avalonia
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            foreach (CGeometry metry in metries) metry.RepaintRequested -= RepaintRequested;
-
-            metries = new List<CGeometry>();
+            metries.Clear();
 
             double entireWidth = availableSize.Width;
             if (Double.IsInfinity(availableSize.Width) && Bounds.Width != 0)
                 entireWidth = Bounds.Width;
 
+
+            double width = 0;
+            double height = 0;
+
             // measure & split by linebreak
-            var lineMetries = new List<Tuple<List<CGeometry>, Size>>();
+            var reqHeight = GetValue(LineHeightProperty);
+            var lines = new List<LineInfo>();
             {
+                LineInfo now = null;
 
                 double remainWidth = entireWidth;
 
-                var atlineWid = 0d;
-                var atlineHei = 0d;
-                var atline = new List<CGeometry>();
                 foreach (CInline inline in Content)
                 {
                     IEnumerable<CGeometry> inlineGeometry =
@@ -372,50 +385,44 @@ namespace ColorTextBlock.Avalonia
 
                     foreach (CGeometry metry in inlineGeometry)
                     {
-                        atline.Add(metry);
-                        atlineWid += metry.Width;
-                        atlineHei = Math.Max(metry.Height, atlineHei);
-
-                        remainWidth -= metry.Width;
-
-                        if (metry.LineBreak)
+                        if (now is null)
                         {
-                            metries.AddRange(atline);
+                            lines.Add(now = new LineInfo());
+                            if (lines.Count == 1)
+                                now.RequestLineHeight = reqHeight;
+                        }
 
-                            lineMetries.Add(Tuple.Create(atline, new Size(atlineWid, atlineHei)));
+                        if (now.Add(metry))
+                        {
+                            width = Math.Max(width, now.Width);
+                            height += now.Height;
 
-                            atline = new List<CGeometry>();
-                            atlineWid = 0d;
-                            atlineHei = 0d;
-
+                            now = null;
                             remainWidth = entireWidth;
                         }
+                        else remainWidth -= metry.Width;
                     }
                 }
 
-                if (atline.Count > 0)
+                if (now != null)
                 {
-                    metries.AddRange(atline);
-
-                    lineMetries.Add(Tuple.Create(atline, new Size(atlineWid, atlineHei)));
-
-                    atline = new List<CGeometry>();
-                    atlineWid = 0d;
-                    atlineHei = 0d;
-
-                    remainWidth = entireWidth;
+                    width = Math.Max(width, now.Width);
+                    height += now.Height;
                 }
             }
 
-            double width = lineMetries.Count == 0 ? 0d : lineMetries.Max(tpl => tpl.Item2.Width);
-            double height = lineMetries.Count == 0 ? 0d : lineMetries.Sum(tpl => tpl.Item2.Height);
+            if (lines.Count > 0)
+            {
+                computedLineHeight = lines[0].LineHeight;
+                SetValue(LineHeightProperty, lines[0].LineHeight);
+            }
 
             // set position
             {
                 var topOffset = 0d;
                 var leftOffset = 0d;
 
-                foreach (Tuple<List<CGeometry>, Size> lineMetry in lineMetries)
+                foreach (LineInfo lineInf in lines)
                 {
                     switch (TextAlignment)
                     {
@@ -423,22 +430,38 @@ namespace ColorTextBlock.Avalonia
                             leftOffset = 0d;
                             break;
                         case TextAlignment.Center:
-                            leftOffset = (entireWidth - lineMetry.Item2.Width) / 2;
+                            leftOffset = (entireWidth - lineInf.Width) / 2;
                             break;
                         case TextAlignment.Right:
-                            leftOffset = entireWidth - lineMetry.Item2.Width;
+                            leftOffset = entireWidth - lineInf.Width;
                             break;
                     }
 
-                    topOffset += lineMetry.Item2.Height;
-
-                    foreach (CGeometry metry in lineMetry.Item1)
+                    foreach (CGeometry metry in lineInf.Metries)
                     {
                         metry.Left = leftOffset;
-                        metry.Top = topOffset - metry.Height;
+                        switch (metry.TextVerticalAlignment)
+                        {
+                            case TextVerticalAlignment.Top:
+                                metry.Top = topOffset;
+                                break;
+                            case TextVerticalAlignment.Center:
+                                metry.Top = topOffset + (lineInf.Height - metry.Height) / 2;
+                                break;
+                            case TextVerticalAlignment.Bottom:
+                                metry.Top = topOffset + lineInf.Height - metry.Height;
+                                break;
+                            case TextVerticalAlignment.Descent:
+                                metry.Top = topOffset + lineInf.LineHeight - metry.LineHeight;
+                                break;
+                        }
 
                         leftOffset += metry.Width;
+
+                        metries.Add(metry);
                     }
+
+                    topOffset += lineInf.Height;
                 }
             }
 
@@ -459,5 +482,62 @@ namespace ColorTextBlock.Avalonia
                 metry.Render(context);
             }
         }
+    }
+
+    class LineInfo
+    {
+        public List<CGeometry> Metries = new List<CGeometry>();
+
+        public double RequestLineHeight;
+        private double LineHeight1;
+        private double LineHeight2;
+
+        private double _height;
+        private double _dheightTop;
+        private double _dheightBtm;
+
+        public double Width { private set; get; }
+        public double Height => Math.Max(_height, _dheightTop + _dheightBtm);
+        public double LineHeight => Math.Max(RequestLineHeight, LineHeight1 != 0 ? LineHeight1 : LineHeight2);
+
+        public bool Add(CGeometry metry)
+        {
+            Metries.Add(metry);
+
+            Width += metry.Width;
+
+            switch (metry.TextVerticalAlignment)
+            {
+                case TextVerticalAlignment.Descent:
+                    Max(ref LineHeight1, metry.LineHeight);
+                    Max(ref _dheightTop, metry.LineHeight);
+                    Max(ref _dheightBtm, metry.Height - metry.LineHeight);
+                    break;
+
+                case TextVerticalAlignment.Top:
+                    Max(ref LineHeight1, metry.LineHeight);
+                    Max(ref _height, metry.Height);
+                    break;
+
+                case TextVerticalAlignment.Center:
+                    Max(ref LineHeight1, metry.Height / 2);
+                    Max(ref _height, metry.Height);
+                    break;
+
+                case TextVerticalAlignment.Bottom:
+                    Max(ref LineHeight2, metry.LineHeight);
+                    Max(ref _height, metry.Height);
+                    break;
+
+                default:
+                    Throw("sorry library manager forget to modify.");
+                    break;
+            }
+
+            return metry.LineBreak;
+        }
+
+        private static void Max(ref double v1, double v2) => v1 = Math.Max(v1, v2);
+        private static void Throw(string msg) => throw new InvalidOperationException(msg);
     }
 }

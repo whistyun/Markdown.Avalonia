@@ -41,6 +41,18 @@ namespace Markdown.Avalonia
                 o => o.AssetPathRoot,
                 (o, v) => o.AssetPathRoot = v);
 
+        public static readonly StyledPropertyBase<bool> SaveScrollValueWhenContentUpdatedProperty =
+            AvaloniaProperty.Register<MarkdownScrollViewer, bool>(
+                nameof(SaveScrollValueWhenContentUpdated),
+                defaultValue: false);
+
+        public static readonly AvaloniaProperty<Vector> ScrollValueProperty =
+            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, Vector>(
+                nameof(ScrollValue),
+                owner => owner.ScrollValue,
+                (owner, v) => owner.ScrollValue = v);
+
+
         private ScrollViewer _viewer;
 
         public MarkdownScrollViewer()
@@ -73,11 +85,16 @@ namespace Markdown.Avalonia
         private void UpdateMarkdown()
         {
             var doc = Engine.Transform(Markdown ?? "");
+
+            var ofst = _viewer.Offset;
             _viewer.Content = doc;
+
+            if (SaveScrollValueWhenContentUpdated)
+                _viewer.Offset = ofst;
         }
 
-        private Markdown _engine;
-        public Markdown Engine
+        private IMarkdownEngine _engine;
+        public IMarkdownEngine Engine
         {
             set
             {
@@ -103,6 +120,18 @@ namespace Markdown.Avalonia
             get => _AssetPathRoot;
         }
 
+        public bool SaveScrollValueWhenContentUpdated
+        {
+            set { SetValue(SaveScrollValueWhenContentUpdatedProperty, value); }
+            get { return GetValue(SaveScrollValueWhenContentUpdatedProperty); }
+        }
+
+        public Vector ScrollValue
+        {
+            set { _viewer.Offset = value; }
+            get { return _viewer.Offset; }
+        }
+
         [Content]
         public string HereMarkdown
         {
@@ -121,11 +150,11 @@ namespace Markdown.Avalonia
                     var lines = Regex.Split(value, "\r\n|\r|\n", RegexOptions.Multiline);
 
                     // count last line indent
-                    int lastIdtCnt = IndentUtil.CountIndent(lines.Last());
+                    int lastIdtCnt = TextUtil.CountIndent(lines.Last());
                     // count full indent
                     int someIdtCnt = lines
                         .Where(line => !String.IsNullOrWhiteSpace(line))
-                        .Select(line => IndentUtil.CountIndent(line))
+                        .Select(line => TextUtil.CountIndent(line))
                         .Min();
 
                     var indentCount = Math.Max(lastIdtCnt, someIdtCnt);

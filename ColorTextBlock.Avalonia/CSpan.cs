@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
@@ -8,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
 
 namespace ColorTextBlock.Avalonia
 {
@@ -111,6 +111,24 @@ namespace ColorTextBlock.Avalonia
             set { SetValue(ContentProperty, value); }
         }
 
+        public CSpan()
+        {
+            var clst = new AvaloniaList<CInline>();
+            // for xaml loader
+            clst.CollectionChanged += (s, e) =>
+            {
+                if (e.OldItems != null)
+                    foreach (var child in e.OldItems)
+                        LogicalChildren.Remove((CInline)child);
+
+                if (e.NewItems != null)
+                    foreach (var child in e.NewItems)
+                        LogicalChildren.Add((CInline)child);
+            };
+
+            Content = clst;
+        }
+
         public CSpan(IEnumerable<CInline> inlines)
         {
             Content = inlines.ToArray();
@@ -182,9 +200,8 @@ namespace ColorTextBlock.Avalonia
                 var buffer = new List<CGeometry>();
                 foreach (var adding in metries)
                 {
-                    if (adding is TextGeometry t
-                            && String.IsNullOrWhiteSpace(t.Text)
-                            && buffer.Count == 0)
+                    // save linebreak before span
+                    if (adding is TextGeometry t && t.IsLineBreakMarker && buffer.Count == 0)
                     {
                         renew.Add(adding);
                         continue;
@@ -194,14 +211,14 @@ namespace ColorTextBlock.Avalonia
 
                     if (adding.LineBreak)
                     {
-                        renew.Add(new DecoratorGeometry(this, buffer, _border));
+                        renew.Add(DecoratorGeometry.New(this, buffer, _border));
                         buffer.Clear();
                     }
                 }
 
                 if (buffer.Count != 0)
                 {
-                    renew.Add(new DecoratorGeometry(this, buffer, _border));
+                    renew.Add(DecoratorGeometry.New(this, buffer, _border));
                 }
 
                 metries = renew;

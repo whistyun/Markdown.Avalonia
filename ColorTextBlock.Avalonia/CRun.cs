@@ -1,8 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Media;
 using Avalonia.Metadata;
-using Avalonia.Remote.Protocol.Viewport;
 using ColorTextBlock.Avalonia.Geometries;
+using ColorTextBlock.Avalonia.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -126,15 +126,50 @@ namespace ColorTextBlock.Avalonia
                     }
                     else
                     {
-                        fmt.Text = firstLineTxt;
+                        int secondLineSep = -1;
 
-                        infos.Add(new TextGeometry(
-                                        fmt.Bounds.Width, fmt.Bounds.Height, true,
-                                        this,
-                                        firstLineTxt, fmt));
-                        remainWidth = entireWidth;
+                        if (firstLineTxt == " ")
+                        {
+                            // check exists of CJK character.
 
-                        lineTxt = lineTxt.Substring(firstLineTxt.Length - 1);
+                            var secondLineLen = lines[1].Length;
+                            var secondLineTxt = lineTxt.Substring(0, secondLineLen);
+                            secondLineSep = secondLineTxt.Length - 1;
+                            for (; secondLineSep >= 1; --secondLineSep)
+                                if (secondLineTxt[secondLineSep].IsCJK())
+                                    break;
+                        }
+
+                        if (secondLineSep > 0)
+                        {
+                            fmt.Text = lineTxt.Substring(0, secondLineSep);
+
+                            infos.Add(new TextGeometry(
+                                            fmt.Bounds.Width, fmt.Bounds.Height, true,
+                                            this,
+                                            fmt.Text, fmt));
+                            remainWidth = entireWidth;
+
+                            lineTxt = lineTxt.Substring(secondLineSep);
+                        }
+                        else if (firstLineTxt == " ")
+                        {
+                            infos.Add(TextGeometry.NewLine());
+                            remainWidth = entireWidth;
+                        }
+                        else
+                        {
+                            firstLineTxt = firstLineTxt.Substring(1);
+                            fmt.Text = firstLineTxt;
+                            infos.Add(new TextGeometry(
+                                            fmt.Bounds.Width, fmt.Bounds.Height, true,
+                                            this,
+                                            firstLineTxt,
+                                            fmt));
+
+                            remainWidth = entireWidth;
+                            lineTxt = lineTxt.Substring(firstLineTxt.Length);
+                        }
                     }
                 }
 
