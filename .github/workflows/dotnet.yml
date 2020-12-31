@@ -15,7 +15,11 @@ jobs:
     - uses: actions/checkout@v2
       with:
           submodules: 'true'
-    - name: Setup .NET
+    - name: Setup .NET(3.1)
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.301
+    - name: Setup .NET(5.0)
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.100
