@@ -31,7 +31,7 @@ namespace ColorTextBlock.Avalonia
             yield return new TextGeometry(
                 0, fmt.Bounds.Height, true,
                 this,
-                "", fmt);
+                "", null);
         }
     }
 }

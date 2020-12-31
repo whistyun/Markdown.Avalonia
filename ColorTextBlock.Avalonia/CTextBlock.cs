@@ -75,13 +75,14 @@ namespace ColorTextBlock.Avalonia
                 TextWrappingProperty.Changed,
                 BoundsProperty.Changed,
                 TextVerticalAlignmentProperty.Changed
-            ).AddClassHandler<CTextBlock>((x, _) => x.OnMeasureSourceChanged(true));
+            ).AddClassHandler<CTextBlock>((x, _) => x.OnMeasureSourceChanged());
 
             Observable.Merge<AvaloniaPropertyChangedEventArgs>(
                 LineHeightProperty.Changed
-            ).AddClassHandler<CTextBlock>((x, _) => x.OnMeasureSourceChanged(false));
+            ).AddClassHandler<CTextBlock>((x, _) => x.CheckHaveToMeasure());
         }
 
+        private double computedLineHeight;
         private AvaloniaList<CInline> _content;
         private List<CGeometry> metries;
 
@@ -337,13 +338,16 @@ namespace ColorTextBlock.Avalonia
             }
         }
 
-        internal void OnMeasureSourceChanged(bool clearTemporary)
+        private void CheckHaveToMeasure()
         {
-            if (clearTemporary)
-            {
-                ClearValue(LineHeightProperty);
-            }
+            if (computedLineHeight != GetValue(LineHeightProperty))
+                InvalidateMeasure();
+        }
 
+
+        internal void OnMeasureSourceChanged()
+        {
+            ClearValue(LineHeightProperty);
             InvalidateMeasure();
         }
 
@@ -409,6 +413,7 @@ namespace ColorTextBlock.Avalonia
 
             if (lines.Count > 0)
             {
+                computedLineHeight = lines[0].LineHeight;
                 SetValue(LineHeightProperty, lines[0].LineHeight);
             }
 

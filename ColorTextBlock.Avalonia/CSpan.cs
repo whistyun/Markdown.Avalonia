@@ -190,9 +190,8 @@ namespace ColorTextBlock.Avalonia
                 var buffer = new List<CGeometry>();
                 foreach (var adding in metries)
                 {
-                    if (adding is TextGeometry t
-                            && String.IsNullOrWhiteSpace(t.Text)
-                            && buffer.Count == 0)
+                    // save linebreak before span
+                    if (adding is TextGeometry t && t.IsLineBreakMarker && buffer.Count == 0)
                     {
                         renew.Add(adding);
                         continue;

@@ -152,17 +152,23 @@ namespace ColorTextBlock.Avalonia
 
                             lineTxt = lineTxt.Substring(secondLineSep);
                         }
+                        else if (firstLineTxt == " ")
+                        {
+                            infos.Add(TextGeometry.NewLine());
+                            remainWidth = entireWidth;
+                        }
                         else
                         {
+                            firstLineTxt = firstLineTxt.Substring(1);
                             fmt.Text = firstLineTxt;
-
                             infos.Add(new TextGeometry(
                                             fmt.Bounds.Width, fmt.Bounds.Height, true,
                                             this,
-                                            firstLineTxt, fmt));
-                            remainWidth = entireWidth;
+                                            firstLineTxt,
+                                            fmt));
 
-                            lineTxt = lineTxt.Substring(firstLineTxt.Length - 1);
+                            remainWidth = entireWidth;
+                            lineTxt = lineTxt.Substring(firstLineTxt.Length);
                         }
                     }
                 }

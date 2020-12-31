@@ -46,6 +46,8 @@ namespace ColorTextBlock.Avalonia.Geometries
             get => Owner is null ? false : Owner.IsStrikethrough;
         }
 
+        public bool IsLineBreakMarker => Format is null && Width == 0;
+
         private FormattedText Format;
 
         internal TextGeometry(
@@ -86,13 +88,12 @@ namespace ColorTextBlock.Avalonia.Geometries
                 0, format.Bounds.Height,
                 TextVerticalAlignment.Descent,
                 true,
-                "", format);
+                "", null);
         }
 
         public override void Render(DrawingContext ctx)
         {
-            if (Format is null && Width == 0 && Height == 0)
-                return;
+            if (IsLineBreakMarker) return;
 
             var foreground = _TemporaryForeground ?? Foreground;
             var background = _TemporaryBackground ?? Background;

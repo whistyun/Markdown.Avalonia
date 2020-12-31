@@ -1360,6 +1360,15 @@ namespace Markdown.Avalonia
 
                 var buff = new StringBuilder();
 
+                void HandleBefore()
+                {
+                    if (buff.Length > 0)
+                    {
+                        rtn.AddRange(defaultHandler(buff.ToString()));
+                        buff.Clear();
+                    }
+                }
+
                 for (var i = 0; i < text.Length; ++i)
                 {
                     var ch = text[i];
@@ -1415,9 +1424,8 @@ namespace Markdown.Avalonia
                                 }
                                 else
                                 {
-                                    rtn.AddRange(defaultHandler(buff.ToString()));
+                                    HandleBefore();
                                     rtn.Add(inline);
-                                    buff.Clear();
                                 }
                                 break;
                             }
@@ -1432,9 +1440,8 @@ namespace Markdown.Avalonia
                                 }
                                 else
                                 {
-                                    rtn.AddRange(defaultHandler(buff.ToString()));
+                                    HandleBefore();
                                     rtn.Add(inline);
-                                    buff.Clear();
                                 }
                                 break;
                             }
@@ -1449,9 +1456,8 @@ namespace Markdown.Avalonia
                                 }
                                 else
                                 {
-                                    rtn.AddRange(defaultHandler(buff.ToString()));
+                                    HandleBefore();
                                     rtn.Add(inline);
-                                    buff.Clear();
                                 }
                                 break;
                             }
@@ -1466,9 +1472,8 @@ namespace Markdown.Avalonia
                                 }
                                 else
                                 {
-                                    rtn.AddRange(defaultHandler(buff.ToString()));
+                                    HandleBefore();
                                     rtn.Add(inline);
-                                    buff.Clear();
                                 }
                                 break;
                             }
