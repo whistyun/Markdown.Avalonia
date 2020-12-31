@@ -2,13 +2,14 @@
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Avalonia.Styling;
 using ColorTextBlock.Avalonia.Geometries;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reactive.Linq;
 
 namespace ColorTextBlock.Avalonia
 {
+    [TypeConverter(typeof(StringToRunConverter))]
     public abstract class CInline : StyledElement
     {
         public static readonly StyledProperty<IBrush> BackgroundProperty =

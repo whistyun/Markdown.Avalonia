@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
@@ -8,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
 
 namespace ColorTextBlock.Avalonia
 {
@@ -109,6 +109,24 @@ namespace ColorTextBlock.Avalonia
         {
             get { return GetValue(ContentProperty); }
             set { SetValue(ContentProperty, value); }
+        }
+
+        public CSpan()
+        {
+            var clst = new AvaloniaList<CInline>();
+            // for xaml loader
+            clst.CollectionChanged += (s, e) =>
+            {
+                if (e.OldItems != null)
+                    foreach (var child in e.OldItems)
+                        LogicalChildren.Remove((CInline)child);
+
+                if (e.NewItems != null)
+                    foreach (var child in e.NewItems)
+                        LogicalChildren.Add((CInline)child);
+            };
+
+            Content = clst;
         }
 
         public CSpan(IEnumerable<CInline> inlines)

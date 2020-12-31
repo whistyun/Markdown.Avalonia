@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Avalonia.Media;
 using Avalonia;
 using ColorTextBlock.Avalonia.Fonts;
@@ -14,6 +12,8 @@ namespace ColorTextBlock.Avalonia
                 nameof(MonospaceFontFamily),
                 defaultValue: FontFamilyCollecter.TryGetMonospace() ?? FontFamily.Default,
                 inherits: true);
+
+        public CCode() { }
 
         public CCode(IEnumerable<CInline> inlines) : base(inlines)
         {
