@@ -123,7 +123,7 @@ namespace ColorTextBlock.Avalonia
             }
             if (Parent is CTextBlock ctxt)
             {
-                ctxt.OnMeasureSourceChanged(true);
+                ctxt.OnMeasureSourceChanged();
             }
             if (Parent is Layoutable layout)
             {
