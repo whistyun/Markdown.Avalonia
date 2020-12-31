@@ -140,7 +140,7 @@ namespace ColorTextBlock.Avalonia
                                     break;
                         }
 
-                        if (secondLineSep != -1)
+                        if (secondLineSep > 0)
                         {
                             fmt.Text = lineTxt.Substring(0, secondLineSep);
 

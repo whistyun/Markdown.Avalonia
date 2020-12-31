@@ -840,10 +840,26 @@ namespace Markdown.Avalonia
 
             IEnumerable<Control> listItems = ProcessListItems(list, markerPattern);
 
-
             var grid = new Grid();
             grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
             grid.ColumnDefinitions.Add(new ColumnDefinition());
+
+            CTextBlock FindFirstFrom(IControl ctrl)
+            {
+                if (ctrl is IPanel pnl)
+                {
+                    foreach (var chld in pnl.Children)
+                    {
+                        var res = FindFirstFrom(chld);
+                        if (res != null) return res;
+                    }
+                }
+                if (ctrl is CTextBlock ctxt)
+                {
+                    return ctxt;
+                }
+                return null;
+            }
 
             foreach (Tuple<Control, int> listItemTpl in listItems.Select((elm, idx) => Tuple.Create(elm, idx)))
             {
@@ -851,6 +867,9 @@ namespace Markdown.Avalonia
                 CTextBlock markerTxt = new CTextBlock(textMarker.CreateMakerText(index));
 
                 var control = listItemTpl.Item1;
+                CTextBlock controlTxt = FindFirstFrom(control);
+
+                markerTxt.ObserveLineHeightOf(controlTxt);
 
                 grid.RowDefinitions.Add(new RowDefinition());
                 grid.Children.Add(markerTxt);

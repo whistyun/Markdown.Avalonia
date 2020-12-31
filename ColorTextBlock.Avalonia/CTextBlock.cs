@@ -15,6 +15,9 @@ namespace ColorTextBlock.Avalonia
 {
     public class CTextBlock : Control
     {
+        private static readonly StyledProperty<double> LineHeightProperty =
+            AvaloniaProperty.Register<CTextBlock, double>("LineHeight");
+
         public static readonly StyledProperty<IBrush> BackgroundProperty =
             Border.BackgroundProperty.AddOwner<CTextBlock>();
 
@@ -70,8 +73,13 @@ namespace ColorTextBlock.Avalonia
                 TextBlock.FontStyleProperty.Changed,
                 TextBlock.FontWeightProperty.Changed,
                 TextWrappingProperty.Changed,
-                BoundsProperty.Changed
-            ).AddClassHandler<CTextBlock>((x, _) => x.OnMeasureSourceChanged());
+                BoundsProperty.Changed,
+                TextVerticalAlignmentProperty.Changed
+            ).AddClassHandler<CTextBlock>((x, _) => x.OnMeasureSourceChanged(true));
+
+            Observable.Merge<AvaloniaPropertyChangedEventArgs>(
+                LineHeightProperty.Changed
+            ).AddClassHandler<CTextBlock>((x, _) => x.OnMeasureSourceChanged(false));
         }
 
         private AvaloniaList<CInline> _content;
@@ -169,7 +177,6 @@ namespace ColorTextBlock.Avalonia
         {
             _content.AddRange(inlines);
         }
-
 
         #region pointer event
 
@@ -293,6 +300,10 @@ namespace ColorTextBlock.Avalonia
 
         #endregion
 
+        public void ObserveLineHeightOf(CTextBlock target)
+        {
+            this.Bind(LineHeightProperty, target.GetBindingObservable(LineHeightProperty));
+        }
 
         private void ContentCollectionChangedd(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -326,26 +337,13 @@ namespace ColorTextBlock.Avalonia
             }
         }
 
-
-        private void OnTextStructureChanged(object sender, AvaloniaPropertyChangedEventArgs args)
+        internal void OnMeasureSourceChanged(bool clearTemporary)
         {
-            var prop = args.Property;
-
-            if (prop == CInline.FontFamilyProperty
-                || prop == CInline.FontSizeProperty
-                || prop == CInline.FontStyleProperty
-                || prop == CInline.FontWeightProperty
-                || prop == CRun.TextProperty
-                || prop == CSpan.ContentProperty
-                || prop == CImage.LayoutHeightProperty
-                || prop == CImage.LayoutWidthProperty)
+            if (clearTemporary)
             {
-                OnMeasureSourceChanged();
+                ClearValue(LineHeightProperty);
             }
-        }
 
-        private void OnMeasureSourceChanged()
-        {
             InvalidateMeasure();
         }
 
@@ -367,6 +365,7 @@ namespace ColorTextBlock.Avalonia
             double height = 0;
 
             // measure & split by linebreak
+            var reqHeight = GetValue(LineHeightProperty);
             var lines = new List<LineInfo>();
             {
                 LineInfo now = null;
@@ -382,7 +381,12 @@ namespace ColorTextBlock.Avalonia
 
                     foreach (CGeometry metry in inlineGeometry)
                     {
-                        if (now is null) lines.Add(now = new LineInfo());
+                        if (now is null)
+                        {
+                            lines.Add(now = new LineInfo());
+                            if (lines.Count == 1)
+                                now.RequestLineHeight = reqHeight;
+                        }
 
                         if (now.Add(metry))
                         {
@@ -401,6 +405,11 @@ namespace ColorTextBlock.Avalonia
                     width = Math.Max(width, now.Width);
                     height += now.Height;
                 }
+            }
+
+            if (lines.Count > 0)
+            {
+                SetValue(LineHeightProperty, lines[0].LineHeight);
             }
 
             // set position
@@ -474,16 +483,17 @@ namespace ColorTextBlock.Avalonia
     {
         public List<CGeometry> Metries = new List<CGeometry>();
 
-        public double LineHeight1;
-        public double LineHeight2;
+        public double RequestLineHeight;
+        private double LineHeight1;
+        private double LineHeight2;
 
-        public double _height;
-        public double _dheightTop;
-        public double _dheightBtm;
+        private double _height;
+        private double _dheightTop;
+        private double _dheightBtm;
 
-        public double Width;
+        public double Width { private set; get; }
         public double Height => Math.Max(_height, _dheightTop + _dheightBtm);
-        public double LineHeight => LineHeight1 != 0 ? LineHeight1 : LineHeight2;
+        public double LineHeight => Math.Max(RequestLineHeight, LineHeight1 != 0 ? LineHeight1 : LineHeight2);
 
         public bool Add(CGeometry metry)
         {
