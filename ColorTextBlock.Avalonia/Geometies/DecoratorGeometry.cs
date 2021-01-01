@@ -81,8 +81,8 @@ namespace ColorTextBlock.Avalonia.Geometries
             double descentHeightTop = 0;
             double descentHeightBtm = 0;
 
-            double lineHeight = 0;
-            double lineHeight2 = 0;
+            double baseHeight = 0;
+            double baseHeight2 = 0;
 
             void Max(ref double v1, double v2) => v1 = Math.Max(v1, v2);
 
@@ -92,25 +92,25 @@ namespace ColorTextBlock.Avalonia.Geometries
 
                 switch (one.TextVerticalAlignment)
                 {
-                    case TextVerticalAlignment.Descent:
-                        Max(ref lineHeight, one.LineHeight);
+                    case TextVerticalAlignment.Base:
+                        Max(ref baseHeight, one.BaseHeight);
 
-                        Max(ref descentHeightTop, one.LineHeight);
-                        Max(ref descentHeightBtm, one.Height - one.LineHeight);
+                        Max(ref descentHeightTop, one.BaseHeight);
+                        Max(ref descentHeightBtm, one.Height - one.BaseHeight);
                         break;
 
                     case TextVerticalAlignment.Top:
-                        Max(ref lineHeight, one.LineHeight);
+                        Max(ref baseHeight, one.BaseHeight);
                         Max(ref height, one.Height);
                         break;
 
                     case TextVerticalAlignment.Center:
-                        Max(ref lineHeight, one.Height / 2);
+                        Max(ref baseHeight, one.Height / 2);
                         Max(ref height, one.Height);
                         break;
 
                     case TextVerticalAlignment.Bottom:
-                        Max(ref lineHeight2, one.LineHeight);
+                        Max(ref baseHeight2, one.BaseHeight);
                         Max(ref height, one.Height);
                         break;
 
@@ -122,12 +122,12 @@ namespace ColorTextBlock.Avalonia.Geometries
 
             Max(ref height, descentHeightTop + descentHeightBtm);
 
-            lineHeight = lineHeight != 0 ? lineHeight : lineHeight2;
+            baseHeight = baseHeight != 0 ? baseHeight : baseHeight2;
 
             return new DecoratorGeometry(
                 width + decorate.DesiredSize.Width,
                 height + decorate.DesiredSize.Height,
-                lineHeight + decorate.Margin.Top + decorate.BorderThickness.Top + decorate.Padding.Top,
+                baseHeight + decorate.Margin.Top + decorate.BorderThickness.Top + decorate.Padding.Top,
                 owner,
                 oneline.ToArray(),
                 decorate);
@@ -180,8 +180,8 @@ namespace ColorTextBlock.Avalonia.Geometries
                         target.Top = btm - target.Height;
                         break;
 
-                    case TextVerticalAlignment.Descent:
-                        target.Top = Top + LineHeight - target.LineHeight;
+                    case TextVerticalAlignment.Base:
+                        target.Top = Top + BaseHeight - target.BaseHeight;
                         break;
                 }
 
