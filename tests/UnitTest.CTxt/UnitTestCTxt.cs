@@ -132,7 +132,7 @@ namespace UnitTest.CTxt
          */
         //[Test]
         [RunOnUI]
-        public void GivenTest4_generatesExpectedResult()
+        public void GivenTestXXX_generatesExpectedResult()
         {
             var text = Util.LoadText("MainWindow.md");
 
@@ -161,6 +161,35 @@ namespace UnitTest.CTxt
                 new DiffToolReporter(DiffEngine.DiffTool.WinMerge));
         }
 
+        [Test]
+        [RunOnUI]
+        public void GivenTest4_generatesExpectedResult()
+        {
+            var tst4 = new Test4();
+            var ctxt = (CTextBlock)tst4.Content;
+
+            var info = new MetryHolder(ctxt, 1000, 1000);
+
+            Approvals.Verify(
+                new ApprovalImageWriter(info.Image),
+                Approvals.GetDefaultNamer(),
+                new DiffToolReporter(DiffEngine.DiffTool.WinMerge));
+        }
+
+        [Test]
+        [RunOnUI]
+        public void GivenTest5_generatesExpectedResult()
+        {
+            var tst5 = new Test5();
+            var ctxt = (CTextBlock)tst5.Content;
+
+            var info = new MetryHolder(ctxt, 1000, 1000);
+
+            Approvals.Verify(
+                new ApprovalImageWriter(info.Image),
+                Approvals.GetDefaultNamer(),
+                new DiffToolReporter(DiffEngine.DiffTool.WinMerge));
+        }
     }
 
     class MetryHolder : AvaloniaObject

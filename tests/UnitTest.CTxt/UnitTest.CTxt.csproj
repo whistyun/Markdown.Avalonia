@@ -18,4 +18,10 @@
     <ProjectReference Include="..\UnitTest.Base\UnitTest.Base.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Xamls\Test5.axaml.cs">
+      <DependentUpon>Test5.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
 </Project>
