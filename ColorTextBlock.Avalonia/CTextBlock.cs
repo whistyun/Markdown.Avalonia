@@ -15,8 +15,14 @@ namespace ColorTextBlock.Avalonia
 {
     public class CTextBlock : Control
     {
-        private static readonly StyledProperty<double> LineHeightProperty =
-            AvaloniaProperty.Register<CTextBlock, double>("LineHeight");
+        private static readonly StyledProperty<double> BaseHeightProperty =
+            AvaloniaProperty.Register<CTextBlock, double>("BaseHeight");
+
+        public static readonly StyledProperty<double> LineHeightProperty =
+            AvaloniaProperty.Register<CTextBlock, double>(nameof(LineHeight), defaultValue: Double.NaN);
+
+        public static readonly StyledProperty<double> LineSpacingProperty =
+            AvaloniaProperty.Register<CTextBlock, double>(nameof(LineSpacing), defaultValue: 0);
 
         public static readonly StyledProperty<IBrush> BackgroundProperty =
             Border.BackgroundProperty.AddOwner<CTextBlock>();
@@ -39,7 +45,7 @@ namespace ColorTextBlock.Avalonia
         public static readonly StyledProperty<TextVerticalAlignment> TextVerticalAlignmentProperty =
             AvaloniaProperty.Register<CTextBlock, TextVerticalAlignment>(
                 nameof(TextVerticalAlignment),
-                defaultValue: TextVerticalAlignment.Descent,
+                defaultValue: TextVerticalAlignment.Base,
                 inherits: true);
 
         public static readonly StyledProperty<TextWrapping> TextWrappingProperty =
@@ -74,15 +80,17 @@ namespace ColorTextBlock.Avalonia
                 TextBlock.FontWeightProperty.Changed,
                 TextWrappingProperty.Changed,
                 BoundsProperty.Changed,
-                TextVerticalAlignmentProperty.Changed
+                TextVerticalAlignmentProperty.Changed,
+                LineHeightProperty.Changed,
+                LineSpacingProperty.Changed
             ).AddClassHandler<CTextBlock>((x, _) => x.OnMeasureSourceChanged());
 
             Observable.Merge<AvaloniaPropertyChangedEventArgs>(
-                LineHeightProperty.Changed
+                BaseHeightProperty.Changed
             ).AddClassHandler<CTextBlock>((x, _) => x.CheckHaveToMeasure());
         }
 
-        private double computedLineHeight;
+        private double computedBaseHeight;
         private AvaloniaList<CInline> _content;
         private List<CGeometry> metries;
 
@@ -138,6 +146,18 @@ namespace ColorTextBlock.Avalonia
         {
             get { return GetValue(TextVerticalAlignmentProperty); }
             set { SetValue(TextVerticalAlignmentProperty, value); }
+        }
+
+        public double LineHeight
+        {
+            get { return GetValue(LineHeightProperty); }
+            set { SetValue(LineHeightProperty, value); }
+        }
+
+        public double LineSpacing
+        {
+            get { return GetValue(LineSpacingProperty); }
+            set { SetValue(LineSpacingProperty, value); }
         }
 
         [Content]
@@ -301,9 +321,9 @@ namespace ColorTextBlock.Avalonia
 
         #endregion
 
-        public void ObserveLineHeightOf(CTextBlock target)
+        public void ObserveBaseHeightOf(CTextBlock target)
         {
-            this.Bind(LineHeightProperty, target.GetBindingObservable(LineHeightProperty));
+            this.Bind(BaseHeightProperty, target.GetBindingObservable(BaseHeightProperty));
         }
 
         private void ContentCollectionChangedd(object sender, NotifyCollectionChangedEventArgs e)
@@ -340,14 +360,14 @@ namespace ColorTextBlock.Avalonia
 
         private void CheckHaveToMeasure()
         {
-            if (computedLineHeight != GetValue(LineHeightProperty))
+            if (computedBaseHeight != GetValue(BaseHeightProperty))
                 InvalidateMeasure();
         }
 
 
         internal void OnMeasureSourceChanged()
         {
-            ClearValue(LineHeightProperty);
+            ClearValue(BaseHeightProperty);
             InvalidateMeasure();
         }
 
@@ -369,7 +389,8 @@ namespace ColorTextBlock.Avalonia
             double height = 0;
 
             // measure & split by linebreak
-            var reqHeight = GetValue(LineHeightProperty);
+            var reqHeight = GetValue(BaseHeightProperty);
+            var entireLineHeight = LineHeight;
             var lines = new List<LineInfo>();
             {
                 LineInfo now = null;
@@ -389,11 +410,14 @@ namespace ColorTextBlock.Avalonia
                         {
                             lines.Add(now = new LineInfo());
                             if (lines.Count == 1)
-                                now.RequestLineHeight = reqHeight;
+                                now.RequestBaseHeight = reqHeight;
                         }
 
                         if (now.Add(metry))
                         {
+                            if (!Double.IsNaN(entireLineHeight))
+                                now.OverwriteHeight(entireLineHeight);
+
                             width = Math.Max(width, now.Width);
                             height += now.Height;
 
@@ -406,6 +430,9 @@ namespace ColorTextBlock.Avalonia
 
                 if (now != null)
                 {
+                    if (!Double.IsNaN(entireLineHeight))
+                        now.OverwriteHeight(entireLineHeight);
+
                     width = Math.Max(width, now.Width);
                     height += now.Height;
                 }
@@ -413,9 +440,12 @@ namespace ColorTextBlock.Avalonia
 
             if (lines.Count > 0)
             {
-                computedLineHeight = lines[0].LineHeight;
-                SetValue(LineHeightProperty, lines[0].LineHeight);
+                computedBaseHeight = lines[0].BaseHeight;
+                SetValue(BaseHeightProperty, lines[0].BaseHeight);
             }
+
+            var lineSpc = LineSpacing;
+            height += lineSpc * (lines.Count - 1);
 
             // set position
             {
@@ -451,8 +481,8 @@ namespace ColorTextBlock.Avalonia
                             case TextVerticalAlignment.Bottom:
                                 metry.Top = topOffset + lineInf.Height - metry.Height;
                                 break;
-                            case TextVerticalAlignment.Descent:
-                                metry.Top = topOffset + lineInf.LineHeight - metry.LineHeight;
+                            case TextVerticalAlignment.Base:
+                                metry.Top = topOffset + lineInf.BaseHeight - metry.BaseHeight;
                                 break;
                         }
 
@@ -461,7 +491,7 @@ namespace ColorTextBlock.Avalonia
                         metries.Add(metry);
                     }
 
-                    topOffset += lineInf.Height;
+                    topOffset += lineInf.Height + lineSpc;
                 }
             }
 
@@ -488,9 +518,9 @@ namespace ColorTextBlock.Avalonia
     {
         public List<CGeometry> Metries = new List<CGeometry>();
 
-        public double RequestLineHeight;
-        private double LineHeight1;
-        private double LineHeight2;
+        public double RequestBaseHeight;
+        private double BaseHeight1;
+        private double BaseHeight2;
 
         private double _height;
         private double _dheightTop;
@@ -498,7 +528,7 @@ namespace ColorTextBlock.Avalonia
 
         public double Width { private set; get; }
         public double Height => Math.Max(_height, _dheightTop + _dheightBtm);
-        public double LineHeight => Math.Max(RequestLineHeight, LineHeight1 != 0 ? LineHeight1 : LineHeight2);
+        public double BaseHeight => Math.Max(RequestBaseHeight, BaseHeight1 != 0 ? BaseHeight1 : BaseHeight2);
 
         public bool Add(CGeometry metry)
         {
@@ -508,24 +538,24 @@ namespace ColorTextBlock.Avalonia
 
             switch (metry.TextVerticalAlignment)
             {
-                case TextVerticalAlignment.Descent:
-                    Max(ref LineHeight1, metry.LineHeight);
-                    Max(ref _dheightTop, metry.LineHeight);
-                    Max(ref _dheightBtm, metry.Height - metry.LineHeight);
+                case TextVerticalAlignment.Base:
+                    Max(ref BaseHeight1, metry.BaseHeight);
+                    Max(ref _dheightTop, metry.BaseHeight);
+                    Max(ref _dheightBtm, metry.Height - metry.BaseHeight);
                     break;
 
                 case TextVerticalAlignment.Top:
-                    Max(ref LineHeight1, metry.LineHeight);
+                    Max(ref BaseHeight1, metry.BaseHeight);
                     Max(ref _height, metry.Height);
                     break;
 
                 case TextVerticalAlignment.Center:
-                    Max(ref LineHeight1, metry.Height / 2);
+                    Max(ref BaseHeight1, metry.Height / 2);
                     Max(ref _height, metry.Height);
                     break;
 
                 case TextVerticalAlignment.Bottom:
-                    Max(ref LineHeight2, metry.LineHeight);
+                    Max(ref BaseHeight2, metry.BaseHeight);
                     Max(ref _height, metry.Height);
                     break;
 
@@ -535,6 +565,12 @@ namespace ColorTextBlock.Avalonia
             }
 
             return metry.LineBreak;
+        }
+
+        public void OverwriteHeight(double height)
+        {
+            _height = height;
+            _dheightBtm = _dheightTop = 0;
         }
 
         private static void Max(ref double v1, double v2) => v1 = Math.Max(v1, v2);
