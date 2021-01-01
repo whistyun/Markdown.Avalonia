@@ -7,6 +7,6 @@ namespace ColorTextBlock.Avalonia
         Center,
         Bottom,
 
-        Descent,
+        Base,
     }
 }

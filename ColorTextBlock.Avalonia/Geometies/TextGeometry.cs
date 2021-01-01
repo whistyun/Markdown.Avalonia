@@ -77,7 +77,7 @@ namespace ColorTextBlock.Avalonia.Geometries
         {
             return new TextGeometry(
                 0, 0,
-                TextVerticalAlignment.Descent,
+                TextVerticalAlignment.Base,
                 true,
                 "", null);
         }
@@ -86,7 +86,7 @@ namespace ColorTextBlock.Avalonia.Geometries
         {
             return new TextGeometry(
                 0, format.Bounds.Height,
-                TextVerticalAlignment.Descent,
+                TextVerticalAlignment.Base,
                 true,
                 "", null);
         }
