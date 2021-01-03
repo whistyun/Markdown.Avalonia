@@ -75,7 +75,6 @@ namespace UnitTest.Md
         {
             var text = Util.LoadText("Links_inline_style.md");
             var markdown = new Markdown.Avalonia.Markdown();
-            markdown.DisabledTootip = true;
             var result = markdown.Transform(text);
             Approvals.Verify(Util.AsXaml(result));
         }

@@ -68,20 +68,19 @@ namespace Markdown.Avalonia
         /// </summary>
         public bool StrictBoldItalic { get; set; }
 
-        public bool DisabledTootip { get; set; }
-
-        //public bool DisabledLazyLoad { get; set; }
-
         private string _assetPathRoot;
+        /// <inheritdoc/>
         public string AssetPathRoot
         {
             get => _assetPathRoot;
             set => BitmapLoader.AssetPathRoot = _assetPathRoot = value;
         }
 
+        /// <inheritdoc/>
         public ICommand HyperlinkCommand { get; set; }
 
         private IBitmapLoader _loader;
+        /// <inheritdoc/>
         public IBitmapLoader BitmapLoader
         {
             get => _loader;
@@ -111,37 +110,6 @@ namespace Markdown.Avalonia
 
         #endregion
 
-
-        #region legacy property
-
-        /*
-         
-         TODO read https://github.com/AvaloniaUI/Avalonia/issues/2765
-         
-        public Style Heading1Style { get; set; }
-        public Style Heading2Style { get; set; }
-        public Style Heading3Style { get; set; }
-        public Style Heading4Style { get; set; }
-        public Style NormalParagraphStyle { get; set; }
-        public Style CodeStyle { get; set; }
-        public Style CodeBlockStyle { get; set; }
-        public Style BlockquoteStyle { get; set; }
-        public Style LinkStyle { get; set; }
-        public Style ImageStyle { get; set; }
-        public Style SeparatorStyle { get; set; }
-        public Style TableStyle { get; set; }
-        public Style TableHeaderStyle { get; set; }
-        public Style TableBodyStyle { get; set; }
-        public Style NoteStyle { get; set; }
-        */
-
-        #endregion
-
-        #region regex pattern
-
-
-        #endregion
-
         public Markdown()
         {
             _assetPathRoot = Environment.CurrentDirectory;
@@ -154,6 +122,7 @@ namespace Markdown.Avalonia
                 ImageNotFound = new Bitmap(strm);
         }
 
+        /// <inheritdoc/>
         public Control Transform(string text)
         {
             if (text is null)
@@ -165,9 +134,6 @@ namespace Markdown.Avalonia
 
             var document = Create<StackPanel, Control>(RunBlockGamut(text, true));
             document.Orientation = Orientation.Vertical;
-
-            // todo implements after
-            //            document.SetBinding(FlowDocument.StyleProperty, new Binding(DocumentStyleProperty.Name) { Source = this });
 
             return document;
         }
@@ -193,19 +159,6 @@ namespace Markdown.Avalonia
                     s7 => DoIndentCodeBlock(s7,
                     sn => FormParagraphs(sn, supportTextAlignment
                     )))))))));
-
-            //text = DoCodeBlocks(text);
-            //text = DoBlockQuotes(text);
-
-            //// We already ran HashHTMLBlocks() before, in Markdown(), but that
-            //// was to escape raw HTML in the original Markdown source. This time,
-            //// we're escaping the markup we've just created, so that we don't wrap
-            //// <p> tags around block-level tags.
-            //text = HashHTMLBlocks(text);
-
-            //text = FormParagraphs(text);
-
-            //return text;
         }
 
         /// <summary>
@@ -222,23 +175,6 @@ namespace Markdown.Avalonia
                 s0 => DoImagesOrHrefs(s0,
                 s1 => DoTextDecorations(s1,
                 s2 => DoText(s2))));
-
-            //text = EscapeSpecialCharsWithinTagAttributes(text);
-            //text = EscapeBackslashes(text);
-
-            //// Images must come first, because ![foo][f] looks like an anchor.
-            //text = DoImages(text);
-            //text = DoAnchors(text);
-
-            //// Must come after DoAnchors(), because you can use < and >
-            //// delimiters in inline links like [this](<url>).
-            //text = DoAutoLinks(text);
-
-            //text = EncodeAmpsAndAngles(text);
-            //text = DoItalicsAndBold(text);
-            //text = DoHardBreaks(text);
-
-            //return text;
         }
 
 

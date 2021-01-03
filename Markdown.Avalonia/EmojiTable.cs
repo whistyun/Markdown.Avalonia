@@ -7,6 +7,10 @@ using System.Text;
 
 namespace Markdown.Avalonia
 {
+    /// <summary>
+    /// Translate emoji keyword to code.
+    /// For example Translate 'smile' to '😄'.
+    /// </summary>
     public static class EmojiTable
     {
         private static ConcurrentDictionary<String, String> keywords;

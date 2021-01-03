@@ -17,25 +17,25 @@ namespace Markdown.Avalonia
 {
     public class MarkdownScrollViewer : Control
     {
-        public static readonly AvaloniaProperty<string> MarkdownProperty =
+        public static readonly DirectProperty<MarkdownScrollViewer, string> MarkdownProperty =
             AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, string>(
                 nameof(Markdown),
                 o => o.Markdown,
                 (o, v) => o.Markdown = v);
 
-        public static readonly AvaloniaProperty<IStyle> MarkdownStyleProperty =
+        public static readonly DirectProperty<MarkdownScrollViewer, IStyle> MarkdownStyleProperty =
             AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, IStyle>(
                 nameof(MarkdownStyle),
                 o => o.MarkdownStyle,
                 (o, v) => o.MarkdownStyle = v);
 
-        public static readonly AvaloniaProperty<string> MarkdownStyleNameProperty =
+        public static readonly DirectProperty<MarkdownScrollViewer, string> MarkdownStyleNameProperty =
             AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, string>(
                 nameof(MarkdownStyleName),
                 o => o.MarkdownStyleName,
                 (o, v) => o.MarkdownStyleName = v);
 
-        public static readonly AvaloniaProperty<string> AssetPathRootProperty =
+        public static readonly DirectProperty<MarkdownScrollViewer, string> AssetPathRootProperty =
             AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, string>(
                 nameof(AssetPathRoot),
                 o => o.AssetPathRoot,
@@ -46,7 +46,7 @@ namespace Markdown.Avalonia
                 nameof(SaveScrollValueWhenContentUpdated),
                 defaultValue: false);
 
-        public static readonly AvaloniaProperty<Vector> ScrollValueProperty =
+        public static readonly DirectProperty<MarkdownScrollViewer, Vector> ScrollValueProperty =
             AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, Vector>(
                 nameof(ScrollValue),
                 owner => owner.ScrollValue,
@@ -107,6 +107,14 @@ namespace Markdown.Avalonia
         }
 
         private string _AssetPathRoot;
+        /// <summary>
+        /// The base of relative path.
+        /// </summary>
+        /// <remarks>
+        /// This path is used as base path for load images which are indicated relative path.
+        /// This property wrap IMarkdownEngine.AssetPathRoot.
+        /// </remarks>
+        /// <see cref="IMarkdownEngine.AssetPathRoot"/>
         public string AssetPathRoot
         {
             set
@@ -120,18 +128,32 @@ namespace Markdown.Avalonia
             get => _AssetPathRoot;
         }
 
+        /// <summary>
+        /// If this property is 'true', This save scroll value even if content is changed.
+        /// </summary>
         public bool SaveScrollValueWhenContentUpdated
         {
             set { SetValue(SaveScrollValueWhenContentUpdatedProperty, value); }
             get { return GetValue(SaveScrollValueWhenContentUpdatedProperty); }
         }
 
+        /// <summary>
+        /// The current scroll value.
+        /// </summary>
         public Vector ScrollValue
         {
             set { _viewer.Offset = value; }
             get { return _viewer.Offset; }
         }
 
+        /// <summary>
+        /// Markdown text to draw.
+        /// </summary>
+        /// <remarks>
+        /// This property is used in markup and accept indented markdown.
+        /// indentations is trimmed following with a rule 
+        /// like a flexible_heredoc_nowdoc_syntaxes in PHP7.3.
+        /// </remarks>
         [Content]
         public string HereMarkdown
         {
@@ -194,6 +216,9 @@ namespace Markdown.Avalonia
         }
 
         private string _markdown;
+        /// <summary>
+        /// Markdown text to draw.
+        /// </summary>
         public string Markdown
         {
             get { return _markdown; }
@@ -207,6 +232,12 @@ namespace Markdown.Avalonia
         }
 
         private Uri _source;
+        /// <summary>
+        /// .md file uri to draw.
+        /// </summary>
+        /// <remarks>
+        /// The md file must be UTF-8 encoded.
+        /// </remarks>
         public Uri Source
         {
             get { return _source; }
@@ -247,6 +278,13 @@ namespace Markdown.Avalonia
         }
 
         private IStyle _markdownStyle;
+        /// <summary>
+        /// The style for drawing Markdown text.
+        /// </summary>
+        /// <remarks>
+        /// This property resets the style of all text elements in Markdown.
+        /// If you want to add some styles, use `Styles` propety.
+        /// </remarks>
         public IStyle MarkdownStyle
         {
             get { return _markdownStyle; }
@@ -267,6 +305,10 @@ namespace Markdown.Avalonia
         }
 
         private string _markdownStyleName;
+        /// <summary>
+        /// The style name for drawing Markdown text.
+        /// </summary>
+        /// <see cref="MdStyle"/>
         public string MarkdownStyleName
         {
             get { return _markdownStyleName; }

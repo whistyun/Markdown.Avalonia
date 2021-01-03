@@ -11,16 +11,11 @@ using System.Text;
 
 namespace Markdown.Avalonia
 {
+    /// <summary>
+    /// Provides embedded styles markdown.
+    /// </summary>
     public static class MarkdownStyle
     {
-        static IStyle LoadXaml(string name)
-        {
-            return new StyleInclude(new Uri("avares://Markdown.Avalonia/"))
-            {
-                Source = new Uri("avares://Markdown.Avalonia/" + name)
-            };
-        }
-
         public static Styles Standard
         {
             get => new MarkdownStyleStandard();
