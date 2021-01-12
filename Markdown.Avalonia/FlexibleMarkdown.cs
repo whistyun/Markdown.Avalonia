@@ -165,6 +165,9 @@ namespace Markdown.Avalonia
         private static readonly Regex _newlinesLeadingTrailing = new Regex(@"^\n+|\n+\z", RegexOptions.Compiled);
         private static readonly Regex _newlinesMultiple = new Regex(@"\n{2,}", RegexOptions.Compiled);
 
+        private static readonly Regex _newlineLeadingTrailing = new Regex(@"^\n|\n\z", RegexOptions.Compiled);
+        private static readonly Regex _newlinesDouble = new Regex(@"\n{2}", RegexOptions.Compiled);
+
         /// <summary>
         /// splits on two or more newlines, to form "paragraphs";    
         /// </summary>
@@ -175,8 +178,66 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(text));
             }
 
+            string[] grafs;
 
-            string[] grafs = _newlinesMultiple.Split(_newlinesLeadingTrailing.Replace(text, ""));
+            if (EnableSaveLineBreak)
+            {
+                var buff = new List<string>();
+
+                var lnCnt = 0;
+                var trimedTxt = _newlineLeadingTrailing.Replace(text, "");
+
+                if (Regex.IsMatch(text, "^\n+$"))
+                {
+                    lnCnt = text.Length;
+                }
+                else
+                {
+                    foreach (var e in _newlinesDouble.Split(trimedTxt))
+                    {
+                        if (e == "")
+                        {
+                            // treat as 2 linebreaks
+                            lnCnt += 2;
+                        }
+                        else if (e == "\n")
+                        {
+                            // treat as 3 linebreaks,   foo [\n\n] \n 
+                            lnCnt += 3;
+                        }
+                        else if (lnCnt > 0)
+                        {
+                            var ln = new String('\n', lnCnt);
+                            buff.Add(ln + e);
+                            lnCnt = 0;
+                        }
+                        else
+                        {
+                            buff.Add(e);
+                            lnCnt = 0;
+                        }
+                    }
+                }
+
+                if (buff.Count == 0 && lnCnt > 1)
+                {
+                    // ln only
+                    var ln = new String('\n', lnCnt - 1);
+                    buff.Add(ln);
+                }
+                else if (lnCnt > 0 && buff.Count > 0)
+                {
+                    var ln = new String('\n', lnCnt);
+                    buff[buff.Count - 1] = buff[buff.Count - 1] + ln;
+                }
+
+                grafs = buff.ToArray();
+            }
+            else
+            {
+                grafs = _newlinesMultiple.Split(_newlinesLeadingTrailing.Replace(text, ""));
+            }
+
 
             foreach (var g in grafs)
             {
@@ -205,7 +266,32 @@ namespace Markdown.Avalonia
                     }
                 }
 
-                var ctbox = new CTextBlock(RunSpanGamut(chip));
+                CTextBlock ctbox;
+                if (Regex.IsMatch(chip, "^\n+$"))
+                {
+                    var inlines = new List<CInline>();
+                    for (var i = 0; i < chip.Length; ++i) inlines.Add(new CLineBreak());
+                    ctbox = new CTextBlock(inlines);
+                }
+                else if (chip.StartsWith("\n") || chip.EndsWith("\n"))
+                {
+                    var inlines = new List<CInline>();
+
+                    int bgnCnt = chip.TakeWhile(c => c == '\n').Count();
+                    int lstCnt = chip.Reverse().TakeWhile(c => c == '\n').Count();
+
+                    for (var i = 0; i < bgnCnt; ++i) inlines.Add(new CLineBreak());
+
+                    inlines.AddRange(RunSpanGamut(chip.Substring(bgnCnt, chip.Length - bgnCnt - lstCnt)));
+
+                    for (var i = 0; i < lstCnt; ++i) inlines.Add(new CLineBreak());
+
+                    ctbox = new CTextBlock(inlines);
+                }
+                else
+                {
+                    ctbox = new CTextBlock(RunSpanGamut(chip));
+                }
 
                 if (indiAlignment.HasValue)
                     ctbox.TextAlignment = indiAlignment.Value;
@@ -328,7 +414,7 @@ namespace Markdown.Avalonia
                 \n
                 (=+|-+)     # $1 = string of ='s or -'s
                 [ ]*
-                \n+",
+                \n",
                 RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static readonly Regex _headerAtx = new Regex(@"
@@ -337,7 +423,7 @@ namespace Markdown.Avalonia
                 (.+?)       # $2 = Header text
                 [ ]*
                 \#*         # optional closing #'s (not counted)
-                \n+",
+                \n",
                 RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
@@ -440,7 +526,7 @@ namespace Markdown.Avalonia
                 (.+?)       # $2 = Header text
                 [ ]*
                 \>*         # optional closing >'s (not counted)
-                \n+
+                \n
             ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
@@ -1158,7 +1244,7 @@ namespace Markdown.Avalonia
                     ((.|\n)+?)       # $3 = The code block
                     \n[ ]*
                     \1
-                    (?!`)[\n]+", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
+                    (?!`)[\n]", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
 
         private static Regex _indentCodeBlock = new Regex(@"
                     ^
@@ -1709,7 +1795,7 @@ namespace Markdown.Avalonia
                     first = false;
                 else
                     yield return new CLineBreak();
-                var t = _eoln.Replace(line, " ");
+                var t = EnableSaveSpaces ? line : _eoln.Replace(line, " ");
                 yield return new CRun() { Text = t };
             }
         }
