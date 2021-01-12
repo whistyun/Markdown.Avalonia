@@ -601,9 +601,13 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(match));
             }
 
-            return EnableListMarkerExtension ?
-                new Rule(RuleType.TwoLines) :
-                new Rule() { Classes = { nameof(RuleType.TwoLines) } };
+            return new Rule(RuleType.TwoLines);
+
+            // this method is extension. so I don't need to check the flag.
+            //
+            //return EnableListMarkerExtension ?
+            //    new Rule(RuleType.TwoLines) :
+            //    new Rule() { Classes = { nameof(RuleType.TwoLines) } };
         }
 
         /// <summary>
