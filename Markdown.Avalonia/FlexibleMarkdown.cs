@@ -5,20 +5,13 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using Avalonia.Styling;
 using ColorTextBlock.Avalonia;
 using Markdown.Avalonia.Controls;
 using Markdown.Avalonia.Tables;
 using Markdown.Avalonia.Utils;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Net.Cache;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -26,7 +19,7 @@ using System.Windows.Input;
 
 namespace Markdown.Avalonia
 {
-    public class Markdown : AvaloniaObject, IMarkdownEngine
+    public class FlexibleMarkdown : AvaloniaObject, IMarkdownEngine
     {
         #region const
         /// <summary>
@@ -40,34 +33,20 @@ namespace Markdown.Avalonia
         /// </summary>
         private const int _tabWidth = 4;
 
-        public const string Heading1Class = "Heading1";
-        public const string Heading2Class = "Heading2";
-        public const string Heading3Class = "Heading3";
-        public const string Heading4Class = "Heading4";
-        public const string Heading5Class = "Heading5";
-        public const string Heading6Class = "Heading6";
-
-        public const string CodeBlockClass = "CodeBlock";
-        public const string BlockquoteClass = "Blockquote";
-        public const string NoteClass = "Note";
-
-        public const string ParagraphClass = "Paragraph";
-
-        public const string TableClass = "Table";
-        public const string TableHeaderClass = "TableHeader";
-        public const string TableRowOddClass = "OddTableRow";
-        public const string TableRowEvenClass = "EvenTableRow";
-
-        public const string ListClass = "List";
-        public const string ListMarkerClass = "ListMarker";
-
         #endregion
 
-        /// <summary>
-        /// when true, bold and italic require non-word characters on either side  
-        /// WARNING: this is a significant deviation from the markdown spec
-        /// </summary>
-        public bool StrictBoldItalic { get; set; }
+        #region
+
+        public bool EnableNoteBlock { get; set; }
+        public bool EnableTableExtension { get; set; }
+        public bool EnableTextDecorationExtension { get; set; }
+        public bool EnableListMarkerExtension { get; set; }
+        public bool EnableParagraphAlignment { get; set; }
+
+        public bool EnableSaveSpaces { get; set; }
+        public bool EnableSaveLineBreak { get; set; }
+
+        #endregion
 
         private string _assetPathRoot;
         /// <inheritdoc/>
@@ -111,7 +90,7 @@ namespace Markdown.Avalonia
 
         #endregion
 
-        public Markdown()
+        public FlexibleMarkdown()
         {
             _assetPathRoot = Environment.CurrentDirectory;
 
@@ -156,9 +135,9 @@ namespace Markdown.Avalonia
                     s3 => DoHorizontalRules(s3,
                     s4 => DoLists(s4,
                     s5 => DoTable(s5,
-                    s6 => DoNote(s6, supportTextAlignment,
+                    s6 => DoNote(s6, supportTextAlignment & EnableParagraphAlignment,
                     s7 => DoIndentCodeBlock(s7,
-                    sn => FormParagraphs(sn, supportTextAlignment
+                    sn => FormParagraphs(sn, supportTextAlignment & EnableParagraphAlignment
                     )))))))));
         }
 
@@ -230,7 +209,7 @@ namespace Markdown.Avalonia
                 if (indiAlignment.HasValue)
                     ctbox.TextAlignment = indiAlignment.Value;
 
-                ctbox.Classes.Add(ParagraphClass);
+                ctbox.Classes.Add(Markdown.ParagraphClass);
 
                 yield return ctbox;
             }
@@ -425,27 +404,27 @@ namespace Markdown.Avalonia
             switch (level)
             {
                 case 1:
-                    heading.Classes.Add(Heading1Class);
+                    heading.Classes.Add(Markdown.Heading1Class);
                     break;
 
                 case 2:
-                    heading.Classes.Add(Heading2Class);
+                    heading.Classes.Add(Markdown.Heading2Class);
                     break;
 
                 case 3:
-                    heading.Classes.Add(Heading3Class);
+                    heading.Classes.Add(Markdown.Heading3Class);
                     break;
 
                 case 4:
-                    heading.Classes.Add(Heading4Class);
+                    heading.Classes.Add(Markdown.Heading4Class);
                     break;
 
                 case 5:
-                    heading.Classes.Add(Heading5Class);
+                    heading.Classes.Add(Markdown.Heading5Class);
                     break;
 
                 case 6:
-                    heading.Classes.Add(Heading6Class);
+                    heading.Classes.Add(Markdown.Heading6Class);
                     break;
             }
 
@@ -477,9 +456,13 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(text));
             }
 
-            return Evaluate<Control>(text, _note,
-                m => NoteEvaluator(m, supportTextAlignment),
-                defaultHandler);
+            if (EnableNoteBlock)
+                return Evaluate<Control>(text, _note,
+                    m => NoteEvaluator(m, supportTextAlignment),
+                    defaultHandler);
+
+            else
+                return defaultHandler(text);
         }
 
         private Border NoteEvaluator(Match match, bool supportTextAlignment)
@@ -525,14 +508,14 @@ namespace Markdown.Avalonia
             }
 
             var note = new CTextBlock(content);
-            note.Classes.Add(NoteClass);
+            note.Classes.Add(Markdown.NoteClass);
             if (indiAlignment.HasValue)
             {
                 note.TextAlignment = indiAlignment.Value;
             }
 
             var result = new Border();
-            result.Classes.Add(NoteClass);
+            result.Classes.Add(Markdown.NoteClass);
             result.Child = note;
 
             return result;
@@ -638,10 +621,12 @@ namespace Markdown.Avalonia
 
         #region grammer - list
 
+        private const string _listMaker = @"(?:[*+-]|\d+[.])";
+
         // `alphabet order` and `roman number` must start 'a.'～'c.' and 'i,'～'iii,'.
         // This restrict is avoid to treat "Yes," as list marker.
-        private const string _firstListMaker = @"(?:[*+=-]|\d+[.]|[a-c][.]|[i]{1,3}[,]|[A-C][.]|[I]{1,3}[,])";
-        private const string _subseqListMaker = @"(?:[*+=-]|\d+[.]|[a-c][.]|[cdilmvx]+[,]|[A-C][.]|[CDILMVX]+[,])";
+        private const string _firstListMakerEx = @"(?:[*+=-]|\d+[.]|[a-c][.]|[i]{1,3}[,]|[A-C][.]|[I]{1,3}[,])";
+        private const string _subseqListMakerEx = @"(?:[*+=-]|\d+[.]|[a-c][.]|[cdilmvx]+[,]|[A-C][.]|[CDILMVX]+[,])";
 
         //private const string _markerUL = @"[*+=-]";
         //private const string _markerOL = @"\d+[.]|\p{L}+[.,]";
@@ -650,10 +635,14 @@ namespace Markdown.Avalonia
         private const string _markerUL_Disc = @"[*]";
         private const string _markerUL_Box = @"[+]";
         private const string _markerUL_Circle = @"[-]";
+
+        // Unordered List (Enhance)
         private const string _markerUL_Square = @"[=]";
 
         // Ordered List
         private const string _markerOL_Number = @"\d+[.]";
+
+        // Ordered List (Enhance)
         private const string _markerOL_LetterLower = @"[a-c][.]";
         private const string _markerOL_LetterUpper = @"[A-C][.]";
         private const string _markerOL_RomanLower = @"[cdilmvx]+[,]";
@@ -668,6 +657,32 @@ namespace Markdown.Avalonia
         private const int _listDepth = 4;
 
         private static readonly string _wholeList = string.Format(@"
+            (                               # $1 = whole list
+              (                             # $2 = list marker with indent
+                [ ]{{0,{1}}}
+                ({0})                       # $3 = first list item marker
+                [ ]+
+              )
+              (?s:.+?)
+              (                             # $4
+                  \z
+                |
+                  \n{{2,}}
+                  (?=\S)
+                  (?!                       # Negative lookahead for another list item marker
+                    [ ]*
+                    {0}[ ]+
+                  )
+              )
+            )", _listMaker, _listDepth - 1);
+
+        private static readonly Regex _listNested = new Regex(@"^" + _wholeList,
+            RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
+        private static readonly Regex _listTopLevel = new Regex(@"(?:(?<=\n)|\A\n?)" + _wholeList,
+            RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
+        private static readonly string _wholeListEx = string.Format(@"
             (                               # $1 = whole list
               (                             # $2 = list marker with indent
                 [ ]{{0,{2}}}
@@ -685,12 +700,12 @@ namespace Markdown.Avalonia
                     {1}[ ]+
                   )
               )
-            )", _firstListMaker, _subseqListMaker, _listDepth - 1);
+            )", _firstListMakerEx, _subseqListMakerEx, _listDepth - 1);
 
-        private static readonly Regex _listNested = new Regex(@"^" + _wholeList,
+        private static readonly Regex _listNestedEx = new Regex(@"^" + _wholeListEx,
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        private static readonly Regex _listTopLevel = new Regex(@"(?:(?<=\n)|\A\n?)" + _wholeList,
+        private static readonly Regex _listTopLevelEx = new Regex(@"(?:(?<=\n)|\A\n?)" + _wholeListEx,
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
@@ -703,12 +718,22 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(text));
             }
 
-            // We use a different prefix before nested lists than top-level lists.
-            // See extended comment in _ProcessListItems().
-            if (_listLevel > 0)
-                return Evaluate(text, _listNested, ListEvaluator, defaultHandler);
+            if (EnableListMarkerExtension)
+            {
+                // We use a different prefix before nested lists than top-level lists.
+                // See extended comment in _ProcessListItems().
+                if (_listLevel > 0)
+                    return Evaluate(text, _listNestedEx, ListEvaluator, defaultHandler);
+                else
+                    return Evaluate(text, _listTopLevelEx, ListEvaluator, defaultHandler);
+            }
             else
-                return Evaluate(text, _listTopLevel, ListEvaluator, defaultHandler);
+            {
+                if (_listLevel > 0)
+                    return Evaluate(text, _listNested, ListEvaluator, defaultHandler);
+                else
+                    return Evaluate(text, _listTopLevel, ListEvaluator, defaultHandler);
+            }
         }
 
         private IEnumerable<Control> ListEvaluator(Match match)
@@ -743,7 +768,7 @@ namespace Markdown.Avalonia
                     else if (TextUtil.TryDetendLine(line, countIndent, out var stripedLine))
                     {
                         // is it had list marker?
-                        var someMarkerMch = Regex.Match(stripedLine, _subseqListMaker);
+                        var someMarkerMch = Regex.Match(stripedLine, EnableListMarkerExtension ? _subseqListMakerEx : _listMaker);
                         if (someMarkerMch.Success && someMarkerMch.Index == 0)
                         {
                             // is it same marker as now processed?
@@ -814,7 +839,7 @@ namespace Markdown.Avalonia
 
                 markerTxt.TextAlignment = TextAlignment.Right;
                 markerTxt.TextWrapping = TextWrapping.NoWrap;
-                markerTxt.Classes.Add(ListMarkerClass);
+                markerTxt.Classes.Add(Markdown.ListMarkerClass);
                 Grid.SetRow(markerTxt, index);
                 Grid.SetColumn(markerTxt, 0);
 
@@ -822,7 +847,7 @@ namespace Markdown.Avalonia
                 Grid.SetColumn(control, 1);
             }
 
-            grid.Classes.Add(ListClass);
+            grid.Classes.Add(Markdown.ListClass);
 
             yield return grid;
 
@@ -1003,10 +1028,6 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(match));
             }
 
-            var headerTxt = match.Groups["hdr"].Value.Trim();
-            var styleTxt = match.Groups["col"].Value.Trim();
-            var rowTxt = match.Groups["row"].Value.Trim();
-
             string ExtractCoverBar(string txt)
             {
                 if (txt[0] == '|')
@@ -1021,14 +1042,18 @@ namespace Markdown.Avalonia
                 return txt;
             }
 
-            var mdtable = new TextileTable(
-                ExtractCoverBar(headerTxt).Split('|'),
-                ExtractCoverBar(styleTxt).Split('|').Select(txt => txt.Trim()).ToArray(),
-                rowTxt.Split('\n').Select(ritm =>
-                {
-                    var trimRitm = ritm.Trim();
-                    return ExtractCoverBar(trimRitm).Split('|');
-                }).ToList());
+            var headerAry = ExtractCoverBar(match.Groups["hdr"].Value.Trim()).Split('|');
+            var styleAry = ExtractCoverBar(match.Groups["col"].Value.Trim()).Split('|').Select(txt => txt.Trim()).ToArray();
+            var rowLst = match.Groups["row"].Value.Trim().Split('\n').Select(ritm =>
+            {
+                var trimRitm = ritm.Trim();
+                return ExtractCoverBar(trimRitm).Split('|');
+            }).ToList();
+
+
+            var mdtable = EnableTableExtension ? (ITable)
+                new TextileTable(headerAry, styleAry, rowLst) :
+                new MdTable(headerAry, styleAry, rowLst);
 
             // table
             var table = new Grid();
@@ -1041,7 +1066,7 @@ namespace Markdown.Avalonia
             table.RowDefinitions.Add(new RowDefinition());
             foreach (Border tableHeaderCell in CreateTableRow(mdtable.Header, 0))
             {
-                tableHeaderCell.Classes.Add(TableHeaderClass);
+                tableHeaderCell.Classes.Add(Markdown.TableHeaderClass);
 
                 table.Children.Add(tableHeaderCell);
             }
@@ -1052,17 +1077,17 @@ namespace Markdown.Avalonia
                 table.RowDefinitions.Add(new RowDefinition());
                 foreach (Border cell in CreateTableRow(mdtable.Details[rowIdx], rowIdx + 1))
                 {
-                    cell.Classes.Add((rowIdx & 1) == 0 ? TableRowOddClass : TableRowEvenClass);
+                    cell.Classes.Add((rowIdx & 1) == 0 ? Markdown.TableRowOddClass : Markdown.TableRowEvenClass);
 
                     table.Children.Add(cell);
                 }
             }
 
-            table.Classes.Add(TableClass);
+            table.Classes.Add(Markdown.TableClass);
 
             var result = new Border();
             result.Child = table;
-            result.Classes.Add(TableClass);
+            result.Classes.Add(Markdown.TableClass);
 
             return result;
         }
@@ -1151,10 +1176,10 @@ namespace Markdown.Avalonia
                 Text = code,
                 TextWrapping = TextWrapping.NoWrap
             };
-            ctxt.Classes.Add(CodeBlockClass);
+            ctxt.Classes.Add(Markdown.CodeBlockClass);
 
             var result = new Border();
-            result.Classes.Add(CodeBlockClass);
+            result.Classes.Add(Markdown.CodeBlockClass);
             result.Child = ctxt;
 
             return result;
@@ -1260,10 +1285,13 @@ namespace Markdown.Avalonia
 
 
         #region grammer - textdecorations
-
-        private static readonly Regex _strictBold = new Regex(@"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)",
+        private static readonly Regex _bold = new Regex(@"(\*\*) (?=\S) (.+?[*_]*) (?<=\S) \1",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
-        private static readonly Regex _strictItalic = new Regex(@"([\W_]|^) (\*|_) (?=\S) ([^\r\*_]*?\S) \2 ([\W_]|$)",
+        private static readonly Regex _italic = new Regex(@"(\*) (?=\S) (.+?) (?<=\S) \1",
+            RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+        private static readonly Regex _barBold = new Regex(@"([\W_]|^) (__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)",
+            RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+        private static readonly Regex _barItalic = new Regex(@"([\W_]|^) (_) (?=\S) ([^\r\*_]*?\S) \2 ([\W_]|$)",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
         private static readonly Regex _strikethrough = new Regex(@"(~~) (?=\S) (.+?) (?<=\S) \1",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
@@ -1282,14 +1310,13 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(text));
             }
 
-            // <strong> must go first, then <em>
-            if (StrictBoldItalic)
+            if (!EnableTextDecorationExtension)
             {
-                return Evaluate<CInline>(text, _strictBold, m => BoldEvaluator(m, 3),
-                    s1 => Evaluate<CInline>(s1, _strictItalic, m => ItalicEvaluator(m, 3),
-                    s2 => Evaluate<CInline>(s2, _strikethrough, m => StrikethroughEvaluator(m, 2),
-                    s3 => Evaluate<CInline>(s3, _underline, m => UnderlineEvaluator(m, 2),
-                    s4 => defaultHandler(s4)))));
+                return Evaluate<CInline>(text, _bold, m => BoldEvaluator(m, 2),
+                        s1 => Evaluate<CInline>(s1, _italic, m => ItalicEvaluator(m, 2),
+                        s2 => Evaluate<CInline>(s2, _barBold, m => BoldEvaluator(m, 3),
+                        s3 => Evaluate<CInline>(s3, _barItalic, m => ItalicEvaluator(m, 3),
+                        s4 => defaultHandler(s4)))));
             }
             else
             {
@@ -1720,10 +1747,10 @@ namespace Markdown.Avalonia
 
             var panel = Create<StackPanel, Control>(blocks);
             panel.Orientation = Orientation.Vertical;
-            panel.Classes.Add(BlockquoteClass);
+            panel.Classes.Add(Markdown.BlockquoteClass);
 
             var result = new Border();
-            result.Classes.Add(BlockquoteClass);
+            result.Classes.Add(Markdown.BlockquoteClass);
             result.Child = panel;
 
             return result;

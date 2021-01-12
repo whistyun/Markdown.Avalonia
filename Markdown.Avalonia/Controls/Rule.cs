@@ -18,6 +18,9 @@ namespace Markdown.Avalonia.Controls
         const double _BoldLineWidth = 2;
         const double _LineMargin = 1;
 
+        public static readonly StyledProperty<RuleType> TypeProperty =
+            AvaloniaProperty.Register<Rule, RuleType>(nameof(Type), defaultValue: RuleType.Single);
+
         public static readonly StyledProperty<double> SingleLineWidthProperty =
             AvaloniaProperty.Register<Rule, double>(nameof(SingleLineWidth), defaultValue: _SingleLineWidth);
 
@@ -59,18 +62,21 @@ namespace Markdown.Avalonia.Controls
             set { SetValue(LineMarginProperty, value); }
         }
 
-
         public RuleType Type
         {
-            get; set;
+            get { return GetValue(TypeProperty); }
+            set { SetValue(TypeProperty, value); }
         }
 
-        public Rule(RuleType ruleType)
+        public Rule()
         {
-            this.Type = ruleType;
             this.HorizontalAlignment = HAlign.Stretch;
             this.VerticalAlignment = VAlign.Center;
+        }
 
+        public Rule(RuleType ruleType) : this()
+        {
+            this.Type = ruleType;
             this.Classes.Add(Enum.GetName(typeof(RuleType), ruleType));
         }
 
