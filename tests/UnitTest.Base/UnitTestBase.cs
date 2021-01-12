@@ -18,15 +18,14 @@ namespace UnitTest.Base
 
         }
 
-        IDisposable disposable;
-
+        private object Starter;
         protected string AssetPath;
 
         public UnitTestBase()
         {
             var asm = Assembly.GetExecutingAssembly();
             AssetPath = Path.GetDirectoryName(asm.Location);
-            disposable = App.Start();
+            Starter = App.Start();
         }
     }
 }

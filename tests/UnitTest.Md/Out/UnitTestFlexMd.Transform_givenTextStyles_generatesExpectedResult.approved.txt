@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-16"?>
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+  <c:CTextBlock Classes="Paragraph">
+    <c:CItalic>
+      <c:CRun Text="This text will be italic" />
+    </c:CItalic>
+    <c:CRun Text=" " />
+    <c:CBold>
+      <c:CRun Text="This text will be bold" />
+    </c:CBold>
+  </c:CTextBlock>
+  <c:CTextBlock Classes="Paragraph">
+    <c:CStrikethrough IsStrikethrough="True">
+      <c:CRun Text="This text will be striketrhough" />
+    </c:CStrikethrough>
+    <c:CRun Text=" " />
+    <c:CUnderline IsUnderline="True">
+      <c:CRun Text="This text will be underline" />
+    </c:CUnderline>
+  </c:CTextBlock>
+</StackPanel>

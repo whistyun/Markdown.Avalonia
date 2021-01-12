@@ -14,6 +14,7 @@ using System.Reactive.Concurrency;
 using Avalonia.Controls.ApplicationLifetimes;
 using System.Collections.Generic;
 using System.Threading;
+using System.Runtime.CompilerServices;
 
 namespace UnitTest.Base.Apps
 {
@@ -33,13 +34,18 @@ namespace UnitTest.Base.Apps
             base.OnFrameworkInitializationCompleted();
         }
 
-        public static IDisposable Start()
+        private static AppStarter starter;
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public static object Start()
         {
-            var starter = new AppStarter();
+            if (starter is null)
+            {
+                starter = new AppStarter();
 
-            var th = new Thread(starter.Start);
-            th.Start();
-
+                var th = new Thread(starter.Start);
+                th.Start();
+            }
             return starter;
         }
     }
