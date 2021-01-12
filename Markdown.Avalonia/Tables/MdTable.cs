@@ -37,7 +37,7 @@ namespace Markdown.Avalonia.Tables
                     => new MdTableCell(txt) { ColumnIndex = idx, Horizontal = aligns[idx] };
 
                 var lst = line.Select(MkCell).ToList();
-                while (lst.Count < ColCount) lst.Add(MkCell("", Header.Count));
+                while (lst.Count < ColCount) lst.Add(MkCell("", lst.Count));
                 return lst;
             }
 
