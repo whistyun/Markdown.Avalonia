@@ -20,6 +20,7 @@ namespace UnitTest.Md
                 EnableListMarkerExtension = true,
                 EnableParagraphAlignment = true,
                 EnableSaveSpaces = true,
+                EnableHorizontalRuleExtension = true,
                 EnableSaveLineBreak = true
             };
             return md;

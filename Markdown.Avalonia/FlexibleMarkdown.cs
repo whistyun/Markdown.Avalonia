@@ -41,6 +41,7 @@ namespace Markdown.Avalonia
         public bool EnableTableExtension { get; set; }
         public bool EnableTextDecorationExtension { get; set; }
         public bool EnableListMarkerExtension { get; set; }
+        public bool EnableHorizontalRuleExtension { get; set; }
         public bool EnableParagraphAlignment { get; set; }
 
         public bool EnableSaveSpaces { get; set; }
@@ -525,9 +526,10 @@ namespace Markdown.Avalonia
         #region grammer - horizontal rules
 
         private static readonly Regex _horizontalRules = HorizontalRulesRegex("-");
-        private static readonly Regex _horizontalTwoLinesRules = HorizontalRulesRegex("=");
         private static readonly Regex _horizontalBoldRules = HorizontalRulesRegex("*");
         private static readonly Regex _horizontalBoldWithSingleRules = HorizontalRulesRegex("_");
+        // ext
+        private static readonly Regex _horizontalTwoLinesRules = HorizontalRulesRegex("=");
         private static Regex HorizontalRulesRegex(string markers)
         {
             return new Regex(@"
@@ -558,10 +560,20 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(text));
             }
 
-            return Evaluate(text, _horizontalRules, RuleEvaluator,
-                s1 => Evaluate(s1, _horizontalTwoLinesRules, TwoLinesRuleEvaluator,
-                s2 => Evaluate(s2, _horizontalBoldRules, BoldRuleEvaluator,
-                s3 => Evaluate(s3, _horizontalBoldWithSingleRules, BoldWithSingleRuleEvaluator, defaultHandler))));
+            if (EnableHorizontalRuleExtension)
+            {
+                return Evaluate(text, _horizontalRules, RuleEvaluator,
+                    s1 => Evaluate(s1, _horizontalTwoLinesRules, TwoLinesRuleEvaluator,
+                    s2 => Evaluate(s2, _horizontalBoldRules, BoldRuleEvaluator,
+                    s3 => Evaluate(s3, _horizontalBoldWithSingleRules, BoldWithSingleRuleEvaluator, defaultHandler))));
+            }
+            else
+            {
+                return Evaluate(text, _horizontalRules, RuleEvaluator,
+                    s2 => Evaluate(s2, _horizontalBoldRules, BoldRuleEvaluator,
+                    s3 => Evaluate(s3, _horizontalBoldWithSingleRules, BoldWithSingleRuleEvaluator, defaultHandler)));
+            }
+
         }
 
         /// <summary>
@@ -574,7 +586,9 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(match));
             }
 
-            return new Rule(RuleType.Single);
+            return EnableListMarkerExtension ?
+                new Rule(RuleType.Single) :
+                new Rule() { Classes = { nameof(RuleType.Single) } };
         }
 
         /// <summary>
@@ -587,7 +601,9 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(match));
             }
 
-            return new Rule(RuleType.TwoLines);
+            return EnableListMarkerExtension ?
+                new Rule(RuleType.TwoLines) :
+                new Rule() { Classes = { nameof(RuleType.TwoLines) } };
         }
 
         /// <summary>
@@ -600,7 +616,9 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(match));
             }
 
-            return new Rule(RuleType.Bold);
+            return EnableListMarkerExtension ?
+                new Rule(RuleType.Bold) :
+                new Rule() { Classes = { nameof(RuleType.Bold) } };
         }
 
         /// <summary>
@@ -613,7 +631,9 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(match));
             }
 
-            return new Rule(RuleType.BoldWithSingle);
+            return EnableListMarkerExtension ?
+                new Rule(RuleType.BoldWithSingle) :
+                new Rule() { Classes = { nameof(RuleType.Bold) } };
         }
 
         #endregion
