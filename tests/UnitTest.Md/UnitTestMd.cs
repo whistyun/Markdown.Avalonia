@@ -126,6 +126,18 @@ namespace UnitTest.Md
 
         [Test]
         [RunOnUI]
+        public void Transform_givenCodes_generatesExpectedResult()
+        {
+            var text = Util.LoadText("Codes.md");
+            var markdown = new Markdown.Avalonia.Markdown();
+            markdown.AssetPathRoot = AssetPath;
+
+            var result = markdown.Transform(text);
+            Approvals.Verify(Util.AsXaml(result));
+        }
+
+        [Test]
+        [RunOnUI]
         public void Transform_givenEmoji()
         {
             var text = Util.LoadText("Emoji.md");

@@ -4,91 +4,63 @@
     <c:CRun Text="Dashes:" />
   </c:CTextBlock>
   <m:Rule BoldLineWidth="2" Classes="Single" />
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="Single" />
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="Single" />
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="Single" />
-  <c:CTextBlock Classes="Paragraph" />
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="---&#xA;" Classes="CodeBlock" />
+      <TextBlock Text="---" Classes="CodeBlock" />
     </Border.Child>
   </Border>
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="Single" />
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="Single" />
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="Single" />
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="Single" />
-  <c:CTextBlock Classes="Paragraph" />
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="- - -&#xA;" Classes="CodeBlock" />
+      <TextBlock Text="- - -" Classes="CodeBlock" />
     </Border.Child>
   </Border>
   <c:CTextBlock Classes="Paragraph">
     <c:CRun Text="Asterisks:" />
   </c:CTextBlock>
   <m:Rule BoldLineWidth="2" Classes="Bold" />
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="Bold" />
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="Bold" />
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="Bold" />
-  <c:CTextBlock Classes="Paragraph" />
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="***&#xA;" Classes="CodeBlock" />
+      <TextBlock Text="***" Classes="CodeBlock" />
     </Border.Child>
   </Border>
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="Bold" />
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="Bold" />
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="Bold" />
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="Bold" />
-  <c:CTextBlock Classes="Paragraph" />
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="* * *&#xA;" Classes="CodeBlock" />
+      <TextBlock Text="* * *" Classes="CodeBlock" />
     </Border.Child>
   </Border>
   <c:CTextBlock Classes="Paragraph">
     <c:CRun Text="Underscores:" />
   </c:CTextBlock>
   <m:Rule BoldLineWidth="2" Classes="BoldWithSingle" />
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="BoldWithSingle" />
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="BoldWithSingle" />
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="BoldWithSingle" />
-  <c:CTextBlock Classes="Paragraph" />
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="___&#xA;" Classes="CodeBlock" />
+      <TextBlock Text="___" Classes="CodeBlock" />
     </Border.Child>
   </Border>
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="BoldWithSingle" />
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="BoldWithSingle" />
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="BoldWithSingle" />
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="BoldWithSingle" />
-  <c:CTextBlock Classes="Paragraph" />
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="_ _ _&#xA;" Classes="CodeBlock" />
+      <TextBlock Text="_ _ _" Classes="CodeBlock" />
     </Border.Child>
   </Border>
-  <c:CTextBlock Classes="Paragraph" />
 </StackPanel>

@@ -162,6 +162,12 @@
         <Setter Property="HoverForeground" Value="Red"/>
       </Style.Setters>
     </Style>
+
+    <Style Selector="mdc|Rule">
+      <Style.Setters>
+        <Setter Property="Margin" Value="0,3"/>
+      </Style.Setters>
+    </Style>
   </Styles>
 
 
@@ -315,6 +321,12 @@
     <Style Selector="StackPanel.Blockquote">
       <Style.Setters>
         <Setter Property="Margin" Value="10, 5"/>
+      </Style.Setters>
+    </Style>
+
+    <Style Selector="mdc|Rule">
+      <Style.Setters>
+        <Setter Property="Margin" Value="0,3"/>
       </Style.Setters>
     </Style>
   </Styles>
@@ -477,6 +489,12 @@
         <Setter Property="IsUnderline" Value="true"/>
         <Setter Property="Foreground" Value="Blue"/>
         <Setter Property="HoverForeground" Value="Red"/>
+      </Style.Setters>
+    </Style>
+
+    <Style Selector="mdc|Rule">
+      <Style.Setters>
+        <Setter Property="Margin" Value="0,3"/>
       </Style.Setters>
     </Style>
   </Styles>
