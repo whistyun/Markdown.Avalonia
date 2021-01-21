@@ -8,6 +8,7 @@ using Avalonia.Platform;
 using Avalonia.Styling;
 using ColorTextBlock.Avalonia;
 using Markdown.Avalonia.Controls;
+using Markdown.Avalonia.Tables;
 using Markdown.Avalonia.Utils;
 using System;
 using System.Collections.Generic;
@@ -68,20 +69,19 @@ namespace Markdown.Avalonia
         /// </summary>
         public bool StrictBoldItalic { get; set; }
 
-        public bool DisabledTootip { get; set; }
-
-        //public bool DisabledLazyLoad { get; set; }
-
         private string _assetPathRoot;
+        /// <inheritdoc/>
         public string AssetPathRoot
         {
             get => _assetPathRoot;
             set => BitmapLoader.AssetPathRoot = _assetPathRoot = value;
         }
 
+        /// <inheritdoc/>
         public ICommand HyperlinkCommand { get; set; }
 
         private IBitmapLoader _loader;
+        /// <inheritdoc/>
         public IBitmapLoader BitmapLoader
         {
             get => _loader;
@@ -111,37 +111,6 @@ namespace Markdown.Avalonia
 
         #endregion
 
-
-        #region legacy property
-
-        /*
-         
-         TODO read https://github.com/AvaloniaUI/Avalonia/issues/2765
-         
-        public Style Heading1Style { get; set; }
-        public Style Heading2Style { get; set; }
-        public Style Heading3Style { get; set; }
-        public Style Heading4Style { get; set; }
-        public Style NormalParagraphStyle { get; set; }
-        public Style CodeStyle { get; set; }
-        public Style CodeBlockStyle { get; set; }
-        public Style BlockquoteStyle { get; set; }
-        public Style LinkStyle { get; set; }
-        public Style ImageStyle { get; set; }
-        public Style SeparatorStyle { get; set; }
-        public Style TableStyle { get; set; }
-        public Style TableHeaderStyle { get; set; }
-        public Style TableBodyStyle { get; set; }
-        public Style NoteStyle { get; set; }
-        */
-
-        #endregion
-
-        #region regex pattern
-
-
-        #endregion
-
         public Markdown()
         {
             _assetPathRoot = Environment.CurrentDirectory;
@@ -154,6 +123,7 @@ namespace Markdown.Avalonia
                 ImageNotFound = new Bitmap(strm);
         }
 
+        /// <inheritdoc/>
         public Control Transform(string text)
         {
             if (text is null)
@@ -165,9 +135,6 @@ namespace Markdown.Avalonia
 
             var document = Create<StackPanel, Control>(RunBlockGamut(text, true));
             document.Orientation = Orientation.Vertical;
-
-            // todo implements after
-            //            document.SetBinding(FlowDocument.StyleProperty, new Binding(DocumentStyleProperty.Name) { Source = this });
 
             return document;
         }
@@ -193,19 +160,6 @@ namespace Markdown.Avalonia
                     s7 => DoIndentCodeBlock(s7,
                     sn => FormParagraphs(sn, supportTextAlignment
                     )))))))));
-
-            //text = DoCodeBlocks(text);
-            //text = DoBlockQuotes(text);
-
-            //// We already ran HashHTMLBlocks() before, in Markdown(), but that
-            //// was to escape raw HTML in the original Markdown source. This time,
-            //// we're escaping the markup we've just created, so that we don't wrap
-            //// <p> tags around block-level tags.
-            //text = HashHTMLBlocks(text);
-
-            //text = FormParagraphs(text);
-
-            //return text;
         }
 
         /// <summary>
@@ -222,23 +176,6 @@ namespace Markdown.Avalonia
                 s0 => DoImagesOrHrefs(s0,
                 s1 => DoTextDecorations(s1,
                 s2 => DoText(s2))));
-
-            //text = EscapeSpecialCharsWithinTagAttributes(text);
-            //text = EscapeBackslashes(text);
-
-            //// Images must come first, because ![foo][f] looks like an anchor.
-            //text = DoImages(text);
-            //text = DoAnchors(text);
-
-            //// Must come after DoAnchors(), because you can use < and >
-            //// delimiters in inline links like [this](<url>).
-            //text = DoAutoLinks(text);
-
-            //text = EncodeAmpsAndAngles(text);
-            //text = DoItalicsAndBold(text);
-            //text = DoHardBreaks(text);
-
-            //return text;
         }
 
 
@@ -258,8 +195,11 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(text));
             }
 
+            var trimemdText = _newlinesLeadingTrailing.Replace(text, "");
 
-            string[] grafs = _newlinesMultiple.Split(_newlinesLeadingTrailing.Replace(text, ""));
+            string[] grafs = trimemdText == "" ?
+                new string[0] :
+                _newlinesMultiple.Split(trimemdText);
 
             foreach (var g in grafs)
             {
@@ -618,7 +558,7 @@ namespace Markdown.Avalonia
                         \1                  # Marker character
                     ){2,}                   # Group repeated at least twice
                     [ ]*                    # Trailing spaces
-                    $                       # End of line.
+                    \n                      # End of line.
                 ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
         }
 
@@ -819,7 +759,7 @@ namespace Markdown.Avalonia
                         }
                         else
                         {
-                            var detentedline = TextUtil.DetentBestEffort(stripedLine, indentAppending);
+                            var detentedline = TextUtil.DetentLineBestEffort(stripedLine, indentAppending);
                             listBulder.Append(detentedline).Append("\n");
                         }
                     }
@@ -1084,7 +1024,7 @@ namespace Markdown.Avalonia
                 return txt;
             }
 
-            var mdtable = new MdTable(
+            var mdtable = new TextileTable(
                 ExtractCoverBar(headerTxt).Split('|'),
                 ExtractCoverBar(styleTxt).Split('|').Select(txt => txt.Trim()).ToArray(),
                 rowTxt.Split('\n').Select(ritm =>
@@ -1130,7 +1070,7 @@ namespace Markdown.Avalonia
             return result;
         }
 
-        private IEnumerable<Border> CreateTableRow(IList<MdTableCell> mdcells, int rowIdx)
+        private IEnumerable<Border> CreateTableRow(IList<ITableCell> mdcells, int rowIdx)
         {
             foreach (var mdcell in mdcells)
             {
@@ -1165,7 +1105,7 @@ namespace Markdown.Avalonia
 
         private static Regex _codeBlockFirst = new Regex(@"
                     ^          # Character before opening
-                    [ ]*
+                    [ ]{0,3}
                     (`+)             # $1 = Opening run of `
                     ([^\n`]*)      # $2 = The code lang
                     \n
@@ -1176,7 +1116,11 @@ namespace Markdown.Avalonia
 
         private static Regex _indentCodeBlock = new Regex(@"
                     ^
-                    (([ ]{4}.+\n?)+)
+                    (
+                    [ ]{4}.+
+                    (\n([ ]{4}.+|[ ]*))*
+                    \n?
+                    )
                     ", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
 
 
@@ -1204,7 +1148,11 @@ namespace Markdown.Avalonia
             => CodeBlocksEvaluator(match.Groups[2].Value, match.Groups[3].Value);
 
         private Border CodeBlocksWithoutLangEvaluator(Match match)
-            => CodeBlocksEvaluator(null, TextUtil.DetentBestEffort(match.Groups[1].Value, 4));
+        {
+            var detentTxt = String.Join("\n", match.Groups[1].Value.Split('\n').Select(line => TextUtil.DetentLineBestEffort(line, 4)));
+            return CodeBlocksEvaluator(null, _newlinesLeadingTrailing.Replace(detentTxt, ""));
+        }
+
 
 
         private Border CodeBlocksEvaluator(string lang, string code)
