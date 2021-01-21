@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
   <c:CTextBlock Classes="Heading1">
     <c:CCode>
       <c:CRun Text="```" />
@@ -34,6 +34,38 @@
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
       <TextBlock Text="```cs&#xA;public void Main(){&#xA;    Console.WriteLine(&quot;`Hello World`&quot;);&#xA;}&#xA;```" Classes="CodeBlock" />
+    </Border.Child>
+  </Border>
+  <c:CTextBlock Classes="Heading1">
+    <c:CRun Text="Indent" />
+  </c:CTextBlock>
+  <Border Classes="CodeBlock" xmlns="">
+    <Border.Child>
+      <TextBlock Text="abcd&#xA;efgh" Classes="CodeBlock" />
+    </Border.Child>
+  </Border>
+  <m:Rule BoldLineWidth="2" Classes="Single" />
+  <Border Classes="CodeBlock" xmlns="">
+    <Border.Child>
+      <TextBlock Text=" abcd&#xA;efgh" Classes="CodeBlock" />
+    </Border.Child>
+  </Border>
+  <m:Rule BoldLineWidth="2" Classes="Single" />
+  <Border Classes="CodeBlock" xmlns="">
+    <Border.Child>
+      <TextBlock Text="abcd&#xA; efgh&#xA;&#xA; ijkl&#xA;&#xA;opqr" Classes="CodeBlock" />
+    </Border.Child>
+  </Border>
+  <m:Rule BoldLineWidth="2" Classes="Single" />
+  <Border Classes="Blockquote" xmlns="">
+    <Border.Child>
+      <StackPanel Classes="Blockquote">
+        <Border Classes="CodeBlock">
+          <Border.Child>
+            <TextBlock Text="asdf&#xA; ghij" Classes="CodeBlock" />
+          </Border.Child>
+        </Border>
+      </StackPanel>
     </Border.Child>
   </Border>
 </StackPanel>
