@@ -235,7 +235,8 @@ namespace Markdown.Avalonia
             }
             else
             {
-                grafs = _newlinesMultiple.Split(_newlinesLeadingTrailing.Replace(text, ""));
+                var trimedText = _newlinesLeadingTrailing.Replace(text, "");
+                grafs = trimedText == "" ? new string[0] : _newlinesMultiple.Split(trimedText);
             }
 
 
@@ -626,7 +627,7 @@ namespace Markdown.Avalonia
                         \1                  # Marker character
                     ){2,}                   # Group repeated at least twice
                     [ ]*                    # Trailing spaces
-                    $                       # End of line.
+                    \n                      # End of line.
                 ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
         }
 
@@ -908,7 +909,7 @@ namespace Markdown.Avalonia
 
             // Turn double returns into triple returns, so that we can make a
             // paragraph for the last item in a list, if necessary:
-            list = Regex.Replace(list, @"\n{2,}", "\n\n\n");
+            //list = Regex.Replace(list, @"\n{2,}", "\n\n\n");
 
             IEnumerable<Control> listItems = ProcessListItems(list, markerPattern);
 
@@ -1104,7 +1105,6 @@ namespace Markdown.Avalonia
 
         private static readonly Regex _table = new Regex(@"
             (                               # whole table
-                [ \n]*
                 (?<hdr>                     # table header
                     ([^\n\|]*\|[^\n]+)
                 )
@@ -1118,6 +1118,7 @@ namespace Markdown.Avalonia
                         ([^\n\|]*\|[^\n]+)
                     )+
                 )
+                \n
             )",
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
@@ -1237,7 +1238,7 @@ namespace Markdown.Avalonia
 
         private static Regex _codeBlockFirst = new Regex(@"
                     ^          # Character before opening
-                    [ ]*
+                    [ ]{0,3}
                     (`+)             # $1 = Opening run of `
                     ([^\n`]*)      # $2 = The code lang
                     \n
@@ -1805,18 +1806,10 @@ namespace Markdown.Avalonia
         #region grammer - blockquote
 
         private static Regex _blockquote = new Regex(@"
-            (?<=\n)
-            [\n]*
-            ([>].*)
-            (\n[>].*)*
-            [\n]*
-            ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private static Regex _blockquoteFirst = new Regex(@"
             ^
             ([>].*)
             (\n[>].*)*
-            [\n]*
+            [\n]
             ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private IEnumerable<Control> DoBlockquotes(string text, Func<string, IEnumerable<Control>> defaultHandler)
@@ -1826,10 +1819,7 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(text));
             }
 
-            return Evaluate(
-                text, _blockquoteFirst, BlockquotesEvaluator,
-                sn => Evaluate(sn, _blockquote, BlockquotesEvaluator, defaultHandler)
-            );
+            return Evaluate(text, _blockquote, BlockquotesEvaluator, defaultHandler);
         }
 
         private Border BlockquotesEvaluator(Match match)
@@ -1853,7 +1843,7 @@ namespace Markdown.Avalonia
                         .ToArray()
             );
 
-            var blocks = RunBlockGamut(trimmedTxt, true);
+            var blocks = RunBlockGamut(trimmedTxt + "\n", true);
 
             var panel = Create<StackPanel, Control>(blocks);
             panel.Orientation = Orientation.Vertical;

@@ -195,8 +195,11 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(text));
             }
 
+            var trimemdText = _newlinesLeadingTrailing.Replace(text, "");
 
-            string[] grafs = _newlinesMultiple.Split(_newlinesLeadingTrailing.Replace(text, ""));
+            string[] grafs = trimemdText == "" ?
+                new string[0] :
+                _newlinesMultiple.Split(trimemdText);
 
             foreach (var g in grafs)
             {
@@ -555,7 +558,7 @@ namespace Markdown.Avalonia
                         \1                  # Marker character
                     ){2,}                   # Group repeated at least twice
                     [ ]*                    # Trailing spaces
-                    $                       # End of line.
+                    \n                      # End of line.
                 ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
         }
 
@@ -1102,7 +1105,7 @@ namespace Markdown.Avalonia
 
         private static Regex _codeBlockFirst = new Regex(@"
                     ^          # Character before opening
-                    [ ]*
+                    [ ]{0,3}
                     (`+)             # $1 = Opening run of `
                     ([^\n`]*)      # $2 = The code lang
                     \n
