@@ -379,7 +379,6 @@
     </Grid.RowDefinitions>
   </Grid>
   <m:Rule BoldLineWidth="2" Classes="Bold" />
-  <c:CTextBlock Classes="Paragraph" />
   <Grid Classes="List" xmlns="">
     <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
       <c:CRun Text="•" />

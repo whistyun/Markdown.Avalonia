@@ -1727,7 +1727,7 @@ namespace Markdown.Avalonia
                         .ToArray()
             );
 
-            var blocks = RunBlockGamut(trimmedTxt, true);
+            var blocks = RunBlockGamut(trimmedTxt + "\n", true);
 
             var panel = Create<StackPanel, Control>(blocks);
             panel.Orientation = Orientation.Vertical;
