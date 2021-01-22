@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
@@ -1164,9 +1165,13 @@ namespace Markdown.Avalonia
             };
             ctxt.Classes.Add(CodeBlockClass);
 
+            var scrl = new ScrollViewer();
+            scrl.Content = ctxt;
+            scrl.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+
             var result = new Border();
             result.Classes.Add(CodeBlockClass);
-            result.Child = ctxt;
+            result.Child = scrl;
 
             return result;
         }
