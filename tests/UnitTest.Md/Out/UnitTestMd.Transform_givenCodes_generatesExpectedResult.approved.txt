@@ -7,12 +7,20 @@
   </c:CTextBlock>
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="```cs&#xA;public void Main(){&#xA;    Console.WriteLine(&quot;`Hello World`&quot;);&#xA;}&#xA;```" Classes="CodeBlock" />
+      <ScrollViewer>
+        <ScrollViewer.Content>
+          <TextBlock Text="```cs&#xA;public void Main(){&#xA;    Console.WriteLine(&quot;`Hello World`&quot;);&#xA;}&#xA;```" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
     </Border.Child>
   </Border>
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="public void Main(){&#xA;    Console.WriteLine(&quot;`Hello World`&quot;);&#xA;}" Classes="CodeBlock" />
+      <ScrollViewer>
+        <ScrollViewer.Content>
+          <TextBlock Text="public void Main(){&#xA;    Console.WriteLine(&quot;`Hello World`&quot;);&#xA;}" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
     </Border.Child>
   </Border>
   <Border Classes="Blockquote" xmlns="">
@@ -20,7 +28,11 @@
       <StackPanel Classes="Blockquote">
         <Border Classes="CodeBlock">
           <Border.Child>
-            <TextBlock Text="public void Main(){&#xA;    Console.WriteLine(&quot;`Hello World`&quot;);&#xA;}" Classes="CodeBlock" />
+            <ScrollViewer>
+              <ScrollViewer.Content>
+                <TextBlock Text="public void Main(){&#xA;    Console.WriteLine(&quot;`Hello World`&quot;);&#xA;}" Classes="CodeBlock" />
+              </ScrollViewer.Content>
+            </ScrollViewer>
           </Border.Child>
         </Border>
       </StackPanel>
@@ -28,12 +40,20 @@
   </Border>
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="   public void Main(){&#xA;       Console.WriteLine(&quot;`Hello World`&quot;);&#xA;   }" Classes="CodeBlock" />
+      <ScrollViewer>
+        <ScrollViewer.Content>
+          <TextBlock Text="   public void Main(){&#xA;       Console.WriteLine(&quot;`Hello World`&quot;);&#xA;   }" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
     </Border.Child>
   </Border>
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="```cs&#xA;public void Main(){&#xA;    Console.WriteLine(&quot;`Hello World`&quot;);&#xA;}&#xA;```" Classes="CodeBlock" />
+      <ScrollViewer>
+        <ScrollViewer.Content>
+          <TextBlock Text="```cs&#xA;public void Main(){&#xA;    Console.WriteLine(&quot;`Hello World`&quot;);&#xA;}&#xA;```" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
     </Border.Child>
   </Border>
   <c:CTextBlock Classes="Heading1">
@@ -41,19 +61,31 @@
   </c:CTextBlock>
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="abcd&#xA;efgh" Classes="CodeBlock" />
+      <ScrollViewer>
+        <ScrollViewer.Content>
+          <TextBlock Text="abcd&#xA;efgh" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
     </Border.Child>
   </Border>
   <m:Rule BoldLineWidth="2" Classes="Single" />
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text=" abcd&#xA;efgh" Classes="CodeBlock" />
+      <ScrollViewer>
+        <ScrollViewer.Content>
+          <TextBlock Text=" abcd&#xA;efgh" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
     </Border.Child>
   </Border>
   <m:Rule BoldLineWidth="2" Classes="Single" />
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="abcd&#xA; efgh&#xA;&#xA; ijkl&#xA;&#xA;opqr" Classes="CodeBlock" />
+      <ScrollViewer>
+        <ScrollViewer.Content>
+          <TextBlock Text="abcd&#xA; efgh&#xA;&#xA; ijkl&#xA;&#xA;opqr" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
     </Border.Child>
   </Border>
   <m:Rule BoldLineWidth="2" Classes="Single" />
@@ -62,7 +94,11 @@
       <StackPanel Classes="Blockquote">
         <Border Classes="CodeBlock">
           <Border.Child>
-            <TextBlock Text="asdf&#xA; ghij" Classes="CodeBlock" />
+            <ScrollViewer>
+              <ScrollViewer.Content>
+                <TextBlock Text="asdf&#xA; ghij" Classes="CodeBlock" />
+              </ScrollViewer.Content>
+            </ScrollViewer>
           </Border.Child>
         </Border>
       </StackPanel>

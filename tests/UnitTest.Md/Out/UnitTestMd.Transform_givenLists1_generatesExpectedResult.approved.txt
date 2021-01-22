@@ -792,7 +792,11 @@
           </c:CTextBlock>
           <Border Classes="CodeBlock">
             <Border.Child>
-              <TextBlock Text="as code" Classes="CodeBlock" />
+              <ScrollViewer>
+                <ScrollViewer.Content>
+                  <TextBlock Text="as code" Classes="CodeBlock" />
+                </ScrollViewer.Content>
+              </ScrollViewer>
             </Border.Child>
           </Border>
         </StackPanel>
