@@ -88,8 +88,7 @@ namespace ColorTextBlock.Avalonia
                     Image = new WriteableBitmap(
                                     new PixelSize(1, 1),
                                     new Vector(96, 96),
-                                    PixelFormat.Rgb565,
-                                    AlphaFormat.Premul);
+                                    PixelFormat.Rgb565);
 
                     Thread.MemoryBarrier();
 

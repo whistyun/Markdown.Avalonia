@@ -17,6 +17,12 @@ namespace Markdown.Avalonia
 {
     public class MarkdownScrollViewer : Control
     {
+        public static readonly AvaloniaProperty<Uri> SourceProperty =
+            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, Uri>(
+                nameof(Source),
+                o => o.Source,
+                (o, v) => o.Source = v);
+
         public static readonly AvaloniaProperty<string> MarkdownProperty =
             AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, string>(
                 nameof(Markdown),
@@ -206,6 +212,9 @@ namespace Markdown.Avalonia
             get { return _source; }
             set
             {
+                if (!SetAndRaise(SourceProperty, ref _source, value))
+                    return;
+
                 if (!value.IsAbsoluteUri)
                     throw new ArgumentException("it is not absolute.");
 
@@ -237,6 +246,11 @@ namespace Markdown.Avalonia
                     default:
                         throw new ArgumentException($"unsupport schema {_source.Scheme}");
                 }
+
+                AssetPathRoot =
+                    value.Scheme == "file" ?
+                    value.LocalPath :
+                    value.AbsoluteUri;
             }
         }
 
