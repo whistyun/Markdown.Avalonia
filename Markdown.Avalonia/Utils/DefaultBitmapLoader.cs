@@ -82,8 +82,15 @@ namespace Markdown.Avalonia.Utils
             {
                 try
                 {
-                    using (var strm = File.OpenRead(Path.Combine(AssetPathRoot, urlTxt)))
-                        imgSource = new Bitmap(strm);
+                    if (Uri.IsWellFormedUriString(AssetPathRoot, UriKind.Absolute))
+                    {
+                        imgSource = Get(new Uri(new Uri(AssetPathRoot), urlTxt));
+                    }
+                    else
+                    {
+                        using (var strm = File.OpenRead(Path.Combine(AssetPathRoot, urlTxt)))
+                            imgSource = new Bitmap(strm);
+                    }
                 }
                 catch { }
             }
