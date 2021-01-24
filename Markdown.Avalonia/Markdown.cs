@@ -150,17 +150,18 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(text));
             }
 
-            return
-                DoCodeBlocks(text,
-                    s1 => DoBlockquotes(s1,
-                    s2 => DoHeaders(s2,
-                    s3 => DoHorizontalRules(s3,
-                    s4 => DoLists(s4,
-                    s5 => DoTable(s5,
-                    s6 => DoNote(s6, supportTextAlignment,
-                    s7 => DoIndentCodeBlock(s7,
-                    sn => FormParagraphs(sn, supportTextAlignment
-                    )))))))));
+            return Evaluate2(
+                text,
+                _codeBlockFirst, CodeBlocksWithLangEvaluator,
+                _listLevel > 0 ? _listNested : _listTopLevel, ListEvaluator,
+                s1 => DoBlockquotes(s1,
+                s2 => DoHeaders(s2,
+                s3 => DoHorizontalRules(s3,
+                s4 => DoTable(s4,
+                s5 => DoNote(s5, supportTextAlignment,
+                s6 => DoIndentCodeBlock(s6,
+                sn => FormParagraphs(sn, supportTextAlignment)))))))
+            );
         }
 
         /// <summary>
@@ -545,15 +546,9 @@ namespace Markdown.Avalonia
 
         #region grammer - horizontal rules
 
-        private static readonly Regex _horizontalRules = HorizontalRulesRegex("-");
-        private static readonly Regex _horizontalTwoLinesRules = HorizontalRulesRegex("=");
-        private static readonly Regex _horizontalBoldRules = HorizontalRulesRegex("*");
-        private static readonly Regex _horizontalBoldWithSingleRules = HorizontalRulesRegex("_");
-        private static Regex HorizontalRulesRegex(string markers)
-        {
-            return new Regex(@"
+        private static readonly Regex _horizontalRules = new Regex(@"
                 ^[ ]{0,3}                   # Leading space
-                    ([" + markers + @"])    # $1: First marker ([markers])
+                    ([-=*_])                # $1: First marker ([markers])
                     (?>                     # Repeated marker group
                         [ ]{0,2}            # Zero, one, or two spaces.
                         \1                  # Marker character
@@ -561,7 +556,6 @@ namespace Markdown.Avalonia
                     [ ]*                    # Trailing spaces
                     \n                      # End of line.
                 ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-        }
 
         /// <summary>
         /// Turn Markdown horizontal rules into HTML hr tags
@@ -579,10 +573,7 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(text));
             }
 
-            return Evaluate(text, _horizontalRules, RuleEvaluator,
-                s1 => Evaluate(s1, _horizontalTwoLinesRules, TwoLinesRuleEvaluator,
-                s2 => Evaluate(s2, _horizontalBoldRules, BoldRuleEvaluator,
-                s3 => Evaluate(s3, _horizontalBoldWithSingleRules, BoldWithSingleRuleEvaluator, defaultHandler))));
+            return Evaluate(text, _horizontalRules, RuleEvaluator, defaultHandler);
         }
 
         /// <summary>
@@ -595,46 +586,21 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(match));
             }
 
-            return new Rule(RuleType.Single);
-        }
-
-        /// <summary>
-        /// Two lines separator.
-        /// </summary>
-        private Rule TwoLinesRuleEvaluator(Match match)
-        {
-            if (match is null)
+            switch (match.Groups[1].Value)
             {
-                Helper.ThrowArgNull(nameof(match));
+                default:
+                case "-":
+                    return new Rule(RuleType.Single);
+
+                case "=":
+                    return new Rule(RuleType.TwoLines);
+
+                case "*":
+                    return new Rule(RuleType.Bold);
+
+                case "_":
+                    return new Rule(RuleType.BoldWithSingle);
             }
-
-            return new Rule(RuleType.TwoLines);
-        }
-
-        /// <summary>
-        /// Double line separator.
-        /// </summary>
-        private Rule BoldRuleEvaluator(Match match)
-        {
-            if (match is null)
-            {
-                Helper.ThrowArgNull(nameof(match));
-            }
-
-            return new Rule(RuleType.Bold);
-        }
-
-        /// <summary>
-        /// Two lines separator consisting of a double line and a single line.
-        /// </summary>
-        private Rule BoldWithSingleRuleEvaluator(Match match)
-        {
-            if (match is null)
-            {
-                Helper.ThrowArgNull(nameof(match));
-            }
-
-            return new Rule(RuleType.BoldWithSingle);
         }
 
         #endregion
@@ -672,10 +638,11 @@ namespace Markdown.Avalonia
         private const int _listDepth = 4;
 
         private static readonly string _wholeList = string.Format(@"
-            (                               # $1 = whole list
-              (                             # $2 = list marker with indent
-                [ ]{{0,{2}}}
-                ({0})                       # $3 = first list item marker
+            (?<whltxt>                      # whole list
+              (?<mkr_i>                     # list marker with indent
+                (?![ ]{{0,3}}(?<hrm>[-=*_])([ ]{{0,2}}\k<hrm>){{2,}})
+                (?<idt>[ ]{{0,{2}}})
+                (?<mkr>{0})                 # first list item marker
                 [ ]+
               )
               (?s:.+?)
@@ -691,29 +658,16 @@ namespace Markdown.Avalonia
               )
             )", _firstListMaker, _subseqListMaker, _listDepth - 1);
 
+        private static readonly Regex _startNoIndentRule = new Regex(@"\A(?<hrm>[-=*_])([ ]{0,2}\k<hrm>){2,}",
+            RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
+        private static readonly Regex _startNoIndentSublistMarker = new Regex(@"\A" + _subseqListMaker, RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
         private static readonly Regex _listNested = new Regex(@"^" + _wholeList,
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static readonly Regex _listTopLevel = new Regex(@"(?:(?<=\n)|\A\n?)" + _wholeList,
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        /// <summary>
-        /// Turn Markdown lists into HTML ul and ol and li tags
-        /// </summary>
-        private IEnumerable<Control> DoLists(string text, Func<string, IEnumerable<Control>> defaultHandler)
-        {
-            if (text is null)
-            {
-                Helper.ThrowArgNull(nameof(text));
-            }
-
-            // We use a different prefix before nested lists than top-level lists.
-            // See extended comment in _ProcessListItems().
-            if (_listLevel > 0)
-                return Evaluate(text, _listNested, ListEvaluator, defaultHandler);
-            else
-                return Evaluate(text, _listTopLevel, ListEvaluator, defaultHandler);
-        }
 
         private IEnumerable<Control> ListEvaluator(Match match)
         {
@@ -724,13 +678,15 @@ namespace Markdown.Avalonia
 
             // Check text marker style.
             (TextMarkerStyle textMarker, string markerPattern, int indentAppending)
-                = GetTextMarkerStyle(match.Groups[3].Value);
+                = GetTextMarkerStyle(match.Groups["mkr"].Value);
+
+            Regex markerRegex = new Regex(@"\A" + markerPattern, RegexOptions.Compiled);
 
             // count indent from first marker with indent
-            int countIndent = TextUtil.CountIndent(match.Groups[2].Value);
+            int countIndent = TextUtil.CountIndent(match.Groups["mkr_i"].Value);
 
             // whole list
-            string[] whileListLins = match.Groups[1].Value.Split('\n');
+            string[] whileListLins = match.Groups["whltxt"].Value.Split('\n');
 
             // collect detendentable line
             var listBulder = new StringBuilder();
@@ -746,13 +702,17 @@ namespace Markdown.Avalonia
                     }
                     else if (TextUtil.TryDetendLine(line, countIndent, out var stripedLine))
                     {
+                        // is it horizontal line?
+                        if (_startNoIndentRule.IsMatch(stripedLine))
+                        {
+                            isInOuterList = true;
+                        }
                         // is it had list marker?
-                        var someMarkerMch = Regex.Match(stripedLine, _subseqListMaker);
-                        if (someMarkerMch.Success && someMarkerMch.Index == 0)
+                        else if (_startNoIndentSublistMarker.IsMatch(stripedLine))
                         {
                             // is it same marker as now processed?
-                            var targetMarkerMch = Regex.Match(stripedLine, markerPattern);
-                            if (targetMarkerMch.Success && targetMarkerMch.Index == 0)
+                            var targetMarkerMch = markerRegex.Match(stripedLine);
+                            if (targetMarkerMch.Success)
                             {
                                 listBulder.Append(stripedLine).Append("\n");
                             }
@@ -1123,17 +1083,6 @@ namespace Markdown.Avalonia
                     \n?
                     )
                     ", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
-
-
-        private IEnumerable<Control> DoCodeBlocks(string text, Func<string, IEnumerable<Control>> defaultHandler)
-        {
-            if (text is null)
-            {
-                Helper.ThrowArgNull(nameof(text));
-            }
-
-            return Evaluate(text, _codeBlockFirst, CodeBlocksWithLangEvaluator, defaultHandler);
-        }
 
         private IEnumerable<Control> DoIndentCodeBlock(string text, Func<string, IEnumerable<Control>> defaultHandler)
         {
@@ -1831,39 +1780,84 @@ namespace Markdown.Avalonia
 
             return result;
         }
-        private IEnumerable<T> Evaluate<T>(string text, Regex expression, Func<Match, IEnumerable<T>> build, Func<string, IEnumerable<T>> rest)
+        private IEnumerable<T> Evaluate2<T>(
+                string text,
+                Regex expression1, Func<Match, T> build1,
+                Regex expression2, Func<Match, IEnumerable<T>> build2,
+                Func<string, IEnumerable<T>> rest)
         {
             if (text is null)
             {
                 Helper.ThrowArgNull(nameof(text));
             }
 
-            var matches = expression.Matches(text);
             var index = 0;
-            foreach (Match m in matches)
+
+            var rtn = new List<T>();
+
+            var match1 = expression1.Match(text, index);
+            var match2 = expression2.Match(text, index);
+
+            IEnumerable<T> ProcPre(Match m)
             {
-                if (m.Index > index)
+                var prefix = text.Substring(index, m.Index - index);
+                return rest(prefix);
+            }
+
+            void ProcessMatch1()
+            {
+                if (match1.Index > index)
                 {
-                    var prefix = text.Substring(index, m.Index - index);
-                    foreach (var t in rest(prefix))
-                    {
-                        yield return t;
-                    }
+                    rtn.AddRange(ProcPre(match1));
                 }
+                rtn.Add(build1(match1));
+                index = match1.Index + match1.Length;
+            }
 
-                foreach (var part in build(m)) yield return part;
+            void ProcessMatch2()
+            {
+                if (match2.Index > index)
+                {
+                    rtn.AddRange(ProcPre(match2));
+                }
+                rtn.AddRange(build2(match2));
+                index = match2.Index + match2.Length;
+            }
 
-                index = m.Index + m.Length;
+            // match1 vs match2
+            while (match1.Success && match2.Success)
+            {
+                if (match1.Index < match2.Index)
+                {
+                    ProcessMatch1();
+                }
+                else
+                {
+                    ProcessMatch2();
+                }
+                match1 = expression1.Match(text, index);
+                match2 = expression2.Match(text, index);
+            }
+
+            while (match1.Success)
+            {
+                ProcessMatch1();
+                match1 = expression1.Match(text, index);
+            }
+
+            while (match2.Success)
+            {
+                ProcessMatch2();
+                match2 = expression2.Match(text, index);
             }
 
             if (index < text.Length)
             {
                 var suffix = text.Substring(index, text.Length - index);
-                foreach (var t in rest(suffix))
-                {
-                    yield return t;
-                }
+                rtn.AddRange(rest(suffix));
             }
+
+            return rtn;
         }
 
         private IEnumerable<T> Evaluate<T>(string text, Regex expression, Func<Match, T> build, Func<string, IEnumerable<T>> rest)
