@@ -29,8 +29,8 @@ namespace Markdown.Avalonia
                 o => o.Markdown,
                 (o, v) => o.Markdown = v);
 
-        public static readonly AvaloniaProperty<Styles> MarkdownStyleProperty =
-            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, Styles>(
+        public static readonly AvaloniaProperty<IStyle> MarkdownStyleProperty =
+            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, IStyle>(
                 nameof(MarkdownStyle),
                 o => o.MarkdownStyle,
                 (o, v) => o.MarkdownStyle = v);
@@ -254,8 +254,8 @@ namespace Markdown.Avalonia
             }
         }
 
-        private Styles _markdownStyle;
-        public Styles MarkdownStyle
+        private IStyle _markdownStyle;
+        public IStyle MarkdownStyle
         {
             get { return _markdownStyle; }
             set
@@ -292,7 +292,7 @@ namespace Markdown.Avalonia
                     var prop = typeof(MarkdownStyle).GetProperty(_markdownStyleName);
                     if (prop == null) return;
 
-                    MarkdownStyle = (Styles)prop.GetValue(null);
+                    MarkdownStyle = (IStyle)prop.GetValue(null);
                 }
             }
         }

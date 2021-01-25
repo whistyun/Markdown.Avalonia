@@ -770,7 +770,7 @@ namespace Markdown.Avalonia
                 var control = listItemTpl.Item1;
                 CTextBlock controlTxt = FindFirstFrom(control);
 
-                markerTxt.ObserveLineHeightOf(controlTxt);
+                markerTxt.ObserveBaseHeightOf(controlTxt);
 
                 grid.RowDefinitions.Add(new RowDefinition());
                 grid.Children.Add(markerTxt);
