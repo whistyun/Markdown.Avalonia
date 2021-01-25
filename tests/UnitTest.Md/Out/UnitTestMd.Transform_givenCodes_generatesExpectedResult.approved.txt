@@ -106,6 +106,33 @@
       <RowDefinition />
     </Grid.RowDefinitions>
   </Grid>
+  <m:Rule BoldLineWidth="2" Classes="TwoLines" />
+  <Grid Classes="List" xmlns="">
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+      <c:CRun Text="▪" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="0">
+      <c:CTextBlock Classes="Paragraph">
+        <c:CRun Text="one" />
+      </c:CTextBlock>
+      <Border Classes="CodeBlock">
+        <Border.Child>
+          <ScrollViewer>
+            <ScrollViewer.Content>
+              <TextBlock Text="public void Main(){&#xA;&#xA;&#xA;}" Classes="CodeBlock" />
+            </ScrollViewer.Content>
+          </ScrollViewer>
+        </Border.Child>
+      </Border>
+    </StackPanel>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition />
+    </Grid.RowDefinitions>
+  </Grid>
   <c:CTextBlock Classes="Heading1">
     <c:CRun Text="Indent" />
   </c:CTextBlock>
@@ -164,6 +191,33 @@
           <ScrollViewer>
             <ScrollViewer.Content>
               <TextBlock Text="public void Main(){&#xA;&#xA;&#xA;}" Classes="CodeBlock" />
+            </ScrollViewer.Content>
+          </ScrollViewer>
+        </Border.Child>
+      </Border>
+    </StackPanel>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition />
+    </Grid.RowDefinitions>
+  </Grid>
+  <m:Rule BoldLineWidth="2" Classes="Bold" />
+  <Grid Classes="List" xmlns="">
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+      <c:CRun Text="▪" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="0">
+      <c:CTextBlock Classes="Paragraph">
+        <c:CRun Text="one public void Main(){" />
+      </c:CTextBlock>
+      <Border Classes="CodeBlock">
+        <Border.Child>
+          <ScrollViewer>
+            <ScrollViewer.Content>
+              <TextBlock Text="}" Classes="CodeBlock" />
             </ScrollViewer.Content>
           </ScrollViewer>
         </Border.Child>
