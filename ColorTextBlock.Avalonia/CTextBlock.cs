@@ -324,7 +324,7 @@ namespace ColorTextBlock.Avalonia
         public void ObserveBaseHeightOf(CTextBlock target)
         {
             if (target != null)
-                this.Bind(LineHeightProperty, target.GetObservable(LineHeightProperty));
+                this.Bind(BaseHeightProperty, target.GetObservable(BaseHeightProperty));
         }
 
         private void ContentCollectionChangedd(object sender, NotifyCollectionChangedEventArgs e)

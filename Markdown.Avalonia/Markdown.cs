@@ -658,10 +658,12 @@ namespace Markdown.Avalonia
               )
             )", _firstListMaker, _subseqListMaker, _listDepth - 1);
 
-        private static readonly Regex _startNoIndentRule = new Regex(@"\A(?<hrm>[-=*_])([ ]{0,2}\k<hrm>){2,}",
+        private static readonly Regex _startNoIndentRule = new Regex(@"\A[ ]{0,2}(?<hrm>[-=*_])([ ]{0,2}\k<hrm>){2,}",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static readonly Regex _startNoIndentSublistMarker = new Regex(@"\A" + _subseqListMaker, RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
+        private static readonly Regex _startQuoteOrHeader = new Regex(@"\A(\#{1,6}[ ]|>|```)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static readonly Regex _listNested = new Regex(@"^" + _wholeList,
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
@@ -704,6 +706,11 @@ namespace Markdown.Avalonia
                     {
                         // is it horizontal line?
                         if (_startNoIndentRule.IsMatch(stripedLine))
+                        {
+                            isInOuterList = true;
+                        }
+                        // is it header or blockquote?
+                        else if (_startQuoteOrHeader.IsMatch(stripedLine))
                         {
                             isInOuterList = true;
                         }
@@ -1067,8 +1074,8 @@ namespace Markdown.Avalonia
         private static Regex _codeBlockFirst = new Regex(@"
                     ^          # Character before opening
                     [ ]{0,3}
-                    (`+)             # $1 = Opening run of `
-                    ([^\n`]*)      # $2 = The code lang
+                    (`{3,})          # $1 = Opening run of `
+                    ([^\n`]*)        # $2 = The code lang
                     \n
                     ((.|\n)+?)       # $3 = The code block
                     \n[ ]*
