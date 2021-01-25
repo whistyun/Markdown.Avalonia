@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
@@ -8,6 +9,7 @@ using Avalonia.Platform;
 using Avalonia.Styling;
 using ColorTextBlock.Avalonia;
 using Markdown.Avalonia.Controls;
+using Markdown.Avalonia.Tables;
 using Markdown.Avalonia.Utils;
 using System;
 using System.Collections.Generic;
@@ -68,20 +70,19 @@ namespace Markdown.Avalonia
         /// </summary>
         public bool StrictBoldItalic { get; set; }
 
-        public bool DisabledTootip { get; set; }
-
-        //public bool DisabledLazyLoad { get; set; }
-
         private string _assetPathRoot;
+        /// <inheritdoc/>
         public string AssetPathRoot
         {
             get => _assetPathRoot;
             set => BitmapLoader.AssetPathRoot = _assetPathRoot = value;
         }
 
+        /// <inheritdoc/>
         public ICommand HyperlinkCommand { get; set; }
 
         private IBitmapLoader _loader;
+        /// <inheritdoc/>
         public IBitmapLoader BitmapLoader
         {
             get => _loader;
@@ -111,37 +112,6 @@ namespace Markdown.Avalonia
 
         #endregion
 
-
-        #region legacy property
-
-        /*
-         
-         TODO read https://github.com/AvaloniaUI/Avalonia/issues/2765
-         
-        public Style Heading1Style { get; set; }
-        public Style Heading2Style { get; set; }
-        public Style Heading3Style { get; set; }
-        public Style Heading4Style { get; set; }
-        public Style NormalParagraphStyle { get; set; }
-        public Style CodeStyle { get; set; }
-        public Style CodeBlockStyle { get; set; }
-        public Style BlockquoteStyle { get; set; }
-        public Style LinkStyle { get; set; }
-        public Style ImageStyle { get; set; }
-        public Style SeparatorStyle { get; set; }
-        public Style TableStyle { get; set; }
-        public Style TableHeaderStyle { get; set; }
-        public Style TableBodyStyle { get; set; }
-        public Style NoteStyle { get; set; }
-        */
-
-        #endregion
-
-        #region regex pattern
-
-
-        #endregion
-
         public Markdown()
         {
             _assetPathRoot = Environment.CurrentDirectory;
@@ -154,6 +124,7 @@ namespace Markdown.Avalonia
                 ImageNotFound = new Bitmap(strm);
         }
 
+        /// <inheritdoc/>
         public Control Transform(string text)
         {
             if (text is null)
@@ -165,9 +136,6 @@ namespace Markdown.Avalonia
 
             var document = Create<StackPanel, Control>(RunBlockGamut(text, true));
             document.Orientation = Orientation.Vertical;
-
-            // todo implements after
-            //            document.SetBinding(FlowDocument.StyleProperty, new Binding(DocumentStyleProperty.Name) { Source = this });
 
             return document;
         }
@@ -182,30 +150,18 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(text));
             }
 
-            return
-                DoCodeBlocks(text,
-                    s1 => DoBlockquotes(s1,
-                    s2 => DoHeaders(s2,
-                    s3 => DoHorizontalRules(s3,
-                    s4 => DoLists(s4,
-                    s5 => DoTable(s5,
-                    s6 => DoNote(s6, supportTextAlignment,
-                    s7 => DoIndentCodeBlock(s7,
-                    sn => FormParagraphs(sn, supportTextAlignment
-                    )))))))));
-
-            //text = DoCodeBlocks(text);
-            //text = DoBlockQuotes(text);
-
-            //// We already ran HashHTMLBlocks() before, in Markdown(), but that
-            //// was to escape raw HTML in the original Markdown source. This time,
-            //// we're escaping the markup we've just created, so that we don't wrap
-            //// <p> tags around block-level tags.
-            //text = HashHTMLBlocks(text);
-
-            //text = FormParagraphs(text);
-
-            //return text;
+            return Evaluate2(
+                text,
+                _codeBlockFirst, CodeBlocksWithLangEvaluator,
+                _listLevel > 0 ? _listNested : _listTopLevel, ListEvaluator,
+                s1 => DoBlockquotes(s1,
+                s2 => DoHeaders(s2,
+                s3 => DoHorizontalRules(s3,
+                s4 => DoTable(s4,
+                s5 => DoNote(s5, supportTextAlignment,
+                s6 => DoIndentCodeBlock(s6,
+                sn => FormParagraphs(sn, supportTextAlignment)))))))
+            );
         }
 
         /// <summary>
@@ -222,23 +178,6 @@ namespace Markdown.Avalonia
                 s0 => DoImagesOrHrefs(s0,
                 s1 => DoTextDecorations(s1,
                 s2 => DoText(s2))));
-
-            //text = EscapeSpecialCharsWithinTagAttributes(text);
-            //text = EscapeBackslashes(text);
-
-            //// Images must come first, because ![foo][f] looks like an anchor.
-            //text = DoImages(text);
-            //text = DoAnchors(text);
-
-            //// Must come after DoAnchors(), because you can use < and >
-            //// delimiters in inline links like [this](<url>).
-            //text = DoAutoLinks(text);
-
-            //text = EncodeAmpsAndAngles(text);
-            //text = DoItalicsAndBold(text);
-            //text = DoHardBreaks(text);
-
-            //return text;
         }
 
 
@@ -258,8 +197,11 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(text));
             }
 
+            var trimemdText = _newlinesLeadingTrailing.Replace(text, "");
 
-            string[] grafs = _newlinesMultiple.Split(_newlinesLeadingTrailing.Replace(text, ""));
+            string[] grafs = trimemdText == "" ?
+                new string[0] :
+                _newlinesMultiple.Split(trimemdText);
 
             foreach (var g in grafs)
             {
@@ -604,23 +546,16 @@ namespace Markdown.Avalonia
 
         #region grammer - horizontal rules
 
-        private static readonly Regex _horizontalRules = HorizontalRulesRegex("-");
-        private static readonly Regex _horizontalTwoLinesRules = HorizontalRulesRegex("=");
-        private static readonly Regex _horizontalBoldRules = HorizontalRulesRegex("*");
-        private static readonly Regex _horizontalBoldWithSingleRules = HorizontalRulesRegex("_");
-        private static Regex HorizontalRulesRegex(string markers)
-        {
-            return new Regex(@"
+        private static readonly Regex _horizontalRules = new Regex(@"
                 ^[ ]{0,3}                   # Leading space
-                    ([" + markers + @"])    # $1: First marker ([markers])
+                    ([-=*_])                # $1: First marker ([markers])
                     (?>                     # Repeated marker group
                         [ ]{0,2}            # Zero, one, or two spaces.
                         \1                  # Marker character
                     ){2,}                   # Group repeated at least twice
                     [ ]*                    # Trailing spaces
-                    $                       # End of line.
+                    \n                      # End of line.
                 ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-        }
 
         /// <summary>
         /// Turn Markdown horizontal rules into HTML hr tags
@@ -638,10 +573,7 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(text));
             }
 
-            return Evaluate(text, _horizontalRules, RuleEvaluator,
-                s1 => Evaluate(s1, _horizontalTwoLinesRules, TwoLinesRuleEvaluator,
-                s2 => Evaluate(s2, _horizontalBoldRules, BoldRuleEvaluator,
-                s3 => Evaluate(s3, _horizontalBoldWithSingleRules, BoldWithSingleRuleEvaluator, defaultHandler))));
+            return Evaluate(text, _horizontalRules, RuleEvaluator, defaultHandler);
         }
 
         /// <summary>
@@ -654,46 +586,21 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(match));
             }
 
-            return new Rule(RuleType.Single);
-        }
-
-        /// <summary>
-        /// Two lines separator.
-        /// </summary>
-        private Rule TwoLinesRuleEvaluator(Match match)
-        {
-            if (match is null)
+            switch (match.Groups[1].Value)
             {
-                Helper.ThrowArgNull(nameof(match));
+                default:
+                case "-":
+                    return new Rule(RuleType.Single);
+
+                case "=":
+                    return new Rule(RuleType.TwoLines);
+
+                case "*":
+                    return new Rule(RuleType.Bold);
+
+                case "_":
+                    return new Rule(RuleType.BoldWithSingle);
             }
-
-            return new Rule(RuleType.TwoLines);
-        }
-
-        /// <summary>
-        /// Double line separator.
-        /// </summary>
-        private Rule BoldRuleEvaluator(Match match)
-        {
-            if (match is null)
-            {
-                Helper.ThrowArgNull(nameof(match));
-            }
-
-            return new Rule(RuleType.Bold);
-        }
-
-        /// <summary>
-        /// Two lines separator consisting of a double line and a single line.
-        /// </summary>
-        private Rule BoldWithSingleRuleEvaluator(Match match)
-        {
-            if (match is null)
-            {
-                Helper.ThrowArgNull(nameof(match));
-            }
-
-            return new Rule(RuleType.BoldWithSingle);
         }
 
         #endregion
@@ -731,10 +638,11 @@ namespace Markdown.Avalonia
         private const int _listDepth = 4;
 
         private static readonly string _wholeList = string.Format(@"
-            (                               # $1 = whole list
-              (                             # $2 = list marker with indent
-                [ ]{{0,{2}}}
-                ({0})                       # $3 = first list item marker
+            (?<whltxt>                      # whole list
+              (?<mkr_i>                     # list marker with indent
+                (?![ ]{{0,3}}(?<hrm>[-=*_])([ ]{{0,2}}\k<hrm>){{2,}})
+                (?<idt>[ ]{{0,{2}}})
+                (?<mkr>{0})                 # first list item marker
                 [ ]+
               )
               (?s:.+?)
@@ -750,29 +658,18 @@ namespace Markdown.Avalonia
               )
             )", _firstListMaker, _subseqListMaker, _listDepth - 1);
 
+        private static readonly Regex _startNoIndentRule = new Regex(@"\A[ ]{0,2}(?<hrm>[-=*_])([ ]{0,2}\k<hrm>){2,}",
+            RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
+        private static readonly Regex _startNoIndentSublistMarker = new Regex(@"\A" + _subseqListMaker, RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
+        private static readonly Regex _startQuoteOrHeader = new Regex(@"\A(\#{1,6}[ ]|>|```)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
         private static readonly Regex _listNested = new Regex(@"^" + _wholeList,
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static readonly Regex _listTopLevel = new Regex(@"(?:(?<=\n)|\A\n?)" + _wholeList,
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        /// <summary>
-        /// Turn Markdown lists into HTML ul and ol and li tags
-        /// </summary>
-        private IEnumerable<Control> DoLists(string text, Func<string, IEnumerable<Control>> defaultHandler)
-        {
-            if (text is null)
-            {
-                Helper.ThrowArgNull(nameof(text));
-            }
-
-            // We use a different prefix before nested lists than top-level lists.
-            // See extended comment in _ProcessListItems().
-            if (_listLevel > 0)
-                return Evaluate(text, _listNested, ListEvaluator, defaultHandler);
-            else
-                return Evaluate(text, _listTopLevel, ListEvaluator, defaultHandler);
-        }
 
         private IEnumerable<Control> ListEvaluator(Match match)
         {
@@ -783,13 +680,15 @@ namespace Markdown.Avalonia
 
             // Check text marker style.
             (TextMarkerStyle textMarker, string markerPattern, int indentAppending)
-                = GetTextMarkerStyle(match.Groups[3].Value);
+                = GetTextMarkerStyle(match.Groups["mkr"].Value);
+
+            Regex markerRegex = new Regex(@"\A" + markerPattern, RegexOptions.Compiled);
 
             // count indent from first marker with indent
-            int countIndent = TextUtil.CountIndent(match.Groups[2].Value);
+            int countIndent = TextUtil.CountIndent(match.Groups["mkr_i"].Value);
 
             // whole list
-            string[] whileListLins = match.Groups[1].Value.Split('\n');
+            string[] whileListLins = match.Groups["whltxt"].Value.Split('\n');
 
             // collect detendentable line
             var listBulder = new StringBuilder();
@@ -805,13 +704,22 @@ namespace Markdown.Avalonia
                     }
                     else if (TextUtil.TryDetendLine(line, countIndent, out var stripedLine))
                     {
+                        // is it horizontal line?
+                        if (_startNoIndentRule.IsMatch(stripedLine))
+                        {
+                            isInOuterList = true;
+                        }
+                        // is it header or blockquote?
+                        else if (_startQuoteOrHeader.IsMatch(stripedLine))
+                        {
+                            isInOuterList = true;
+                        }
                         // is it had list marker?
-                        var someMarkerMch = Regex.Match(stripedLine, _subseqListMaker);
-                        if (someMarkerMch.Success && someMarkerMch.Index == 0)
+                        else if (_startNoIndentSublistMarker.IsMatch(stripedLine))
                         {
                             // is it same marker as now processed?
-                            var targetMarkerMch = Regex.Match(stripedLine, markerPattern);
-                            if (targetMarkerMch.Success && targetMarkerMch.Index == 0)
+                            var targetMarkerMch = markerRegex.Match(stripedLine);
+                            if (targetMarkerMch.Success)
                             {
                                 listBulder.Append(stripedLine).Append("\n");
                             }
@@ -819,7 +727,7 @@ namespace Markdown.Avalonia
                         }
                         else
                         {
-                            var detentedline = TextUtil.DetentBestEffort(stripedLine, indentAppending);
+                            var detentedline = TextUtil.DetentLineBestEffort(stripedLine, indentAppending);
                             listBulder.Append(detentedline).Append("\n");
                         }
                     }
@@ -1084,7 +992,7 @@ namespace Markdown.Avalonia
                 return txt;
             }
 
-            var mdtable = new MdTable(
+            var mdtable = new TextileTable(
                 ExtractCoverBar(headerTxt).Split('|'),
                 ExtractCoverBar(styleTxt).Split('|').Select(txt => txt.Trim()).ToArray(),
                 rowTxt.Split('\n').Select(ritm =>
@@ -1130,7 +1038,7 @@ namespace Markdown.Avalonia
             return result;
         }
 
-        private IEnumerable<Border> CreateTableRow(IList<MdTableCell> mdcells, int rowIdx)
+        private IEnumerable<Border> CreateTableRow(IList<ITableCell> mdcells, int rowIdx)
         {
             foreach (var mdcell in mdcells)
             {
@@ -1165,9 +1073,9 @@ namespace Markdown.Avalonia
 
         private static Regex _codeBlockFirst = new Regex(@"
                     ^          # Character before opening
-                    [ ]*
-                    (`+)             # $1 = Opening run of `
-                    ([^\n`]*)      # $2 = The code lang
+                    [ ]{0,3}
+                    (`{3,})          # $1 = Opening run of `
+                    ([^\n`]*)        # $2 = The code lang
                     \n
                     ((.|\n)+?)       # $3 = The code block
                     \n[ ]*
@@ -1175,20 +1083,13 @@ namespace Markdown.Avalonia
                     (?!`)[\n]+", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
 
         private static Regex _indentCodeBlock = new Regex(@"
-                    ^
-                    (([ ]{4}.+\n?)+)
+                    (?:\A|^[ ]*\n)
+                    (
+                    [ ]{4}.+
+                    (\n([ ]{4}.+|[ ]*))*
+                    \n?
+                    )
                     ", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
-
-
-        private IEnumerable<Control> DoCodeBlocks(string text, Func<string, IEnumerable<Control>> defaultHandler)
-        {
-            if (text is null)
-            {
-                Helper.ThrowArgNull(nameof(text));
-            }
-
-            return Evaluate(text, _codeBlockFirst, CodeBlocksWithLangEvaluator, defaultHandler);
-        }
 
         private IEnumerable<Control> DoIndentCodeBlock(string text, Func<string, IEnumerable<Control>> defaultHandler)
         {
@@ -1204,7 +1105,11 @@ namespace Markdown.Avalonia
             => CodeBlocksEvaluator(match.Groups[2].Value, match.Groups[3].Value);
 
         private Border CodeBlocksWithoutLangEvaluator(Match match)
-            => CodeBlocksEvaluator(null, TextUtil.DetentBestEffort(match.Groups[1].Value, 4));
+        {
+            var detentTxt = String.Join("\n", match.Groups[1].Value.Split('\n').Select(line => TextUtil.DetentLineBestEffort(line, 4)));
+            return CodeBlocksEvaluator(null, _newlinesLeadingTrailing.Replace(detentTxt, ""));
+        }
+
 
 
         private Border CodeBlocksEvaluator(string lang, string code)
@@ -1216,9 +1121,13 @@ namespace Markdown.Avalonia
             };
             ctxt.Classes.Add(CodeBlockClass);
 
+            var scrl = new ScrollViewer();
+            scrl.Content = ctxt;
+            scrl.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+
             var result = new Border();
             result.Classes.Add(CodeBlockClass);
-            result.Child = ctxt;
+            result.Child = scrl;
 
             return result;
         }
@@ -1779,7 +1688,7 @@ namespace Markdown.Avalonia
                         .ToArray()
             );
 
-            var blocks = RunBlockGamut(trimmedTxt, true);
+            var blocks = RunBlockGamut(trimmedTxt + "\n", true);
 
             var panel = Create<StackPanel, Control>(blocks);
             panel.Orientation = Orientation.Vertical;
@@ -1878,39 +1787,84 @@ namespace Markdown.Avalonia
 
             return result;
         }
-        private IEnumerable<T> Evaluate<T>(string text, Regex expression, Func<Match, IEnumerable<T>> build, Func<string, IEnumerable<T>> rest)
+        private IEnumerable<T> Evaluate2<T>(
+                string text,
+                Regex expression1, Func<Match, T> build1,
+                Regex expression2, Func<Match, IEnumerable<T>> build2,
+                Func<string, IEnumerable<T>> rest)
         {
             if (text is null)
             {
                 Helper.ThrowArgNull(nameof(text));
             }
 
-            var matches = expression.Matches(text);
             var index = 0;
-            foreach (Match m in matches)
+
+            var rtn = new List<T>();
+
+            var match1 = expression1.Match(text, index);
+            var match2 = expression2.Match(text, index);
+
+            IEnumerable<T> ProcPre(Match m)
             {
-                if (m.Index > index)
+                var prefix = text.Substring(index, m.Index - index);
+                return rest(prefix);
+            }
+
+            void ProcessMatch1()
+            {
+                if (match1.Index > index)
                 {
-                    var prefix = text.Substring(index, m.Index - index);
-                    foreach (var t in rest(prefix))
-                    {
-                        yield return t;
-                    }
+                    rtn.AddRange(ProcPre(match1));
                 }
+                rtn.Add(build1(match1));
+                index = match1.Index + match1.Length;
+            }
 
-                foreach (var part in build(m)) yield return part;
+            void ProcessMatch2()
+            {
+                if (match2.Index > index)
+                {
+                    rtn.AddRange(ProcPre(match2));
+                }
+                rtn.AddRange(build2(match2));
+                index = match2.Index + match2.Length;
+            }
 
-                index = m.Index + m.Length;
+            // match1 vs match2
+            while (match1.Success && match2.Success)
+            {
+                if (match1.Index < match2.Index)
+                {
+                    ProcessMatch1();
+                }
+                else
+                {
+                    ProcessMatch2();
+                }
+                match1 = expression1.Match(text, index);
+                match2 = expression2.Match(text, index);
+            }
+
+            while (match1.Success)
+            {
+                ProcessMatch1();
+                match1 = expression1.Match(text, index);
+            }
+
+            while (match2.Success)
+            {
+                ProcessMatch2();
+                match2 = expression2.Match(text, index);
             }
 
             if (index < text.Length)
             {
                 var suffix = text.Substring(index, text.Length - index);
-                foreach (var t in rest(suffix))
-                {
-                    yield return t;
-                }
+                rtn.AddRange(rest(suffix));
             }
+
+            return rtn;
         }
 
         private IEnumerable<T> Evaluate<T>(string text, Regex expression, Func<Match, T> build, Func<string, IEnumerable<T>> rest)

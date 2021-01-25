@@ -1,8 +1,11 @@
 ﻿using Avalonia;
 using Avalonia.Media.Imaging;
+using Avalonia.Platform;
+using Avalonia.Threading;
 using ColorTextBlock.Avalonia.Geometries;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ColorTextBlock.Avalonia
@@ -74,8 +77,28 @@ namespace ColorTextBlock.Avalonia
         {
             if (Image is null)
             {
-                Task.Wait();
-                Image = Task.IsFaulted ? WhenError : Task.Result ?? WhenError;
+                if (Task.Status == TaskStatus.RanToCompletion
+                    || Task.Status == TaskStatus.Faulted
+                    || Task.Status == TaskStatus.Canceled)
+                {
+                    Image = Task.IsFaulted ? WhenError : Task.Result ?? WhenError;
+                }
+                else
+                {
+                    Image = new WriteableBitmap(
+                                    new PixelSize(1, 1),
+                                    new Vector(96, 96),
+                                    PixelFormat.Rgb565);
+
+                    Thread.MemoryBarrier();
+
+                    System.Threading.Tasks.Task.Run(() =>
+                    {
+                        Task.Wait();
+                        Image = Task.IsFaulted ? WhenError : Task.Result ?? WhenError;
+                        Dispatcher.UIThread.InvokeAsync(RequestMeasure);
+                    });
+                }
             }
 
             double imageWidth = Image.Size.Width;
