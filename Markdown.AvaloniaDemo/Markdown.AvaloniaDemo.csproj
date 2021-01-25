@@ -8,10 +8,10 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.0-rc1" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.0-rc1" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0-rc1" />
-    <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="0.10.0-rc1" />
+    <PackageReference Include="Avalonia" Version="0.10.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0" />
+    <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="0.10.0" />
     <None Remove="Assets\XamlTemplate.txt" />
   </ItemGroup>
   <ItemGroup>

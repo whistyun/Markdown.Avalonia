@@ -75,7 +75,6 @@ namespace UnitTest.Md
         {
             var text = Util.LoadText("Links_inline_style.md");
             var markdown = new Markdown.Avalonia.Markdown();
-            markdown.DisabledTootip = true;
             var result = markdown.Transform(text);
             Approvals.Verify(Util.AsXaml(result));
         }
@@ -118,6 +117,18 @@ namespace UnitTest.Md
         public void Transform_givenMixing_generatesExpectedResult()
         {
             var text = Util.LoadText("Mixing.md");
+            var markdown = new Markdown.Avalonia.Markdown();
+            markdown.AssetPathRoot = AssetPath;
+
+            var result = markdown.Transform(text);
+            Approvals.Verify(Util.AsXaml(result));
+        }
+
+        [Test]
+        [RunOnUI]
+        public void Transform_givenCodes_generatesExpectedResult()
+        {
+            var text = Util.LoadText("Codes.md");
             var markdown = new Markdown.Avalonia.Markdown();
             markdown.AssetPathRoot = AssetPath;
 

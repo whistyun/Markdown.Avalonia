@@ -721,7 +721,6 @@
       </Grid>
     </Border.Child>
   </Border>
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="Single" />
   <Border Classes="Table" xmlns="">
     <Border.Child>
@@ -965,7 +964,6 @@
       </Grid>
     </Border.Child>
   </Border>
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="Single" />
   <Border Classes="Table" xmlns="">
     <Border.Child>
@@ -1033,7 +1031,6 @@
       </Grid>
     </Border.Child>
   </Border>
-  <c:CTextBlock Classes="Paragraph" />
   <m:Rule BoldLineWidth="2" Classes="Single" />
   <Border Classes="Table" xmlns="">
     <Border.Child>
@@ -1337,5 +1334,4 @@
       </Grid>
     </Border.Child>
   </Border>
-  <c:CTextBlock Classes="Paragraph" />
 </StackPanel>

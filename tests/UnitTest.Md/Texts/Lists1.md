@@ -155,6 +155,7 @@ Mixing list
         inlist 2
          inline 3
           inline 4
+
            as code
 2. two
 * three
@@ -193,3 +194,36 @@ yes, we can
 ===
 
 iiii, one
+
+
+* * *
+* one
+* * *
+* one
+ * * *
+* one
+  * * *
+* two
+```
+code
+```
+* three
+> quote
+* four
+# head
+* four
+## head
+
+* * *
+* one
+   * * *
+* two
+ ```
+ code
+ ```
+* three
+ > quote
+* four
+ # head
+* four
+ ## head
