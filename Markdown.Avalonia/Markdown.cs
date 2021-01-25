@@ -1076,7 +1076,7 @@ namespace Markdown.Avalonia
                     (?!`)[\n]+", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
 
         private static Regex _indentCodeBlock = new Regex(@"
-                    ^
+                    (?:\A|^[ ]*\n)
                     (
                     [ ]{4}.+
                     (\n([ ]{4}.+|[ ]*))*
