@@ -742,10 +742,6 @@ namespace Markdown.Avalonia
 
             string list = listBulder.ToString();
 
-            // Turn double returns into triple returns, so that we can make a
-            // paragraph for the last item in a list, if necessary:
-            list = Regex.Replace(list, @"\n{2,}", "\n\n\n");
-
             IEnumerable<Control> listItems = ProcessListItems(list, markerPattern);
 
             var grid = new Grid();
@@ -1122,6 +1118,7 @@ namespace Markdown.Avalonia
             ctxt.Classes.Add(CodeBlockClass);
 
             var scrl = new ScrollViewer();
+            scrl.Classes.Add(CodeBlockClass);
             scrl.Content = ctxt;
             scrl.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
 
