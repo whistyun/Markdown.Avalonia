@@ -792,7 +792,7 @@
           </c:CTextBlock>
           <Border Classes="CodeBlock">
             <Border.Child>
-              <ScrollViewer>
+              <ScrollViewer Classes="CodeBlock">
                 <ScrollViewer.Content>
                   <TextBlock Text="as code" Classes="CodeBlock" />
                 </ScrollViewer.Content>
@@ -1118,7 +1118,7 @@
   </Grid>
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <ScrollViewer>
+      <ScrollViewer Classes="CodeBlock">
         <ScrollViewer.Content>
           <TextBlock Text="code" Classes="CodeBlock" />
         </ScrollViewer.Content>
@@ -1211,7 +1211,7 @@
       </c:CTextBlock>
       <Border Classes="CodeBlock">
         <Border.Child>
-          <ScrollViewer>
+          <ScrollViewer Classes="CodeBlock">
             <ScrollViewer.Content>
               <TextBlock Text="code" Classes="CodeBlock" />
             </ScrollViewer.Content>
