@@ -108,19 +108,78 @@
         </Grid>
       </TabItem>
 
+      <TabItem Header="Other">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="10*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+
+          <TextBlock Grid.Row="0" Grid.Column="0"
+              VerticalAlignment="Center">
+            AssetPathRoot
+          </TextBlock>
+
+          <TextBox Grid.Row="0" Grid.Column="1"
+                   Text="{Binding AssetPathRootText}" />
+
+          <Button Grid.Row="0" Grid.Column="2"
+                  Content="Apply"
+                  Command="{Binding ApplyAssetPathRoot}" />
+
+          <TextBlock Grid.Row="1" Grid.Column="0"
+              VerticalAlignment="Center">
+            Source
+          </TextBlock>
+
+          <TextBox Grid.Row="1" Grid.Column="1"
+                   Text="{Binding SourceText}"/>
+
+          <Button Grid.Row="1" Grid.Column="2"
+                  Content="Apply"
+                  Command="{Binding ApplySource}" />
+
+        </Grid>
+
+      </TabItem>
+
     </TabControl>
 
-    <md:MarkdownScrollViewer
-      Grid.Row="0"
-      Grid.Column="1"
-      VerticalAlignment="Stretch"
-      SaveScrollValueWhenContentUpdated="True"
-      Markdown="{Binding Text}"
+    <TabControl
+          Grid.Row="0"
+          Grid.Column="1"
+          VerticalAlignment="Stretch">
+
+      <TabItem Header="View">
+        <md:MarkdownScrollViewer
+          x:Name="MarkdownViewer"
+          SaveScrollValueWhenContentUpdated="True"
+          
+          Markdown="{Binding Text}"
+
+          AssetPathRoot="{Binding AssetPathRoot}"
+          Source="{Binding Source}"
       
-      local:DynamicStyleBehavior.XamlText="{Binding AppendStyleXamlText}"
-      local:DynamicStyleBehavior.ValidationResult="{Binding XamlParseResult}"
-      >
-    </md:MarkdownScrollViewer>
+          local:DynamicStyleBehavior.XamlText="{Binding AppendStyleXamlText}"
+          local:DynamicStyleBehavior.ValidationResult="{Binding XamlParseResult}">
+        </md:MarkdownScrollViewer>
+      </TabItem>
+
+      <TabItem Header="Xaml (broken)" x:Name="SourceTab">
+        <TextBox
+            x:Name="MarkdownSource"
+            AcceptsReturn="True"
+            TextWrapping="NoWrap"
+            />
+      </TabItem>
+    </TabControl>
+
   </Grid>
 
 </Window>

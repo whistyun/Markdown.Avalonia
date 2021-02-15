@@ -9,7 +9,11 @@
   <m:Rule BoldLineWidth="2" Classes="Single" />
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="---&#xA;" Classes="CodeBlock" />
+      <ScrollViewer Classes="CodeBlock">
+        <ScrollViewer.Content>
+          <TextBlock Text="---" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
     </Border.Child>
   </Border>
   <m:Rule BoldLineWidth="2" Classes="Single" />
@@ -18,7 +22,11 @@
   <m:Rule BoldLineWidth="2" Classes="Single" />
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="- - -&#xA;" Classes="CodeBlock" />
+      <ScrollViewer Classes="CodeBlock">
+        <ScrollViewer.Content>
+          <TextBlock Text="- - -" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
     </Border.Child>
   </Border>
   <c:CTextBlock Classes="Paragraph">
@@ -30,7 +38,11 @@
   <m:Rule BoldLineWidth="2" Classes="Bold" />
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="***&#xA;" Classes="CodeBlock" />
+      <ScrollViewer Classes="CodeBlock">
+        <ScrollViewer.Content>
+          <TextBlock Text="***" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
     </Border.Child>
   </Border>
   <m:Rule BoldLineWidth="2" Classes="Bold" />
@@ -39,7 +51,11 @@
   <m:Rule BoldLineWidth="2" Classes="Bold" />
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="* * *&#xA;" Classes="CodeBlock" />
+      <ScrollViewer Classes="CodeBlock">
+        <ScrollViewer.Content>
+          <TextBlock Text="* * *" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
     </Border.Child>
   </Border>
   <c:CTextBlock Classes="Paragraph">
@@ -51,7 +67,11 @@
   <m:Rule BoldLineWidth="2" Classes="BoldWithSingle" />
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="___&#xA;" Classes="CodeBlock" />
+      <ScrollViewer Classes="CodeBlock">
+        <ScrollViewer.Content>
+          <TextBlock Text="___" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
     </Border.Child>
   </Border>
   <m:Rule BoldLineWidth="2" Classes="BoldWithSingle" />
@@ -60,7 +80,11 @@
   <m:Rule BoldLineWidth="2" Classes="BoldWithSingle" />
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="_ _ _&#xA;" Classes="CodeBlock" />
+      <ScrollViewer Classes="CodeBlock">
+        <ScrollViewer.Content>
+          <TextBlock Text="_ _ _" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
     </Border.Child>
   </Border>
 </StackPanel>

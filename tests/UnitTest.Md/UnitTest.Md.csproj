@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <None Remove="Texts\SaveLinebreak.md" />
+    <None Remove="Texts\Codes.md" />
   </ItemGroup>
 
   <ItemGroup>

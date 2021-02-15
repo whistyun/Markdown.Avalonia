@@ -169,7 +169,7 @@
 
   <Style Selector="mdc|Rule">
     <Style.Setters>
-      <Setter Property="Margin" Value="0, 5"/>
+      <Setter Property="Margin" Value="0,3"/>
     </Style.Setters>
   </Style>
 </Styles>

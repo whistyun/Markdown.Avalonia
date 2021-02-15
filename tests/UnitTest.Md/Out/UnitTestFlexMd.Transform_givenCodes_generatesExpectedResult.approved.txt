@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-16"?>
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+  <c:CTextBlock Classes="Heading1">
+    <c:CCode>
+      <c:CRun Text="```" />
+    </c:CCode>
+  </c:CTextBlock>
+  <Border Classes="CodeBlock" xmlns="">
+    <Border.Child>
+      <ScrollViewer Classes="CodeBlock">
+        <ScrollViewer.Content>
+          <TextBlock Text="```cs&#xA;public void Main(){&#xA;    Console.WriteLine(&quot;`Hello World`&quot;);&#xA;}&#xA;```" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
+    </Border.Child>
+  </Border>
+  <Border Classes="CodeBlock" xmlns="">
+    <Border.Child>
+      <ScrollViewer Classes="CodeBlock">
+        <ScrollViewer.Content>
+          <TextBlock Text="public void Main(){&#xA;    Console.WriteLine(&quot;`Hello World`&quot;);&#xA;}" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
+    </Border.Child>
+  </Border>
+  <Border Classes="Blockquote" xmlns="">
+    <Border.Child>
+      <StackPanel Classes="Blockquote">
+        <Border Classes="CodeBlock">
+          <Border.Child>
+            <ScrollViewer Classes="CodeBlock">
+              <ScrollViewer.Content>
+                <TextBlock Text="public void Main(){&#xA;    Console.WriteLine(&quot;`Hello World`&quot;);&#xA;}" Classes="CodeBlock" />
+              </ScrollViewer.Content>
+            </ScrollViewer>
+          </Border.Child>
+        </Border>
+      </StackPanel>
+    </Border.Child>
+  </Border>
+  <Border Classes="CodeBlock" xmlns="">
+    <Border.Child>
+      <ScrollViewer Classes="CodeBlock">
+        <ScrollViewer.Content>
+          <TextBlock Text="   public void Main(){&#xA;       Console.WriteLine(&quot;`Hello World`&quot;);&#xA;   }" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
+    </Border.Child>
+  </Border>
+  <Border Classes="CodeBlock" xmlns="">
+    <Border.Child>
+      <ScrollViewer Classes="CodeBlock">
+        <ScrollViewer.Content>
+          <TextBlock Text="```cs&#xA;public void Main(){&#xA;    Console.WriteLine(&quot;`Hello World`&quot;);&#xA;}&#xA;```" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
+    </Border.Child>
+  </Border>
+  <Grid Classes="List" xmlns="">
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+      <c:CRun Text="•" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="0">
+      <Border Classes="CodeBlock">
+        <Border.Child>
+          <ScrollViewer Classes="CodeBlock">
+            <ScrollViewer.Content>
+              <TextBlock Text="public void Main(){&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}" Classes="CodeBlock" />
+            </ScrollViewer.Content>
+          </ScrollViewer>
+        </Border.Child>
+      </Border>
+    </StackPanel>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition />
+    </Grid.RowDefinitions>
+  </Grid>
+  <m:Rule BoldLineWidth="2" Classes="Bold" />
+  <Grid Classes="List" xmlns="">
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+      <c:CRun Text="▪" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="0">
+      <c:CTextBlock Classes="Paragraph">
+        <c:CRun Text="one" />
+      </c:CTextBlock>
+      <Border Classes="CodeBlock">
+        <Border.Child>
+          <ScrollViewer Classes="CodeBlock">
+            <ScrollViewer.Content>
+              <TextBlock Text="public void Main(){&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}" Classes="CodeBlock" />
+            </ScrollViewer.Content>
+          </ScrollViewer>
+        </Border.Child>
+      </Border>
+    </StackPanel>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition />
+    </Grid.RowDefinitions>
+  </Grid>
+  <m:Rule BoldLineWidth="2" Classes="TwoLines" />
+  <Grid Classes="List" xmlns="">
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+      <c:CRun Text="▪" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="0">
+      <c:CTextBlock Classes="Paragraph">
+        <c:CRun Text="one" />
+      </c:CTextBlock>
+      <Border Classes="CodeBlock">
+        <Border.Child>
+          <ScrollViewer Classes="CodeBlock">
+            <ScrollViewer.Content>
+              <TextBlock Text="public void Main(){&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}" Classes="CodeBlock" />
+            </ScrollViewer.Content>
+          </ScrollViewer>
+        </Border.Child>
+      </Border>
+    </StackPanel>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition />
+    </Grid.RowDefinitions>
+  </Grid>
+  <c:CTextBlock Classes="Heading1">
+    <c:CRun Text="Indent" />
+  </c:CTextBlock>
+  <Border Classes="CodeBlock" xmlns="">
+    <Border.Child>
+      <ScrollViewer Classes="CodeBlock">
+        <ScrollViewer.Content>
+          <TextBlock Text="abcd&#xA;efgh" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
+    </Border.Child>
+  </Border>
+  <m:Rule BoldLineWidth="2" Classes="Single" />
+  <Border Classes="CodeBlock" xmlns="">
+    <Border.Child>
+      <ScrollViewer Classes="CodeBlock">
+        <ScrollViewer.Content>
+          <TextBlock Text=" abcd&#xA;efgh" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
+    </Border.Child>
+  </Border>
+  <m:Rule BoldLineWidth="2" Classes="Single" />
+  <Border Classes="CodeBlock" xmlns="">
+    <Border.Child>
+      <ScrollViewer Classes="CodeBlock">
+        <ScrollViewer.Content>
+          <TextBlock Text="abcd&#xA; efgh&#xA;&#xA; ijkl&#xA;&#xA;opqr" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
+    </Border.Child>
+  </Border>
+  <m:Rule BoldLineWidth="2" Classes="Single" />
+  <Border Classes="Blockquote" xmlns="">
+    <Border.Child>
+      <StackPanel Classes="Blockquote">
+        <Border Classes="CodeBlock">
+          <Border.Child>
+            <ScrollViewer Classes="CodeBlock">
+              <ScrollViewer.Content>
+                <TextBlock Text="asdf&#xA; ghij" Classes="CodeBlock" />
+              </ScrollViewer.Content>
+            </ScrollViewer>
+          </Border.Child>
+        </Border>
+      </StackPanel>
+    </Border.Child>
+  </Border>
+  <Grid Classes="List" xmlns="">
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+      <c:CRun Text="•" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="0">
+      <Border Classes="CodeBlock">
+        <Border.Child>
+          <ScrollViewer Classes="CodeBlock">
+            <ScrollViewer.Content>
+              <TextBlock Text="public void Main(){&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}" Classes="CodeBlock" />
+            </ScrollViewer.Content>
+          </ScrollViewer>
+        </Border.Child>
+      </Border>
+    </StackPanel>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition />
+    </Grid.RowDefinitions>
+  </Grid>
+  <m:Rule BoldLineWidth="2" Classes="Bold" />
+  <Grid Classes="List" xmlns="">
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+      <c:CRun Text="▪" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="0">
+      <c:CTextBlock Classes="Paragraph">
+        <c:CRun Text="one public void Main(){" />
+      </c:CTextBlock>
+      <Border Classes="CodeBlock">
+        <Border.Child>
+          <ScrollViewer Classes="CodeBlock">
+            <ScrollViewer.Content>
+              <TextBlock Text="}" Classes="CodeBlock" />
+            </ScrollViewer.Content>
+          </ScrollViewer>
+        </Border.Child>
+      </Border>
+    </StackPanel>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition />
+    </Grid.RowDefinitions>
+  </Grid>
+  <m:Rule BoldLineWidth="2" Classes="Bold" />
+  <Grid Classes="List" xmlns="">
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+      <c:CRun Text="▪" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="0">
+      <c:CTextBlock Classes="Paragraph">
+        <c:CRun Text="one" />
+      </c:CTextBlock>
+      <Border Classes="CodeBlock">
+        <Border.Child>
+          <ScrollViewer Classes="CodeBlock">
+            <ScrollViewer.Content>
+              <TextBlock Text="public void Main(){&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;&#xA;}" Classes="CodeBlock" />
+            </ScrollViewer.Content>
+          </ScrollViewer>
+        </Border.Child>
+      </Border>
+    </StackPanel>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition />
+    </Grid.RowDefinitions>
+  </Grid>
+</StackPanel>

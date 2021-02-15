@@ -358,7 +358,11 @@
   </c:CTextBlock>
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <TextBlock Text="#include &lt;stdio.h&gt;&#xA;int main()&#xA;{&#xA;   // printf() displays the string inside quotation&#xA;   printf(&quot;Hello, World!&quot;);&#xA;   return 0;&#xA;}" Classes="CodeBlock" />
+      <ScrollViewer Classes="CodeBlock">
+        <ScrollViewer.Content>
+          <TextBlock Text="#include &lt;stdio.h&gt;&#xA;int main()&#xA;{&#xA;   // printf() displays the string inside quotation&#xA;   printf(&quot;Hello, World!&quot;);&#xA;   return 0;&#xA;}" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
     </Border.Child>
   </Border>
   <Grid Classes="List" xmlns="">

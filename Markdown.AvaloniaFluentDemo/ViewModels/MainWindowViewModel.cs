@@ -48,6 +48,42 @@ namespace Markdown.AvaloniaFluentDemo.ViewModels
             set => this.RaiseAndSetIfChanged(ref _ErrorInfo, value);
         }
 
+        private string _AssetPathRootText;
+        public string AssetPathRootText
+        {
+            get => _AssetPathRootText;
+            set => this.RaiseAndSetIfChanged(ref _AssetPathRootText, value);
+        }
+
+        private string _SourceText;
+        public string SourceText
+        {
+            get => _SourceText;
+            set => this.RaiseAndSetIfChanged(ref _SourceText, value);
+        }
+
+        private string _AssetPathRoot;
+        public string AssetPathRoot
+        {
+            get => _AssetPathRoot;
+            set
+            {
+                _AssetPathRoot = value;
+                this.RaisePropertyChanged();
+            }
+        }
+
+        private Uri _Source;
+        public Uri Source
+        {
+            get => _Source;
+            set
+            {
+                _Source = value;
+                this.RaisePropertyChanged();
+            }
+        }
+
         public List<ThemeViewModel> Themes { set; get; }
 
         public void XamlParseResult(string result) => ErrorInfo = result;
@@ -82,6 +118,12 @@ namespace Markdown.AvaloniaFluentDemo.ViewModels
                 EdittingStyleXamlText = reader.ReadToEnd();
             }
         }
+
+        public void ApplyAssetPathRoot()
+            => AssetPathRoot = AssetPathRootText;
+
+        public void ApplySource()
+            => Source = new Uri(SourceText);
     }
 
     public class ThemeViewModel

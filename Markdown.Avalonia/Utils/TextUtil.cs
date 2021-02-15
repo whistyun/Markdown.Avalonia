@@ -34,7 +34,7 @@ namespace Markdown.Avalonia.Utils
         /// If the leading white-space is too short than `indentCount`,
         /// this method removes all leading white-spaces.
         /// </summary>
-        public static string DetentBestEffort(string line, int indentCount)
+        public static string DetentLineBestEffort(string line, int indentCount)
         {
             // this index count tab as 1: for String.Substring
             var realIdx = 0;
