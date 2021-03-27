@@ -4,6 +4,7 @@
       xmlns:mdc="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia"
       xmlns:mde="clr-namespace:Markdown.Avalonia.Extensions;assembly=Markdown.Avalonia"
       xmlns:ctxt="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia"
+      xmlns:avedit="https://github.com/avaloniaui/avaloniaedit"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         
       x:Class="Markdown.Avalonia.StyleCollections.MarkdownStyleFluentTheme"
@@ -120,6 +121,10 @@
       <Setter Property="Foreground" Value="{mde:DivideColor Blue, SystemBaseHighColor, 0.45}" />
       <Setter Property="Background" Value="{mde:Alpha SystemBaseHighColor, 0.15}" />
     </Style.Setters>
+  </Style>
+
+  <Style Selector="avedit|TextEditor">
+    <Setter Property="SyntaxHighlighting" Value="{mde:SyntaxHighlightWrapper SystemBaseHighColor}"/>
   </Style>
 
   <Style Selector="Border.Note">
