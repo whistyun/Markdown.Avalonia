@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:a="https://github.com/avaloniaui/avaloniaedit" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
   <c:CTextBlock Classes="Heading1">
     <c:CCode>
       <c:CRun Text="```" />
@@ -258,4 +258,25 @@
       <RowDefinition />
     </Grid.RowDefinitions>
   </Grid>
+  <m:Rule BoldLineWidth="2" Classes="Bold" />
+  <Border Classes="CodeBlock" xmlns="">
+    <Border.Child>
+      <a:TextEditor IsReadOnly="True" IsModified="True" Tag="c" Text="public void Main(){&#xA;    Console.WriteLine(&quot;`Hello World`&quot;);&#xA;}" SelectedText="" CaretOffset="0" SelectionStart="0" SelectionLength="0" />
+    </Border.Child>
+  </Border>
+  <Border Classes="CodeBlock" xmlns="">
+    <Border.Child>
+      <a:TextEditor IsReadOnly="True" IsModified="True" Tag="cs" Text="public void Main(){&#xA;    Console.WriteLine(&quot;`Hello World`&quot;);&#xA;}" SelectedText="" CaretOffset="0" SelectionStart="0" SelectionLength="0" />
+    </Border.Child>
+  </Border>
+  <Border Classes="CodeBlock" xmlns="">
+    <Border.Child>
+      <a:TextEditor IsReadOnly="True" IsModified="True" Tag="java" Text="public void Main(){&#xA;    Console.WriteLine(&quot;`Hello World`&quot;);&#xA;}" SelectedText="" CaretOffset="0" SelectionStart="0" SelectionLength="0" />
+    </Border.Child>
+  </Border>
+  <Border Classes="CodeBlock" xmlns="">
+    <Border.Child>
+      <a:TextEditor IsReadOnly="True" IsModified="True" Tag="html" Text="public void Main(){&#xA;    Console.WriteLine(&quot;`Hello World`&quot;);&#xA;}" SelectedText="" CaretOffset="0" SelectionStart="0" SelectionLength="0" />
+    </Border.Child>
+  </Border>
 </StackPanel>
