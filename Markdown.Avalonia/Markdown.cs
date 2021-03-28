@@ -3,10 +3,13 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
+using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using AvaloniaEdit;
+using AvaloniaEdit.Highlighting;
 using ColorTextBlock.Avalonia;
 using Markdown.Avalonia.Controls;
 using Markdown.Avalonia.Tables;
@@ -1110,56 +1113,54 @@ namespace Markdown.Avalonia
 
         private Border CodeBlocksEvaluator(string lang, string code)
         {
-            var ctxt = new TextBlock()
+            if (String.IsNullOrEmpty(lang))
             {
-                Text = code,
-                TextWrapping = TextWrapping.NoWrap
-            };
-            ctxt.Classes.Add(CodeBlockClass);
+                var ctxt = new TextBlock()
+                {
+                    Text = code,
+                    TextWrapping = TextWrapping.NoWrap
+                };
+                ctxt.Classes.Add(CodeBlockClass);
 
-            var scrl = new ScrollViewer();
-            scrl.Classes.Add(CodeBlockClass);
-            scrl.Content = ctxt;
-            scrl.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+                var scrl = new ScrollViewer();
+                scrl.Classes.Add(CodeBlockClass);
+                scrl.Content = ctxt;
+                scrl.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
 
-            var result = new Border();
-            result.Classes.Add(CodeBlockClass);
-            result.Child = scrl;
+                var result = new Border();
+                result.Classes.Add(CodeBlockClass);
+                result.Child = scrl;
 
-            return result;
+                return result;
+            }
+            else
+            {
+                // check wheither style is set
+                if (!ThemeDetector.IsAvalonEditSetup)
+                {
+                    var aeStyle = new StyleInclude(new Uri("avares://Markdown.Avalonia/"))
+                    {
+                        Source = new Uri("avares://AvaloniaEdit/AvaloniaEdit.xaml")
+                    };
+                    Application.Current.Styles.Add(aeStyle);
+                }
+
+                var txtEdit = new TextEditor();
+                var highlight = HighlightingManager.Instance.GetDefinitionByExtension("." + lang);
+                txtEdit.Tag = lang;
+                //txtEdit.SetValue(TextEditor.SyntaxHighlightingProperty, highlight);
+
+                txtEdit.Text = code;
+                txtEdit.HorizontalAlignment = HorizontalAlignment.Stretch;
+                txtEdit.IsReadOnly = true;
+
+                var result = new Border();
+                result.Classes.Add(CodeBlockClass);
+                result.Child = txtEdit;
+
+                return result;
+            }
         }
-        // Use AvalonEdit
-        //        private Block CodeBlocksEvaluator(Match match)
-        //        {
-        //            if (match is null)
-        //            {
-        //                throw new ArgumentNullException(nameof(match));
-        //            }
-        //
-        //            string lang = match.Groups[2].Value;
-        //            string code = match.Groups[3].Value;
-        //
-        //            var txtEdit = new TextEditor();
-        //            var highlight = HighlightingManager.Instance.GetDefinitionByExtension("." + lang);
-        //            txtEdit.SyntaxHighlighting = highlight;
-        //
-        //            txtEdit.Text = code;
-        //            txtEdit.HorizontalAlignment = HorizontalAlignment.Stretch;
-        //            txtEdit.IsReadOnly = true;
-        //
-        //            var result = new BlockUIContainer(txtEdit);
-        //            if (CodeBlockStyle != null)
-        //            {
-        //                result.Style = CodeBlockStyle;
-        //            }
-        //            if (!DisabledTag)
-        //            {
-        //                result.Tag = TagCodeBlock;
-        //            }
-        //
-        //            return result;
-        //        }
-
 
         #endregion
 

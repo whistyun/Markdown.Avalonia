@@ -3,7 +3,7 @@
     <OutputType>Library</OutputType>
     <TargetFrameworks>netcoreapp2.0;net461;netstandard2.0</TargetFrameworks>
     <PackageId>Markdown.Avalonia</PackageId>
-    <Version>0.10.1</Version>
+    <Version>0.10.2</Version>
     <Authors>Bevan Arps(original); whistyun</Authors>
     <Company />
     <Description>Markdown Controls for Avalonia</Description>
@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.10.0" />
+    <PackageReference Include="Avalonia.AvaloniaEdit" Version="0.10.0" />
   </ItemGroup>
 
   <ItemGroup>
