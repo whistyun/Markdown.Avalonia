@@ -27,7 +27,8 @@ namespace Markdown.Avalonia.Utils
                 foreach (var style in Application.Current.Styles)
                 {
                     if (style is StyleInclude incld
-                            && incld.Source?.Host == "Avalonia.Themes.Default")
+                        && incld.Source?.IsAbsoluteUri == true
+                        && incld.Source?.Host == "Avalonia.Themes.Default")
                     {
                         return _isDefaultUsed = true;
                     }
@@ -80,7 +81,9 @@ namespace Markdown.Avalonia.Utils
 
                 foreach (var style in Application.Current.Styles)
                 {
-                    if (style is StyleInclude incld && incld.Source?.Host == "AvaloniaEdit")
+                    if (style is StyleInclude incld 
+                        && incld.Source?.IsAbsoluteUri == true
+                        && incld.Source?.Host == "AvaloniaEdit")
                     {
                         return _isAvalonEditSetup = true;
                     }
