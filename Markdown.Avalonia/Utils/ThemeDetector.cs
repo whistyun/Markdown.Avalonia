@@ -56,6 +56,7 @@ namespace Markdown.Avalonia.Utils
                         return _isFluentUsed = true;
                     }
                     else if (style is StyleInclude incld
+                            && incld.Source?.IsAbsoluteUri == true
                             && incld.Source?.Host == "Avalonia.Themes.Fluent")
                     {
                         return _isFluentUsed = true;
