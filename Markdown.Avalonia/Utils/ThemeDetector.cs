@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Styling;
 using Avalonia.Themes.Fluent;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,21 @@ namespace Markdown.Avalonia.Utils
         static bool? _isDefaultUsed;
         static bool? _isFluentUsed;
         static bool _isAvalonEditSetup;
+
+        private static bool CheckStyleSourceHost(IStyle style, string hostName)
+        {
+            if (style is StyleInclude incld)
+            {
+                var uri = incld.Source;
+
+                if (uri is null) return false;
+                if (!uri.IsAbsoluteUri) return false;
+
+                try { return uri.Host == hostName; }
+                catch { return false; }
+            }
+            else return false;
+        }
 
         public static bool? IsDefaultUsed
         {
@@ -26,8 +42,7 @@ namespace Markdown.Avalonia.Utils
 
                 foreach (var style in Application.Current.Styles)
                 {
-                    if (style is StyleInclude incld
-                            && incld.Source?.Host == "Avalonia.Themes.Default")
+                    if (CheckStyleSourceHost(style, "Avalonia.Themes.Default"))
                     {
                         return _isDefaultUsed = true;
                     }
@@ -51,21 +66,13 @@ namespace Markdown.Avalonia.Utils
 
                 foreach (var style in Application.Current.Styles)
                 {
-                    try
+                    if (style is FluentTheme)
                     {
-                        if (style is FluentTheme)
-                        {
-                            return _isFluentUsed = true;
-                        }
-                        else if (style is StyleInclude incld
-                                 && incld.Source?.Host == "Avalonia.Themes.Fluent")
-                        {
-                            return _isFluentUsed = true;
-                        }
+                        return _isFluentUsed = true;
                     }
-                    catch (InvalidOperationException)
+                    if (CheckStyleSourceHost(style, "Avalonia.Themes.Fluent"))
                     {
-                        // Ignore StyleInclude from project xaml files
+                        return _isFluentUsed = true;
                     }
                 }
 
@@ -86,7 +93,7 @@ namespace Markdown.Avalonia.Utils
 
                 foreach (var style in Application.Current.Styles)
                 {
-                    if (style is StyleInclude incld && incld.Source?.Host == "AvaloniaEdit")
+                    if (CheckStyleSourceHost(style, "AvaloniaEdit"))
                     {
                         return _isAvalonEditSetup = true;
                     }

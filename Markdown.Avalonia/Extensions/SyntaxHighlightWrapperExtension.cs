@@ -208,24 +208,28 @@ namespace Markdown.Avalonia.Extensions
 
         public override IBrush GetBrush(ITextRunConstructionContext context)
         {
-            return new SolidColorBrush(GetColor(context).Value);
+            var originalBrush = baseBrush.GetBrush(context);
+
+            return (originalBrush is ISolidColorBrush sbrsh) ?
+                 new SolidColorBrush(WrapColor(sbrsh.Color)) :
+                 originalBrush;
         }
 
         public override Color? GetColor(ITextRunConstructionContext context)
         {
-            Color color;
-
             if (baseBrush.GetBrush(context) is ISolidColorBrush sbrsh)
             {
-                color = sbrsh.Color;
+                return WrapColor(sbrsh.Color);
             }
             else
             {
                 var colorN = this.baseBrush.GetColor(context);
-                if (colorN.HasValue) color = colorN.Value;
-                else return fore;
+                return colorN.HasValue ? WrapColor(colorN.Value) : colorN;
             }
+        }
 
+        private Color WrapColor(Color color)
+        {
             if (color.A == 0) return color;
 
             var foreMax = Math.Max(fore.R, Math.Max(fore.G, fore.B));

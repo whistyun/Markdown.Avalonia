@@ -11,5 +11,6 @@
     <StyleInclude Source="avares://Avalonia.Themes.Fluent/FluentDark.xaml"/>
     -->
     <StyleInclude Source="avares://Avalonia.Themes.Fluent/FluentLight.xaml"/>
+    <StyleInclude Source="/Assets/AppendingStyles.axaml"/>
   </Application.Styles>
 </Application>
