@@ -51,14 +51,21 @@ namespace Markdown.Avalonia.Utils
 
                 foreach (var style in Application.Current.Styles)
                 {
-                    if (style is FluentTheme)
+                    try
                     {
-                        return _isFluentUsed = true;
+                        if (style is FluentTheme)
+                        {
+                            return _isFluentUsed = true;
+                        }
+                        else if (style is StyleInclude incld
+                                 && incld.Source?.Host == "Avalonia.Themes.Fluent")
+                        {
+                            return _isFluentUsed = true;
+                        }
                     }
-                    else if (style is StyleInclude incld
-                            && incld.Source?.Host == "Avalonia.Themes.Fluent")
+                    catch (InvalidOperationException)
                     {
-                        return _isFluentUsed = true;
+                        // Ignore StyleInclude from project xaml files
                     }
                 }
 
