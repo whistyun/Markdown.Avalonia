@@ -31,8 +31,12 @@ namespace Markdown.AvaloniaDemo
             if (ctrl.Styles.Count == 0)
             {
                 ctrl.Styles.Add(style);
+                return src;
             }
-            else
+
+            var oldStyle = ctrl.Styles[0];
+
+            if (!(oldStyle is StyleInclude oldStyleInc && oldStyleInc.Source == style.Source))
             {
                 ctrl.Styles[0] = style;
             }
