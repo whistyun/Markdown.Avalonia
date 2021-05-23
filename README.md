@@ -18,6 +18,8 @@ https://www.nuget.org/packages/Markdown.Avalonia/
 The table of compability with Avalonia's version
 | AvaloniaUI      | Markdown.Avalonia |
 |-----------------|-------------------|
+| 0.10.1～0.10.5  | 0.10.4            |
+| 0.10.0          | 0.10.1～0.10.3    |
 | 0.10.0-rc1      | 0.10.0-a5～a7     |
 | 0.10.0-preview6 | 0.10.0-a1～a4     |
 | 0.9.11          | 0.9.0-a1～a7      |
