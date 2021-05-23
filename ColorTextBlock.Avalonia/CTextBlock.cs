@@ -368,7 +368,7 @@ namespace ColorTextBlock.Avalonia
 
         internal void OnMeasureSourceChanged()
         {
-            ClearValue(BaseHeightProperty);
+            SetValue(BaseHeightProperty, default(double));
             InvalidateMeasure();
         }
 

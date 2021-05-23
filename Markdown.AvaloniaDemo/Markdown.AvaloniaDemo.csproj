@@ -4,17 +4,16 @@
     <TargetFrameworks>netcoreapp3.1;net461;netcoreapp2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
   <ItemGroup>
     <AvaloniaXaml Remove="Assets\AppendingStyles.axaml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0" />
-    <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="0.10.0" />
+    <PackageReference Include="Avalonia" Version="0.10.5" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.5" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.5" />
+    <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="0.10.5" />
     <None Remove="Assets\XamlTemplate.txt" />
   </ItemGroup>
   <ItemGroup>

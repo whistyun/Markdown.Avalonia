@@ -31,8 +31,11 @@ namespace Markdown.AvaloniaFluentDemo
             if (app.Styles.Count == 0)
             {
                 app.Styles.Add(style);
+                return src;
             }
-            else
+
+            var oldStyle = app.Styles[0];
+            if (!(oldStyle is StyleInclude oldStyleInc && oldStyleInc.Source == style.Source))
             {
                 app.Styles[0] = style;
             }

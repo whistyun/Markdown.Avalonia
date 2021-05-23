@@ -18,6 +18,8 @@ namespace Markdown.AvaloniaFluentDemo
         public static AttachedProperty<string> MyIdProperty =
             AvaloniaProperty.RegisterAttached<DynamicStyleBehavior, Styles, string>("MyId");
 
+        public static AttachedProperty<string> MyLastParsedProperty =
+            AvaloniaProperty.RegisterAttached<DynamicStyleBehavior, MarkdownScrollViewer, string>("MyLastParsed");
 
         public static AttachedProperty<string> XamlTextProperty =
             AvaloniaProperty.RegisterAttached<DynamicStyleBehavior, MarkdownScrollViewer, string>(
@@ -33,6 +35,9 @@ namespace Markdown.AvaloniaFluentDemo
 
             try
             {
+                var old = ctrl.GetValue(MyLastParsedProperty);
+                if (old == xamlTxt) return xamlTxt;
+
                 var style = (Styles)AvaloniaRuntimeXamlLoader.Load(xamlTxt);
                 style.SetValue(MyIdProperty, nameof(DynamicStyleBehavior));
 
@@ -41,8 +46,8 @@ namespace Markdown.AvaloniaFluentDemo
                         if (existsStyle.GetValue(MyIdProperty) == nameof(DynamicStyleBehavior))
                             ctrl.Styles.Remove(exists);
 
+                ctrl.SetValue(MyLastParsedProperty, xamlTxt);
                 ctrl.Styles.Add(style);
-                //ctrl.ResetContent();
 
                 var resultMsgr = ctrl.GetValue(ValidationResultProperty);
                 resultMsgr?.Execute(null);

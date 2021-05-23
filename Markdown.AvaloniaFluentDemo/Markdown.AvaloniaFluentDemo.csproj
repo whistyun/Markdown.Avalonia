@@ -8,10 +8,10 @@
     <AvaloniaResource Include="Assets2\**" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0" />
-    <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="0.10.0" />
+    <PackageReference Include="Avalonia" Version="0.10.5" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.5" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.5" />
+    <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="0.10.5" />
     <None Remove="Assets\XamlTemplate.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -25,8 +25,5 @@
     <None Update="MainWindow.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
   </ItemGroup>
 </Project>
