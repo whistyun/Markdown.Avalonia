@@ -110,7 +110,7 @@ namespace Markdown.Avalonia.Utils
 
             Compact();
 
-            Bitmap imgSource = null;
+            Bitmap imgSource;
 
             try
             {
@@ -124,22 +124,29 @@ namespace Markdown.Avalonia.Utils
                         break;
 
                     case "file":
+                        if (!File.Exists(url.LocalPath)) return null;
+
                         using (var strm = File.OpenRead(url.LocalPath))
                             imgSource = new Bitmap(strm);
                         break;
 
                     case "avares":
+                        if (!AssetLoader.Exists(url)) return null;
+
                         using (var strm = AssetLoader.Open(url))
                             imgSource = new Bitmap(strm);
                         break;
+
+                    default:
+                        throw new InvalidDataException($"unsupport scheme '{url.Scheme}'");
                 }
             }
-            catch { }
-
-            if (imgSource != null)
+            catch
             {
-                Cache[url] = new WeakReference<Bitmap>(imgSource);
+                return null;
             }
+
+            Cache[url] = new WeakReference<Bitmap>(imgSource);
 
             return imgSource;
         }
