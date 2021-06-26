@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ColorTextBlock.Avalonia.Fonts
 {
-    internal class FontFamilyCollecter
+    internal class FontFamilyCollector
     {
         public static FontFamily TryGetMonospace()
         {
