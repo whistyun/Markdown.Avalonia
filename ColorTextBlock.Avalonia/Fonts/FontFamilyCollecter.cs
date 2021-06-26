@@ -18,7 +18,7 @@ namespace ColorTextBlock.Avalonia.Fonts
                 "inconsolata",
                 "courier new",
                 "monospace",
-                "droid sans fallback"
+                "dejavu sans mono",
             };
 
             var monospaceName = FontManager.Current.GetInstalledFontFamilyNames()
