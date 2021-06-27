@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{AD84CF32
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTest.Base", "tests\UnitTest.Base\UnitTest.Base.csproj", "{B5F20CDD-025F-4BD8-A1AF-0F3EC9B6E8E4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTest.CTxt", "tests\UnitTest.Ctxt\UnitTest.CTxt.csproj", "{A3A5D851-4041-403A-95F9-F4ADBA9602A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTest.CTxt", "tests\UnitTest.CTxt\UnitTest.CTxt.csproj", "{A3A5D851-4041-403A-95F9-F4ADBA9602A0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTest.Md", "tests\UnitTest.Md\UnitTest.Md.csproj", "{C763BC05-5587-479E-8225-AA33F1F8F55B}"
 EndProject

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ColorTextBlock.Avalonia.Fonts
 {
-    internal class FontFamilyCollecter
+    internal class FontFamilyCollector
     {
         public static FontFamily TryGetMonospace()
         {
@@ -18,7 +18,7 @@ namespace ColorTextBlock.Avalonia.Fonts
                 "inconsolata",
                 "courier new",
                 "monospace",
-                "droid sans fallback"
+                "dejavu sans mono",
             };
 
             var monospaceName = FontManager.Current.GetInstalledFontFamilyNames()

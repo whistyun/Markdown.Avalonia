@@ -10,7 +10,7 @@ namespace ColorTextBlock.Avalonia
         public static readonly StyledProperty<FontFamily> MonospaceFontFamilyProperty =
             AvaloniaProperty.Register<CCode, FontFamily>(
                 nameof(MonospaceFontFamily),
-                defaultValue: FontFamilyCollecter.TryGetMonospace() ?? FontFamily.Default,
+                defaultValue: FontFamilyCollector.TryGetMonospace() ?? FontFamily.Default,
                 inherits: true);
 
         public CCode() { }
