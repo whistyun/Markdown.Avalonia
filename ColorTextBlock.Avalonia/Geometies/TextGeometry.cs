@@ -1,33 +1,27 @@
 ﻿using Avalonia;
 using Avalonia.Media;
+using Avalonia.Media.TextFormatting;
+using System.Linq;
 
 namespace ColorTextBlock.Avalonia.Geometries
 {
-    public class TextGeometry : CGeometry
+    internal abstract class TextGeometry : CGeometry
     {
-        public string Text { get; }
+        private CInline Owner;
 
         private IBrush _TemporaryForeground;
         public IBrush TemporaryForeground
         {
             get => _TemporaryForeground;
-            set
-            {
-                _TemporaryForeground = value;
-            }
+            set => _TemporaryForeground = value;
         }
 
         private IBrush _TemporaryBackground;
         public IBrush TemporaryBackground
         {
             get => _TemporaryBackground;
-            set
-            {
-                _TemporaryBackground = value;
-            }
+            set => _TemporaryBackground = value;
         }
-
-        private CInline Owner;
 
         public IBrush Foreground
         {
@@ -46,81 +40,92 @@ namespace ColorTextBlock.Avalonia.Geometries
             get => Owner is null ? false : Owner.IsStrikethrough;
         }
 
-        public bool IsLineBreakMarker => Format is null && Width == 0;
-
-        private FormattedText Format;
-
         internal TextGeometry(
-            double width, double height,
-            TextVerticalAlignment alignment,
-            bool linebreak,
-            string text, FormattedText format) :
-            base(width, height, height, alignment, linebreak)
-        {
-            this.Text = text;
-            this.Format = format;
-        }
-
-        internal TextGeometry(
-            double width, double height,
-            bool linebreak,
             CInline owner,
-            string text, FormattedText format) :
-            base(width, height, height, owner.TextVerticalAlignment, linebreak)
+            double width, double height, double lineHeight,
+            TextVerticalAlignment alignment,
+            bool linebreak) :
+            base(width, height, lineHeight, alignment, linebreak)
         {
-            this.Text = text;
-            this.Format = format;
-            this.Owner = owner;
+            Owner = owner;
+        }
+    }
+
+    internal class LineBreakMarkGeometry : TextGeometry
+    {
+        internal LineBreakMarkGeometry(
+            CInline owner,
+            TextLayout layout) :
+            base(owner, 0, layout.Size.Height, layout.Size.Height, TextVerticalAlignment.Base, true)
+        {
+        }
+        internal LineBreakMarkGeometry(CInline owner) :
+            base(owner, 0, 0, 0, TextVerticalAlignment.Base, true)
+        {
         }
 
-        internal static TextGeometry NewLine()
-        {
-            return new TextGeometry(
-                0, 0,
-                TextVerticalAlignment.Base,
-                true,
-                "", null);
-        }
+        public override void Render(DrawingContext ctx) { }
+    }
 
-        internal static TextGeometry NewLine(FormattedText format)
+    internal class SingleTextLayoutGeometry : TextGeometry
+    {
+        private string Text { get; }
+        private TextLayoutCreator Creator { get; }
+        private TextLayout Layout { set; get; }
+        private IBrush LayoutForeground { set; get; }
+
+        internal SingleTextLayoutGeometry(
+            CInline owner,
+            TextLayout layout,
+            TextLayoutCreator creator,
+            TextVerticalAlignment align,
+            string text,
+            bool linebreak) :
+            base(owner, layout.Size.Width, layout.Size.Height, layout.Size.Height, align, linebreak)
         {
-            return new TextGeometry(
-                0, format.Bounds.Height,
-                TextVerticalAlignment.Base,
-                true,
-                "", null);
+            Creator = creator;
+            Layout = layout;
+            LayoutForeground = owner.Foreground;
+            Text = text;
         }
 
         public override void Render(DrawingContext ctx)
         {
-            if (IsLineBreakMarker) return;
+            var foreground = TemporaryForeground ?? Foreground;
+            var background = TemporaryBackground ?? Background;
 
-            var foreground = _TemporaryForeground ?? Foreground;
-            var background = _TemporaryBackground ?? Background;
-            if (background != null)
+            if (LayoutForeground != foreground)
             {
-                ctx.FillRectangle(background, new Rect(Left, Top, Width, Height));
+                LayoutForeground = foreground;
+                Layout = Creator(Text, LayoutForeground);
             }
 
-            var pen = new Pen(foreground);
-
-
-            Format.Text = Text;
-            ctx.DrawText(foreground, new Point(Left, Top), Format);
-
-            if (IsUnderline)
+            using (ctx.PushPostTransform(Matrix.CreateTranslation(Left, Top)))
             {
-                ctx.DrawLine(pen,
-                    new Point(Left, Top + Height),
-                    new Point(Left + Width, Top + Height));
-            }
+                if (background != null)
+                {
+                    ctx.FillRectangle(background, new Rect(0, 0, Width, Height));
+                }
 
-            if (IsStrikethrough)
-            {
-                ctx.DrawLine(pen,
-                    new Point(Left, Top + Height / 2),
-                    new Point(Left + Width, Top + Height / 2));
+                Layout.Draw(ctx);
+
+                var pen = new Pen(foreground);
+                if (IsUnderline)
+                {
+                    ctx.DrawLine(pen,
+                        new Point(0, Height),
+                        new Point(Width, Height));
+                }
+
+                if (IsStrikethrough)
+                {
+                    ctx.DrawLine(pen,
+                        new Point(0, Height / 2),
+                        new Point(Width, Height / 2));
+                }
             }
         }
     }
+
+    internal delegate TextLayout TextLayoutCreator(string text, IBrush foreground);
 }

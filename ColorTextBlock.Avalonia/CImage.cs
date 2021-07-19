@@ -126,7 +126,7 @@ namespace ColorTextBlock.Avalonia
             {
                 if (entireWidth != remainWidth)
                 {
-                    yield return TextGeometry.NewLine();
+                    yield return new LineBreakMarkGeometry(this);
                 }
 
                 if (FittingWhenProtrude && imageWidth > entireWidth)
