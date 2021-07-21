@@ -41,7 +41,6 @@ namespace ColorTextBlock.Avalonia
 
             if (String.IsNullOrEmpty(Text))
             {
-                Console.WriteLine("????"); // TODO: Check
                 yield break;
             }
 
