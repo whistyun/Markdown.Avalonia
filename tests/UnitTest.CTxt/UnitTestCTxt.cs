@@ -205,6 +205,21 @@ namespace UnitTest.CTxt
                 Approvals.GetDefaultNamer(),
                 new DiffToolReporter(DiffEngine.DiffTool.WinMerge));
         }
+
+        [Test]
+        [RunOnUI]
+        public void GivenTest7_generatesExpectedResult()
+        {
+            var tst6 = new Test7();
+            var ctxt = (Grid)tst6.Content;
+
+            var info = new MetryHolder(ctxt, 1248, 1000);
+
+            Approvals.Verify(
+                new ApprovalImageWriter(info.Image),
+                Approvals.GetDefaultNamer(),
+                new DiffToolReporter(DiffEngine.DiffTool.WinMerge));
+        }
     }
 
     class MetryHolder : AvaloniaObject

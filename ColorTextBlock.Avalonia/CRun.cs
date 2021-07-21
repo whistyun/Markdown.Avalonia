@@ -44,29 +44,21 @@ namespace ColorTextBlock.Avalonia
                 Console.WriteLine("????"); // TODO: Check
                 yield break;
             }
-            /*
-             * It is hacking-resolution for 'line breaking rules'.
-             * 
-             * TODO 後で、英訳する。
-             * 
-             * Avalonia(9.11)のFormattedTextでは、
-             * 矩形範囲に単一のスタイルで文字描画したときの改行位置しか計算できません。
-             * 
-             * そのため、 既に適当な文字を入力した後に、追加で別の文言を描画しようとした時、
-             * 以下のどちらの理由で改行が発生したか判断ができません。
-             * 
-             * 　理由1.余白が小さすぎるため改行が行われた
-             * 　理由2.描画領域が狭く(あるいは単語が長すぎるため)無理やり改行が行われた
-             * 
-             * 先頭にスペースを入れて改行位置を計算させることで、
-             * 理由1でも理由2でも先頭で改行が行われるようにしています。
-             * (この場合、スペース1文字を追加したために理由1に該当してしまう可能性がありますが、
-             *  スペースの横幅は小さいため、不自然には見えないと期待しています)
-             */
+
             string entireText = Text;
 
             if (remainWidth != entireWidth)
             {
+                /*
+                 * It is hacking-resolution for 'line breaking rules'.
+                 * 
+                 * insert one space in the head to detect the line break position
+                 *   |                        |                 |                        |
+                 *   | xxxxxx xxxxxx          |   rather than   | xxxxxx xxxxxx internat |
+                 *   | internationalization   |                 | ionalization           |
+                 *   |                        |                 |                        |
+                 */
+
                 var firstTxtLen =
                         creator.Create(" " + entireText, Foreground, remainWidth)
                             .TextLines.First().TextRange.Length;
@@ -92,13 +84,21 @@ namespace ColorTextBlock.Avalonia
 
             if (midlayout.TextLines.Count >= 2)
             {
-                var lastStart = midlayout.TextLines.Last().TextRange.Start;
+                //var lastStart = midlayout.TextLines.Last().TextRange.Start;
+                //
+                //var midTxt = entireText.Substring(0, lastStart);
+                //var lstTxt = entireText.Substring(lastStart);
+                //yield return NewGeometry2(midTxt, true, entireWidth);
+                //yield return NewGeometry(lstTxt, false);
 
-                // TODO split linebreak
-                var midTxt = entireText.Substring(0, lastStart);
-                var lstTxt = entireText.Substring(lastStart);
-                yield return NewGeometry2(midTxt, lstTxt != "", entireWidth);
-                yield return NewGeometry(lstTxt, false);
+                var ranges = midlayout.TextLines.Select(ln => ln.TextRange).ToArray();
+                var lastRange = ranges[ranges.Length - 1];
+
+                foreach (var range in ranges)
+                {
+                    var line = entireText.Substring(range.Start, range.Length);
+                    yield return NewGeometry(line, !range.Equals(lastRange));
+                }
             }
             else
             {

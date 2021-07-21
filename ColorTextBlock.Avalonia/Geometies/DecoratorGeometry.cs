@@ -133,7 +133,7 @@ namespace ColorTextBlock.Avalonia.Geometries
                 decorate);
         }
 
-        internal DecoratorGeometry(
+        private DecoratorGeometry(
             double w, double h, double lh,
             CSpan owner,
             CGeometry[] targets,
