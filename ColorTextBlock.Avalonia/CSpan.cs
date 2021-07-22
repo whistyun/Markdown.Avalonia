@@ -201,7 +201,7 @@ namespace ColorTextBlock.Avalonia
                 foreach (var adding in metries)
                 {
                     // save linebreak before span
-                    if (adding is TextGeometry t && t.IsLineBreakMarker && buffer.Count == 0)
+                    if (adding is LineBreakMarkGeometry && buffer.Count == 0)
                     {
                         renew.Add(adding);
                         continue;

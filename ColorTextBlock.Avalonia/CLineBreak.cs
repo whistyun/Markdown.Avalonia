@@ -16,22 +16,14 @@ namespace ColorTextBlock.Avalonia
             double entireWidth,
             double remainWidth)
         {
-            var family = FontFamily;
-            var size = FontSize;
-            var style = FontStyle;
-            var weight = FontWeight;
-            var foreground = Foreground;
-            var background = Background;
-            var underline = IsUnderline;
-            var strikethrough = IsStrikethrough;
 
-            FormattedText fmt = Measure(Size.Infinity, family, size, style, weight, TextWrapping.Wrap);
-            fmt.Text = "Ty";
+            var creator = new LayoutCreateor(
+                FontFamily,
+                FontStyle,
+                FontWeight,
+                FontSize);
 
-            yield return new TextGeometry(
-                0, fmt.Bounds.Height, true,
-                this,
-                "", null);
+            yield return new LineBreakMarkGeometry(this, creator.Create("Ty", Foreground));
         }
     }
 }

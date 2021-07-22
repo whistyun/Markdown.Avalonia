@@ -22,6 +22,9 @@
     <Compile Update="Xamls\Test5.axaml.cs">
       <DependentUpon>Test5.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Xamls\Test7.axaml.cs">
+      <DependentUpon>Test7.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>
