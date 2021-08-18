@@ -1,4 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\UnitTest.props" />
+
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
@@ -10,14 +13,6 @@
     <EmbeddedResource Include="Texts\*" />
   </ItemGroup>
 
-  <Import Project="..\UnitTest.props" />
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\ColorTextBlock.Avalonia\ColorTextBlock.Avalonia.csproj" />
-    <ProjectReference Include="..\..\Markdown.Avalonia\Markdown.Avalonia.csproj" />
-    <ProjectReference Include="..\UnitTest.Base\UnitTest.Base.csproj" />
-  </ItemGroup>
-
   <ItemGroup>
     <Compile Update="Xamls\Test5.axaml.cs">
       <DependentUpon>Test5.axaml</DependentUpon>
@@ -27,4 +22,19 @@
     </Compile>
   </ItemGroup>
 
+  <ItemGroup Condition="'$(AvaloniaVersion)'==''">
+    <PackageReference Include="Avalonia" Version="$(DefaultAvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Desktop" Version="$(DefaultAvaloniaVersion)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(AvaloniaVersion)'!=''">
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\ColorTextBlock.Avalonia\ColorTextBlock.Avalonia.csproj" />
+    <ProjectReference Include="..\..\Markdown.Avalonia\Markdown.Avalonia.csproj" />
+    <ProjectReference Include="..\UnitTest.Base\UnitTest.Base.csproj" />
+  </ItemGroup>
 </Project>
