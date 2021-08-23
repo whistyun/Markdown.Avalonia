@@ -125,6 +125,7 @@
 
   <Style Selector="avedit|TextEditor">
     <Setter Property="SyntaxHighlighting" Value="{mde:SyntaxHighlightWrapper SystemBaseHighColor}"/>
+    <Setter Property="VerticalScrollBarVisibility" Value="Disabled"/>
   </Style>
 
   <Style Selector="Border.Note">
