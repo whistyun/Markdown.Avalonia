@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Xml;
@@ -8,6 +9,16 @@ namespace UnitTest.Base.Utils
 {
     public static class Util
     {
+        public static string[] GetTextNames()
+        {
+            var caller = Assembly.GetCallingAssembly();
+            string resourceKey = caller.GetName().Name + ".Texts.";
+
+            return caller.GetManifestResourceNames()
+                         .Where(nm => nm.StartsWith(resourceKey))
+                         .Select(nm=>nm.Substring(resourceKey.Length))
+                         .ToArray();
+        }
 
         public static string LoadText(string name)
         {

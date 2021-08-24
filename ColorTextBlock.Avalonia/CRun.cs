@@ -52,10 +52,12 @@ namespace ColorTextBlock.Avalonia
                  * It is hacking-resolution for 'line breaking rules'.
                  * 
                  * insert one space in the head to detect the line break position
+                 * 
                  *   |                        |                 |                        |
                  *   | xxxxxx xxxxxx          |   rather than   | xxxxxx xxxxxx internat |
                  *   | internationalization   |                 | ionalization           |
                  *   |                        |                 |                        |
+                 *
                  */
 
                 var firstTxtLen =
@@ -83,18 +85,17 @@ namespace ColorTextBlock.Avalonia
 
             if (midlayout.TextLines.Count >= 2)
             {
-                //var lastStart = midlayout.TextLines.Last().TextRange.Start;
-                //
-                //var midTxt = entireText.Substring(0, lastStart);
-                //var lstTxt = entireText.Substring(lastStart);
-                //yield return NewGeometry2(midTxt, true, entireWidth);
-                //yield return NewGeometry(lstTxt, false);
-
                 var ranges = midlayout.TextLines.Select(ln => ln.TextRange).ToArray();
                 var lastRange = ranges[ranges.Length - 1];
 
                 foreach (var range in ranges)
                 {
+                    // If the text ends with a line break,
+                    // the empty line which indicate the last caret position of text is appeared.
+                    // AvaloniaUI/Avalonia#6454
+                    if (entireText.Length <= range.Start)
+                        break;
+
                     var line = entireText.Substring(range.Start, range.Length);
                     yield return NewGeometry(line, !range.Equals(lastRange));
                 }
