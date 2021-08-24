@@ -90,10 +90,11 @@ namespace ColorTextBlock.Avalonia
 
                 foreach (var range in ranges)
                 {
-                    // In rare cases, TextLines has a unexpectly TextRange
-                    // that is outside tha range of inputed text.
-                    if (entireText.Length < range.End || entireText.Length <= range.Start)
-                        continue;
+                    // If the text ends with a line break,
+                    // the empty line which indicate the last caret position of text is appeared.
+                    // AvaloniaUI/Avalonia#6454
+                    if (entireText.Length <= range.Start)
+                        break;
 
                     var line = entireText.Substring(range.Start, range.Length);
                     yield return NewGeometry(line, !range.Equals(lastRange));
