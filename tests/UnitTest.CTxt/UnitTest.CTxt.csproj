@@ -10,7 +10,13 @@
   <ItemGroup>
     <AvaloniaResource Include="Assets\Fonts\license.html" />
     <AvaloniaResource Include="Assets\Fonts\ume-ugo4.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Texts\*" />
+    <EmbeddedResource Include="..\UnitTest.Md\Texts\*">
+      <Link>Texts\%(Filename)%(Extension)</Link>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -37,4 +43,5 @@
     <ProjectReference Include="..\..\Markdown.Avalonia\Markdown.Avalonia.csproj" />
     <ProjectReference Include="..\UnitTest.Base\UnitTest.Base.csproj" />
   </ItemGroup>
+
 </Project>

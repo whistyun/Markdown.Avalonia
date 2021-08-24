@@ -125,6 +125,34 @@ namespace UnitTest.CTxt
                 new DiffToolReporter(DiffEngine.DiffTool.WinMerge));
         }
 
+        [Test]
+        [RunOnUI]
+        public void GivenTest_drawableSomeMds()
+        {
+            foreach (var mdname in Util.GetTextNames().Where(nm => nm.EndsWith(".md")))
+            {
+                var text = Util.LoadText(mdname);
+                var markdown = new Markdown.Avalonia.Markdown();
+                var control = markdown.Transform(text);
+
+                control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Default/"))
+                {
+                    Source = new Uri("avares://Avalonia.Themes.Default/DefaultTheme.xaml")
+                });
+                control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Default/"))
+                {
+                    Source = new Uri("avares://Avalonia.Themes.Default/Accents/BaseLight.xaml")
+                });
+                control.Styles.Add(MarkdownStyle.DefaultTheme);
+                control.Resources.Add("FontSizeNormal", 16d);
+
+                var umefont = new FontFamily(new Uri("avares://UnitTest.CTxt/Assets/Fonts/ume-ugo4.ttf"), "Ume UI Gothic");
+                TextBlock.SetFontFamily(control, umefont);
+
+                var info = new MetryHolder(control, 500, 10000);
+            }
+        }
+
         /*
          * On Github Action, this test don't pass.
          * But on my environment, this test pass.
