@@ -1,7 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\Markdown.Avalonia.props" />
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>$(DemoAppTargetFrameworks)</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
@@ -15,8 +18,11 @@
     <None Remove="Assets\XamlTemplate.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\tests\UnitTest.Base\Utils\BrokenXamlWriter.cs" Link="BrokenXamlWriter.cs" />
+    <Compile Include="..\tests\UnitTest.Base\Utils\Util.cs" Link="Util.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Markdown.Avalonia\Markdown.Avalonia.csproj" />
-    <ProjectReference Include="..\tests\UnitTest.Base\UnitTest.Base.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="LocalPath.png">

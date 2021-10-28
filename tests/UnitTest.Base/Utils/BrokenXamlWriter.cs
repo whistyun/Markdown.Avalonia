@@ -106,7 +106,7 @@ namespace UnitTest.Base.Utils
         private string GeneratePrefixFor(Assembly asm)
         {
             // 'Markdown.Avalonia' -> "ma"
-            string full = String.Join("", asm.GetName().Name.Split(".")
+            string full = String.Join("", asm.GetName().Name.Split('.')
                                              .Select(nmchip => nmchip[0].ToString().ToLower()));
 
             // When full is 'yoghurt', Try 'y', 'yo', 'yog', ...
