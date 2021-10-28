@@ -17,10 +17,10 @@
   <PropertyGroup>
     <TestTargetFrameworks>netcoreapp3.1</TestTargetFrameworks>
   </PropertyGroup>
-  <PropertyGroup Condition="exists('$(AVA_VER)')">
+  <PropertyGroup Condition=" '$(AVA_VER)' != '' ">
     <TestAvaloniaVersion>$(AVA_VER)</TestAvaloniaVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="! exists('$(AVA_VER)')">
+  <PropertyGroup Condition=" '$(AVA_VER)' == '' ">
     <TestAvaloniaVersion>0.10.10</TestAvaloniaVersion>
   </PropertyGroup>
 
