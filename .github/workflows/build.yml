@@ -1,15 +1,16 @@
 name: .NET
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
 
 jobs:
   build:
-
     runs-on: windows-latest
+
+    strategy:
+      matrix:
+        versions: [ 0.10.0, 0.10.8, 0.10.9, 0.10.10]
 
     steps:
     - uses: actions/checkout@v2
@@ -18,12 +19,20 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.301
-    - name: Clean package cache as a temporary workaround for actions/setup-dotnet#155
-      run: dotnet clean && dotnet nuget locals all --clear
+        dotnet-version: 3.1.x
+    - name: Clean
+      run: dotnet clean
+      env:
+        AVA_VER: ${{ matrix.versions }}
     - name: Restore
       run: dotnet restore
+      env:
+        AVA_VER: ${{ matrix.versions }}
     - name: Build
       run: dotnet build --no-restore
+      env:
+        AVA_VER: ${{ matrix.versions }}
     - name: Test
       run: dotnet test --no-build --verbosity normal
+      env:
+        AVA_VER: ${{ matrix.versions }}

@@ -1,9 +1,33 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
+
+  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
     <PackageTargetFrameworks>netcoreapp2.0;net461;netstandard2.0</PackageTargetFrameworks>
-    <PackageVersion>0.10.7</PackageVersion>
+    <DemoAppTargetFrameworks>netcoreapp3.1;net461;netcoreapp2.0</DemoAppTargetFrameworks>
   </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(OS)' != 'Windows_NT' ">
+    <PackageTargetFrameworks>netcoreapp2.0;netstandard2.0</PackageTargetFrameworks>
+    <DemoAppTargetFrameworks>netcoreapp3.1;netcoreapp2.0</DemoAppTargetFrameworks>
+  </PropertyGroup>
+
   <PropertyGroup>
     <AvaloniaVersion>0.10.0</AvaloniaVersion>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <TestTargetFrameworks>netcoreapp3.1</TestTargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(AVA_VER)' != '' ">
+    <TestAvaloniaVersion>$(AVA_VER)</TestAvaloniaVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(AVA_VER)' == '' ">
+    <TestAvaloniaVersion>0.10.10</TestAvaloniaVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageVersion>0.10.7</PackageVersion>
+  </PropertyGroup>
+
 </Project>
+
+

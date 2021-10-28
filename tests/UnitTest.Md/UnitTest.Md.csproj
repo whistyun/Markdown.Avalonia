@@ -3,7 +3,7 @@
   <Import Project="..\UnitTest.props" />
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>$(TestTargetFrameworks)</TargetFrameworks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -15,14 +15,9 @@
     <None Remove="Texts\Codes.md" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(AvaloniaVersion)'==''">
-    <PackageReference Include="Avalonia" Version="$(DefaultAvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Desktop" Version="$(DefaultAvaloniaVersion)" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(AvaloniaVersion)'!=''">
-    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(TestAvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Desktop" Version="$(TestAvaloniaVersion)" />
   </ItemGroup>
 
   <ItemGroup>
