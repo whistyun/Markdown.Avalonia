@@ -1092,7 +1092,7 @@ namespace Markdown.Avalonia
 
             return Evaluate(
                             text, _containerBlockFirst, ContainerBlockEvaluator,
-                            sn => Evaluate(sn, _blockquote, ContainerBlockEvaluator, defaultHandler)
+                            sn => Evaluate(sn, _containerBlockFirst, ContainerBlockEvaluator, defaultHandler)
                            );
         }
         
