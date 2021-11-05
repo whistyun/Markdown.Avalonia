@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
@@ -99,6 +99,8 @@ namespace Markdown.Avalonia
             }
         }
 
+        public IContainerBlockHandler ContainerBlockHandler { get; set; }
+
         private Bitmap ImageNotFound { get; }
 
         #region dependencyobject property
@@ -157,13 +159,14 @@ namespace Markdown.Avalonia
                 text,
                 _codeBlockFirst, CodeBlocksWithLangEvaluator,
                 _listLevel > 0 ? _listNested : _listTopLevel, ListEvaluator,
-                s1 => DoBlockquotes(s1,
-                s2 => DoHeaders(s2,
-                s3 => DoHorizontalRules(s3,
-                s4 => DoTable(s4,
-                s5 => DoNote(s5, supportTextAlignment,
-                s6 => DoIndentCodeBlock(s6,
-                sn => FormParagraphs(sn, supportTextAlignment)))))))
+                s1 => DoContainerBlock(s1,
+                s2 => DoBlockquotes(s2,
+                s3 => DoHeaders(s3,
+                s4 => DoHorizontalRules(s4,
+                s5 => DoTable(s5,
+                s6 => DoNote(s6, supportTextAlignment,
+                s7 => DoIndentCodeBlock(s7,
+                sn => FormParagraphs(sn, supportTextAlignment))))))) )
             );
         }
 
@@ -934,7 +937,6 @@ namespace Markdown.Avalonia
 
         #endregion
 
-
         #region grammer - table
 
         private static readonly Regex _table = new Regex(@"
@@ -1067,7 +1069,53 @@ namespace Markdown.Avalonia
 
         #endregion
 
+        #region grammer - container block
 
+        private static Regex _containerBlockFirst = new Regex(@"
+                    ^          # Character before opening
+                    [ ]{0,3}
+                    (:{3,})          # $1 = Opening run of `
+                    ([^\n`]*)        # $2 = The container type
+                    \n
+                    ((.|\n)+?)       # $3 = The code block
+                    \n[ ]*
+                    \1
+                    (?!:)[\n]+", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
+
+        
+        private IEnumerable<Control> DoContainerBlock(string text, Func<string, IEnumerable<Control>> defaultHandler)
+        {
+            if (text is null)
+            {
+                Helper.ThrowArgNull(nameof(text));
+            }
+
+            return Evaluate(
+                            text, _containerBlockFirst, ContainerBlockEvaluator,
+                            sn => Evaluate(sn, _containerBlockFirst, ContainerBlockEvaluator, defaultHandler)
+                           );
+        }
+        
+        private Border ContainerBlockEvaluator(Match match)
+        {
+            if ( match is null )
+            {
+                Helper.ThrowArgNull(nameof(match));
+            }
+
+            if( ContainerBlockHandler == null )
+            {
+                Border _retVal = CodeBlocksEvaluator( null, match.Value );
+                _retVal.BorderBrush = Brushes.Red;
+
+                return _retVal;
+            }
+            
+            return ContainerBlockHandler?.ProvideControl( AssetPathRoot, match.Groups[2].Value, match.Groups[3].Value );
+        }
+        
+        #endregion
+        
         #region grammer - code block
 
         private static Regex _codeBlockFirst = new Regex(@"
@@ -1164,7 +1212,6 @@ namespace Markdown.Avalonia
 
         #endregion
 
-
         #region grammer - code
 
         private static Regex _codeSpan = new Regex(@"
@@ -1227,7 +1274,6 @@ namespace Markdown.Avalonia
         }
 
         #endregion
-
 
         #region grammer - textdecorations
 

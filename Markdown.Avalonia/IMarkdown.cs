@@ -13,6 +13,8 @@ namespace Markdown.Avalonia
         ICommand HyperlinkCommand { get; set; }
         IBitmapLoader BitmapLoader { get; set; }
 
+        IContainerBlockHandler ContainerBlockHandler { get; set; }
+            
         Control Transform(string text);
     }
 }
