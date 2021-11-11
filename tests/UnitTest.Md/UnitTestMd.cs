@@ -1,6 +1,8 @@
 using ApprovalTests;
 using ApprovalTests.Reporters;
+using Avalonia.Controls;
 using NUnit.Framework;
+using System.Linq;
 using UnitTest.Base;
 using UnitTest.Base.Utils;
 
@@ -138,6 +140,18 @@ namespace UnitTest.Md
 
         [Test]
         [RunOnUI]
+        public void Transform_givenContainer_generatesExpectedResult()
+        {
+            var text = Util.LoadText("ContainerBlock.md");
+            var markdown = new Markdown.Avalonia.Markdown();
+            markdown.AssetPathRoot = AssetPath;
+
+            var result = markdown.Transform(text);
+            Approvals.Verify(Util.AsXaml(result));
+        }
+
+        [Test]
+        [RunOnUI]
         public void Transform_givenEmoji()
         {
             var text = Util.LoadText("Emoji.md");
@@ -146,6 +160,64 @@ namespace UnitTest.Md
 
             var result = markdown.Transform(text);
             Approvals.Verify(Util.AsXaml(result));
+        }
+
+        [Test]
+        [RunOnUI]
+        public void CheckSwitch()
+        {
+            var markdown = new Markdown.Avalonia.Markdown();
+            markdown.ContainerBlockHandler = new Markdown.Avalonia.ContainerSwitch() {
+                { "test", new EmptyBorder("TestBorder1")},
+                { "test2", new EmptyBorder("TestBorder2")},
+            };
+
+            {
+                var control1_1 = markdown.Transform(TextUtil.HereDoc(@"
+                    ::: test{}
+                    some text
+                    :::
+                "));
+                Assert.AreEqual(1, Util.FindControlsByClassName<Border>(control1_1, "TestBorder1").Count());
+            }
+
+            {
+                var control1_2 = markdown.Transform(TextUtil.HereDoc(@"
+                    ::: test             []
+                    some text
+                    :::
+                "));
+                Assert.AreEqual(1, Util.FindControlsByClassName<Border>(control1_2, "TestBorder1").Count());
+            }
+
+            {
+                var control2 = markdown.Transform(TextUtil.HereDoc(@"
+                    :::    test2    ()
+                    some text
+                    :::
+                "));
+                Assert.AreEqual(1, Util.FindControlsByClassName<Border>(control2, "TestBorder2").Count());
+            }
+
+        }
+
+
+        class EmptyBorder : Markdown.Avalonia.Utils.IContainerBlockHandler
+        {
+            public string ClassName { private set; get; }
+
+            public EmptyBorder(string classNm)
+            {
+                ClassName = classNm;
+            }
+
+            public Avalonia.Controls.Border ProvideControl(string assetPathRoot, string blockName, string lines)
+            {
+                var border = new Avalonia.Controls.Border();
+                border.Classes.Add(ClassName);
+
+                return border;
+            }
         }
     }
 

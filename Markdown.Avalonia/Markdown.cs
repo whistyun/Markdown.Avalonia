@@ -52,6 +52,8 @@ namespace Markdown.Avalonia
         public const string Heading6Class = "Heading6";
 
         public const string CodeBlockClass = "CodeBlock";
+        public const string ContainerBlockClass = "ContainerBlock";
+        public const string NoContainerClass = "NoContainer";
         public const string BlockquoteClass = "Blockquote";
         public const string NoteClass = "Note";
 
@@ -155,18 +157,20 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(text));
             }
 
-            return Evaluate2(
+            return Evaluates(
                 text,
-                _codeBlockFirst, CodeBlocksWithLangEvaluator,
-                _listLevel > 0 ? _listNested : _listTopLevel, ListEvaluator,
-                s1 => DoContainerBlock(s1,
-                s2 => DoBlockquotes(s2,
-                s3 => DoHeaders(s3,
-                s4 => DoHorizontalRules(s4,
-                s5 => DoTable(s5,
-                s6 => DoNote(s6, supportTextAlignment,
-                s7 => DoIndentCodeBlock(s7,
-                sn => FormParagraphs(sn, supportTextAlignment))))))) )
+                new[] {
+                    Parser.Create<Control>(_codeBlockFirst, CodeBlocksWithLangEvaluator),
+                    Parser.Create<Control>(_containerBlockFirst, ContainerBlockEvaluator),
+                    Parser.Create<Control>(_listLevel > 0 ? _listNested : _listTopLevel, ListEvaluator),
+                },
+                s1 => DoBlockquotes(s1,
+                s2 => DoHeaders(s2,
+                s3 => DoHorizontalRules(s3,
+                s4 => DoTable(s4,
+                s5 => DoNote(s5, supportTextAlignment,
+                s6 => DoIndentCodeBlock(s6,
+                sn => FormParagraphs(sn, supportTextAlignment)))))))
             );
         }
 
@@ -1082,40 +1086,28 @@ namespace Markdown.Avalonia
                     \1
                     (?!:)[\n]+", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
 
-        
-        private IEnumerable<Control> DoContainerBlock(string text, Func<string, IEnumerable<Control>> defaultHandler)
-        {
-            if (text is null)
-            {
-                Helper.ThrowArgNull(nameof(text));
-            }
-
-            return Evaluate(
-                            text, _containerBlockFirst, ContainerBlockEvaluator,
-                            sn => Evaluate(sn, _containerBlockFirst, ContainerBlockEvaluator, defaultHandler)
-                           );
-        }
-        
         private Border ContainerBlockEvaluator(Match match)
         {
-            if ( match is null )
+            if (match is null)
             {
                 Helper.ThrowArgNull(nameof(match));
             }
 
-            if( ContainerBlockHandler == null )
-            {
-                Border _retVal = CodeBlocksEvaluator( null, match.Value );
-                _retVal.BorderBrush = Brushes.Red;
+            var result = ContainerBlockHandler?.ProvideControl(AssetPathRoot, match.Groups[2].Value, match.Groups[3].Value);
 
+            if (result == null)
+            {
+                Border _retVal = CodeBlocksEvaluator(null, match.Value);
+                _retVal.Classes.Add(NoContainerClass);
                 return _retVal;
             }
-            
-            return ContainerBlockHandler?.ProvideControl( AssetPathRoot, match.Groups[2].Value, match.Groups[3].Value );
+
+            result.Classes.Add(ContainerBlockClass);
+            return result;
         }
-        
+
         #endregion
-        
+
         #region grammer - code block
 
         private static Regex _codeBlockFirst = new Regex(@"
@@ -1831,11 +1823,12 @@ namespace Markdown.Avalonia
 
             return result;
         }
-        private IEnumerable<T> Evaluate2<T>(
+
+        private IEnumerable<T> Evaluates<T>(
                 string text,
-                Regex expression1, Func<Match, T> build1,
-                Regex expression2, Func<Match, IEnumerable<T>> build2,
-                Func<string, IEnumerable<T>> rest)
+                Parser<T>[] parsers,
+                Func<string, IEnumerable<T>> rest
+            )
         {
             if (text is null)
             {
@@ -1843,63 +1836,36 @@ namespace Markdown.Avalonia
             }
 
             var index = 0;
-
             var rtn = new List<T>();
 
-            var match1 = expression1.Match(text, index);
-            var match2 = expression2.Match(text, index);
-
-            IEnumerable<T> ProcPre(Match m)
+            while (true)
             {
-                var prefix = text.Substring(index, m.Index - index);
-                return rest(prefix);
-            }
+                int bestIndex = Int32.MaxValue;
+                Match bestMatch = null;
+                Parser<T> bestParser = null;
 
-            void ProcessMatch1()
-            {
-                if (match1.Index > index)
+                foreach (var parser in parsers)
                 {
-                    rtn.AddRange(ProcPre(match1));
+                    var match = parser.Match(text, index);
+                    if (match.Success && match.Index < bestIndex)
+                    {
+                        bestIndex = match.Index;
+                        bestMatch = match;
+                        bestParser = parser;
+                    }
                 }
-                rtn.Add(build1(match1));
-                index = match1.Index + match1.Length;
-            }
 
-            void ProcessMatch2()
-            {
-                if (match2.Index > index)
+                if (bestParser == null) break;
+
+                if (bestIndex > index)
                 {
-                    rtn.AddRange(ProcPre(match2));
+                    var prefix = text.Substring(index, bestIndex - index);
+                    rtn.AddRange(rest(prefix));
                 }
-                rtn.AddRange(build2(match2));
-                index = match2.Index + match2.Length;
-            }
 
-            // match1 vs match2
-            while (match1.Success && match2.Success)
-            {
-                if (match1.Index < match2.Index)
-                {
-                    ProcessMatch1();
-                }
-                else
-                {
-                    ProcessMatch2();
-                }
-                match1 = expression1.Match(text, index);
-                match2 = expression2.Match(text, index);
-            }
+                rtn.AddRange(bestParser.Convert(bestMatch));
 
-            while (match1.Success)
-            {
-                ProcessMatch1();
-                match1 = expression1.Match(text, index);
-            }
-
-            while (match2.Success)
-            {
-                ProcessMatch2();
-                match2 = expression2.Match(text, index);
+                index = bestIndex + bestMatch.Length;
             }
 
             if (index < text.Length)
@@ -1909,6 +1875,7 @@ namespace Markdown.Avalonia
             }
 
             return rtn;
+
         }
 
         private IEnumerable<T> Evaluate<T>(string text, Regex expression, Func<Match, T> build, Func<string, IEnumerable<T>> rest)
@@ -1947,5 +1914,57 @@ namespace Markdown.Avalonia
         }
 
         #endregion
+
+        static class Parser
+        {
+            public static Parser<T> Create<T>(Regex pattern, Func<Match, T> converter)
+                => new SingleParser<T>(pattern, converter);
+
+            public static Parser<T> Create<T>(Regex pattern, Func<Match, IEnumerable<T>> converter)
+                => new MultiParser<T>(pattern, converter);
+        }
+
+        abstract class Parser<T>
+        {
+            private Regex pattern;
+
+            public Parser(Regex pattern)
+            {
+                this.pattern = pattern;
+            }
+
+            public Match Match(string text, int index) => pattern.Match(text, index);
+
+            public abstract IEnumerable<T> Convert(Match match);
+        }
+
+        class SingleParser<T> : Parser<T>
+        {
+            private Func<Match, T> converter;
+
+            public SingleParser(Regex pattern, Func<Match, T> converter) : base(pattern)
+            {
+                this.converter = converter;
+            }
+
+            public override IEnumerable<T> Convert(Match match)
+            {
+                yield return converter(match);
+            }
+        }
+
+        class MultiParser<T> : Parser<T>
+        {
+            private Func<Match, IEnumerable<T>> converter;
+
+            public MultiParser(Regex pattern, Func<Match, IEnumerable<T>> converter) : base(pattern)
+            {
+                this.converter = converter;
+            }
+
+            public override IEnumerable<T> Convert(Match match) => converter(match);
+        }
+
     }
+
 }

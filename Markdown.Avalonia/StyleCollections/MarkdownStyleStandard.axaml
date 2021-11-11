@@ -65,6 +65,11 @@
       <Setter Property="Foreground"      Value="DarkBlue"/>
     </Style.Setters>
   </Style>
+  <Style Selector="Border.NoContainer">
+    <Style.Setters>
+      <Setter Property="BorderBrush"     Value="Red"/>
+    </Style.Setters>
+  </Style>
 
   <Style Selector="ctxt|CCode">
     <Style.Setters>
