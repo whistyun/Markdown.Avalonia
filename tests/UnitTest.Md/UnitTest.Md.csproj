@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <None Remove="Texts\Codes.md" />
+    <None Remove="Texts\ContainerBlock.md" />
   </ItemGroup>
 
   <ItemGroup>

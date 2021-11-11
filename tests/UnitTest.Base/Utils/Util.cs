@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Avalonia.Controls;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,7 +18,7 @@ namespace UnitTest.Base.Utils
 
             return caller.GetManifestResourceNames()
                          .Where(nm => nm.StartsWith(resourceKey))
-                         .Select(nm=>nm.Substring(resourceKey.Length))
+                         .Select(nm => nm.Substring(resourceKey.Length))
                          .ToArray();
         }
 
@@ -88,6 +90,18 @@ namespace UnitTest.Base.Utils
             }
 
             return "dotnet";
+        }
+
+        public static IEnumerable<T> FindControlsByClassName<T>(IControl ctrl, string classNm) where T : IControl
+        {
+            if (ctrl.Classes.Contains(classNm))
+                yield return (T)ctrl;
+
+            if (ctrl is Panel panel)
+            {
+                foreach (var rs in panel.Children.SelectMany(p => FindControlsByClassName<T>(p, classNm)))
+                    yield return rs;
+            }
         }
     }
 }
