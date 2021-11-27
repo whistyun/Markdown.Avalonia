@@ -25,12 +25,11 @@ namespace Markdown.Avalonia.Utils
         {
             AssetLoader = AvaloniaLocator.Current.GetService<IAssetLoader>();
 
-            var myasm = Assembly.GetCallingAssembly();
             var stack = new StackTrace();
             this.AssetAssemblyNames = stack.GetFrames()
-                            .Select(frm => frm.GetMethod().DeclaringType.Assembly)
-                            .Where(asm => asm != myasm)
-                            .Select(asm => asm.GetName().Name)
+                            .Select(frm => frm.GetMethod().DeclaringType?.Assembly?.GetName()?.Name)
+                            .OfType<string>()
+                            .Where(name => !name.Equals("Markdown.Avalonia"))
                             .Distinct()
                             .ToArray();
 
