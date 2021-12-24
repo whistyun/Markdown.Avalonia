@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Avalonia.Visuals.Media.Imaging;
 
 namespace ColorTextBlock.Avalonia.Geometries
 {
@@ -29,7 +30,8 @@ namespace ColorTextBlock.Avalonia.Geometries
             ctx.DrawImage(
                 Bitmap,
                 new Rect(Bitmap.Size),
-                new Rect(Left, Top, Width, Height)
+                new Rect(Left, Top, Width, Height),
+                BitmapInterpolationMode.HighQuality
                 );
         }
     }
