@@ -162,7 +162,7 @@ namespace Markdown.Avalonia
                 new[] {
                     Parser.Create<Control>(_codeBlockFirst, CodeBlocksWithLangEvaluator),
                     Parser.Create<Control>(_containerBlockFirst, ContainerBlockEvaluator),
-                    Parser.Create<Control>(_listLevel > 0 ? _listNested : _listTopLevel, ListEvaluator),
+                    Parser.Create<Control>(_listNested, ListEvaluator),
                 },
                 s1 => DoBlockquotes(s1,
                 s2 => DoHeaders(s2,
@@ -639,8 +639,6 @@ namespace Markdown.Avalonia
         private const string _markerOL_RomanLower = @"[cdilmvx]+[,]";
         private const string _markerOL_RomanUpper = @"[CDILMVX]+[,]";
 
-        private int _listLevel;
-
         /// <summary>
         /// Maximum number of levels a single list can have.
         /// In other words, _listDepth - 1 is the maximum number of nested lists.
@@ -676,9 +674,6 @@ namespace Markdown.Avalonia
         private static readonly Regex _startQuoteOrHeader = new Regex(@"\A(\#{1,6}[ ]|>|```)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static readonly Regex _listNested = new Regex(@"^" + _wholeList,
-            RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private static readonly Regex _listTopLevel = new Regex(@"(?:(?<=\n)|\A\n?)" + _wholeList,
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private IEnumerable<Control> ListEvaluator(Match match)
@@ -838,30 +833,22 @@ namespace Markdown.Avalonia
             // change the syntax rules such that sub-lists must start with a
             // starting cardinal number; e.g. "1." or "a.".
 
-            _listLevel++;
-            try
-            {
-                // Trim trailing blank lines:
-                list = Regex.Replace(list, @"\n{2,}\z", "\n");
+            // Trim trailing blank lines:
+            list = Regex.Replace(list, @"\n{2,}\z", "\n");
 
-                string pattern = string.Format(
-                  @"(\n)?                  # leading line = $1
+            string pattern = string.Format(
+              @"(\n)?                  # leading line = $1
                 (^[ ]*)                    # leading whitespace = $2
                 ({0}) [ ]+                 # list marker = $3
                 ((?s:.+?)                  # list item text = $4
                 (\n{{1,2}}))      
                 (?= \n* (\z | \2 ({0}) [ ]+))", marker);
 
-                var regex = new Regex(pattern, RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline);
-                var matches = regex.Matches(list);
-                foreach (Match m in matches)
-                {
-                    yield return ListItemEvaluator(m);
-                }
-            }
-            finally
+            var regex = new Regex(pattern, RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline);
+            var matches = regex.Matches(list);
+            foreach (Match m in matches)
             {
-                _listLevel--;
+                yield return ListItemEvaluator(m);
             }
         }
 
@@ -1675,14 +1662,6 @@ namespace Markdown.Avalonia
 
         #region grammer - blockquote
 
-        private static Regex _blockquote = new Regex(@"
-            (?<=\n)
-            [\n]*
-            ([>].*)
-            (\n[>].*)*
-            [\n]*
-            ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
         private static Regex _blockquoteFirst = new Regex(@"
             ^
             ([>].*)
@@ -1697,10 +1676,7 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(text));
             }
 
-            return Evaluate(
-                text, _blockquoteFirst, BlockquotesEvaluator,
-                sn => Evaluate(sn, _blockquote, BlockquotesEvaluator, defaultHandler)
-            );
+            return Evaluate(text, _blockquoteFirst, BlockquotesEvaluator, defaultHandler);
         }
 
         private Border BlockquotesEvaluator(Match match)

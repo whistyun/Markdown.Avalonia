@@ -128,6 +128,18 @@ namespace UnitTest.Md
 
         [Test]
         [RunOnUI]
+        public void Transform_givenMixing2_generatesExpectedResult()
+        {
+            var text = Util.LoadText("Mixing2.md");
+            var markdown = new Markdown.Avalonia.Markdown();
+            markdown.AssetPathRoot = AssetPath;
+
+            var result = markdown.Transform(text);
+            Approvals.Verify(Util.AsXaml(result));
+        }
+
+        [Test]
+        [RunOnUI]
         public void Transform_givenCodes_generatesExpectedResult()
         {
             var text = Util.LoadText("Codes.md");
