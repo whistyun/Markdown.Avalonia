@@ -1,6 +1,6 @@
 ﻿using Avalonia.Media;
 using AvaloniaEdit.Highlighting;
-using Markdown.Avalonia.Extensions;
+using Markdown.Avalonia.SyntaxHigh.Extensions;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Text;
 using UnitTest.Base;
 using UnitTest.Base.Utils;
 
-namespace UnitTest.Md
+namespace UnitTest.MdSyntax
 {
     class UnitTestConverter
     {

@@ -1,0 +1,12 @@
+<Styles
+      xmlns="https://github.com/avaloniaui"
+      xmlns:mde="clr-namespace:Markdown.Avalonia.SyntaxHigh.Extensions;assembly=Markdown.Avalonia.SyntaxHigh"
+      xmlns:avedit="https://github.com/avaloniaui/avaloniaedit"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      x:Class="Markdown.Avalonia.SyntaxHigh.StyleCollections.AppendixOfFluentTheme"
+      >
+  <Style Selector="avedit|TextEditor">
+    <Setter Property="SyntaxHighlighting" Value="{mde:SyntaxHighlightWrapper SystemBaseHighColor}"/>
+    <Setter Property="VerticalScrollBarVisibility" Value="Disabled"/>
+  </Style>
+</Styles>

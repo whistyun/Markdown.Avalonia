@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\Markdown.Avalonia.props" />
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFrameworks>$(PackageTargetFrameworks)</TargetFrameworks>
+    <PackageId>Markdown.Avalonia.SyntaxHigh</PackageId>
+    <Version>$(PackageVersion)</Version>
+    <Authors>whistyun</Authors>
+    <Copyright>Copyright (c) 2021 whistyun</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Company />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.AvaloniaEdit" Version="$(AvaloniaVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Markdown.Avalonia\Markdown.Avalonia.csproj" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="StyleCollections\AppendixOfDefaultTheme.axaml.cs">
+      <DependentUpon>AppendixOfDefaultTheme.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="StyleCollections\AppendixOfFluentTheme.axaml.cs">
+      <DependentUpon>AppendixOfFluentTheme.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>

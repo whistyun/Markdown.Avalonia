@@ -8,13 +8,13 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Styling;
-using AvaloniaEdit;
-using AvaloniaEdit.Highlighting;
 using ColorTextBlock.Avalonia;
 using Markdown.Avalonia.Controls;
+using Markdown.Avalonia.Parsers;
 using Markdown.Avalonia.Tables;
 using Markdown.Avalonia.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -32,6 +32,35 @@ namespace Markdown.Avalonia
 {
     public class Markdown : AvaloniaObject, IMarkdownEngine
     {
+        private static Dictionary<string, Func<Match, Control>> converterMap;
+
+        static Markdown()
+        {
+            converterMap = new Dictionary<string, Func<Match, Control>>();
+
+            try
+            {
+                var kvps = InterassemblyUtil.InvokeInstanceMethodToGetProperty
+                    <IEnumerable>(
+                    "Markdown.Avalonia.SyntaxHigh",
+                    "Markdown.Avalonia.SyntaxHigh.SyntaxSetup",
+                    "GetOverrideConverters");
+
+                foreach (var kvpObj in kvps)
+                {
+                    if (kvpObj is KeyValuePair<string, Func<Match, Control>> kvp)
+                        converterMap[kvp.Key] = kvp.Value;
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.GetType().Name + ":" + e.Message);
+            }
+        }
+
+        private static Func<Match, Control> GetConverterOrNull(string processName)
+            => converterMap.TryGetValue(processName, out var getval) ? getval : null;
+
         #region const
         /// <summary>
         /// maximum nested depth of [] and () supported by the transform; implementation detail
@@ -119,6 +148,13 @@ namespace Markdown.Avalonia
 
         #endregion
 
+        #region ParseTree
+
+        private Parser<Control>[] TopLevelBlockParsers { get; }
+        private Parser<Control>[] SubLevelBlockParsers { get; }
+
+        #endregion
+
         public Markdown()
         {
             _assetPathRoot = Environment.CurrentDirectory;
@@ -129,6 +165,23 @@ namespace Markdown.Avalonia
             var assetLoader = AvaloniaLocator.Current.GetService<IAssetLoader>();
             using (var strm = assetLoader.Open(new Uri($"avares://Markdown.Avalonia/Assets/ImageNotFound.bmp")))
                 ImageNotFound = new Bitmap(strm);
+
+            TopLevelBlockParsers = new[]{
+                Parser.Create<Control>(_codeBlockFirst     , GetConverterOrNull(nameof(CodeBlocksWithLangEvaluator   )), CodeBlocksWithLangEvaluator   ),
+                Parser.Create<Control>(_containerBlockFirst, GetConverterOrNull(nameof(ContainerBlockEvaluator       )), ContainerBlockEvaluator       ),
+                Parser.Create<Control>( _listNested        , GetConverterOrNull(nameof(ListEvaluator                 )), ListEvaluator                 ),
+            };
+
+            SubLevelBlockParsers = new[] {
+                Parser.Create<Control>(_blockquoteFirst    , GetConverterOrNull(nameof(BlockquotesEvaluator          )), BlockquotesEvaluator          ),
+                Parser.Create<Control>(_headerSetext       , GetConverterOrNull(nameof(SetextHeaderEvaluator         )), SetextHeaderEvaluator         ),
+                Parser.Create<Control>(_headerAtx          , GetConverterOrNull(nameof(AtxHeaderEvaluator            )), AtxHeaderEvaluator            ),
+                Parser.Create<Control>(_horizontalRules    , GetConverterOrNull(nameof(RuleEvaluator                 )), RuleEvaluator                 ),
+                Parser.Create<Control>(_table              , GetConverterOrNull(nameof(TableEvalutor                 )), TableEvalutor                 ),
+                Parser.Create<Control>(_note               , GetConverterOrNull(nameof(NoteEvaluator                 )), NoteEvaluator                 ),
+                Parser.Create<Control>(_indentCodeBlock    , GetConverterOrNull(nameof(CodeBlocksWithoutLangEvaluator)), CodeBlocksWithoutLangEvaluator),
+            };
+
         }
 
         /// <inheritdoc/>
@@ -141,7 +194,12 @@ namespace Markdown.Avalonia
 
             text = TextUtil.Normalize(text, _tabWidth);
 
-            var document = Create<StackPanel, Control>(RunBlockGamut(text, true));
+            var status = new ParseStatus()
+            {
+                SupportTextAlignment = true
+            };
+
+            var document = Create<StackPanel, Control>(RunBlockGamut(text, status));
             document.Orientation = Orientation.Vertical;
 
             return document;
@@ -150,7 +208,7 @@ namespace Markdown.Avalonia
         /// <summary>
         /// Perform transformations that form block-level tags like paragraphs, headers, and list items.
         /// </summary>
-        private IEnumerable<Control> RunBlockGamut(string text, bool supportTextAlignment)
+        private IEnumerable<Control> RunBlockGamut(string text, ParseStatus status)
         {
             if (text is null)
             {
@@ -158,19 +216,10 @@ namespace Markdown.Avalonia
             }
 
             return Evaluates(
-                text,
-                new[] {
-                    Parser.Create<Control>(_codeBlockFirst, CodeBlocksWithLangEvaluator),
-                    Parser.Create<Control>(_containerBlockFirst, ContainerBlockEvaluator),
-                    Parser.Create<Control>(_listNested, ListEvaluator),
-                },
-                s1 => DoBlockquotes(s1,
-                s2 => DoHeaders(s2,
-                s3 => DoHorizontalRules(s3,
-                s4 => DoTable(s4,
-                s5 => DoNote(s5, supportTextAlignment,
-                s6 => DoIndentCodeBlock(s6,
-                sn => FormParagraphs(sn, supportTextAlignment)))))))
+                text, status,
+                TopLevelBlockParsers,
+                SubLevelBlockParsers,
+                FormParagraphs
             );
         }
 
@@ -200,7 +249,7 @@ namespace Markdown.Avalonia
         /// <summary>
         /// splits on two or more newlines, to form "paragraphs";    
         /// </summary>
-        private IEnumerable<Control> FormParagraphs(string text, bool supportTextAlignment)
+        private IEnumerable<Control> FormParagraphs(string text, ParseStatus status)
         {
             if (text is null)
             {
@@ -219,7 +268,7 @@ namespace Markdown.Avalonia
 
                 TextAlignment? indiAlignment = null;
 
-                if (supportTextAlignment)
+                if (status.SupportTextAlignment)
                 {
                     var alignMatch = _align.Match(chip);
                     if (alignMatch.Success)
@@ -357,24 +406,6 @@ namespace Markdown.Avalonia
 
         #region grammer - header
 
-        private static readonly Regex _headerSetext = new Regex(@"
-                ^(.+?)
-                [ ]*
-                \n
-                (=+|-+)     # $1 = string of ='s or -'s
-                [ ]*
-                \n+",
-                RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private static readonly Regex _headerAtx = new Regex(@"
-                ^(\#{1,6})  # $1 = string of #'s
-                [ ]*
-                (.+?)       # $2 = Header text
-                [ ]*
-                \#*         # optional closing #'s (not counted)
-                \n+",
-                RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
         /// <summary>
         /// Turn Markdown headers into HTML header tags
         /// </summary>
@@ -384,23 +415,31 @@ namespace Markdown.Avalonia
         /// 
         /// Header 2  
         /// --------  
-        /// 
+        /// </remarks>
+        private static readonly Regex _headerSetext = new Regex(@"
+                ^(.+?)
+                [ ]*
+                \n
+                (=+|-+)     # $1 = string of ='s or -'s
+                [ ]*
+                \n+",
+                RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
+        /// <summary>
         /// # Header 1  
         /// ## Header 2  
         /// ## Header 2 with closing hashes ##  
         /// ...  
         /// ###### Header 6  
         /// </remarks>
-        private IEnumerable<Control> DoHeaders(string text, Func<string, IEnumerable<Control>> defaultHandler)
-        {
-            if (text is null)
-            {
-                Helper.ThrowArgNull(nameof(text));
-            }
-
-            return Evaluate<Control>(text, _headerSetext, m => SetextHeaderEvaluator(m),
-                s => Evaluate<Control>(s, _headerAtx, m => AtxHeaderEvaluator(m), defaultHandler));
-        }
+        private static readonly Regex _headerAtx = new Regex(@"
+                ^(\#{1,6})  # $1 = string of #'s
+                [ ]*
+                (.+?)       # $2 = Header text
+                [ ]*
+                \#*         # optional closing #'s (not counted)
+                \n+",
+                RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private CTextBlock SetextHeaderEvaluator(Match match)
         {
@@ -469,6 +508,13 @@ namespace Markdown.Avalonia
         #endregion
 
         #region grammer - Note
+
+        /// <summary>
+        /// Turn Markdown into HTML paragraphs.
+        /// </summary>
+        /// <remarks>
+        /// < Note
+        /// </remarks>
         private static readonly Regex _note = new Regex(@"
                 ^(\<)       # $1 = starting marker <
                 [ ]*
@@ -478,26 +524,7 @@ namespace Markdown.Avalonia
                 \n+
             ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        /// <summary>
-        /// Turn Markdown into HTML paragraphs.
-        /// </summary>
-        /// <remarks>
-        /// < Note
-        /// </remarks>
-        private IEnumerable<Control> DoNote(string text, bool supportTextAlignment,
-                Func<string, IEnumerable<Control>> defaultHandler)
-        {
-            if (text is null)
-            {
-                Helper.ThrowArgNull(nameof(text));
-            }
-
-            return Evaluate<Control>(text, _note,
-                m => NoteEvaluator(m, supportTextAlignment),
-                defaultHandler);
-        }
-
-        private Border NoteEvaluator(Match match, bool supportTextAlignment)
+        private Border NoteEvaluator(Match match, ParseStatus status)
         {
             if (match is null)
             {
@@ -508,7 +535,7 @@ namespace Markdown.Avalonia
 
             TextAlignment? indiAlignment = null;
 
-            if (supportTextAlignment)
+            if (status.SupportTextAlignment)
             {
                 var alignMatch = _align.Match(text);
                 if (alignMatch.Success)
@@ -556,6 +583,15 @@ namespace Markdown.Avalonia
 
         #region grammer - horizontal rules
 
+        /// <summary>
+        /// Turn Markdown horizontal rules into HTML hr tags
+        /// </summary>
+        /// <remarks>
+        /// ***  
+        /// * * *  
+        /// ---
+        /// - - -
+        /// </remarks>
         private static readonly Regex _horizontalRules = new Regex(@"
                 ^[ ]{0,3}                   # Leading space
                     ([-=*_])                # $1: First marker ([markers])
@@ -566,25 +602,6 @@ namespace Markdown.Avalonia
                     [ ]*                    # Trailing spaces
                     \n                      # End of line.
                 ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        /// <summary>
-        /// Turn Markdown horizontal rules into HTML hr tags
-        /// </summary>
-        /// <remarks>
-        /// ***  
-        /// * * *  
-        /// ---
-        /// - - -
-        /// </remarks>
-        private IEnumerable<Control> DoHorizontalRules(string text, Func<string, IEnumerable<Control>> defaultHandler)
-        {
-            if (text is null)
-            {
-                Helper.ThrowArgNull(nameof(text));
-            }
-
-            return Evaluate(text, _horizontalRules, RuleEvaluator, defaultHandler);
-        }
 
         /// <summary>
         /// Single line separator.
@@ -801,7 +818,7 @@ namespace Markdown.Avalonia
 
             if (outerListBuildre.Length != 0)
             {
-                foreach (var ctrl in RunBlockGamut(outerListBuildre.ToString(), true))
+                foreach (var ctrl in RunBlockGamut(outerListBuildre.ToString(), ParseStatus.Init))
                     yield return ctrl;
             }
         }
@@ -862,15 +879,14 @@ namespace Markdown.Avalonia
             string item = match.Groups[4].Value;
             string leadingLine = match.Groups[1].Value;
 
-            if (!String.IsNullOrEmpty(leadingLine) || Regex.IsMatch(item, @"\n{2,}"))
-                // we could correct any bad indentation here..
-
-                return Create<StackPanel, Control>(RunBlockGamut(item, false));
-            else
+            var status = new ParseStatus()
             {
-                // recursion for sub-lists
-                return Create<StackPanel, Control>(RunBlockGamut(item, false));
-            }
+                SupportTextAlignment = false
+            };
+
+            // we could correct any bad indentation here..
+            // recursion for sub-lists
+            return Create<StackPanel, Control>(RunBlockGamut(item, status));
         }
 
         /// <summary>
@@ -948,16 +964,6 @@ namespace Markdown.Avalonia
                 )
             )",
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-
-        public IEnumerable<Control> DoTable(string text, Func<string, IEnumerable<Control>> defaultHandler)
-        {
-            if (text is null)
-            {
-                Helper.ThrowArgNull(nameof(text));
-            }
-
-            return Evaluate(text, _table, TableEvalutor, defaultHandler);
-        }
 
         private Border TableEvalutor(Match match)
         {
@@ -1117,16 +1123,6 @@ namespace Markdown.Avalonia
                     )
                     ", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
 
-        private IEnumerable<Control> DoIndentCodeBlock(string text, Func<string, IEnumerable<Control>> defaultHandler)
-        {
-            if (text is null)
-            {
-                Helper.ThrowArgNull(nameof(text));
-            }
-
-            return Evaluate(text, _indentCodeBlock, CodeBlocksWithoutLangEvaluator, defaultHandler);
-        }
-
         private Border CodeBlocksWithLangEvaluator(Match match)
             => CodeBlocksEvaluator(match.Groups[2].Value, match.Groups[3].Value);
 
@@ -1136,57 +1132,25 @@ namespace Markdown.Avalonia
             return CodeBlocksEvaluator(null, _newlinesLeadingTrailing.Replace(detentTxt, ""));
         }
 
-
-
         private Border CodeBlocksEvaluator(string lang, string code)
         {
-            if (String.IsNullOrEmpty(lang))
+            var ctxt = new TextBlock()
             {
-                var ctxt = new TextBlock()
-                {
-                    Text = code,
-                    TextWrapping = TextWrapping.NoWrap
-                };
-                ctxt.Classes.Add(CodeBlockClass);
+                Text = code,
+                TextWrapping = TextWrapping.NoWrap
+            };
+            ctxt.Classes.Add(CodeBlockClass);
 
-                var scrl = new ScrollViewer();
-                scrl.Classes.Add(CodeBlockClass);
-                scrl.Content = ctxt;
-                scrl.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+            var scrl = new ScrollViewer();
+            scrl.Classes.Add(CodeBlockClass);
+            scrl.Content = ctxt;
+            scrl.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
 
-                var result = new Border();
-                result.Classes.Add(CodeBlockClass);
-                result.Child = scrl;
+            var result = new Border();
+            result.Classes.Add(CodeBlockClass);
+            result.Child = scrl;
 
-                return result;
-            }
-            else
-            {
-                // check wheither style is set
-                if (!ThemeDetector.IsAvalonEditSetup)
-                {
-                    var aeStyle = new StyleInclude(new Uri("avares://Markdown.Avalonia/"))
-                    {
-                        Source = new Uri("avares://AvaloniaEdit/AvaloniaEdit.xaml")
-                    };
-                    Application.Current.Styles.Add(aeStyle);
-                }
-
-                var txtEdit = new TextEditor();
-                var highlight = HighlightingManager.Instance.GetDefinitionByExtension("." + lang);
-                txtEdit.Tag = lang;
-                //txtEdit.SetValue(TextEditor.SyntaxHighlightingProperty, highlight);
-
-                txtEdit.Text = code;
-                txtEdit.HorizontalAlignment = HorizontalAlignment.Stretch;
-                txtEdit.IsReadOnly = true;
-
-                var result = new Border();
-                result.Classes.Add(CodeBlockClass);
-                result.Child = txtEdit;
-
-                return result;
-            }
+            return result;
         }
 
         #endregion
@@ -1632,7 +1596,6 @@ namespace Markdown.Avalonia
 
         #endregion
 
-
         #region grammer - text
 
         private static Regex _eoln = new Regex("\\s+");
@@ -1669,16 +1632,6 @@ namespace Markdown.Avalonia
             [\n]*
             ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        private IEnumerable<Control> DoBlockquotes(string text, Func<string, IEnumerable<Control>> defaultHandler)
-        {
-            if (text is null)
-            {
-                Helper.ThrowArgNull(nameof(text));
-            }
-
-            return Evaluate(text, _blockquoteFirst, BlockquotesEvaluator, defaultHandler);
-        }
-
         private Border BlockquotesEvaluator(Match match)
         {
             if (match is null)
@@ -1700,7 +1653,11 @@ namespace Markdown.Avalonia
                         .ToArray()
             );
 
-            var blocks = RunBlockGamut(trimmedTxt + "\n", true);
+            var status = new ParseStatus()
+            {
+                SupportTextAlignment = true
+            };
+            var blocks = RunBlockGamut(trimmedTxt + "\n", status);
 
             var panel = Create<StackPanel, Control>(blocks);
             panel.Orientation = Orientation.Vertical;
@@ -1801,9 +1758,10 @@ namespace Markdown.Avalonia
         }
 
         private IEnumerable<T> Evaluates<T>(
-                string text,
-                Parser<T>[] parsers,
-                Func<string, IEnumerable<T>> rest
+                string text, ParseStatus status,
+                Parser<T>[] primary,
+                Parser<T>[] secondly,
+                Func<string, ParseStatus, IEnumerable<T>> rest
             )
         {
             if (text is null)
@@ -1812,6 +1770,7 @@ namespace Markdown.Avalonia
             }
 
             var index = 0;
+            var length = text.Length;
             var rtn = new List<T>();
 
             while (true)
@@ -1820,9 +1779,9 @@ namespace Markdown.Avalonia
                 Match bestMatch = null;
                 Parser<T> bestParser = null;
 
-                foreach (var parser in parsers)
+                foreach (var parser in primary)
                 {
-                    var match = parser.Match(text, index);
+                    var match = parser.Match(text, index, length, status);
                     if (match.Success && match.Index < bestIndex)
                     {
                         bestIndex = match.Index;
@@ -1835,24 +1794,63 @@ namespace Markdown.Avalonia
 
                 if (bestIndex > index)
                 {
-                    var prefix = text.Substring(index, bestIndex - index);
-                    rtn.AddRange(rest(prefix));
+                    EvaluateRest(rtn, text, index, bestIndex - index, status, secondly, 0, rest);
                 }
 
-                rtn.AddRange(bestParser.Convert(bestMatch));
+                rtn.AddRange(bestParser.Convert(bestMatch, status));
 
-                index = bestIndex + bestMatch.Length;
+                var newIndex = bestIndex + bestMatch.Length;
+                length -= newIndex - index;
+                index = newIndex;
             }
 
             if (index < text.Length)
             {
-                var suffix = text.Substring(index, text.Length - index);
-                rtn.AddRange(rest(suffix));
+                EvaluateRest(rtn, text, index, text.Length - index, status, secondly, 0, rest);
             }
 
             return rtn;
 
         }
+
+        private void EvaluateRest<T>(
+            List<T> resultIn,
+            string text, int index, int length,
+            ParseStatus status,
+            Parser<T>[] parsers, int parserStart,
+            Func<string, ParseStatus, IEnumerable<T>> rest)
+        {
+            for (; parserStart < parsers.Length; ++parserStart)
+            {
+                var parser = parsers[parserStart];
+
+                for (; ; )
+                {
+                    var match = parser.Match(text, index, length, status);
+                    if (!match.Success) break;
+
+                    if (match.Index > index)
+                    {
+                        EvaluateRest(resultIn, text, index, match.Index - index, status, parsers, parserStart + 1, rest);
+                    }
+
+                    resultIn.AddRange(parser.Convert(match, status));
+
+                    var newIndex = match.Index + match.Length;
+                    length -= newIndex - index;
+                    index = newIndex;
+                }
+
+                if (length == 0) break;
+            }
+
+            if (length != 0)
+            {
+                var suffix = text.Substring(index, length);
+                resultIn.AddRange(rest(suffix, status));
+            }
+        }
+
 
         private IEnumerable<T> Evaluate<T>(string text, Regex expression, Func<Match, T> build, Func<string, IEnumerable<T>> rest)
         {
@@ -1890,57 +1888,6 @@ namespace Markdown.Avalonia
         }
 
         #endregion
-
-        static class Parser
-        {
-            public static Parser<T> Create<T>(Regex pattern, Func<Match, T> converter)
-                => new SingleParser<T>(pattern, converter);
-
-            public static Parser<T> Create<T>(Regex pattern, Func<Match, IEnumerable<T>> converter)
-                => new MultiParser<T>(pattern, converter);
-        }
-
-        abstract class Parser<T>
-        {
-            private Regex pattern;
-
-            public Parser(Regex pattern)
-            {
-                this.pattern = pattern;
-            }
-
-            public Match Match(string text, int index) => pattern.Match(text, index);
-
-            public abstract IEnumerable<T> Convert(Match match);
-        }
-
-        class SingleParser<T> : Parser<T>
-        {
-            private Func<Match, T> converter;
-
-            public SingleParser(Regex pattern, Func<Match, T> converter) : base(pattern)
-            {
-                this.converter = converter;
-            }
-
-            public override IEnumerable<T> Convert(Match match)
-            {
-                yield return converter(match);
-            }
-        }
-
-        class MultiParser<T> : Parser<T>
-        {
-            private Func<Match, IEnumerable<T>> converter;
-
-            public MultiParser(Regex pattern, Func<Match, IEnumerable<T>> converter) : base(pattern)
-            {
-                this.converter = converter;
-            }
-
-            public override IEnumerable<T> Convert(Match match) => converter(match);
-        }
-
     }
 
 }

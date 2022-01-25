@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-16"?>
-<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:a="https://github.com/avaloniaui/avaloniaedit" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
   <c:CTextBlock Classes="Paragraph">
     <c:CRun Text="abcd" />
   </c:CTextBlock>
   <Border Classes="CodeBlock" xmlns="">
     <Border.Child>
-      <ScrollViewer Classes="CodeBlock">
-        <ScrollViewer.Content>
-          <TextBlock Text="* one&#xA;* two&#xA;* three" Classes="CodeBlock" />
-        </ScrollViewer.Content>
-      </ScrollViewer>
+      <a:TextEditor IsReadOnly="True" IsModified="True" Tag="md" Text="* one&#xA;* two&#xA;* three" SelectedText="" CaretOffset="0" SelectionStart="0" SelectionLength="0" />
     </Border.Child>
   </Border>
   <c:CTextBlock Classes="Paragraph">
@@ -25,11 +21,7 @@
       </c:CTextBlock>
       <Border Classes="CodeBlock">
         <Border.Child>
-          <ScrollViewer Classes="CodeBlock">
-            <ScrollViewer.Content>
-              <TextBlock Text="::: plugin&#xA;parameter&#xA;:::" Classes="CodeBlock" />
-            </ScrollViewer.Content>
-          </ScrollViewer>
+          <a:TextEditor IsReadOnly="True" IsModified="True" Tag="md" Text="::: plugin&#xA;parameter&#xA;:::" SelectedText="" CaretOffset="0" SelectionStart="0" SelectionLength="0" />
         </Border.Child>
       </Border>
     </StackPanel>
