@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Markdown.Avalonia\Markdown.Avalonia.csproj" />
+    <ProjectReference Include="..\Markdown.Avalonia.SyntaxHigh\Markdown.Avalonia.SyntaxHigh.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="LocalPath.png">

@@ -17,6 +17,15 @@
     <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
     <PackageReference Include="Avalonia.AvaloniaEdit" Version="$(AvaloniaVersion)" />
   </ItemGroup>
+  
+  <!--
+  Workaround for dependency in AvaloniaEdit.
+  AvaloniaEdit depends on System.Collections.Immutable but it is not menthioned in nuspec.
+  This will causes FileNotFoundException on netframework or netcoreapp2.0.
+  -->
+  <ItemGroup Condition=" '$(TargetFramework)' != 'netstandard2.0' ">
+    <PackageReference Include="System.Collections.Immutable" Version="1.6.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Markdown.Avalonia\Markdown.Avalonia.csproj" PrivateAssets="All" />
