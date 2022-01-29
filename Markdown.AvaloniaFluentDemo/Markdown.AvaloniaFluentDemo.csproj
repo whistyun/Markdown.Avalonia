@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
+    <IsPackable>false</IsPackable>
     <TargetFrameworks>$(DemoAppTargetFrameworks)</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
@@ -22,7 +23,7 @@
     <Compile Include="..\tests\UnitTest.Base\Utils\Util.cs" Link="Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Markdown.Avalonia\Markdown.Avalonia.csproj" />
+    <ProjectReference Include="..\Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj" />
     <ProjectReference Include="..\Markdown.Avalonia.SyntaxHigh\Markdown.Avalonia.SyntaxHigh.csproj" />
   </ItemGroup>
   <ItemGroup>

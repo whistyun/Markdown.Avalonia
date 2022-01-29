@@ -3,6 +3,7 @@
   <Import Project="..\Markdown.Avalonia.props" />
 
   <PropertyGroup>
+    <IsPackable>false</IsPackable>
     <TargetFrameworks>$(PackageTargetFrameworks)</TargetFrameworks>
     <PackageId>ColorTextBlock.Avalonia</PackageId>
     <Version>$(PackageVersion)</Version>

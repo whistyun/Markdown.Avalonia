@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
+    <IsPackable>false</IsPackable>
     <TargetFrameworks>$(DemoAppTargetFrameworks)</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
@@ -20,7 +21,8 @@
     <None Remove="Assets\XamlTemplate.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Markdown.Avalonia\Markdown.Avalonia.csproj" />
+    <ProjectReference Include="..\Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj" />
+    <ProjectReference Include="..\Markdown.Avalonia.SyntaxHigh\Markdown.Avalonia.SyntaxHigh.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="LocalPath.png">

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown.Avalonia", "Markdown.Avalonia\Markdown.Avalonia.csproj", "{B5FBF669-6012-4A62-9EAC-9ECB7BD599FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown.Avalonia.Tight", "Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj", "{B5FBF669-6012-4A62-9EAC-9ECB7BD599FC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ColorTextBlock.Avalonia", "ColorTextBlock.Avalonia\ColorTextBlock.Avalonia.csproj", "{E4F9286F-A812-476E-A37D-EE2B8ED5D958}"
 EndProject
