@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\Markdown.Avalonia.props" />
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFrameworks>$(PackageTargetFrameworks)</TargetFrameworks>
+    <PackageId>Markdown.Avalonia.SyntaxHigh</PackageId>
+    <Version>$(PackageVersion)</Version>
+    <Authors>whistyun</Authors>
+    <Copyright>Copyright (c) 2021 whistyun</Copyright>
+    <PackageProjectUrl>https://github.com/whistyun/Markdown.Avalonia</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Company />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.AvaloniaEdit" Version="$(AvaloniaVersion)" />
+  </ItemGroup>
+  
+  <!--
+  Workaround for dependency in AvaloniaEdit.
+  AvaloniaEdit depends on System.Collections.Immutable but it is not menthioned in nuspec.
+  This will causes FileNotFoundException on netframework or netcoreapp2.0.
+  -->
+  <ItemGroup>
+    <PackageReference Include="System.Collections.Immutable" Version="1.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="StyleCollections\AppendixOfDefaultTheme.axaml.cs">
+      <DependentUpon>AppendixOfDefaultTheme.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="StyleCollections\AppendixOfFluentTheme.axaml.cs">
+      <DependentUpon>AppendixOfFluentTheme.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>

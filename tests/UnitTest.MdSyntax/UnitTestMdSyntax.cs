@@ -6,10 +6,10 @@ using System.Linq;
 using UnitTest.Base;
 using UnitTest.Base.Utils;
 
-namespace UnitTest.Md
+namespace UnitTest.MdSyntax
 {
     [UseReporter(typeof(DiffReporter))]
-    public class UnitTestMd : UnitTestBase
+    public class UnitTestMdSyntax : UnitTestBase
     {
         [Test]
         [RunOnUI]

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-16"?>
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:a="https://github.com/avaloniaui/avaloniaedit" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+  <c:CTextBlock Classes="Paragraph">
+    <c:CRun Text="abcd" />
+  </c:CTextBlock>
+  <Border Classes="CodeBlock" xmlns="">
+    <Border.Child>
+      <a:TextEditor IsReadOnly="True" IsModified="True" Tag="md" Text="* one&#xA;* two&#xA;* three" SelectedText="" CaretOffset="0" SelectionStart="0" SelectionLength="0" />
+    </Border.Child>
+  </Border>
+  <c:CTextBlock Classes="Paragraph">
+    <c:CRun Text="abcd" />
+  </c:CTextBlock>
+  <Grid Classes="List" xmlns="">
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+      <c:CRun Text="•" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="0">
+      <c:CTextBlock Classes="Paragraph">
+        <c:CRun Text="one" />
+      </c:CTextBlock>
+      <Border Classes="CodeBlock">
+        <Border.Child>
+          <a:TextEditor IsReadOnly="True" IsModified="True" Tag="md" Text="::: plugin&#xA;parameter&#xA;:::" SelectedText="" CaretOffset="0" SelectionStart="0" SelectionLength="0" />
+        </Border.Child>
+      </Border>
+    </StackPanel>
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="1">
+      <c:CRun Text="•" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="1">
+      <c:CTextBlock Classes="Paragraph">
+        <c:CRun Text="two *three" />
+      </c:CTextBlock>
+      <Grid Classes="List">
+        <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+          <c:CRun Text="•" />
+        </c:CTextBlock>
+        <StackPanel Grid.Column="1" Grid.Row="0">
+          <c:CTextBlock Classes="Paragraph">
+            <c:CRun Text="one-two" />
+          </c:CTextBlock>
+        </StackPanel>
+        <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="1">
+          <c:CRun Text="•" />
+        </c:CTextBlock>
+        <StackPanel Grid.Column="1" Grid.Row="1">
+          <c:CTextBlock Classes="Paragraph">
+            <c:CRun Text="three four" />
+          </c:CTextBlock>
+        </StackPanel>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition />
+          <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+          <RowDefinition />
+          <RowDefinition />
+        </Grid.RowDefinitions>
+      </Grid>
+    </StackPanel>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition />
+      <RowDefinition />
+    </Grid.RowDefinitions>
+  </Grid>
+  <c:CTextBlock Classes="Paragraph">
+    <c:CRun Text="abcd" />
+  </c:CTextBlock>
+  <Border Classes="CodeBlock,NoContainer" xmlns="">
+    <Border.Child>
+      <ScrollViewer Classes="CodeBlock">
+        <ScrollViewer.Content>
+          <TextBlock Text="::: plugin&#xA;* one&#xA;* two&#xA;* three&#xA;:::&#xA;&#xA;&#xA;" Classes="CodeBlock" />
+        </ScrollViewer.Content>
+      </ScrollViewer>
+    </Border.Child>
+  </Border>
+</StackPanel>

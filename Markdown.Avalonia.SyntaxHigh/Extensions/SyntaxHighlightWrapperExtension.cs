@@ -12,7 +12,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 
-namespace Markdown.Avalonia.Extensions
+namespace Markdown.Avalonia.SyntaxHigh.Extensions
 {
     /// <summary>
     /// Change syntax color according to the Foreground color.

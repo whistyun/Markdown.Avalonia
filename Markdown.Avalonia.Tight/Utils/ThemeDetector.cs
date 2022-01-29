@@ -12,7 +12,6 @@ namespace Markdown.Avalonia.Utils
     {
         static bool? _isDefaultUsed;
         static bool? _isFluentUsed;
-        static bool _isAvalonEditSetup;
 
         private static bool CheckStyleSourceHost(IStyle style, string hostName)
         {
@@ -77,29 +76,6 @@ namespace Markdown.Avalonia.Utils
                 }
 
                 return _isFluentUsed = false;
-            }
-        }
-
-        public static bool IsAvalonEditSetup
-        {
-            get
-            {
-                if (_isAvalonEditSetup)
-                    return true;
-
-                if (Application.Current is null
-                        || Application.Current.Styles is null)
-                    return false;
-
-                foreach (var style in Application.Current.Styles)
-                {
-                    if (CheckStyleSourceHost(style, "AvaloniaEdit"))
-                    {
-                        return _isAvalonEditSetup = true;
-                    }
-                }
-
-                return _isAvalonEditSetup = false;
             }
         }
     }

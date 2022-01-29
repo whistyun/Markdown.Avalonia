@@ -25,7 +25,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>0.10.9</PackageVersion>
+    <PackageVersion>0.10.10-a1</PackageVersion>
   </PropertyGroup>
 
 </Project>
