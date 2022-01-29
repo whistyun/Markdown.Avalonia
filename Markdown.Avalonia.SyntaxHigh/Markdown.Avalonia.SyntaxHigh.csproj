@@ -9,6 +9,7 @@
     <Version>$(PackageVersion)</Version>
     <Authors>whistyun</Authors>
     <Copyright>Copyright (c) 2021 whistyun</Copyright>
+    <PackageProjectUrl>https://github.com/whistyun/Markdown.Avalonia</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Company />
   </PropertyGroup>

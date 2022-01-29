@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\Markdown.Avalonia.props" />
+
+  <PropertyGroup>
+    <TargetFrameworks>$(PackageTargetFrameworks)</TargetFrameworks>
+    <Version>$(PackageVersion)</Version>
+    <Authors>Bevan Arps(original); whistyun</Authors>
+    <Company />
+    <Description>Markdown Controls for Avalonia</Description>
+    <Copyright>Copyright (c) 2010 Bevan Arps, 2020 whistyun</Copyright>
+    <PackageProjectUrl>https://github.com/whistyun/Markdown.Avalonia</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>Markdown Avalonia Avaloniaui</PackageTags>
+  </PropertyGroup>
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <NoBuild>true</NoBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeSymbols>false</IncludeSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj" />
+    <ProjectReference Include="..\Markdown.Avalonia.SyntaxHigh\Markdown.Avalonia.SyntaxHigh.csproj" />
+  </ItemGroup>
+
+</Project>
