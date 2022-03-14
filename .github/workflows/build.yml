@@ -6,11 +6,11 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2019
 
     strategy:
       matrix:
-        versions: [ 0.10.0, 0.10.8, 0.10.9, 0.10.10]
+        versions: [ 0.10.0, 0.10.8, 0.10.9, 0.10.10, 0.10.13]
 
     steps:
     - uses: actions/checkout@v2
