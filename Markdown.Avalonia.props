@@ -11,21 +11,22 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AvaloniaVersion>0.10.0</AvaloniaVersion>
+    <RestoreSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.avaloniaui.net/repository/avalonia-nightly/index.json;
+    </RestoreSources>
+    <AvaloniaVersion>0.10.999-*</AvaloniaVersion>
+	<AvaloniaEditVersion>0.10.0</AvaloniaEditVersion>
+    <DemoAvaloniaVersion>0.10.999-*</DemoAvaloniaVersion>
   </PropertyGroup>
 
   <PropertyGroup>
     <TestTargetFrameworks>netcoreapp3.1</TestTargetFrameworks>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(AVA_VER)' != '' ">
-    <TestAvaloniaVersion>$(AVA_VER)</TestAvaloniaVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(AVA_VER)' == '' ">
-    <TestAvaloniaVersion>0.10.10</TestAvaloniaVersion>
+    <TestAvaloniaVersion>0.10.999-*</TestAvaloniaVersion>
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>0.10.10</PackageVersion>
+    <PackageVersion>0.10.999</PackageVersion>
   </PropertyGroup>
 
 </Project>

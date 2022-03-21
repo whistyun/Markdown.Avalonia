@@ -28,14 +28,6 @@ namespace UnitTest.CTxt
     {
         public UnitTestCTxt()
         {
-            var currentTestVerTxt = Environment.GetEnvironmentVariable("AVA_VER");
-            var currentTestVer = Version.Parse(currentTestVerTxt ?? "0.10.0");
-
-            if (currentTestVer >= Version.Parse("0.10.13"))
-            {
-                Approvals.RegisterDefaultNamerCreation(() => new ChangeOutputPathNamer("Out13"));
-            }
-
             Approvals.RegisterDefaultApprover((w, n, c) => new ImageFileApprover(w, n, c));
         }
 

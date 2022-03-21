@@ -1,3 +1,7 @@
+** TEST BRANCH FOR NIGHTLY BUILD **  
+** Only Markdown.Avalonia.Tight is supported. **  
+** Markdown.Avalonia.SyntaxHight is not supported. **
+
 # Markdown.Avalonia
 
 Markdown.Avalonia is a portted version of [MdXaml](https://github.com/whistyun/MdXaml) for [Avalonia UI](https://www.avaloniaui.net/).

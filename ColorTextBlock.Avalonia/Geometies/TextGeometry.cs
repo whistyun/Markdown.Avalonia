@@ -56,8 +56,9 @@ namespace ColorTextBlock.Avalonia.Geometries
         internal LineBreakMarkGeometry(
             CInline owner,
             TextLayout layout) :
-            base(owner, 0, layout.Size.Height, layout.Size.Height, TextVerticalAlignment.Base, true)
+            base(owner, 0, layout.Bounds.Height, layout.Bounds.Height, TextVerticalAlignment.Base, true)
         {
+
         }
         internal LineBreakMarkGeometry(CInline owner) :
             base(owner, 0, 0, 0, TextVerticalAlignment.Base, true)
@@ -81,7 +82,7 @@ namespace ColorTextBlock.Avalonia.Geometries
             TextVerticalAlignment align,
             string text,
             bool linebreak) :
-            base(owner, layout.Size.Width, layout.Size.Height, layout.Size.Height, align, linebreak)
+            base(owner, layout.Bounds.Width, layout.Bounds.Height, layout.Bounds.Height, align, linebreak)
         {
             Creator = creator;
             Layout = layout;
@@ -100,29 +101,26 @@ namespace ColorTextBlock.Avalonia.Geometries
                 Layout = Creator(Text, LayoutForeground);
             }
 
-            using (ctx.PushPostTransform(Matrix.CreateTranslation(Left, Top)))
+            if (background != null)
             {
-                if (background != null)
-                {
-                    ctx.FillRectangle(background, new Rect(0, 0, Width, Height));
-                }
+                ctx.FillRectangle(background, new Rect(Left, Top, Width, Height));
+            }
 
-                Layout.Draw(ctx);
+            Layout.Draw(ctx, new Point(Left, Top));
 
-                var pen = new Pen(foreground);
-                if (IsUnderline)
-                {
-                    ctx.DrawLine(pen,
-                        new Point(0, Height),
-                        new Point(Width, Height));
-                }
+            var pen = new Pen(foreground);
+            if (IsUnderline)
+            {
+                ctx.DrawLine(pen,
+                    new Point(Left, Top + Height),
+                    new Point(Left + Width, Top + Height));
+            }
 
-                if (IsStrikethrough)
-                {
-                    ctx.DrawLine(pen,
-                        new Point(0, Height / 2),
-                        new Point(Width, Height / 2));
-                }
+            if (IsStrikethrough)
+            {
+                ctx.DrawLine(pen,
+                    new Point(Left, +Top + Height / 2),
+                    new Point(Left + Width, Top + Height / 2));
             }
         }
     }
