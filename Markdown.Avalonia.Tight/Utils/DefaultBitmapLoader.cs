@@ -27,12 +27,11 @@ namespace Markdown.Avalonia.Utils
 
             var stack = new StackTrace();
             this.AssetAssemblyNames = stack.GetFrames()
-                            .Select(frm => frm.GetMethod().DeclaringType?.Assembly?.GetName()?.Name)
+                            .Select(frm => frm?.GetMethod()?.DeclaringType?.Assembly?.GetName()?.Name)
                             .OfType<string>()
                             .Where(name => !name.Equals("Markdown.Avalonia"))
                             .Distinct()
                             .ToArray();
-
 
             Cache = new ConcurrentDictionary<Uri, WeakReference<Bitmap>>();
         }
