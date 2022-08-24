@@ -14,6 +14,7 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="$(DemoAvaloniaVersion)" />
     <PackageReference Include="Avalonia.Desktop" Version="$(DemoAvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="$(DemoAvaloniaVersion)" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="$(DemoAvaloniaVersion)" />
     <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="$(DemoAvaloniaVersion)" />
     <None Remove="Assets\XamlTemplate.txt" />

@@ -71,7 +71,7 @@ namespace Markdown.Avalonia
 
             MarkdownStyleName =
                 nvl(ThemeDetector.IsFluentUsed) ? nameof(MdStyle.FluentTheme) :
-                nvl(ThemeDetector.IsDefaultUsed) ? nameof(MdStyle.DefaultTheme) :
+                nvl(ThemeDetector.IsSimpleUsed) ? nameof(MdStyle.DefaultTheme) :
                 nameof(MdStyle.Standard);
         }
 
@@ -294,7 +294,7 @@ namespace Markdown.Avalonia
 
                     MarkdownStyle =
                         nvl(ThemeDetector.IsFluentUsed) ? MdStyle.FluentTheme :
-                        nvl(ThemeDetector.IsDefaultUsed) ? MdStyle.DefaultTheme :
+                        nvl(ThemeDetector.IsSimpleUsed) ? MdStyle.DefaultTheme :
                         MdStyle.Standard;
                 }
                 else

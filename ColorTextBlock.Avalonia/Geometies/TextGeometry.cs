@@ -7,27 +7,27 @@ namespace ColorTextBlock.Avalonia.Geometries
 {
     internal abstract class TextGeometry : CGeometry
     {
-        private CInline Owner;
+        internal CInline Owner { get; }
 
-        private IBrush _TemporaryForeground;
-        public IBrush TemporaryForeground
+        private IBrush? _TemporaryForeground;
+        public IBrush? TemporaryForeground
         {
             get => _TemporaryForeground;
             set => _TemporaryForeground = value;
         }
 
-        private IBrush _TemporaryBackground;
-        public IBrush TemporaryBackground
+        private IBrush? _TemporaryBackground;
+        public IBrush? TemporaryBackground
         {
             get => _TemporaryBackground;
             set => _TemporaryBackground = value;
         }
 
-        public IBrush Foreground
+        public IBrush? Foreground
         {
             get => Owner?.Foreground;
         }
-        public IBrush Background
+        public IBrush? Background
         {
             get => Owner?.Background;
         }
@@ -55,8 +55,8 @@ namespace ColorTextBlock.Avalonia.Geometries
     {
         internal LineBreakMarkGeometry(
             CInline owner,
-            TextLayout layout) :
-            base(owner, 0, layout.Bounds.Height, layout.Bounds.Height, TextVerticalAlignment.Base, true)
+            double lineHeight) :
+            base(owner, 0, lineHeight, lineHeight, TextVerticalAlignment.Base, true)
         {
 
         }
@@ -71,23 +71,33 @@ namespace ColorTextBlock.Avalonia.Geometries
     internal class SingleTextLayoutGeometry : TextGeometry
     {
         private string Text { get; }
-        private TextLayoutCreator Creator { get; }
-        private TextLayout Layout { set; get; }
-        private IBrush LayoutForeground { set; get; }
+        private FormattedText Layout { set; get; }
+        private IBrush? LayoutForeground { set; get; }
 
         internal SingleTextLayoutGeometry(
             CInline owner,
-            TextLayout layout,
-            TextLayoutCreator creator,
+            FormattedText tline,
             TextVerticalAlignment align,
             string text,
             bool linebreak) :
-            base(owner, layout.Bounds.Width, layout.Bounds.Height, layout.Bounds.Height, align, linebreak)
+            base(owner, tline.WidthIncludingTrailingWhitespace, tline.Height, tline.Height, align, linebreak)
         {
-            Creator = creator;
-            Layout = layout;
+            Layout = tline;
             LayoutForeground = owner.Foreground;
             Text = text;
+        }
+
+        internal SingleTextLayoutGeometry(
+                SingleTextLayoutGeometry baseGeometry,
+                bool linebreak) :
+            base(baseGeometry.Owner,
+                 baseGeometry.Width, baseGeometry.Height, baseGeometry.Height,
+                 baseGeometry.TextVerticalAlignment,
+                 linebreak)
+        {
+            Layout = baseGeometry.Layout;
+            LayoutForeground = baseGeometry.LayoutForeground;
+            Text = baseGeometry.Text;
         }
 
         public override void Render(DrawingContext ctx)
@@ -98,7 +108,7 @@ namespace ColorTextBlock.Avalonia.Geometries
             if (LayoutForeground != foreground)
             {
                 LayoutForeground = foreground;
-                Layout = Creator(Text, LayoutForeground);
+                Layout.SetForegroundBrush(LayoutForeground, 0, Text.Length);
             }
 
             if (background != null)
@@ -106,7 +116,7 @@ namespace ColorTextBlock.Avalonia.Geometries
                 ctx.FillRectangle(background, new Rect(Left, Top, Width, Height));
             }
 
-            Layout.Draw(ctx, new Point(Left, Top));
+            ctx.DrawText(Layout, new Point(Left, Top));
 
             var pen = new Pen(foreground);
             if (IsUnderline)
@@ -124,6 +134,4 @@ namespace ColorTextBlock.Avalonia.Geometries
             }
         }
     }
-
-    internal delegate TextLayout TextLayoutCreator(string text, IBrush foreground);
 }

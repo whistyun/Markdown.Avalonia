@@ -4,6 +4,7 @@ using ApprovalTests.Reporters;
 using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -135,19 +136,19 @@ namespace UnitTest.CTxt
                 var markdown = new Markdown.Avalonia.Markdown();
                 var control = markdown.Transform(text);
 
-                control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Default/"))
+                control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Simple/"))
                 {
-                    Source = new Uri("avares://Avalonia.Themes.Default/DefaultTheme.xaml")
+                    Source = new Uri("avares://Avalonia.Themes.Simple/Controls/SimpleControls.xaml")
                 });
-                control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Default/"))
+                control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Simple/"))
                 {
-                    Source = new Uri("avares://Avalonia.Themes.Default/Accents/BaseLight.xaml")
+                    Source = new Uri("avares://Avalonia.Themes.Simple/Accents/BaseLight.xaml")
                 });
                 control.Styles.Add(MarkdownStyle.DefaultTheme);
                 control.Resources.Add("FontSizeNormal", 16d);
 
                 var umefont = new FontFamily(new Uri("avares://UnitTest.CTxt/Assets/Fonts/ume-ugo4.ttf"), "Ume UI Gothic");
-                TextBlock.SetFontFamily(control, umefont);
+                TextElement.SetFontFamily(control, umefont);
 
                 var info = new MetryHolder(control, 500, 10000);
             }
@@ -167,19 +168,19 @@ namespace UnitTest.CTxt
             var markdown = new Markdown.Avalonia.Markdown();
             var control = markdown.Transform(text);
 
-            control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Default/"))
+            control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Simple/"))
             {
-                Source = new Uri("avares://Avalonia.Themes.Default/DefaultTheme.xaml")
+                Source = new Uri("avares://Avalonia.Themes.Simple/Controls/SimpleControls.xaml")
             });
-            control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Default/"))
+            control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Simple/"))
             {
-                Source = new Uri("avares://Avalonia.Themes.Default/Accents/BaseLight.xaml")
+                Source = new Uri("avares://Avalonia.Themes.Simple/Accents/BaseLight.xaml")
             });
             control.Styles.Add(MarkdownStyle.DefaultTheme);
             control.Resources.Add("FontSizeNormal", 16d);
 
             var umefont = new FontFamily(new Uri("avares://UnitTest.CTxt/Assets/Fonts/ume-ugo4.ttf"), "Ume UI Gothic");
-            TextBlock.SetFontFamily(control, umefont);
+            TextElement.SetFontFamily(control, umefont);
 
             var info = new MetryHolder(control, 500, 10000);
 

@@ -12,22 +12,22 @@ namespace ColorTextBlock.Avalonia
     [TypeConverter(typeof(StringToRunConverter))]
     public abstract class CInline : StyledElement
     {
-        public static readonly StyledProperty<IBrush> BackgroundProperty =
-            AvaloniaProperty.Register<CInline, IBrush>(nameof(Background), inherits: true);
+        public static readonly StyledProperty<IBrush?> BackgroundProperty =
+            AvaloniaProperty.Register<CInline, IBrush?>(nameof(Background), inherits: true);
 
-        public static readonly AttachedProperty<IBrush> ForegroundProperty =
+        public static readonly StyledProperty<IBrush?> ForegroundProperty =
             TextBlock.ForegroundProperty.AddOwner<CInline>();
 
-        public static readonly AttachedProperty<FontFamily> FontFamilyProperty =
+        public static readonly StyledProperty<FontFamily> FontFamilyProperty =
             TextBlock.FontFamilyProperty.AddOwner<CInline>();
 
-        public static readonly AttachedProperty<FontWeight> FontWeightProperty =
+        public static readonly StyledProperty<FontWeight> FontWeightProperty =
             TextBlock.FontWeightProperty.AddOwner<CInline>();
 
-        public static readonly AttachedProperty<double> FontSizeProperty =
+        public static readonly StyledProperty<double> FontSizeProperty =
             TextBlock.FontSizeProperty.AddOwner<CInline>();
 
-        public static readonly AttachedProperty<FontStyle> FontStyleProperty =
+        public static readonly StyledProperty<FontStyle> FontStyleProperty =
             TextBlock.FontStyleProperty.AddOwner<CInline>();
 
         public static readonly StyledProperty<TextVerticalAlignment> TextVerticalAlignmentProperty =
@@ -61,13 +61,13 @@ namespace ColorTextBlock.Avalonia
             ).AddClassHandler<CInline>((x, _) => x.RequestMeasure());
         }
 
-        public IBrush Background
+        public IBrush? Background
         {
             get { return GetValue(BackgroundProperty); }
             set { SetValue(BackgroundProperty, value); }
         }
 
-        public IBrush Foreground
+        public IBrush? Foreground
         {
             get { return GetValue(ForegroundProperty); }
             set { SetValue(ForegroundProperty, value); }

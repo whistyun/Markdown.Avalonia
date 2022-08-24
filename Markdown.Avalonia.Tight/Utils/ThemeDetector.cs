@@ -1,17 +1,20 @@
 ﻿using Avalonia;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Styling;
-using Avalonia.Themes.Fluent;
-using System;
-using System.Collections.Generic;
-using System.Text;
+
 
 namespace Markdown.Avalonia.Utils
 {
     static class ThemeDetector
     {
-        static bool? _isDefaultUsed;
-        static bool? _isFluentUsed;
+        private static readonly string s_SimpleThemeFQCN = "Avalonia.Themes.Simple.SimpleTheme";
+        private static readonly string s_FluentThemeFQCN = "Avalonia.Themes.Fluent.FluentTheme";
+
+        private static readonly string s_SimpleThemeHost = "Avalonia.Themes.Simple";
+        private static readonly string s_FluentThemeHost = "Avalonia.Themes.Fluent";
+
+        static bool? s_isSimpleUsed;
+        static bool? s_isFluentUsed;
 
         private static bool CheckStyleSourceHost(IStyle style, string hostName)
         {
@@ -28,12 +31,12 @@ namespace Markdown.Avalonia.Utils
             else return false;
         }
 
-        public static bool? IsDefaultUsed
+        public static bool? IsSimpleUsed
         {
             get
             {
-                if (_isDefaultUsed.HasValue)
-                    return _isDefaultUsed;
+                if (s_isSimpleUsed.HasValue)
+                    return s_isSimpleUsed;
 
                 if (Application.Current is null
                         || Application.Current.Styles is null)
@@ -41,13 +44,17 @@ namespace Markdown.Avalonia.Utils
 
                 foreach (var style in Application.Current.Styles)
                 {
-                    if (CheckStyleSourceHost(style, "Avalonia.Themes.Default"))
+                    if (style.GetType().FullName == s_SimpleThemeFQCN)
                     {
-                        return _isDefaultUsed = true;
+                        return s_isSimpleUsed = true;
+                    }
+                    if (CheckStyleSourceHost(style, s_SimpleThemeHost))
+                    {
+                        return s_isSimpleUsed = true;
                     }
                 }
 
-                return _isDefaultUsed = false;
+                return s_isSimpleUsed = false;
             }
         }
 
@@ -56,8 +63,8 @@ namespace Markdown.Avalonia.Utils
         {
             get
             {
-                if (_isFluentUsed.HasValue)
-                    return _isFluentUsed;
+                if (s_isFluentUsed.HasValue)
+                    return s_isFluentUsed;
 
                 if (Application.Current is null
                         || Application.Current.Styles is null)
@@ -65,17 +72,17 @@ namespace Markdown.Avalonia.Utils
 
                 foreach (var style in Application.Current.Styles)
                 {
-                    if (style is FluentTheme)
+                    if (style.GetType().FullName == s_FluentThemeFQCN)
                     {
-                        return _isFluentUsed = true;
+                        return s_isFluentUsed = true;
                     }
-                    if (CheckStyleSourceHost(style, "Avalonia.Themes.Fluent"))
+                    if (CheckStyleSourceHost(style, s_FluentThemeHost))
                     {
-                        return _isFluentUsed = true;
+                        return s_isFluentUsed = true;
                     }
                 }
 
-                return _isFluentUsed = false;
+                return s_isFluentUsed = false;
             }
         }
     }

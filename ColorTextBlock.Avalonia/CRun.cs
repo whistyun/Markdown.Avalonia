@@ -1,10 +1,12 @@
 ﻿using Avalonia;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
+using Avalonia.Media.TextFormatting.Unicode;
 using Avalonia.Metadata;
 using ColorTextBlock.Avalonia.Geometries;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -12,6 +14,8 @@ namespace ColorTextBlock.Avalonia
 {
     public class CRun : CInline
     {
+        private static readonly Regex Sep = new("\r\n|\r|\n", RegexOptions.Compiled);
+
         public static readonly StyledProperty<string> TextProperty =
             AvaloniaProperty.Register<CRun, string>(nameof(Text));
 
@@ -26,132 +30,162 @@ namespace ColorTextBlock.Avalonia
             double entireWidth,
             double remainWidth)
         {
-            var creator = new LayoutCreateor(
-                FontFamily,
-                FontStyle,
-                FontWeight,
-                FontSize);
-
-
-            SingleTextLayoutGeometry NewGeometry(string text, bool linebreak)
-                => new SingleTextLayoutGeometry(this, creator.Create(text, Foreground), creator.Create, TextVerticalAlignment, text, linebreak);
-
-            SingleTextLayoutGeometry NewGeometry2(string text, bool linebreak, double width)
-                => new SingleTextLayoutGeometry(this, creator.Create(text, Foreground, width), creator.WithConstraint(width), TextVerticalAlignment, text, linebreak);
-
             if (String.IsNullOrEmpty(Text))
             {
                 yield break;
             }
 
-            string entireText = Text;
+            var typeface = new Typeface(FontFamily, FontStyle, FontWeight);
 
-            if (remainWidth != entireWidth)
+            double remain = remainWidth;
+            foreach (var line in Sep.Split(Text))
             {
-                /*
-                 * It is hacking-resolution for 'line breaking rules'.
-                 * 
-                 * insert one space in the head to detect the line break position
-                 * 
-                 *   |                        |                 |                        |
-                 *   | xxxxxx xxxxxx          |   rather than   | xxxxxx xxxxxx internat |
-                 *   | internationalization   |                 | ionalization           |
-                 *   |                        |                 |                        |
-                 *
-                 */
-
-                var firstTxtLen =
-                        creator.Create(" " + entireText, Foreground, remainWidth)
-                            .TextLines.First().TextRange.Length;
-
-                firstTxtLen = Math.Max(firstTxtLen - 1, 0);
-
-                if (firstTxtLen > 0)
-                {
-                    var firstText = entireText.Substring(0, firstTxtLen);
-                    entireText = entireText.Substring(firstTxtLen);
-                    yield return NewGeometry(firstText, entireText != "");
-                }
-                else
+                if (line.Length == 0)
                 {
                     yield return new LineBreakMarkGeometry(this);
                 }
 
-                if (String.IsNullOrEmpty(entireText))
-                    yield break;
-            }
-
-            var midlayout = creator.Create(entireText, Foreground, entireWidth);
-
-            if (midlayout.TextLines.Count >= 2)
-            {
-                var ranges = midlayout.TextLines.Select(ln => ln.TextRange).ToArray();
-                var lastRange = ranges[ranges.Length - 1];
-
-                foreach (var range in ranges)
+                foreach (var geometry in MeasureOverride(line, typeface, FontSize, Foreground, entireWidth, remain))
                 {
-                    // If the text ends with a line break,
-                    // the empty line which indicate the last caret position of text is appeared.
-                    // AvaloniaUI/Avalonia#6454
-                    if (entireText.Length <= range.Start)
-                        break;
-
-                    var line = entireText.Substring(range.Start, range.Length);
-                    yield return NewGeometry(line, !range.Equals(lastRange));
+                    yield return geometry;
                 }
+            }
+        }
+
+
+
+        public IEnumerable<CGeometry> MeasureOverride(
+            string text,
+            Typeface typeface,
+            double fontSize,
+            IBrush? foreground,
+            double entireWidth,
+            double remainWidth)
+        {
+#if DEBUG
+            if (text.Contains("\r") || text.Contains("\n"))
+                throw new InvalidOperationException("text contains linebreak!");
+#endif
+            var ftext = CreateFormattedText(text);
+
+            if (ftext.Width < remainWidth)
+            {
+                return new[] { CreateGeometry(text, ftext, false) };
             }
             else
             {
-                yield return new SingleTextLayoutGeometry(
-                        this,
-                        midlayout,
-                        creator.Create,
-                        TextVerticalAlignment,
-                        entireText,
-                        false);
+                var list = new List<CGeometry>();
+
+                using var chipList = SplitBreakPoint(text).GetEnumerator();
+                chipList.MoveNext();
+
+                var chip = chipList.Current;
+                var fmtChip = CreateFormattedText(chip);
+
+                if (fmtChip.Width > remainWidth
+                    && remainWidth != entireWidth)
+                {
+                    list.Add(new LineBreakMarkGeometry(this));
+                }
+
+                var lineIndex = 0;
+                var lineLength = 0;
+                var lineWidth = 0d;
+
+                for (; ; )
+                {
+                    var constraint = list.Count == 0 ? remainWidth : entireWidth;
+
+                    if (lineWidth + fmtChip.WidthIncludingTrailingWhitespace <= constraint)
+                    {
+                        lineLength += chip.Length;
+                        lineWidth += fmtChip.WidthIncludingTrailingWhitespace;
+                    }
+                    else if (lineLength > 0)
+                    {
+                        // push stored words
+
+                        var line = text.Substring(lineIndex, lineLength);
+                        var fline = CreateFormattedText(line);
+                        list.Add(CreateGeometry(line, fline, true));
+
+                        lineIndex += lineLength;
+                        lineLength = 0;
+                        lineWidth = 0;
+
+                        continue;
+                    }
+                    else
+                    {
+                        // The width is too narrow to render a word.
+                        // Break down a word into letters.
+
+                        var layout = new TextLayout(
+                                            chip,
+                                            typeface, fontSize,
+                                            foreground,
+                                            textWrapping: TextWrapping.Wrap,
+                                            maxWidth: constraint);
+
+                        int layoutIdx = lineIndex;
+                        foreach (var line in layout.TextLines)
+                        {
+                            var brokenWord = text.Substring(layoutIdx, line.Length);
+                            var fbrokenWord = CreateFormattedText(brokenWord);
+                            list.Add(CreateGeometry(brokenWord, fbrokenWord, true));
+                            layoutIdx += line.Length;
+                        }
+
+                        lineIndex += chip.Length;
+                    }
+
+                    if (!chipList.MoveNext()) break;
+
+                    chip = chipList.Current;
+                    fmtChip = CreateFormattedText(chipList.Current);
+                }
+
+                if (lineIndex < text.Length)
+                {
+                    var line = text.Substring(lineIndex);
+                    var fline = CreateFormattedText(line);
+                    list.Add(CreateGeometry(line, fline, true));
+                }
+
+                return list;
             }
-        }
-    }
 
-    class LayoutCreateor
-    {
-        public Typeface Typeface { get; }
-        public double FontSize { get; }
+            FormattedText CreateFormattedText(string text)
+                => new FormattedText(
+                        text,
+                        CultureInfo.CurrentCulture,
+                        FlowDirection.LeftToRight,
+                        typeface, fontSize,
+                        foreground);
 
-        public LayoutCreateor(
-            FontFamily fontFamily,
-            FontStyle fontStyle,
-            FontWeight fontWeight,
-            double fontSize)
-        {
-            Typeface = new Typeface(
-                    fontFamily,
-                    fontStyle,
-                    fontWeight);
-            FontSize = fontSize;
+            SingleTextLayoutGeometry CreateGeometry(string text, FormattedText formattedText, bool linebreak)
+                => new SingleTextLayoutGeometry(
+                        this,
+                        formattedText,
+                        TextVerticalAlignment,
+                        text,
+                        linebreak);
         }
 
-        public TextLayoutCreator WithConstraint(double width)
-        => (text, foreground) => Create(text, foreground, width);
-
-        public TextLayout Create(
-                string text,
-                IBrush foreground)
-        => Create(text, foreground, Double.PositiveInfinity);
-
-        public TextLayout Create(
-                string text,
-                IBrush foreground,
-                double width)
+        private static IEnumerable<string> SplitBreakPoint(string text)
         {
-            return new TextLayout(
-                text ?? string.Empty,
-                Typeface,
-                FontSize,
-                foreground,
-                textWrapping: TextWrapping.Wrap,
-                maxWidth: width,
-                maxHeight: double.PositiveInfinity);
+            var list = new List<string>();
+
+            int idx = 0;
+            var breakposis = new LineBreakEnumerator(text.AsMemory());
+            while (breakposis.MoveNext())
+            {
+                var word = breakposis.Current;
+                list.Add(text.Substring(idx, word.PositionWrap - idx));
+                idx = word.PositionWrap;
+            }
+
+            return list;
         }
     }
 }

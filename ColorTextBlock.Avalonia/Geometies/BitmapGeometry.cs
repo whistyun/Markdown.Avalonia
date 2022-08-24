@@ -1,13 +1,6 @@
 ﻿using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.Styling;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Avalonia.Visuals.Media.Imaging;
 
 namespace ColorTextBlock.Avalonia.Geometries
 {

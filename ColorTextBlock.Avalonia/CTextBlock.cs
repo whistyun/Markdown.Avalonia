@@ -24,22 +24,22 @@ namespace ColorTextBlock.Avalonia
         public static readonly StyledProperty<double> LineSpacingProperty =
             AvaloniaProperty.Register<CTextBlock, double>(nameof(LineSpacing), defaultValue: 0);
 
-        public static readonly StyledProperty<IBrush> BackgroundProperty =
+        public static readonly StyledProperty<IBrush?> BackgroundProperty =
             Border.BackgroundProperty.AddOwner<CTextBlock>();
 
-        public static readonly AttachedProperty<IBrush> ForegroundProperty =
+        public static readonly StyledProperty<IBrush?> ForegroundProperty =
             TextBlock.ForegroundProperty.AddOwner<CTextBlock>();
 
-        public static readonly AttachedProperty<FontFamily> FontFamilyProperty =
+        public static readonly StyledProperty<FontFamily> FontFamilyProperty =
             TextBlock.FontFamilyProperty.AddOwner<CTextBlock>();
 
-        public static readonly AttachedProperty<FontWeight> FontWeightProperty =
+        public static readonly StyledProperty<FontWeight> FontWeightProperty =
             TextBlock.FontWeightProperty.AddOwner<CTextBlock>();
 
-        public static readonly AttachedProperty<double> FontSizeProperty =
+        public static readonly StyledProperty<double> FontSizeProperty =
             TextBlock.FontSizeProperty.AddOwner<CTextBlock>();
 
-        public static readonly AttachedProperty<FontStyle> FontStyleProperty =
+        public static readonly StyledProperty<FontStyle> FontStyleProperty =
             TextBlock.FontStyleProperty.AddOwner<CTextBlock>();
 
         public static readonly StyledProperty<TextVerticalAlignment> TextVerticalAlignmentProperty =
@@ -205,9 +205,9 @@ namespace ColorTextBlock.Avalonia
         CGeometry entered;
         CGeometry pressed;
 
-        protected override void OnPointerLeave(PointerEventArgs e)
+        protected override void OnPointerExited(PointerEventArgs e)
         {
-            base.OnPointerLeave(e);
+            base.OnPointerExited(e);
 
             if (entered != null)
             {

@@ -2,6 +2,7 @@
 using Avalonia.Media;
 using ColorTextBlock.Avalonia.Geometries;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace ColorTextBlock.Avalonia
 {
@@ -16,14 +17,15 @@ namespace ColorTextBlock.Avalonia
             double entireWidth,
             double remainWidth)
         {
+            var ftxt = new FormattedText(
+                        "Ty",
+                        CultureInfo.CurrentCulture,
+                        FlowDirection.LeftToRight,
+                        new Typeface(FontFamily, FontStyle, FontWeight),
+                        FontSize,
+                        Foreground);
 
-            var creator = new LayoutCreateor(
-                FontFamily,
-                FontStyle,
-                FontWeight,
-                FontSize);
-
-            yield return new LineBreakMarkGeometry(this, creator.Create("Ty", Foreground));
+            yield return new LineBreakMarkGeometry(this, ftxt.Height);
         }
     }
 }
