@@ -95,7 +95,7 @@ namespace Markdown.Avalonia.Utils
                 // give up ded
                 else
                 {
-                    detendedLine = null;
+                    detendedLine = string.Empty;
                     return false;
                 }
             }

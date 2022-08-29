@@ -16,14 +16,15 @@ namespace Markdown.Avalonia.Utils
     public class DefaultBitmapLoader : IBitmapLoader
     {
         public string AssetPathRoot { set; private get; }
-        private IAssetLoader AssetLoader { get; }
+        private IAssetLoader? AssetLoader { get; }
         private string[] AssetAssemblyNames { get; }
 
         private ConcurrentDictionary<Uri, WeakReference<Bitmap>> Cache;
 
         public DefaultBitmapLoader()
         {
-            AssetLoader = AvaloniaLocator.Current.GetService<IAssetLoader>();
+            AssetPathRoot = Environment.CurrentDirectory;
+            AssetLoader = Helper.GetAssetLoader();
 
             var stack = new StackTrace();
             this.AssetAssemblyNames = stack.GetFrames()
@@ -41,21 +42,21 @@ namespace Markdown.Avalonia.Utils
         {
             foreach (var entry in Cache.ToArray())
             {
-                if (!entry.Value.TryGetTarget(out var dummy))
+                if (!entry.Value.TryGetTarget(out var _))
                 {
                     ((IDictionary<Uri, WeakReference<Bitmap>>)Cache).Remove(entry.Key);
                 }
             }
         }
 
-        public Task<Bitmap> GetAsync(string urlTxt)
+        public Task<Bitmap?> GetAsync(string urlTxt)
         {
             return Task.Run(() => Get(urlTxt));
         }
 
-        public Bitmap Get(string urlTxt)
+        public Bitmap? Get(string urlTxt)
         {
-            Bitmap imgSource = null;
+            Bitmap? imgSource = null;
 
             // check network
             if (Uri.TryCreate(urlTxt, UriKind.Absolute, out var url))
@@ -96,7 +97,7 @@ namespace Markdown.Avalonia.Utils
             return imgSource;
         }
 
-        public Bitmap Get(Uri url)
+        public Bitmap? Get(Uri url)
         {
             if (Cache.TryGetValue(url, out var reference))
             {
@@ -129,6 +130,7 @@ namespace Markdown.Avalonia.Utils
                         break;
 
                     case "avares":
+                        if (AssetLoader is null) return null;
                         if (!AssetLoader.Exists(url)) return null;
 
                         using (var strm = AssetLoader.Open(url))

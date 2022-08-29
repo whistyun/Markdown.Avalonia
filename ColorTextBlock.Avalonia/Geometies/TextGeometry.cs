@@ -68,6 +68,73 @@ namespace ColorTextBlock.Avalonia.Geometries
         public override void Render(DrawingContext ctx) { }
     }
 
+    internal class TextLineGeometry : TextGeometry
+    {
+        private string Text { get; }
+        private TextLine Layout { set; get; }
+        private IBrush? LayoutForeground { set; get; }
+
+        internal TextLineGeometry(
+            CInline owner,
+            TextLine tline,
+            TextVerticalAlignment align,
+            string text,
+            bool linebreak) :
+            base(owner, tline.WidthIncludingTrailingWhitespace, tline.Height, tline.Height, align, linebreak)
+        {
+            Layout = tline;
+            LayoutForeground = owner.Foreground;
+            Text = text;
+        }
+
+        internal TextLineGeometry(
+                TextLineGeometry baseGeometry,
+                bool linebreak) :
+            base(baseGeometry.Owner,
+                 baseGeometry.Width, baseGeometry.Height, baseGeometry.Height,
+                 baseGeometry.TextVerticalAlignment,
+                 linebreak)
+        {
+            Layout = baseGeometry.Layout;
+            LayoutForeground = baseGeometry.LayoutForeground;
+            Text = baseGeometry.Text;
+        }
+
+        public override void Render(DrawingContext ctx)
+        {
+            var foreground = TemporaryForeground ?? Foreground;
+            var background = TemporaryBackground ?? Background;
+
+            if (LayoutForeground != foreground)
+            {
+                LayoutForeground = foreground;
+                //Layout.SetForegroundBrush(LayoutForeground, 0, Text.Length);
+            }
+
+            if (background != null)
+            {
+                ctx.FillRectangle(background, new Rect(Left, Top, Width, Height));
+            }
+
+            Layout.Draw(ctx, new Point(Left, Top));
+
+            var pen = new Pen(foreground);
+            if (IsUnderline)
+            {
+                ctx.DrawLine(pen,
+                    new Point(Left, Top + Height),
+                    new Point(Left + Width, Top + Height));
+            }
+
+            if (IsStrikethrough)
+            {
+                ctx.DrawLine(pen,
+                    new Point(Left, +Top + Height / 2),
+                    new Point(Left + Width, Top + Height / 2));
+            }
+        }
+    }
+
     internal class SingleTextLayoutGeometry : TextGeometry
     {
         private string Text { get; }

@@ -72,7 +72,7 @@ namespace Markdown.AvaloniaDemo.ViewModels
 
             Styles = new List<StyleViewModel>();
             Styles.Add(new StyleViewModel() { Name = nameof(MarkdownStyle.Standard) });
-            Styles.Add(new StyleViewModel() { Name = nameof(MarkdownStyle.DefaultTheme) });
+            Styles.Add(new StyleViewModel() { Name = nameof(MarkdownStyle.SimpleTheme) });
             Styles.Add(new StyleViewModel() { Name = nameof(MarkdownStyle.GithubLike) });
 
             SelectedStyle = Styles[1];

@@ -9,11 +9,11 @@ namespace Markdown.Avalonia
 {
     public static class EmojiTable
     {
-        private static ConcurrentDictionary<String, String> keywords;
+        private static ConcurrentDictionary<String, String> s_keywords;
 
         static EmojiTable()
         {
-            LoadTxt();
+            s_keywords = LoadTxt();
         }
 
 
@@ -22,29 +22,31 @@ namespace Markdown.Avalonia
             When you open MarkdownStyle from Xaml Designer,
             A null error occurs. Perhaps static constructor is not executed.         
         */
-        static void LoadTxt()
+        private static ConcurrentDictionary<string, string> LoadTxt()
         {
             var resourceName = "Markdown.Avalonia.EmojiTable.txt";
 
-            keywords = new ConcurrentDictionary<string, string>();
+            var dic = new ConcurrentDictionary<string, string>();
 
             Assembly asm = Assembly.GetCallingAssembly();
             using (var stream = asm.GetManifestResourceStream(resourceName))
             using (var reader = new StreamReader(stream, true))
             {
                 string line;
-                while ((line = reader.ReadLine()) != null)
+                while ((line = reader.ReadLine()) is not null)
                 {
                     var elms = line.Split('\t');
-                    keywords[elms[1]] = elms[0];
+                    dic[elms[1]] = elms[0];
                 }
             }
+
+            return dic;
         }
 
         public static bool TryGet(string keyword, out string emoji)
         {
-            if (keywords is null) LoadTxt();
-            return keywords.TryGetValue(keyword, out emoji);
+            if (s_keywords is null) s_keywords = LoadTxt();
+            return s_keywords.TryGetValue(keyword, out emoji);
         }
 
     }

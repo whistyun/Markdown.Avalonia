@@ -7,8 +7,8 @@ namespace Markdown.Avalonia.Tables
     {
         int ColumnIndex { get; }
 
-        string RawText { get; }
-        string Text { get; }
+        string? RawText { get; }
+        string? Text { get; }
         int RowSpan { get; }
         int ColSpan { get; }
         TextAlignment? Horizontal { get; }

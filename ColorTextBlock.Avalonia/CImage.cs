@@ -52,11 +52,11 @@ namespace ColorTextBlock.Avalonia
             set { SetValue(FittingWhenProtrudeProperty, value); }
         }
 
-        public Task<Bitmap> Task { get; }
+        public Task<Bitmap?>? Task { get; }
         private Bitmap WhenError { get; }
-        public Bitmap Image { private set; get; }
+        public Bitmap? Image { private set; get; }
 
-        public CImage(Task<Bitmap> task, Bitmap whenError)
+        public CImage(Task<Bitmap?> task, Bitmap whenError)
         {
             if (task is null) throw new NullReferenceException(nameof(task));
             if (whenError is null) throw new NullReferenceException(nameof(whenError));
@@ -68,8 +68,7 @@ namespace ColorTextBlock.Avalonia
         public CImage(Bitmap bitmap)
         {
             if (bitmap is null) throw new NullReferenceException(nameof(bitmap));
-
-            this.Image = bitmap;
+            this.WhenError = this.Image = bitmap;
         }
 
         protected override IEnumerable<CGeometry> MeasureOverride(
@@ -77,7 +76,12 @@ namespace ColorTextBlock.Avalonia
         {
             if (Image is null)
             {
-                if (Task.Status == TaskStatus.RanToCompletion
+                if (Task is null)
+                {
+                    Image = WhenError;
+                }
+                else if (
+                       Task.Status == TaskStatus.RanToCompletion
                     || Task.Status == TaskStatus.Faulted
                     || Task.Status == TaskStatus.Canceled)
                 {

@@ -51,7 +51,7 @@ namespace Markdown.Avalonia.Tables
                                 Tuple.Create(idx, (TextAlignment?)null);
                     })
                     .Where(tpl => tpl.Item2.HasValue)
-                    .ToDictionary(tpl => tpl.Item1, tpl => tpl.Item2.Value);
+                    .ToDictionary(tpl => tpl.Item1, tpl => tpl.Item2!.Value);
 
             var styleColumnCount = styleMt.Count;
 

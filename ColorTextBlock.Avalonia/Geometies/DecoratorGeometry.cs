@@ -13,13 +13,13 @@ namespace ColorTextBlock.Avalonia.Geometries
         public CGeometry[] Targets { get; }
         public Border Decorate { get; }
 
-        private Action _OnMouseEnter;
-        private Action _OnMouseLeave;
-        private Action _OnMousePressed;
-        private Action _OnMouseReleased;
-        private Action _OnClick;
+        private Action? _OnMouseEnter;
+        private Action? _OnMouseLeave;
+        private Action? _OnMousePressed;
+        private Action? _OnMouseReleased;
+        private Action? _OnClick;
 
-        public override Action OnMouseEnter
+        public override Action? OnMouseEnter
         {
             get => () =>
             {
@@ -29,7 +29,7 @@ namespace ColorTextBlock.Avalonia.Geometries
             };
             set => _OnMouseEnter = value;
         }
-        public override Action OnMouseLeave
+        public override Action? OnMouseLeave
         {
             get => () =>
             {
@@ -39,7 +39,7 @@ namespace ColorTextBlock.Avalonia.Geometries
             };
             set => _OnMouseLeave = value;
         }
-        public override Action OnMousePressed
+        public override Action? OnMousePressed
         {
             get => () =>
             {
@@ -49,7 +49,7 @@ namespace ColorTextBlock.Avalonia.Geometries
             };
             set => _OnMousePressed = value;
         }
-        public override Action OnMouseReleased
+        public override Action? OnMouseReleased
         {
             get => () =>
             {
@@ -59,7 +59,7 @@ namespace ColorTextBlock.Avalonia.Geometries
             };
             set => _OnMouseReleased = value;
         }
-        public override Action OnClick
+        public override Action? OnClick
         {
             get => () =>
             {

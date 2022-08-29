@@ -10,10 +10,10 @@ namespace Markdown.Avalonia
     public interface IMarkdownEngine
     {
         string AssetPathRoot { get; set; }
-        ICommand HyperlinkCommand { get; set; }
-        IBitmapLoader BitmapLoader { get; set; }
+        ICommand? HyperlinkCommand { get; set; }
+        IBitmapLoader? BitmapLoader { get; set; }
 
-        IContainerBlockHandler ContainerBlockHandler { get; set; }
+        IContainerBlockHandler? ContainerBlockHandler { get; set; }
             
         Control Transform(string text);
     }

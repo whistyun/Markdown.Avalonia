@@ -6,8 +6,6 @@ using Avalonia.Metadata;
 using ColorTextBlock.Avalonia.Geometries;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace ColorTextBlock.Avalonia
@@ -32,160 +30,122 @@ namespace ColorTextBlock.Avalonia
         {
             if (String.IsNullOrEmpty(Text))
             {
-                yield break;
+                return Array.Empty<CGeometry>();
             }
 
             var typeface = new Typeface(FontFamily, FontStyle, FontWeight);
 
-            double remain = remainWidth;
-            foreach (var line in Sep.Split(Text))
+            if (remainWidth == entireWidth)
             {
-                if (line.Length == 0)
-                {
-                    yield return new LineBreakMarkGeometry(this);
-                }
-
-                foreach (var geometry in MeasureOverride(line, typeface, FontSize, Foreground, entireWidth, remain))
-                {
-                    yield return geometry;
-                }
+                return Convert(
+                    new TextLayout(
+                            Text,
+                            typeface, FontSize,
+                            Foreground,
+                            textWrapping: TextWrapping.Wrap,
+                            maxWidth: entireWidth)
+                );
             }
-        }
 
+            var layout = new TextLayout(
+                                Text,
+                                typeface, FontSize,
+                                Foreground,
+                                textWrapping: TextWrapping.Wrap);
 
+            IReadOnlyList<TextLine> lines = layout.TextLines;
 
-        public IEnumerable<CGeometry> MeasureOverride(
-            string text,
-            Typeface typeface,
-            double fontSize,
-            IBrush? foreground,
-            double entireWidth,
-            double remainWidth)
-        {
-#if DEBUG
-            if (text.Contains("\r") || text.Contains("\n"))
-                throw new InvalidOperationException("text contains linebreak!");
-#endif
-            var ftext = CreateFormattedText(text);
+            TextLine firstLine = lines[0];
 
-            if (ftext.Width < remainWidth)
+            if (firstLine.Width < remainWidth)
             {
-                return new[] { CreateGeometry(text, ftext, false) };
+                return Convert(
+                    lines.Count == 1 ?
+                        layout :
+                        new TextLayout(
+                                Text,
+                                typeface, FontSize,
+                                Foreground,
+                                textWrapping: TextWrapping.Wrap,
+                                maxWidth: entireWidth)
+                );
             }
             else
             {
-                var list = new List<CGeometry>();
+                string firstLineText = Text.Substring(firstLine.FirstTextSourceIndex, firstLine.Length);
 
-                using var chipList = SplitBreakPoint(text).GetEnumerator();
-                chipList.MoveNext();
+                var firstLineLayout = new TextLayout(
+                                              firstLineText,
+                                              typeface, FontSize,
+                                              Foreground,
+                                              textWrapping: TextWrapping.Wrap,
+                                              maxWidth: remainWidth);
 
-                var chip = chipList.Current;
-                var fmtChip = CreateFormattedText(chip);
 
-                if (fmtChip.Width > remainWidth
-                    && remainWidth != entireWidth)
+                var breakPosEnum = new LineBreakEnumerator(firstLineText.AsMemory());
+                int breakPos = breakPosEnum.MoveNext() ?
+                                    breakPosEnum.Current.PositionWrap :
+                                    int.MaxValue;
+
+
+                if (breakPos < firstLineLayout.TextLines[0].Length)
                 {
-                    list.Add(new LineBreakMarkGeometry(this));
+                    // correct wrap
+
+                    var list = Convert(
+                        new TextLayout(
+                                Text.Substring(firstLineLayout.TextLines[0].Length),
+                                typeface, FontSize,
+                                Foreground,
+                                textWrapping: TextWrapping.Wrap,
+                                maxWidth: entireWidth)
+                    );
+
+                    list.Insert(0, Convert(firstLineLayout.TextLines[0], true));
+
+                    return list;
                 }
-
-                var lineIndex = 0;
-                var lineLength = 0;
-                var lineWidth = 0d;
-
-                for (; ; )
+                else
                 {
-                    var constraint = list.Count == 0 ? remainWidth : entireWidth;
+                    // wrong wrap; first line word is too long
 
-                    if (lineWidth + fmtChip.WidthIncludingTrailingWhitespace <= constraint)
-                    {
-                        lineLength += chip.Length;
-                        lineWidth += fmtChip.WidthIncludingTrailingWhitespace;
-                    }
-                    else if (lineLength > 0)
-                    {
-                        // push stored words
+                    var list = Convert(
+                        new TextLayout(
+                                Text,
+                                typeface, FontSize,
+                                Foreground,
+                                textWrapping: TextWrapping.Wrap,
+                                maxWidth: entireWidth)
+                    );
 
-                        var line = text.Substring(lineIndex, lineLength);
-                        var fline = CreateFormattedText(line);
-                        list.Add(CreateGeometry(line, fline, true));
+                    list.Insert(0, new LineBreakMarkGeometry(this));
 
-                        lineIndex += lineLength;
-                        lineLength = 0;
-                        lineWidth = 0;
-
-                        continue;
-                    }
-                    else
-                    {
-                        // The width is too narrow to render a word.
-                        // Break down a word into letters.
-
-                        var layout = new TextLayout(
-                                            chip,
-                                            typeface, fontSize,
-                                            foreground,
-                                            textWrapping: TextWrapping.Wrap,
-                                            maxWidth: constraint);
-
-                        int layoutIdx = lineIndex;
-                        foreach (var line in layout.TextLines)
-                        {
-                            var brokenWord = text.Substring(layoutIdx, line.Length);
-                            var fbrokenWord = CreateFormattedText(brokenWord);
-                            list.Add(CreateGeometry(brokenWord, fbrokenWord, true));
-                            layoutIdx += line.Length;
-                        }
-
-                        lineIndex += chip.Length;
-                    }
-
-                    if (!chipList.MoveNext()) break;
-
-                    chip = chipList.Current;
-                    fmtChip = CreateFormattedText(chipList.Current);
+                    return list;
                 }
-
-                if (lineIndex < text.Length)
-                {
-                    var line = text.Substring(lineIndex);
-                    var fline = CreateFormattedText(line);
-                    list.Add(CreateGeometry(line, fline, true));
-                }
-
-                return list;
             }
-
-            FormattedText CreateFormattedText(string text)
-                => new FormattedText(
-                        text,
-                        CultureInfo.CurrentCulture,
-                        FlowDirection.LeftToRight,
-                        typeface, fontSize,
-                        foreground);
-
-            SingleTextLayoutGeometry CreateGeometry(string text, FormattedText formattedText, bool linebreak)
-                => new SingleTextLayoutGeometry(
-                        this,
-                        formattedText,
-                        TextVerticalAlignment,
-                        text,
-                        linebreak);
         }
 
-        private static IEnumerable<string> SplitBreakPoint(string text)
+        private List<CGeometry> Convert(TextLayout layout)
         {
-            var list = new List<string>();
+            var rslt = new List<CGeometry>();
 
-            int idx = 0;
-            var breakposis = new LineBreakEnumerator(text.AsMemory());
-            while (breakposis.MoveNext())
+            var textlines = layout.TextLines;
+            for (int j = 0; j < textlines.Count; ++j)
             {
-                var word = breakposis.Current;
-                list.Add(text.Substring(idx, word.PositionWrap - idx));
-                idx = word.PositionWrap;
+                var line = textlines[j];
+
+                rslt.Add(Convert(line, j != textlines.Count - 1));
             }
 
-            return list;
+            return rslt;
         }
+
+        private CGeometry Convert(TextLine line, bool linebreak)
+            => new TextLineGeometry(
+                        this,
+                        line,
+                        TextVerticalAlignment,
+                        Text.Substring(line.FirstTextSourceIndex, line.Length),
+                        linebreak);
     }
 }

@@ -144,7 +144,7 @@ namespace UnitTest.CTxt
                 {
                     Source = new Uri("avares://Avalonia.Themes.Simple/Accents/BaseLight.xaml")
                 });
-                control.Styles.Add(MarkdownStyle.DefaultTheme);
+                control.Styles.Add(MarkdownStyle.SimpleTheme);
                 control.Resources.Add("FontSizeNormal", 16d);
 
                 var umefont = new FontFamily(new Uri("avares://UnitTest.CTxt/Assets/Fonts/ume-ugo4.ttf"), "Ume UI Gothic");
@@ -176,7 +176,7 @@ namespace UnitTest.CTxt
             {
                 Source = new Uri("avares://Avalonia.Themes.Simple/Accents/BaseLight.xaml")
             });
-            control.Styles.Add(MarkdownStyle.DefaultTheme);
+            control.Styles.Add(MarkdownStyle.SimpleTheme);
             control.Resources.Add("FontSizeNormal", 16d);
 
             var umefont = new FontFamily(new Uri("avares://UnitTest.CTxt/Assets/Fonts/ume-ugo4.ttf"), "Ume UI Gothic");

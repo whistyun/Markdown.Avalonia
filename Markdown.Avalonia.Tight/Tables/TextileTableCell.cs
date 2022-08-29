@@ -9,14 +9,14 @@ namespace Markdown.Avalonia.Tables
     {
         public int ColumnIndex { set; get; }
 
-        public string RawText { get; }
-        public string Text { get; }
+        public string? RawText { get; }
+        public string? Text { get; }
         public int RowSpan { set; get; }
         public int ColSpan { set; get; }
         public TextAlignment? Horizontal { set; get; }
         public VerticalAlignment? Vertical { set; get; }
 
-        public TextileTableCell(string txt)
+        public TextileTableCell(string? txt)
         {
             RawText = txt;
             RowSpan = 1;

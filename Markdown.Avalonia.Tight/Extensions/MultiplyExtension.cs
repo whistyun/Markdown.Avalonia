@@ -55,25 +55,17 @@ namespace Markdown.Avalonia.Extensions
                 Scale = scale;
             }
 
-            public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
+            public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
             {
-                switch (values[0])
+                return values[0] switch
                 {
-                    case short s:
-                        return (short)(s * Scale);
-                    case int i:
-                        return (int)(i * Scale);
-                    case long l:
-                        return (long)(l * Scale);
-
-                    case float f:
-                        return (float)(f * Scale);
-                    case double d:
-                        return (double)(d * Scale);
-
-                    default:
-                        return values[0];
-                }
+                    short s => (short)(s * Scale),
+                    int i => (int)(i * Scale),
+                    long l => (long)(l * Scale),
+                    float f => (float)(f * Scale),
+                    double d => (double)(d * Scale),
+                    _ => values[0],
+                };
             }
         }
     }

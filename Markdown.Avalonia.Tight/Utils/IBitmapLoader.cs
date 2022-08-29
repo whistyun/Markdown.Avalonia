@@ -13,6 +13,6 @@ namespace Markdown.Avalonia.Utils
         /// </summary>
         string AssetPathRoot { set; }
 
-        Bitmap Get(string urlTxt);
+        Bitmap? Get(string urlTxt);
     }
 }

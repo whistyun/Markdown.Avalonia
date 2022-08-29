@@ -6,16 +6,16 @@ namespace Markdown.Avalonia.Parsers
 {
     static class Parser
     {
-        public static Parser<T> Create<T>(Regex pattern, Func<Match, T> v1, Func<Match, T> v2)
+        public static Parser<T> Create<T>(Regex pattern, Func<Match, T>? v1, Func<Match, T> v2)
             => new Single<T>(pattern, v1 ?? v2);
 
-        public static Parser<T> Create<T>(Regex pattern, Func<Match, T> v1, Func<Match, ParseStatus, T> v2)
+        public static Parser<T> Create<T>(Regex pattern, Func<Match, T>? v1, Func<Match, ParseStatus, T> v2)
             => v1 is null ? (Parser<T>)new Single2<T>(pattern, v2) : new Single<T>(pattern, v1);
 
-        public static Parser<T> Create<T>(Regex pattern, Func<Match, T> v1, Func<Match, IEnumerable<T>> v2)
+        public static Parser<T> Create<T>(Regex pattern, Func<Match, T>? v1, Func<Match, IEnumerable<T>> v2)
             => v1 is null ? (Parser<T>)new Multi<T>(pattern, v2) : new Single<T>(pattern, v1);
 
-        public static Parser<T> Create<T>(Regex pattern, Func<Match, T> v1, Func<Match, ParseStatus, IEnumerable<T>> v2)
+        public static Parser<T> Create<T>(Regex pattern, Func<Match, T>? v1, Func<Match, ParseStatus, IEnumerable<T>> v2)
             => v1 is null ? (Parser<T>)new Multi2<T>(pattern, v2) : new Single<T>(pattern, v1);
 
         sealed class Single<T> : Parser<T>

@@ -17,14 +17,14 @@ namespace Markdown.Avalonia
 {
     public class MarkdownScrollViewer : Control
     {
-        public static readonly AvaloniaProperty<Uri> SourceProperty =
-            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, Uri>(
+        public static readonly AvaloniaProperty<Uri?> SourceProperty =
+            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, Uri?>(
                 nameof(Source),
                 o => o.Source,
                 (o, v) => o.Source = v);
 
-        public static readonly AvaloniaProperty<string> MarkdownProperty =
-            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, string>(
+        public static readonly AvaloniaProperty<string?> MarkdownProperty =
+            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, string?>(
                 nameof(Markdown),
                 o => o.Markdown,
                 (o, v) => o.Markdown = v);
@@ -35,14 +35,14 @@ namespace Markdown.Avalonia
                 o => o.MarkdownStyle,
                 (o, v) => o.MarkdownStyle = v);
 
-        public static readonly AvaloniaProperty<string> MarkdownStyleNameProperty =
-            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, string>(
+        public static readonly AvaloniaProperty<string?> MarkdownStyleNameProperty =
+            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, string?>(
                 nameof(MarkdownStyleName),
                 o => o.MarkdownStyleName,
                 (o, v) => o.MarkdownStyleName = v);
 
-        public static readonly AvaloniaProperty<string> AssetPathRootProperty =
-            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, string>(
+        public static readonly AvaloniaProperty<string?> AssetPathRootProperty =
+            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, string?>(
                 nameof(AssetPathRoot),
                 o => o.AssetPathRoot,
                 (o, v) => o.AssetPathRoot = v);
@@ -59,33 +59,39 @@ namespace Markdown.Avalonia
                 (owner, v) => owner.ScrollValue = v);
 
 
-        private ScrollViewer _viewer;
+        private readonly ScrollViewer _viewer;
 
         public MarkdownScrollViewer()
         {
-            Engine = new Markdown();
+            _engine = new Markdown();
 
-            this.InitializeComponent();
+            if (nvl(ThemeDetector.IsFluentUsed))
+            {
+                _markdownStyleName = nameof(MdStyle.FluentTheme);
+                _markdownStyle = MdStyle.FluentTheme;
+            }
+            else if (nvl(ThemeDetector.IsSimpleUsed))
+            {
+                _markdownStyleName = nameof(MdStyle.SimpleTheme);
+                _markdownStyle = MdStyle.SimpleTheme;
+            }
+            else
+            {
+                _markdownStyleName = nameof(MdStyle.Standard);
+                _markdownStyle = MdStyle.Standard;
+            }
 
-            bool nvl(bool? vl) => vl.HasValue && vl.Value;
-
-            MarkdownStyleName =
-                nvl(ThemeDetector.IsFluentUsed) ? nameof(MdStyle.FluentTheme) :
-                nvl(ThemeDetector.IsSimpleUsed) ? nameof(MdStyle.DefaultTheme) :
-                nameof(MdStyle.Standard);
-        }
-
-        private void InitializeComponent()
-        {
             _viewer = new ScrollViewer()
             {
-                Padding = new Thickness(5),
+                // TODO: ScrollViewer does not seem to take Padding into account in 11.0.0-preview1
+                Padding = new Thickness(0),
                 HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             };
-
             VisualChildren.Add(_viewer);
             LogicalChildren.Add(_viewer);
+
+            static bool nvl(bool? vl) => vl.HasValue && vl.Value;
         }
 
         private void UpdateMarkdown()
@@ -104,6 +110,9 @@ namespace Markdown.Avalonia
         {
             set
             {
+                if (value is null)
+                    throw new ArgumentNullException(nameof(Engine));
+
                 _engine = value;
 
                 if (AssetPathRoot != null)
@@ -112,12 +121,12 @@ namespace Markdown.Avalonia
             get => _engine;
         }
 
-        private string _AssetPathRoot;
-        public string AssetPathRoot
+        private string? _AssetPathRoot;
+        public string? AssetPathRoot
         {
             set
             {
-                if (value != null)
+                if (value is not null)
                 {
                     Engine.AssetPathRoot = _AssetPathRoot = value;
                     UpdateMarkdown();
@@ -139,7 +148,7 @@ namespace Markdown.Avalonia
         }
 
         [Content]
-        public string HereMarkdown
+        public string? HereMarkdown
         {
             get { return Markdown; }
             set
@@ -199,8 +208,8 @@ namespace Markdown.Avalonia
             }
         }
 
-        private string _markdown;
-        public string Markdown
+        private string? _markdown;
+        public string? Markdown
         {
             get { return _markdown; }
             set
@@ -212,14 +221,21 @@ namespace Markdown.Avalonia
             }
         }
 
-        private Uri _source;
-        public Uri Source
+        private Uri? _source;
+        public Uri? Source
         {
             get { return _source; }
             set
             {
                 if (!SetAndRaise(SourceProperty, ref _source, value))
                     return;
+
+                if (value is null)
+                {
+                    _source = value;
+                    Markdown = null;
+                    return;
+                }
 
                 if (!value.IsAbsoluteUri)
                     throw new ArgumentException("it is not absolute.");
@@ -243,7 +259,8 @@ namespace Markdown.Avalonia
                         break;
 
                     case "avares":
-                        var loader = AvaloniaLocator.Current.GetService<IAssetLoader>();
+                        var loader = Helper.GetAssetLoader();
+
                         using (var strm = loader.Open(_source))
                         using (var reader = new StreamReader(strm, true))
                             Markdown = reader.ReadToEnd();
@@ -266,9 +283,12 @@ namespace Markdown.Avalonia
             get { return _markdownStyle; }
             set
             {
+                if (value is null)
+                    throw new ArgumentNullException(nameof(MarkdownStyle));
+
                 if (_markdownStyle != value)
                 {
-                    if (_markdownStyle != null)
+                    if (_markdownStyle is not null)
                         Styles.Remove(_markdownStyle);
 
                     Styles.Insert(0, value);
@@ -280,8 +300,8 @@ namespace Markdown.Avalonia
             }
         }
 
-        private string _markdownStyleName;
-        public string MarkdownStyleName
+        private string? _markdownStyleName;
+        public string? MarkdownStyleName
         {
             get { return _markdownStyleName; }
             set
@@ -290,11 +310,9 @@ namespace Markdown.Avalonia
 
                 if (_markdownStyleName is null)
                 {
-                    bool nvl(bool? vl) => vl.HasValue && vl.Value;
-
                     MarkdownStyle =
                         nvl(ThemeDetector.IsFluentUsed) ? MdStyle.FluentTheme :
-                        nvl(ThemeDetector.IsSimpleUsed) ? MdStyle.DefaultTheme :
+                        nvl(ThemeDetector.IsSimpleUsed) ? MdStyle.SimpleTheme :
                         MdStyle.Standard;
                 }
                 else
@@ -304,6 +322,8 @@ namespace Markdown.Avalonia
 
                     MarkdownStyle = (IStyle)prop.GetValue(null);
                 }
+
+                static bool nvl(bool? vl) => vl.HasValue && vl.Value;
             }
         }
 
