@@ -9,26 +9,26 @@ namespace ColorTextBlock.Avalonia
 {
     public class CHyperlink : CSpan
     {
-        public static readonly StyledProperty<IBrush> HoverBackgroundProperty =
-            AvaloniaProperty.Register<CHyperlink, IBrush>(nameof(Foreground));
+        public static readonly StyledProperty<IBrush?> HoverBackgroundProperty =
+            AvaloniaProperty.Register<CHyperlink, IBrush?>(nameof(Foreground));
 
-        public static readonly StyledProperty<IBrush> HoverForegroundProperty =
-            AvaloniaProperty.Register<CHyperlink, IBrush>(nameof(Foreground));
+        public static readonly StyledProperty<IBrush?> HoverForegroundProperty =
+            AvaloniaProperty.Register<CHyperlink, IBrush?>(nameof(Foreground));
 
-        public IBrush HoverBackground
+        public IBrush? HoverBackground
         {
             get { return GetValue(HoverBackgroundProperty); }
             set { SetValue(HoverBackgroundProperty, value); }
         }
 
-        public IBrush HoverForeground
+        public IBrush? HoverForeground
         {
             get { return GetValue(HoverForegroundProperty); }
             set { SetValue(HoverForegroundProperty, value); }
         }
 
-        public Action<string> Command { get; set; }
-        public string CommandParameter { get; set; }
+        public Action<string>? Command { get; set; }
+        public string? CommandParameter { get; set; }
 
         public CHyperlink() { }
 
@@ -47,7 +47,7 @@ namespace ColorTextBlock.Avalonia
 
             foreach (CGeometry metry in metrics)
             {
-                metry.OnClick = () => Command?.Invoke(CommandParameter);
+                metry.OnClick = () => Command?.Invoke(CommandParameter ?? string.Empty);
 
                 metry.OnMousePressed = () =>
                 {

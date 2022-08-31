@@ -11,7 +11,7 @@ namespace Markdown.Avalonia
 {
     public class ContainerSwitch : AvaloniaDictionary<string, IContainerBlockHandler>, IContainerBlockHandler
     {
-        public Border ProvideControl(string assetPathRoot, string blockName, string lines)
+        public Border? ProvideControl(string assetPathRoot, string blockName, string lines)
         {
             // blockName may be "name [title] (url) {option}".
             // This collect some character until "[", "(" or "{".

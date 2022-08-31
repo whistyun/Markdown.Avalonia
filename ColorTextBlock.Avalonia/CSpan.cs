@@ -65,7 +65,7 @@ namespace ColorTextBlock.Avalonia
                 });
         }
 
-        private Border _border;
+        private Border? _border;
 
         public Thickness BorderThickness
         {
@@ -97,12 +97,6 @@ namespace ColorTextBlock.Avalonia
             get => GetValue(MarginProperty);
             set => SetValue(MarginProperty, value);
         }
-
-        internal bool HasBorderProperty
-        {
-            get => _border != null;
-        }
-
 
         [Content]
         public IEnumerable<CInline> Content
@@ -160,7 +154,8 @@ namespace ColorTextBlock.Avalonia
             }
             else
             {
-                LogicalChildren.Remove(_border);
+                if (_border is not null)
+                    LogicalChildren.Remove(_border);
                 _border = null;
             }
 
@@ -172,8 +167,7 @@ namespace ColorTextBlock.Avalonia
             double entireWidth,
             double remainWidth)
         {
-            bool applyDeco = HasBorderProperty;
-            if (applyDeco)
+            if (_border is not null)
             {
                 _border.Measure(Size.Infinity);
 
@@ -193,7 +187,7 @@ namespace ColorTextBlock.Avalonia
                 }
             }
 
-            if (applyDeco)
+            if (_border is not null)
             {
                 var renew = new List<CGeometry>();
 

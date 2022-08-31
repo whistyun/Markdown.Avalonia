@@ -17,6 +17,8 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>Markdown Avalonia Avaloniaui</PackageTags>
     <Configurations>Debug;Release</Configurations>
+    <LangVersion>9</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

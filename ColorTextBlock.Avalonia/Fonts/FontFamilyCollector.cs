@@ -8,7 +8,7 @@ namespace ColorTextBlock.Avalonia.Fonts
 {
     internal class FontFamilyCollector
     {
-        public static FontFamily TryGetMonospace()
+        public static FontFamily? TryGetMonospace()
         {
             string[] RequestFamilies = {
                 "menlo",

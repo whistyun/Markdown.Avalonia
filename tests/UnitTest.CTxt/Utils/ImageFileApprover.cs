@@ -66,7 +66,7 @@ namespace UnitTest.CTxt.Utils
             return bary;
         }
 
-        private static bool Compare(ICollection<byte> bytes1, ICollection<byte> bytes2)
+        private new static bool Compare(ICollection<byte> bytes1, ICollection<byte> bytes2)
         {
             if (bytes1.Count != bytes2.Count)
             {

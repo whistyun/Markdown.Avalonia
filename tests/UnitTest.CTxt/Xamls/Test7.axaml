@@ -10,19 +10,8 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="UnitTest.CTxt.Xamls.Test7">
 
-  <Grid>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="1*"/>
-      <ColumnDefinition Width="1*"/>
-      <ColumnDefinition Width="1*"/>
-      <ColumnDefinition Width="1*"/>
-    </Grid.ColumnDefinitions>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto"/>
-      <RowDefinition Height="Auto"/>
-    </Grid.RowDefinitions>
-
-    <ctxt:CTextBlock LineHeight="50" Grid.Row="0" Grid.Column="0">
+  <StackPanel Orientation="Vertical">
+    <ctxt:CTextBlock LineHeight="50" Width="480">
       <ctxt:CRun>Text:</ctxt:CRun>
       <ctxt:CRun TextVerticalAlignment="Top" IsUnderline="True" >Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top Top</ctxt:CRun>
       <ctxt:CRun>:End Text</ctxt:CRun>
@@ -30,7 +19,7 @@
       <ctxt:CRun TextVerticalAlignment="Top">= = = = = = = =</ctxt:CRun>
     </ctxt:CTextBlock>
 
-    <ctxt:CTextBlock LineHeight="50" Grid.Row="0" Grid.Column="1">
+    <ctxt:CTextBlock LineHeight="50" Width="450">
       <ctxt:CRun>Text:</ctxt:CRun>
       <ctxt:CRun TextVerticalAlignment="Center" IsUnderline="True" >Center Center Center Center Center Center Center Center Center</ctxt:CRun>
       <ctxt:CRun>:End Text</ctxt:CRun>
@@ -38,7 +27,7 @@
       <ctxt:CRun TextVerticalAlignment="Top">= = = = = = = =</ctxt:CRun>
     </ctxt:CTextBlock>
 
-    <ctxt:CTextBlock LineHeight="50" Grid.Row="0" Grid.Column="2">
+    <ctxt:CTextBlock LineHeight="50" Width="480">
       <ctxt:CRun>Text:</ctxt:CRun>
       <ctxt:CRun TextVerticalAlignment="Bottom" IsUnderline="True" >Bottom Bottom Bottom Bottom Bottom Bottom Bottom Bottom Bottom</ctxt:CRun>
       <ctxt:CRun>:End Text</ctxt:CRun>
@@ -46,7 +35,7 @@
       <ctxt:CRun TextVerticalAlignment="Top">= = = = = = = =</ctxt:CRun>
     </ctxt:CTextBlock>
 
-    <ctxt:CTextBlock LineHeight="50" Grid.Row="0" Grid.Column="3">
+    <ctxt:CTextBlock LineHeight="50" Width="480">
       <ctxt:CRun>Text:</ctxt:CRun>
       <ctxt:CRun TextVerticalAlignment="Base"  IsUnderline="True" >Base Base Base Base Base Base Base Base Base Base Base Base Base</ctxt:CRun>
       <ctxt:CRun>:End Text</ctxt:CRun>
@@ -54,7 +43,7 @@
       <ctxt:CRun TextVerticalAlignment="Top">= = = = = = = =</ctxt:CRun>
     </ctxt:CTextBlock>
 
-    <ctxt:CTextBlock LineHeight="50" Grid.Row="1" Grid.Column="0">
+    <ctxt:CTextBlock LineHeight="50" Width="430">
       <ctxt:CRun>Text:</ctxt:CRun>
       <ctxt:CSpan TextVerticalAlignment="Base" Padding="2,10,2,2" BorderThickness="2" BorderBrush="Green" Background="LightGreen"
                                              >お腹空いた 眠い 走りたい ツカレタ お腹空いた 眠い 走りたい ツカレタ お腹空いた</ctxt:CSpan>
@@ -62,5 +51,5 @@
       <ctxt:CLineBreak/>
       <ctxt:CRun TextVerticalAlignment="Top">= = = = = = = =</ctxt:CRun>
     </ctxt:CTextBlock>
-  </Grid>
+  </StackPanel>
 </UserControl>

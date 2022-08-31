@@ -10,6 +10,8 @@
     <Authors>whistyun</Authors>
     <Copyright>Copyright (c) 2020 whistyun</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <LangVersion>9</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

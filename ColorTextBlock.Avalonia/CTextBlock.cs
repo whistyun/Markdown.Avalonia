@@ -4,10 +4,12 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Metadata;
+using Avalonia.Utilities;
 using ColorTextBlock.Avalonia.Geometries;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 
@@ -24,22 +26,22 @@ namespace ColorTextBlock.Avalonia
         public static readonly StyledProperty<double> LineSpacingProperty =
             AvaloniaProperty.Register<CTextBlock, double>(nameof(LineSpacing), defaultValue: 0);
 
-        public static readonly StyledProperty<IBrush> BackgroundProperty =
+        public static readonly StyledProperty<IBrush?> BackgroundProperty =
             Border.BackgroundProperty.AddOwner<CTextBlock>();
 
-        public static readonly AttachedProperty<IBrush> ForegroundProperty =
+        public static readonly StyledProperty<IBrush?> ForegroundProperty =
             TextBlock.ForegroundProperty.AddOwner<CTextBlock>();
 
-        public static readonly AttachedProperty<FontFamily> FontFamilyProperty =
+        public static readonly StyledProperty<FontFamily> FontFamilyProperty =
             TextBlock.FontFamilyProperty.AddOwner<CTextBlock>();
 
-        public static readonly AttachedProperty<FontWeight> FontWeightProperty =
+        public static readonly StyledProperty<FontWeight> FontWeightProperty =
             TextBlock.FontWeightProperty.AddOwner<CTextBlock>();
 
-        public static readonly AttachedProperty<double> FontSizeProperty =
+        public static readonly StyledProperty<double> FontSizeProperty =
             TextBlock.FontSizeProperty.AddOwner<CTextBlock>();
 
-        public static readonly AttachedProperty<FontStyle> FontStyleProperty =
+        public static readonly StyledProperty<FontStyle> FontStyleProperty =
             TextBlock.FontStyleProperty.AddOwner<CTextBlock>();
 
         public static readonly StyledProperty<TextVerticalAlignment> TextVerticalAlignmentProperty =
@@ -60,7 +62,6 @@ namespace ColorTextBlock.Avalonia
         public static readonly StyledProperty<TextAlignment> TextAlignmentProperty =
             AvaloniaProperty.Register<CTextBlock, TextAlignment>(
                 nameof(TextAlignment), defaultValue: TextAlignment.Left);
-
 
         static CTextBlock()
         {
@@ -90,17 +91,22 @@ namespace ColorTextBlock.Avalonia
             ).AddClassHandler<CTextBlock>((x, _) => x.CheckHaveToMeasure());
         }
 
-        private double computedBaseHeight;
+        private double _computedBaseHeight;
         private AvaloniaList<CInline> _content;
-        private List<CGeometry> metries;
+        private Size _constraint;
+        private Size _measured;
+        private readonly List<CGeometry> _metries;
+        private bool _isPressed;
+        private CGeometry? _entered;
+        private CGeometry? _pressed;
 
-        public IBrush Background
+        public IBrush? Background
         {
             get { return GetValue(BackgroundProperty); }
             set { SetValue(BackgroundProperty, value); }
         }
 
-        public IBrush Foreground
+        public IBrush? Foreground
         {
             get { return GetValue(ForegroundProperty); }
             set { SetValue(ForegroundProperty, value); }
@@ -186,7 +192,7 @@ namespace ColorTextBlock.Avalonia
             _content = new AvaloniaList<CInline>();
             _content.CollectionChanged += ContentCollectionChangedd;
 
-            metries = new List<CGeometry>();
+            _metries = new List<CGeometry>();
         }
 
         public CTextBlock(string text) : this()
@@ -201,18 +207,14 @@ namespace ColorTextBlock.Avalonia
 
         #region pointer event
 
-        bool isPressed;
-        CGeometry entered;
-        CGeometry pressed;
-
-        protected override void OnPointerLeave(PointerEventArgs e)
+        protected override void OnPointerExited(PointerEventArgs e)
         {
-            base.OnPointerLeave(e);
+            base.OnPointerExited(e);
 
-            if (entered != null)
+            if (_entered is not null)
             {
-                entered.OnMouseLeave?.Invoke();
-                entered = null;
+                _entered.OnMouseLeave?.Invoke();
+                _entered = null;
             }
         }
 
@@ -231,25 +233,25 @@ namespace ColorTextBlock.Avalonia
                     && 0 <= relY && relY <= metry.Height;
             }
 
-            if (entered != null)
+            if (_entered is not null)
             {
-                var relX = point.X - entered.Left;
-                var relY = point.Y - entered.Top;
+                var relX = point.X - _entered.Left;
+                var relY = point.Y - _entered.Top;
 
-                if (!isEntered(entered))
+                if (!isEntered(_entered))
                 {
-                    entered.OnMouseLeave?.Invoke();
-                    entered = null;
+                    _entered.OnMouseLeave?.Invoke();
+                    _entered = null;
                 }
                 else return;
             }
 
-            foreach (CGeometry metry in metries)
+            foreach (CGeometry metry in _metries)
             {
                 if (isEntered(metry))
                 {
                     metry.OnMouseEnter?.Invoke();
-                    entered = metry;
+                    _entered = metry;
                     break;
                 }
             }
@@ -260,7 +262,7 @@ namespace ColorTextBlock.Avalonia
             base.OnPointerPressed(e);
             if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             {
-                isPressed = true;
+                _isPressed = true;
                 e.Handled = true;
 
                 Point point = e.GetPosition(this);
@@ -274,12 +276,12 @@ namespace ColorTextBlock.Avalonia
                         && 0 <= relY && relY <= metry.Height;
                 }
 
-                foreach (CGeometry metry in metries)
+                foreach (CGeometry metry in _metries)
                 {
                     if (isEntered(metry))
                     {
                         metry.OnMousePressed?.Invoke();
-                        pressed = metry;
+                        _pressed = metry;
                         break;
                     }
                 }
@@ -290,21 +292,21 @@ namespace ColorTextBlock.Avalonia
         {
             base.OnPointerReleased(e);
 
-            if (isPressed && e.InitialPressMouseButton == MouseButton.Left)
+            if (_isPressed && e.InitialPressMouseButton == MouseButton.Left)
             {
-                isPressed = false;
+                _isPressed = false;
                 e.Handled = true;
 
-                if (pressed != null)
+                if (_pressed is not null)
                 {
-                    pressed.OnMouseReleased?.Invoke();
-                    pressed = null;
+                    _pressed.OnMouseReleased?.Invoke();
+                    _pressed = null;
                 }
 
 
                 Point point = e.GetPosition(this);
 
-                foreach (CGeometry metry in metries)
+                foreach (CGeometry metry in _metries)
                 {
                     var relX = point.X - metry.Left;
                     var relY = point.Y - metry.Top;
@@ -323,7 +325,7 @@ namespace ColorTextBlock.Avalonia
 
         public void ObserveBaseHeightOf(CTextBlock target)
         {
-            if (target != null)
+            if (target is not null)
                 this.Bind(BaseHeightProperty, target.GetBindingObservable(BaseHeightProperty));
         }
 
@@ -361,15 +363,19 @@ namespace ColorTextBlock.Avalonia
 
         private void CheckHaveToMeasure()
         {
-            if (computedBaseHeight != GetValue(BaseHeightProperty))
+            if (_computedBaseHeight != GetValue(BaseHeightProperty))
+            {
                 InvalidateMeasure();
+                InvalidateArrange();
+            }
         }
 
 
         internal void OnMeasureSourceChanged()
         {
-            SetValue(BaseHeightProperty, default(double));
+            SetValue(BaseHeightProperty, default);
             InvalidateMeasure();
+            InvalidateArrange();
         }
 
         private void RepaintRequested()
@@ -377,12 +383,42 @@ namespace ColorTextBlock.Avalonia
             InvalidateVisual();
         }
 
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            if (_measured.Width > finalSize.Width)
+            {
+                finalSize = finalSize.WithWidth(Math.Ceiling(_measured.Width));
+            }
+            if (MathUtilities.AreClose(_constraint.Width, finalSize.Width))
+            {
+                return finalSize;
+            }
+
+            _constraint = new Size(finalSize.Width, Double.PositiveInfinity);
+            _measured = UpdateGeometry();
+
+            return finalSize;
+        }
+
         protected override Size MeasureOverride(Size availableSize)
         {
-            metries.Clear();
+            if (_measured.Width == 0d || !MathUtilities.AreClose(availableSize.Width, _constraint.Width))
+            {
+                _constraint = availableSize;
+                _measured = UpdateGeometry();
+            }
 
-            double entireWidth = availableSize.Width;
-            if (Double.IsInfinity(availableSize.Width) && Bounds.Width != 0)
+            InvalidateArrange();
+
+            return _measured;
+        }
+
+        private Size UpdateGeometry()
+        {
+            _metries.Clear();
+
+            double entireWidth = _constraint.Width;
+            if (Double.IsInfinity(_constraint.Width) && Bounds.Width != 0)
                 entireWidth = Bounds.Width;
 
 
@@ -394,7 +430,7 @@ namespace ColorTextBlock.Avalonia
             var entireLineHeight = LineHeight;
             var lines = new List<LineInfo>();
             {
-                LineInfo now = null;
+                LineInfo? now = null;
 
                 double remainWidth = entireWidth;
 
@@ -429,7 +465,7 @@ namespace ColorTextBlock.Avalonia
                     }
                 }
 
-                if (now != null)
+                if (now is not null)
                 {
                     if (!Double.IsNaN(entireLineHeight))
                         now.OverwriteHeight(entireLineHeight);
@@ -441,7 +477,7 @@ namespace ColorTextBlock.Avalonia
 
             if (lines.Count > 0)
             {
-                computedBaseHeight = lines[0].BaseHeight;
+                _computedBaseHeight = lines[0].BaseHeight;
                 SetValue(BaseHeightProperty, lines[0].BaseHeight);
             }
 
@@ -489,26 +525,28 @@ namespace ColorTextBlock.Avalonia
 
                         leftOffset += metry.Width;
 
-                        metries.Add(metry);
+                        _metries.Add(metry);
                     }
 
                     topOffset += lineInf.Height + lineSpc;
                 }
             }
 
-            foreach (CGeometry metry in metries) metry.RepaintRequested += RepaintRequested;
+            foreach (CGeometry metry in _metries) metry.RepaintRequested += RepaintRequested;
 
             return new Size(width, height);
         }
 
+
         public override void Render(DrawingContext context)
         {
+            UpdateGeometry();
             if (Background != null)
             {
                 context.FillRectangle(Background, new Rect(0, 0, Bounds.Width, Bounds.Height));
             }
 
-            foreach (var metry in metries)
+            foreach (var metry in _metries)
             {
                 metry.Render(context);
             }
@@ -517,7 +555,7 @@ namespace ColorTextBlock.Avalonia
 
     class LineInfo
     {
-        public List<CGeometry> Metries = new List<CGeometry>();
+        public List<CGeometry> Metries = new();
 
         public double RequestBaseHeight;
         private double BaseHeight1;

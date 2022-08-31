@@ -1,17 +1,19 @@
 ﻿using Avalonia;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
+using Avalonia.Media.TextFormatting.Unicode;
 using Avalonia.Metadata;
 using ColorTextBlock.Avalonia.Geometries;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace ColorTextBlock.Avalonia
 {
     public class CRun : CInline
     {
+        private static readonly Regex Sep = new("\r\n|\r|\n", RegexOptions.Compiled);
+
         public static readonly StyledProperty<string> TextProperty =
             AvaloniaProperty.Register<CRun, string>(nameof(Text));
 
@@ -26,132 +28,108 @@ namespace ColorTextBlock.Avalonia
             double entireWidth,
             double remainWidth)
         {
-            var creator = new LayoutCreateor(
-                FontFamily,
-                FontStyle,
-                FontWeight,
-                FontSize);
-
-
-            SingleTextLayoutGeometry NewGeometry(string text, bool linebreak)
-                => new SingleTextLayoutGeometry(this, creator.Create(text, Foreground), creator.Create, TextVerticalAlignment, text, linebreak);
-
-            SingleTextLayoutGeometry NewGeometry2(string text, bool linebreak, double width)
-                => new SingleTextLayoutGeometry(this, creator.Create(text, Foreground, width), creator.WithConstraint(width), TextVerticalAlignment, text, linebreak);
-
             if (String.IsNullOrEmpty(Text))
             {
-                yield break;
+                return Array.Empty<CGeometry>();
             }
 
-            string entireText = Text;
-
-            if (remainWidth != entireWidth)
+            if (remainWidth == entireWidth)
             {
-                /*
-                 * It is hacking-resolution for 'line breaking rules'.
-                 * 
-                 * insert one space in the head to detect the line break position
-                 * 
-                 *   |                        |                 |                        |
-                 *   | xxxxxx xxxxxx          |   rather than   | xxxxxx xxxxxx internat |
-                 *   | internationalization   |                 | ionalization           |
-                 *   |                        |                 |                        |
-                 *
-                 */
-
-                var firstTxtLen =
-                        creator.Create(" " + entireText, Foreground, remainWidth)
-                            .TextLines.First().TextRange.Length;
-
-                firstTxtLen = Math.Max(firstTxtLen - 1, 0);
-
-                if (firstTxtLen > 0)
-                {
-                    var firstText = entireText.Substring(0, firstTxtLen);
-                    entireText = entireText.Substring(firstTxtLen);
-                    yield return NewGeometry(firstText, entireText != "");
-                }
-                else
-                {
-                    yield return new LineBreakMarkGeometry(this);
-                }
-
-                if (String.IsNullOrEmpty(entireText))
-                    yield break;
+                return Create(Text, entireWidth);
             }
 
-            var midlayout = creator.Create(entireText, Foreground, entireWidth);
+            var layout = new TextLayout(
+                                Text,
+                                Typeface, FontSize,
+                                Foreground,
+                                textWrapping: TextWrapping.Wrap);
 
-            if (midlayout.TextLines.Count >= 2)
+            TextLine firstLine = layout.TextLines[0];
+
+            if (firstLine.Width < remainWidth)
             {
-                var ranges = midlayout.TextLines.Select(ln => ln.TextRange).ToArray();
-                var lastRange = ranges[ranges.Length - 1];
-
-                foreach (var range in ranges)
-                {
-                    // If the text ends with a line break,
-                    // the empty line which indicate the last caret position of text is appeared.
-                    // AvaloniaUI/Avalonia#6454
-                    if (entireText.Length <= range.Start)
-                        break;
-
-                    var line = entireText.Substring(range.Start, range.Length);
-                    yield return NewGeometry(line, !range.Equals(lastRange));
-                }
+                return layout.TextLines.Count == 1 ?
+                    Create(Text, layout) :
+                    Create(Text, entireWidth);
             }
             else
             {
-                yield return new SingleTextLayoutGeometry(
-                        this,
-                        midlayout,
-                        creator.Create,
-                        TextVerticalAlignment,
-                        entireText,
-                        false);
+                string firstLineText = Text.Substring(firstLine.FirstTextSourceIndex, firstLine.Length);
+
+                var firstLineLayout = new TextLayout(
+                                              firstLineText,
+                                              Typeface, FontSize,
+                                              Foreground,
+                                              textWrapping: TextWrapping.Wrap,
+                                              maxWidth: remainWidth);
+
+
+                var breakPosEnum = new LineBreakEnumerator(firstLineText.AsMemory());
+                int breakPos = breakPosEnum.MoveNext() ?
+                                    breakPosEnum.Current.PositionWrap :
+                                    int.MaxValue;
+
+
+                if (breakPos < firstLineLayout.TextLines[0].Length)
+                {
+                    // correct wrap
+
+                    var secondalyText = Text.Substring(firstLineLayout.TextLines[0].Length);
+
+                    var list = Create(secondalyText, entireWidth);
+
+                    list.Insert(0, Create(firstLineText, firstLineLayout.TextLines[0], true));
+
+                    return list;
+                }
+                else
+                {
+                    // wrong wrap; first line word is too long
+
+                    var list = Create(Text, entireWidth);
+
+                    list.Insert(0, new LineBreakMarkGeometry(this));
+
+                    return list;
+                }
             }
         }
-    }
 
-    class LayoutCreateor
-    {
-        public Typeface Typeface { get; }
-        public double FontSize { get; }
-
-        public LayoutCreateor(
-            FontFamily fontFamily,
-            FontStyle fontStyle,
-            FontWeight fontWeight,
-            double fontSize)
+        private CGeometry Create(string chip, TextLine line, bool linebreak)
         {
-            Typeface = new Typeface(
-                    fontFamily,
-                    fontStyle,
-                    fontWeight);
-            FontSize = fontSize;
+            var cline = new CTextLine(chip, Typeface, FontSize, line);
+
+            return new TextLineGeometry(this, cline, TextVerticalAlignment, linebreak);
         }
 
-        public TextLayoutCreator WithConstraint(double width)
-        => (text, foreground) => Create(text, foreground, width);
+        private List<CGeometry> Create(string text, double maxWidth)
+        => Create(
+            text,
+            new TextLayout(
+                    text,
+                    Typeface, FontSize,
+                    Foreground,
+                    textWrapping: TextWrapping.Wrap,
+                    maxWidth: maxWidth));
 
-        public TextLayout Create(
-                string text,
-                IBrush foreground)
-        => Create(text, foreground, Double.PositiveInfinity);
-
-        public TextLayout Create(
-                string text,
-                IBrush foreground,
-                double width)
+        private List<CGeometry> Create(string text, TextLayout layout)
         {
-            return new TextLayout(
-                text ?? string.Empty,
-                Typeface,
-                FontSize,
-                foreground,
-                textWrapping: TextWrapping.Wrap,
-                maxWidth: width,
-                maxHeight: double.PositiveInfinity);
+            var rslt = new List<CGeometry>();
+
+            var textlines = layout.TextLines;
+            for (int j = 0; j < textlines.Count; ++j)
+            {
+                var line = textlines[j];
+                var chip = text.Substring(line.FirstTextSourceIndex, line.Length);
+
+                var cline = new CTextLine(chip, Typeface, FontSize, line);
+
+                var linebreak = j != textlines.Count - 1;
+
+                rslt.Add(new TextLineGeometry(this, cline, TextVerticalAlignment, linebreak));
+            }
+
+            return rslt;
         }
     }
 }

@@ -15,8 +15,8 @@ namespace Markdown.Avalonia.Utils
     /// <param name="assetPathRoot">Asset Path Root</param>
     /// <param name="blockName">Block Name</param>
     /// <param name="lines">Text to parse</param>
-    /// <returns>Controls</returns>
-    Border ProvideControl( string assetPathRoot,
+    /// <returns>Controls; or null when no container founds</returns>
+    Border? ProvideControl( string assetPathRoot,
                            string blockName,
                            string lines );
   }

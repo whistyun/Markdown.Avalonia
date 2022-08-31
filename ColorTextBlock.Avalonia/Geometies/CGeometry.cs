@@ -19,13 +19,13 @@ namespace ColorTextBlock.Avalonia.Geometries
         public bool LineBreak { get; }
         public TextVerticalAlignment TextVerticalAlignment { get; }
 
-        public event Action RepaintRequested;
+        public event Action? RepaintRequested;
 
-        public virtual Action OnMouseEnter { get; set; }
-        public virtual Action OnMouseLeave { get; set; }
-        public virtual Action OnMousePressed { get; set; }
-        public virtual Action OnMouseReleased { get; set; }
-        public virtual Action OnClick { get; set; }
+        public virtual Action? OnMouseEnter { get; set; }
+        public virtual Action? OnMouseLeave { get; set; }
+        public virtual Action? OnMousePressed { get; set; }
+        public virtual Action? OnMouseReleased { get; set; }
+        public virtual Action? OnClick { get; set; }
 
         public CGeometry(
             double width, double height, double baseHeight,

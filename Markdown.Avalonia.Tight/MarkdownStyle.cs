@@ -15,11 +15,11 @@ namespace Markdown.Avalonia
 {
     public static class MarkdownStyle
     {
-        private static Dictionary<string, Action<Styles>> StyleOverrideMap;
+        private static readonly Dictionary<string, Action<Styles>> s_styleOverrideMap;
 
         static MarkdownStyle()
         {
-            StyleOverrideMap = new Dictionary<string, Action<Styles>>();
+            s_styleOverrideMap = new Dictionary<string, Action<Styles>>();
 
             try
             {
@@ -29,8 +29,11 @@ namespace Markdown.Avalonia
                     "Markdown.Avalonia.SyntaxHigh.StyleSetup",
                     "GetOverrideStyles");
 
+                if (actions is null)
+                    throw new NullReferenceException("action");
+
                 foreach (var action in actions)
-                    StyleOverrideMap[action.Key] = action.Value;
+                    s_styleOverrideMap[action.Key] = action.Value;
             }
             catch (Exception e)
             {
@@ -41,7 +44,7 @@ namespace Markdown.Avalonia
 
         private static Styles Filter(string name, Styles origin)
         {
-            if (StyleOverrideMap.TryGetValue(name, out var filter))
+            if (s_styleOverrideMap.TryGetValue(name, out var filter))
                 filter(origin);
 
             return origin;
@@ -52,9 +55,15 @@ namespace Markdown.Avalonia
             get => Filter(nameof(Standard), new MarkdownStyleStandard());
         }
 
+        [Obsolete("Use SimpleTheme instead")]
         public static Styles DefaultTheme
         {
-            get => Filter(nameof(DefaultTheme), new MarkdownStyleDefaultTheme());
+            get => SimpleTheme;
+        }
+
+        public static Styles SimpleTheme
+        {
+            get => Filter(nameof(SimpleTheme), new MarkdownStyleDefaultTheme());
         }
 
         public static Styles FluentTheme

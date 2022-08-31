@@ -4,6 +4,7 @@ using ApprovalTests.Reporters;
 using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -28,14 +29,6 @@ namespace UnitTest.CTxt
     {
         public UnitTestCTxt()
         {
-            var currentTestVerTxt = Environment.GetEnvironmentVariable("AVA_VER");
-            var currentTestVer = Version.Parse(currentTestVerTxt ?? "0.10.0");
-
-            if (currentTestVer >= Version.Parse("0.10.13"))
-            {
-                Approvals.RegisterDefaultNamerCreation(() => new ChangeOutputPathNamer("Out13"));
-            }
-
             Approvals.RegisterDefaultApprover((w, n, c) => new ImageFileApprover(w, n, c));
         }
 
@@ -46,7 +39,7 @@ namespace UnitTest.CTxt
             var tst1 = new Test1();
             var ctxt = (CTextBlock)tst1.Content;
 
-            var info = new MetryHolder(ctxt, 390, 1000);
+            var info = new MetryHolder(ctxt, 385, 1000);
 
             Approvals.Verify(
                 new ApprovalImageWriter(info.Image),
@@ -143,19 +136,19 @@ namespace UnitTest.CTxt
                 var markdown = new Markdown.Avalonia.Markdown();
                 var control = markdown.Transform(text);
 
-                control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Default/"))
+                control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Simple/"))
                 {
-                    Source = new Uri("avares://Avalonia.Themes.Default/DefaultTheme.xaml")
+                    Source = new Uri("avares://Avalonia.Themes.Simple/Controls/SimpleControls.xaml")
                 });
-                control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Default/"))
+                control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Simple/"))
                 {
-                    Source = new Uri("avares://Avalonia.Themes.Default/Accents/BaseLight.xaml")
+                    Source = new Uri("avares://Avalonia.Themes.Simple/Accents/BaseLight.xaml")
                 });
-                control.Styles.Add(MarkdownStyle.DefaultTheme);
+                control.Styles.Add(MarkdownStyle.SimpleTheme);
                 control.Resources.Add("FontSizeNormal", 16d);
 
                 var umefont = new FontFamily(new Uri("avares://UnitTest.CTxt/Assets/Fonts/ume-ugo4.ttf"), "Ume UI Gothic");
-                TextBlock.SetFontFamily(control, umefont);
+                TextElement.SetFontFamily(control, umefont);
 
                 var info = new MetryHolder(control, 500, 10000);
             }
@@ -175,19 +168,19 @@ namespace UnitTest.CTxt
             var markdown = new Markdown.Avalonia.Markdown();
             var control = markdown.Transform(text);
 
-            control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Default/"))
+            control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Simple/"))
             {
-                Source = new Uri("avares://Avalonia.Themes.Default/DefaultTheme.xaml")
+                Source = new Uri("avares://Avalonia.Themes.Simple/Controls/SimpleControls.xaml")
             });
-            control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Default/"))
+            control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Simple/"))
             {
-                Source = new Uri("avares://Avalonia.Themes.Default/Accents/BaseLight.xaml")
+                Source = new Uri("avares://Avalonia.Themes.Simple/Accents/BaseLight.xaml")
             });
-            control.Styles.Add(MarkdownStyle.DefaultTheme);
+            control.Styles.Add(MarkdownStyle.SimpleTheme);
             control.Resources.Add("FontSizeNormal", 16d);
 
             var umefont = new FontFamily(new Uri("avares://UnitTest.CTxt/Assets/Fonts/ume-ugo4.ttf"), "Ume UI Gothic");
-            TextBlock.SetFontFamily(control, umefont);
+            TextElement.SetFontFamily(control, umefont);
 
             var info = new MetryHolder(control, 500, 10000);
 
@@ -247,9 +240,9 @@ namespace UnitTest.CTxt
         public void GivenTest7_generatesExpectedResult()
         {
             var tst6 = new Test7();
-            var ctxt = (Grid)tst6.Content;
+            var ctxt = (StackPanel)tst6.Content;
 
-            var info = new MetryHolder(ctxt, 1248, 1000);
+            var info = new MetryHolder(ctxt, 480, 1000);
 
             Approvals.Verify(
                 new ApprovalImageWriter(info.Image),

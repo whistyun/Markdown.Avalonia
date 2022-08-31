@@ -103,15 +103,10 @@
     </Style.Setters>
   </Style>
 
-  <!--
-            The Table's style don't seem to support border-collapse.
-            By making the ruled line width 0.5 and applying it to cell and table,
-            it looks like the ruled lines are not doubled.
-        -->
   <Style Selector="Border.Table">
     <Style.Setters>
       <Setter Property="Margin" Value="5"/>
-      <Setter Property="BorderThickness" Value="0.5"/>
+      <Setter Property="BorderThickness" Value="0,0,1,1"/>
       <Setter Property="BorderBrush" Value="Gray"/>
     </Style.Setters>
   </Style>
@@ -119,7 +114,7 @@
   <Style Selector="Grid.Table > Border">
     <Style.Setters>
       <Setter Property="Margin" Value="0"/>
-      <Setter Property="BorderThickness" Value="0.5"/>
+      <Setter Property="BorderThickness" Value="1,1,0,0"/>
       <Setter Property="BorderBrush" Value="Gray"/>
       <Setter Property="Padding" Value="2"/>
     </Style.Setters>

@@ -66,7 +66,7 @@ namespace Markdown.Avalonia.Extensions
             Value = value;
         }
 
-        public InstancedBinding Initiate(IAvaloniaObject target, AvaloniaProperty targetProperty, object anchor = null, bool enableDataValidation = false)
+        public InstancedBinding? Initiate(IAvaloniaObject target, AvaloniaProperty? targetProperty, object? anchor = null, bool enableDataValidation = false)
         {
             return InstancedBinding.OneWay(new StaticBindingObservable(Value));
         }
@@ -154,7 +154,7 @@ namespace Markdown.Avalonia.Extensions
             Relate = relate;
         }
 
-        public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
         {
             Color colL;
             if (values[0] is ISolidColorBrush bl)
