@@ -33,42 +33,24 @@ namespace ColorTextBlock.Avalonia
                 return Array.Empty<CGeometry>();
             }
 
-            var typeface = new Typeface(FontFamily, FontStyle, FontWeight);
-
             if (remainWidth == entireWidth)
             {
-                return Convert(
-                    new TextLayout(
-                            Text,
-                            typeface, FontSize,
-                            Foreground,
-                            textWrapping: TextWrapping.Wrap,
-                            maxWidth: entireWidth)
-                );
+                return Create(Text, entireWidth);
             }
 
             var layout = new TextLayout(
                                 Text,
-                                typeface, FontSize,
+                                Typeface, FontSize,
                                 Foreground,
                                 textWrapping: TextWrapping.Wrap);
 
-            IReadOnlyList<TextLine> lines = layout.TextLines;
-
-            TextLine firstLine = lines[0];
+            TextLine firstLine = layout.TextLines[0];
 
             if (firstLine.Width < remainWidth)
             {
-                return Convert(
-                    lines.Count == 1 ?
-                        layout :
-                        new TextLayout(
-                                Text,
-                                typeface, FontSize,
-                                Foreground,
-                                textWrapping: TextWrapping.Wrap,
-                                maxWidth: entireWidth)
-                );
+                return layout.TextLines.Count == 1 ?
+                    Create(Text, layout) :
+                    Create(Text, entireWidth);
             }
             else
             {
@@ -76,7 +58,7 @@ namespace ColorTextBlock.Avalonia
 
                 var firstLineLayout = new TextLayout(
                                               firstLineText,
-                                              typeface, FontSize,
+                                              Typeface, FontSize,
                                               Foreground,
                                               textWrapping: TextWrapping.Wrap,
                                               maxWidth: remainWidth);
@@ -92,16 +74,11 @@ namespace ColorTextBlock.Avalonia
                 {
                     // correct wrap
 
-                    var list = Convert(
-                        new TextLayout(
-                                Text.Substring(firstLineLayout.TextLines[0].Length),
-                                typeface, FontSize,
-                                Foreground,
-                                textWrapping: TextWrapping.Wrap,
-                                maxWidth: entireWidth)
-                    );
+                    var secondalyText = Text.Substring(firstLineLayout.TextLines[0].Length);
 
-                    list.Insert(0, Convert(firstLineLayout.TextLines[0], true));
+                    var list = Create(secondalyText, entireWidth);
+
+                    list.Insert(0, Create(firstLineText, firstLineLayout.TextLines[0], true));
 
                     return list;
                 }
@@ -109,14 +86,7 @@ namespace ColorTextBlock.Avalonia
                 {
                     // wrong wrap; first line word is too long
 
-                    var list = Convert(
-                        new TextLayout(
-                                Text,
-                                typeface, FontSize,
-                                Foreground,
-                                textWrapping: TextWrapping.Wrap,
-                                maxWidth: entireWidth)
-                    );
+                    var list = Create(Text, entireWidth);
 
                     list.Insert(0, new LineBreakMarkGeometry(this));
 
@@ -125,7 +95,24 @@ namespace ColorTextBlock.Avalonia
             }
         }
 
-        private List<CGeometry> Convert(TextLayout layout)
+        private CGeometry Create(string chip, TextLine line, bool linebreak)
+        {
+            var cline = new CTextLine(chip, Typeface, FontSize, line);
+
+            return new TextLineGeometry(this, cline, TextVerticalAlignment, linebreak);
+        }
+
+        private List<CGeometry> Create(string text, double maxWidth)
+        => Create(
+            text,
+            new TextLayout(
+                    text,
+                    Typeface, FontSize,
+                    Foreground,
+                    textWrapping: TextWrapping.Wrap,
+                    maxWidth: maxWidth));
+
+        private List<CGeometry> Create(string text, TextLayout layout)
         {
             var rslt = new List<CGeometry>();
 
@@ -133,19 +120,16 @@ namespace ColorTextBlock.Avalonia
             for (int j = 0; j < textlines.Count; ++j)
             {
                 var line = textlines[j];
+                var chip = text.Substring(line.FirstTextSourceIndex, line.Length);
 
-                rslt.Add(Convert(line, j != textlines.Count - 1));
+                var cline = new CTextLine(chip, Typeface, FontSize, line);
+
+                var linebreak = j != textlines.Count - 1;
+
+                rslt.Add(new TextLineGeometry(this, cline, TextVerticalAlignment, linebreak));
             }
 
             return rslt;
         }
-
-        private CGeometry Convert(TextLine line, bool linebreak)
-            => new TextLineGeometry(
-                        this,
-                        line,
-                        TextVerticalAlignment,
-                        Text.Substring(line.FirstTextSourceIndex, line.Length),
-                        linebreak);
     }
 }

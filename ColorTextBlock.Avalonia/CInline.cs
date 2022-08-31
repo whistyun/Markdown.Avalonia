@@ -24,6 +24,9 @@ namespace ColorTextBlock.Avalonia
         public static readonly StyledProperty<FontWeight> FontWeightProperty =
             TextBlock.FontWeightProperty.AddOwner<CInline>();
 
+        public static readonly StyledProperty<FontStretch> FontStretchProperty =
+            TextBlock.FontStretchProperty.AddOwner<CInline>();
+
         public static readonly StyledProperty<double> FontSizeProperty =
             TextBlock.FontSizeProperty.AddOwner<CInline>();
 
@@ -38,28 +41,6 @@ namespace ColorTextBlock.Avalonia
 
         public static readonly StyledProperty<bool> IsStrikethroughProperty =
             AvaloniaProperty.Register<CInline, bool>(nameof(IsStrikethrough), inherits: true);
-
-        static CInline()
-        {
-            Observable.Merge<AvaloniaPropertyChangedEventArgs>(
-                BackgroundProperty.Changed,
-                ForegroundProperty.Changed,
-                FontFamilyProperty.Changed,
-                FontSizeProperty.Changed,
-                FontStyleProperty.Changed,
-                FontWeightProperty.Changed,
-                IsUnderlineProperty.Changed,
-                IsStrikethroughProperty.Changed
-            ).AddClassHandler<CInline>((x, _) => x.RequestRender());
-
-            Observable.Merge<AvaloniaPropertyChangedEventArgs>(
-                FontFamilyProperty.Changed,
-                FontSizeProperty.Changed,
-                FontStyleProperty.Changed,
-                FontWeightProperty.Changed,
-                TextVerticalAlignmentProperty.Changed
-            ).AddClassHandler<CInline>((x, _) => x.RequestMeasure());
-        }
 
         public IBrush? Background
         {
@@ -97,6 +78,18 @@ namespace ColorTextBlock.Avalonia
             set { SetValue(FontWeightProperty, value); }
         }
 
+        public FontStretch FontStretch
+        {
+            get { return GetValue(FontStretchProperty); }
+            set { SetValue(FontStretchProperty, value); }
+        }
+        public Typeface Typeface
+        {
+            get;
+            private set;
+        }
+
+
         public bool IsUnderline
         {
             get { return GetValue(IsUnderlineProperty); }
@@ -113,6 +106,33 @@ namespace ColorTextBlock.Avalonia
         {
             get { return GetValue(TextVerticalAlignmentProperty); }
             set { SetValue(TextVerticalAlignmentProperty, value); }
+        }
+
+        protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+        {
+            base.OnPropertyChanged(change);
+
+            switch (change.Property.Name)
+            {
+                case nameof(Background):
+                case nameof(Foreground):
+                case nameof(IsUnderline):
+                case nameof(IsStrikethrough):
+                    RequestRender();
+                    break;
+
+                case nameof(FontFamily):
+                case nameof(FontSize):
+                case nameof(FontStyle):
+                case nameof(FontWeight):
+                case nameof(FontStretch):
+                    Typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
+                    goto case nameof(TextVerticalAlignment);
+
+                case nameof(TextVerticalAlignment):
+                    RequestMeasure();
+                    break;
+            }
         }
 
         protected void RequestMeasure()
@@ -145,6 +165,8 @@ namespace ColorTextBlock.Avalonia
 
         internal IEnumerable<CGeometry> Measure(double entireWidth, double remainWidth)
         {
+            Typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
+
             /*
              * This is Imitation of Layoutable.MeasureCore.
              * If parent style is changed, StyledElement.InvalidedStyles is called.
