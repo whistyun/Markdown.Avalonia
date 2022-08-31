@@ -39,7 +39,7 @@ namespace UnitTest.CTxt
             var tst1 = new Test1();
             var ctxt = (CTextBlock)tst1.Content;
 
-            var info = new MetryHolder(ctxt, 390, 1000);
+            var info = new MetryHolder(ctxt, 385, 1000);
 
             Approvals.Verify(
                 new ApprovalImageWriter(info.Image),
@@ -240,9 +240,9 @@ namespace UnitTest.CTxt
         public void GivenTest7_generatesExpectedResult()
         {
             var tst6 = new Test7();
-            var ctxt = (Grid)tst6.Content;
+            var ctxt = (StackPanel)tst6.Content;
 
-            var info = new MetryHolder(ctxt, 1248, 1000);
+            var info = new MetryHolder(ctxt, 480, 1000);
 
             Approvals.Verify(
                 new ApprovalImageWriter(info.Image),
