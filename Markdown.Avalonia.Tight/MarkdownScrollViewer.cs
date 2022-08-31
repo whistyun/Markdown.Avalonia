@@ -80,6 +80,7 @@ namespace Markdown.Avalonia
                 _markdownStyleName = nameof(MdStyle.Standard);
                 _markdownStyle = MdStyle.Standard;
             }
+            Styles.Insert(0, _markdownStyle);
 
             _viewer = new ScrollViewer()
             {

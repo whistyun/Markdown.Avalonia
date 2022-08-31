@@ -10,13 +10,13 @@
       >
   <Style Selector="ctxt|CTextBlock">
     <Style.Setters>
-      <Setter Property="FontSize"   Value="{mde:Multiply ContentControlFontSize, 1}" />
+      <Setter Property="FontSize"   Value="{mde:Multiply ControlContentThemeFontSize, 1}" />
       <Setter Property="Margin"     Value="0,5" />
     </Style.Setters>
   </Style>
   <Style Selector="TextBlock">
     <Style.Setters>
-      <Setter Property="FontSize"   Value="{mde:Multiply ContentControlFontSize, 1}" />
+      <Setter Property="FontSize"   Value="{mde:Multiply ControlContentThemeFontSize, 1}" />
     </Style.Setters>
   </Style>
 
@@ -62,15 +62,10 @@
     <Setter Property="Foreground" Value="{mde:Complementary SystemAccentColor}"/>
   </Style>
 
-  <!--
-        The Table's style don't seem to support border-collapse.
-        By making the ruled line width 0.5 and applying it to cell and table,
-        it looks like the ruled lines are not doubled.
-    -->
   <Style Selector="Border.Table">
     <Style.Setters>
       <Setter Property="Margin" Value="5"/>
-      <Setter Property="BorderThickness" Value="0.5"/>
+      <Setter Property="BorderThickness" Value="0,0,1,1"/>
       <Setter Property="BorderBrush" Value="{mde:Alpha SystemControlForegroundBaseHighBrush}"/>
     </Style.Setters>
   </Style>
@@ -78,7 +73,7 @@
   <Style Selector="Grid.Table > Border">
     <Style.Setters>
       <Setter Property="Margin" Value="0"/>
-      <Setter Property="BorderThickness" Value="0.5"/>
+      <Setter Property="BorderThickness" Value="1,1,0,0"/>
       <Setter Property="BorderBrush" Value="{mde:Alpha SystemControlForegroundBaseHighBrush}"/>
       <Setter Property="Padding" Value="2"/>
     </Style.Setters>
