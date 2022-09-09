@@ -26,16 +26,16 @@ namespace Markdown.Avalonia.SyntaxHigh.Extensions
     /// </remarks>
     public class SyntaxHighlightWrapperExtension : MarkupExtension
     {
-        string ForegroundName;
+        private readonly string _foregroundName;
 
         public SyntaxHighlightWrapperExtension(string colorKey)
         {
-            this.ForegroundName = colorKey;
+            this._foregroundName = colorKey;
         }
 
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-            var dyExt = new DynamicResourceExtension(ForegroundName);
+            var dyExt = new DynamicResourceExtension(_foregroundName);
             var brush = dyExt.ProvideValue(serviceProvider);
 
             var tag = new Binding(nameof(TextEditor.Tag))
@@ -85,21 +85,20 @@ namespace Markdown.Avalonia.SyntaxHigh.Extensions
 
     public class HighlightWrapper : IHighlightingDefinition
     {
-        IHighlightingDefinition baseDef;
-        Color foreColor;
-
-        Dictionary<HighlightingRuleSet, HighlightingRuleSet> Converted;
-        Dictionary<string, HighlightingRuleSet> NamedRuleSet;
-        Dictionary<string, HighlightingColor> NamedColors;
+        private readonly IHighlightingDefinition _baseDef;
+        private readonly Color _foreColor;
+        private readonly Dictionary<HighlightingRuleSet, HighlightingRuleSet> _converted;
+        private readonly Dictionary<string, HighlightingRuleSet> _namedRuleSet;
+        private readonly Dictionary<string, HighlightingColor> _namedColors;
 
         public HighlightWrapper(IHighlightingDefinition baseDef, Color foreColor)
         {
-            this.baseDef = baseDef;
-            this.foreColor = foreColor;
+            _baseDef = baseDef;
+            _foreColor = foreColor;
 
-            Converted = new Dictionary<HighlightingRuleSet, HighlightingRuleSet>();
-            NamedRuleSet = new Dictionary<string, HighlightingRuleSet>();
-            NamedColors = new Dictionary<string, HighlightingColor>();
+            _converted = new Dictionary<HighlightingRuleSet, HighlightingRuleSet>();
+            _namedRuleSet = new Dictionary<string, HighlightingRuleSet>();
+            _namedColors = new Dictionary<string, HighlightingColor>();
 
             foreach (var color in baseDef.NamedHighlightingColors)
             {
@@ -108,25 +107,25 @@ namespace Markdown.Avalonia.SyntaxHigh.Extensions
                 var newCol = color.Clone();
                 newCol.Foreground = color.Foreground is null ?
                     null : new MixHighlightingBrush(color.Foreground, foreColor);
-                NamedColors[name] = newCol;
+                _namedColors[name] = newCol;
             }
 
             MainRuleSet = Wrap(baseDef.MainRuleSet);
         }
 
-        public string Name => "Re:" + baseDef.Name;
+        public string Name => "Re:" + _baseDef.Name;
         public HighlightingRuleSet MainRuleSet { get; }
-        public IEnumerable<HighlightingColor> NamedHighlightingColors => NamedColors.Values;
-        public IDictionary<string, string> Properties => baseDef.Properties;
+        public IEnumerable<HighlightingColor> NamedHighlightingColors => _namedColors.Values;
+        public IDictionary<string, string> Properties => _baseDef.Properties;
 
         public HighlightingColor GetNamedColor(string name)
         {
-            return NamedColors.TryGetValue(name, out var color) ? color : null;
+            return _namedColors.TryGetValue(name, out var color) ? color : null;
         }
 
         public HighlightingRuleSet GetNamedRuleSet(string name)
         {
-            return NamedRuleSet.TryGetValue(name, out var rset) ? rset : null;
+            return _namedRuleSet.TryGetValue(name, out var rset) ? rset : null;
         }
 
         private HighlightingRuleSet Wrap(HighlightingRuleSet ruleSet)
@@ -134,41 +133,44 @@ namespace Markdown.Avalonia.SyntaxHigh.Extensions
             if (ruleSet is null) return null;
 
             if (!String.IsNullOrEmpty(ruleSet.Name)
-                && NamedRuleSet.TryGetValue(ruleSet.Name, out var cachedRule))
+                && _namedRuleSet.TryGetValue(ruleSet.Name, out var cachedRule))
                 return cachedRule;
 
-            if (Converted.TryGetValue(ruleSet, out var cachedRule2))
+            if (_converted.TryGetValue(ruleSet, out var cachedRule2))
                 return cachedRule2;
 
-            var copySet = new HighlightingRuleSet();
-            copySet.Name = ruleSet.Name;
+            var copySet = new HighlightingRuleSet() { Name = ruleSet.Name };
 
-            Converted[ruleSet] = copySet;
+            _converted[ruleSet] = copySet;
             if (!String.IsNullOrEmpty(copySet.Name))
-                NamedRuleSet[copySet.Name] = copySet;
+                _namedRuleSet[copySet.Name] = copySet;
 
             foreach (var baseSpan in ruleSet.Spans)
             {
                 if (baseSpan is null) continue;
 
-                var copySpan = new HighlightingSpan();
-                copySpan.StartExpression = baseSpan.StartExpression;
-                copySpan.EndExpression = baseSpan.EndExpression;
-                copySpan.RuleSet = Wrap(baseSpan.RuleSet);
-                copySpan.StartColor = Wrap(baseSpan.StartColor);
-                copySpan.SpanColor = Wrap(baseSpan.SpanColor);
-                copySpan.EndColor = Wrap(baseSpan.EndColor);
-                copySpan.SpanColorIncludesStart = baseSpan.SpanColorIncludesStart;
-                copySpan.SpanColorIncludesEnd = baseSpan.SpanColorIncludesEnd;
+                var copySpan = new HighlightingSpan()
+                {
+                    StartExpression = baseSpan.StartExpression,
+                    EndExpression = baseSpan.EndExpression,
+                    RuleSet = Wrap(baseSpan.RuleSet),
+                    StartColor = Wrap(baseSpan.StartColor),
+                    SpanColor = Wrap(baseSpan.SpanColor),
+                    EndColor = Wrap(baseSpan.EndColor),
+                    SpanColorIncludesStart = baseSpan.SpanColorIncludesStart,
+                    SpanColorIncludesEnd = baseSpan.SpanColorIncludesEnd,
+                };
 
                 copySet.Spans.Add(copySpan);
             }
 
             foreach (var baseRule in ruleSet.Rules)
             {
-                var copyRule = new HighlightingRule();
-                copyRule.Regex = baseRule.Regex;
-                copyRule.Color = Wrap(baseRule.Color);
+                var copyRule = new HighlightingRule()
+                {
+                    Regex = baseRule.Regex,
+                    Color = Wrap(baseRule.Color)
+                };
 
                 copySet.Rules.Add(copyRule);
             }
@@ -181,15 +183,15 @@ namespace Markdown.Avalonia.SyntaxHigh.Extensions
             if (color is null) return null;
 
             if (!String.IsNullOrEmpty(color.Name)
-                && NamedColors.TryGetValue(color.Name, out var cachedColor))
+                && _namedColors.TryGetValue(color.Name, out var cachedColor))
                 return cachedColor;
 
             var copyColor = color.Clone();
             copyColor.Foreground = color.Foreground is null ?
-                null : new MixHighlightingBrush(color.Foreground, foreColor);
+                null : new MixHighlightingBrush(color.Foreground, _foreColor);
 
             if (!String.IsNullOrEmpty(copyColor.Name))
-                NamedColors[copyColor.Name] = copyColor;
+                _namedColors[copyColor.Name] = copyColor;
 
             return copyColor;
         }
@@ -197,18 +199,18 @@ namespace Markdown.Avalonia.SyntaxHigh.Extensions
 
     class MixHighlightingBrush : HighlightingBrush
     {
-        HighlightingBrush baseBrush;
-        Color fore;
+        private readonly HighlightingBrush _baseBrush;
+        private readonly Color _fore;
 
         public MixHighlightingBrush(HighlightingBrush baseBrush, Color fore)
         {
-            this.baseBrush = baseBrush;
-            this.fore = fore;
+            this._baseBrush = baseBrush;
+            this._fore = fore;
         }
 
         public override IBrush GetBrush(ITextRunConstructionContext context)
         {
-            var originalBrush = baseBrush.GetBrush(context);
+            var originalBrush = _baseBrush.GetBrush(context);
 
             return (originalBrush is ISolidColorBrush sbrsh) ?
                  new SolidColorBrush(WrapColor(sbrsh.Color)) :
@@ -217,13 +219,13 @@ namespace Markdown.Avalonia.SyntaxHigh.Extensions
 
         public override Color? GetColor(ITextRunConstructionContext context)
         {
-            if (baseBrush.GetBrush(context) is ISolidColorBrush sbrsh)
+            if (_baseBrush.GetBrush(context) is ISolidColorBrush sbrsh)
             {
                 return WrapColor(sbrsh.Color);
             }
             else
             {
-                var colorN = this.baseBrush.GetColor(context);
+                var colorN = this._baseBrush.GetColor(context);
                 return colorN.HasValue ? WrapColor(colorN.Value) : colorN;
             }
         }
@@ -232,7 +234,7 @@ namespace Markdown.Avalonia.SyntaxHigh.Extensions
         {
             if (color.A == 0) return color;
 
-            var foreMax = Math.Max(fore.R, Math.Max(fore.G, fore.B));
+            var foreMax = Math.Max(_fore.R, Math.Max(_fore.G, _fore.B));
             var tgtHsv = new HSV(color);
 
             int newValue = tgtHsv.Value + foreMax;
@@ -298,7 +300,7 @@ namespace Markdown.Avalonia.SyntaxHigh.Extensions
 
             //byte c = Saturation;
 
-            int HueInt = Hue / 60;
+            // int HueInt = Hue / 60;
 
             int x = (int)(Saturation * (1 - Math.Abs((Hue / 60f) % 2 - 1)));
 

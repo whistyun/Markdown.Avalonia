@@ -45,7 +45,7 @@ namespace UnitTest.MdSyntax
                     }
 
                     var wrapperType = wrapper.GetType();
-                    var cvtFldInf = wrapperType.GetField("Converted", BindingFlags.NonPublic | BindingFlags.Instance);
+                    var cvtFldInf = wrapperType.GetField("_converted", BindingFlags.NonPublic | BindingFlags.Instance);
 
                     var cvt = (Dictionary<HighlightingRuleSet, HighlightingRuleSet>)cvtFldInf.GetValue(wrapper);
                     foreach (var rule in cvt.Values)

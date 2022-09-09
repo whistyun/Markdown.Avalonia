@@ -60,9 +60,7 @@ namespace Markdown.Avalonia.SyntaxHigh
                 }
 
                 var txtEdit = new TextEditor();
-                var highlight = HighlightingManager.Instance.GetDefinitionByExtension("." + lang);
                 txtEdit.Tag = lang;
-                //txtEdit.SetValue(TextEditor.SyntaxHighlightingProperty, highlight);
 
                 txtEdit.Text = code;
                 txtEdit.HorizontalAlignment = HorizontalAlignment.Stretch;
