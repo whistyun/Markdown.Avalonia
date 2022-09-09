@@ -131,11 +131,11 @@ namespace ColorTextBlock.Avalonia
         private void OnBorderPropertyChanged(bool requestMeasure)
         {
             bool borderEnabled =
-                BorderThickness != default(Thickness) ||
-                Padding != default(Thickness) ||
-                CornerRadius != default(CornerRadius) ||
-                Margin != default(Thickness) ||
-                !BoxShadow.Equals(default(BoxShadows));
+                BorderThickness != default ||
+                Padding != default ||
+                CornerRadius != default ||
+                Margin != default ||
+                !BoxShadow.Equals(default);
 
             if (borderEnabled)
             {
@@ -220,7 +220,7 @@ namespace ColorTextBlock.Avalonia
 
             return metries;
         }
+
+        public override string AsString() => String.Join("", Content.Select(c => c.AsString()));
     }
-
-
 }

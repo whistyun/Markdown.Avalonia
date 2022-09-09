@@ -131,5 +131,7 @@ namespace ColorTextBlock.Avalonia
 
             return rslt;
         }
+
+        public override string AsString() => Text;
     }
 }

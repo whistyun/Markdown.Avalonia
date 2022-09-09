@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Automation.Peers;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -99,6 +100,7 @@ namespace ColorTextBlock.Avalonia
         private bool _isPressed;
         private CGeometry? _entered;
         private CGeometry? _pressed;
+        private string? _text;
 
         public IBrush? Background
         {
@@ -185,6 +187,11 @@ namespace ColorTextBlock.Avalonia
                     _content.CollectionChanged += ContentCollectionChangedd;
                 }
             }
+        }
+
+        public string Text
+        {
+            get => _text ??= String.Join("", Content.Select(c => c.AsString()));
         }
 
         public CTextBlock()
@@ -370,7 +377,6 @@ namespace ColorTextBlock.Avalonia
             }
         }
 
-
         internal void OnMeasureSourceChanged()
         {
             SetValue(BaseHeightProperty, default);
@@ -537,7 +543,6 @@ namespace ColorTextBlock.Avalonia
             return new Size(width, height);
         }
 
-
         public override void Render(DrawingContext context)
         {
             UpdateGeometry();
@@ -551,7 +556,31 @@ namespace ColorTextBlock.Avalonia
                 metry.Render(context);
             }
         }
+
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new CTextBlockAutomationPeer(this);
+        }
     }
+
+    public class CTextBlockAutomationPeer : ControlAutomationPeer
+    {
+        public CTextBlockAutomationPeer(CTextBlock owner) : base(owner)
+        { }
+
+        public new CTextBlock Owner
+            => (CTextBlock)base.Owner;
+
+        protected override AutomationControlType GetAutomationControlTypeCore()
+            => AutomationControlType.Text;
+
+        protected override string? GetNameCore()
+            => Owner.Text;
+
+        protected override bool IsControlElementCore()
+            => Owner.TemplatedParent is null && base.IsControlElementCore();
+    }
+
 
     class LineInfo
     {

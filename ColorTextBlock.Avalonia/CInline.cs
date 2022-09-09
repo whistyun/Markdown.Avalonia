@@ -181,5 +181,7 @@ namespace ColorTextBlock.Avalonia
         protected abstract IEnumerable<CGeometry> MeasureOverride(
             double entireWidth,
             double remainWidth);
+
+        public abstract string AsString();
     }
 }
