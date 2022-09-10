@@ -1,7 +1,3 @@
-** TEST BRANCH FOR NIGHTLY BUILD **  
-** Only Markdown.Avalonia.Tight is supported. **  
-** Markdown.Avalonia.SyntaxHight is not supported. **
-
 # Markdown.Avalonia
 
 Markdown.Avalonia is a portted version of [MdXaml](https://github.com/whistyun/MdXaml) for [Avalonia UI](https://www.avaloniaui.net/).
@@ -22,7 +18,7 @@ https://www.nuget.org/packages/Markdown.Avalonia/
 The table of compability with Avalonia's version
 | AvaloniaUI      | Markdown.Avalonia |
 |-----------------|-------------------|
-| 11.0.0-preview1 | 11.0.0-a1         |
+| 11.0.0-preview1 | 11.0.0-a1～a2     |
 | 0.10.1～0.10.6  | 0.10.4            |
 | 0.10.0          | 0.10.1～0.10.3    |
 | 0.9.11          | 0.9.0-a1～a7      |
