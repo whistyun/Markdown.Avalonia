@@ -14,44 +14,39 @@ namespace UnitTest.Base.Utils
         public static string[] GetTextNames()
         {
             var caller = Assembly.GetCallingAssembly();
-            string resourceKey = caller.GetName().Name + ".Texts.";
+            var resourceDir = Path.Combine(Path.GetDirectoryName(caller.Location), "Texts");
 
-            return caller.GetManifestResourceNames()
-                         .Where(nm => nm.StartsWith(resourceKey))
-                         .Select(nm => nm.Substring(resourceKey.Length))
-                         .ToArray();
+            return Directory.GetFiles(resourceDir)
+                            .Select(path => Path.GetFileName(path))
+                            .ToArray();
         }
 
         public static string LoadText(string name)
         {
             var caller = Assembly.GetCallingAssembly();
-            string resourceKey = caller.GetName().Name + ".Texts.";
+            var resourceFile = Path.Combine(Path.GetDirectoryName(caller.Location), "Texts", name);
 
-            using (Stream stream = caller.GetManifestResourceStream(resourceKey + name))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                return reader.ReadToEnd();
-            }
+            using var reader = File.OpenText(resourceFile);
+
+            return reader.ReadToEnd();
         }
 
         public static string AsXaml(object instance)
         {
-            using (var writer = new StringWriter())
+            using var writer = new StringWriter();
+            var settings = new XmlWriterSettings { Indent = true };
+            using (var xmlWriter = XmlWriter.Create(writer, settings))
             {
-                var settings = new XmlWriterSettings { Indent = true };
-                using (var xmlWriter = XmlWriter.Create(writer, settings))
-                {
-                    var docGen = new BrokenXamlWriter();
-                    var docObj = docGen.Transform(instance);
-                    docObj.Save(xmlWriter);
+                var docGen = new BrokenXamlWriter();
+                var docObj = docGen.Transform(instance);
+                docObj.Save(xmlWriter);
 
-                    //XamlServices.Save(xmlWriter, instance);
-                    //XamlWriter.Save(instance, xmlWriter);
-                }
-
-                writer.WriteLine();
-                return writer.ToString();
+                //XamlServices.Save(xmlWriter, instance);
+                //XamlWriter.Save(instance, xmlWriter);
             }
+
+            writer.WriteLine();
+            return writer.ToString();
 
             //using (var writer = new StringWriter())
             //{

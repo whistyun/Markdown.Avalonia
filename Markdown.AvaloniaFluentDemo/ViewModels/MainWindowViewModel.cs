@@ -98,18 +98,20 @@ namespace Markdown.AvaloniaFluentDemo.ViewModels
                 Text = reader.ReadToEnd();
             }
 
-            Themes = new List<ThemeViewModel>();
-            Themes.Add(new ThemeViewModel()
+            Themes = new List<ThemeViewModel>
             {
-                Name = "FluentLight",
-                Source = new Uri("avares://Avalonia.Themes.Fluent/FluentLight.xaml")
-            });
+                new ThemeViewModel()
+                {
+                    Name = "FluentLight",
+                    Source = new Uri("avares://Avalonia.Themes.Fluent/FluentLight.xaml")
+                },
 
-            Themes.Add(new ThemeViewModel()
-            {
-                Name = "FluentDark",
-                Source = new Uri("avares://Avalonia.Themes.Fluent/FluentDark.xaml")
-            });
+                new ThemeViewModel()
+                {
+                    Name = "FluentDark",
+                    Source = new Uri("avares://Avalonia.Themes.Fluent/FluentDark.xaml")
+                }
+            };
 
             var loader = AvaloniaLocator.Current.GetService<IAssetLoader>();
             using (var strm = loader.Open(new Uri("avares://Markdown.AvaloniaFluentDemo/Assets/XamlTemplate.txt")))

@@ -17,33 +17,28 @@ namespace Markdown.Avalonia.Extensions
 {
     public class MultiplyExtension : MarkupExtension
     {
-        string ResourceKey;
-        double Scale;
+        private readonly string _resourceKey;
+        private readonly double _scale;
 
         public MultiplyExtension(string resourceKey) : this(resourceKey, 1) { }
 
         public MultiplyExtension(string resourceKey, double scale)
         {
-            this.ResourceKey = resourceKey;
-            this.Scale = scale;
+            this._resourceKey = resourceKey;
+            this._scale = scale;
         }
 
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-            var dyExt = new DynamicResourceExtension(ResourceKey);
+            var dyExt = new DynamicResourceExtension(_resourceKey);
 
             var brush = dyExt.ProvideValue(serviceProvider);
 
             return new MultiBinding()
             {
                 Bindings = new IBinding[] { brush },
-                Converter = new MultiplyConverter(Scale)
+                Converter = new MultiplyConverter(_scale)
             };
-        }
-
-        private T GetServiceFrom<T>(IServiceProvider serviceProvider)
-        {
-            return (T)serviceProvider.GetService(typeof(T));
         }
 
         class MultiplyConverter : IMultiValueConverter

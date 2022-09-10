@@ -11,7 +11,12 @@ namespace Markdown.Avalonia.Utils
         {
             var asm = Assembly.Load(asmNm);
             var setupTp = asm.GetType(typeNm);
+            if (setupTp is null)
+                throw new NullReferenceException($"Failed to load '{typeNm}' in '{asm.FullName}'.");
+
             var method = setupTp.GetMethod(methodNm);
+            if (method is null)
+                throw new NullReferenceException($"'{methodNm}' method dosen't exist in '{typeNm}'.");
 
             if (method.IsStatic) return null;
             if (method.GetParameters().Length != methodArgs.Length) return null;

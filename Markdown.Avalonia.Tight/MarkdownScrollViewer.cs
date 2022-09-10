@@ -9,6 +9,7 @@ using Markdown.Avalonia.Utils;
 using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using MdStyle = Markdown.Avalonia.MarkdownStyle;
@@ -58,6 +59,8 @@ namespace Markdown.Avalonia
                 owner => owner.ScrollValue,
                 (owner, v) => owner.ScrollValue = v);
 
+
+        private static readonly HttpClient _httpclient = new();
 
         private readonly ScrollViewer _viewer;
 
@@ -247,8 +250,8 @@ namespace Markdown.Avalonia
                 {
                     case "http":
                     case "https":
-                        using (var wc = new System.Net.WebClient())
-                        using (var strm = new MemoryStream(wc.DownloadData(_source)))
+                        using (var res = _httpclient.GetAsync(_source).Result)
+                        using (var strm = res.Content.ReadAsStreamAsync().Result)
                         using (var reader = new StreamReader(strm, true))
                             Markdown = reader.ReadToEnd();
                         break;
@@ -319,9 +322,12 @@ namespace Markdown.Avalonia
                 else
                 {
                     var prop = typeof(MarkdownStyle).GetProperty(_markdownStyleName);
-                    if (prop == null) return;
+                    if (prop is null) return;
 
-                    MarkdownStyle = (IStyle)prop.GetValue(null);
+                    var propVal = prop.GetValue(null) as IStyle;
+                    if (propVal is null) return;
+
+                    MarkdownStyle = propVal;
                 }
 
                 static bool nvl(bool? vl) => vl.HasValue && vl.Value;

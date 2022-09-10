@@ -5,18 +5,13 @@
   <PropertyGroup>
     <TargetFrameworks>$(TestTargetFrameworks)</TargetFrameworks>
     <IsPackable>false</IsPackable>
+    <LangVersion>9</LangVersion>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\Fonts\license.html" />
     <AvaloniaResource Include="Assets\Fonts\ume-ugo4.ttf" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Texts\*" />
-    <EmbeddedResource Include="..\UnitTest.Md\Texts\*">
-      <Link>Texts\%(Filename)%(Extension)</Link>
-    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -37,6 +32,16 @@
     <ProjectReference Include="..\..\ColorTextBlock.Avalonia\ColorTextBlock.Avalonia.csproj" />
     <ProjectReference Include="..\..\Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj" />
     <ProjectReference Include="..\UnitTest.Base\UnitTest.Base.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Texts\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="..\UnitTest.Md\Texts\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Texts\%(Filename)%(Extension)</Link>
+    </None>
   </ItemGroup>
 
 </Project>

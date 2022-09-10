@@ -70,26 +70,30 @@ namespace Markdown.AvaloniaDemo.ViewModels
                 Text = reader.ReadToEnd();
             }
 
-            Styles = new List<StyleViewModel>();
-            Styles.Add(new StyleViewModel() { Name = nameof(MarkdownStyle.Standard) });
-            Styles.Add(new StyleViewModel() { Name = nameof(MarkdownStyle.SimpleTheme) });
-            Styles.Add(new StyleViewModel() { Name = nameof(MarkdownStyle.GithubLike) });
+            Styles = new List<StyleViewModel>
+            {
+                new StyleViewModel() { Name = nameof(MarkdownStyle.Standard) },
+                new StyleViewModel() { Name = nameof(MarkdownStyle.SimpleTheme) },
+                new StyleViewModel() { Name = nameof(MarkdownStyle.GithubLike) }
+            };
 
             SelectedStyle = Styles[1];
 
 
-            Themes = new List<ThemeViewModel>();
-            Themes.Add(new ThemeViewModel()
+            Themes = new List<ThemeViewModel>
             {
-                Name = "BaseLight",
-                Source = new Uri("avares://Avalonia.Themes.Simple/Accents/BaseLight.xaml")
-            });
+                new ThemeViewModel()
+                {
+                    Name = "BaseLight",
+                    Source = new Uri("avares://Avalonia.Themes.Simple/Accents/BaseLight.xaml")
+                },
 
-            Themes.Add(new ThemeViewModel()
-            {
-                Name = "BaseDark",
-                Source = new Uri("avares://Avalonia.Themes.Simple/Accents/BaseDark.xaml")
-            });
+                new ThemeViewModel()
+                {
+                    Name = "BaseDark",
+                    Source = new Uri("avares://Avalonia.Themes.Simple/Accents/BaseDark.xaml")
+                }
+            };
 
             SelectedTheme = Themes[0];
 

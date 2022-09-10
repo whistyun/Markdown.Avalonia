@@ -96,8 +96,7 @@ namespace UnitTest.Md
         public void Transform_givenImages_generatesExpectedResult()
         {
             var text = Util.LoadText("Images.md");
-            var markdown = new Markdown.Avalonia.Markdown();
-            markdown.AssetPathRoot = AssetPath;
+            var markdown = new Markdown.Avalonia.Markdown() { AssetPathRoot = AssetPath };
 
             var result = markdown.Transform(text);
             Approvals.Verify(Util.AsXaml(result));
@@ -119,8 +118,7 @@ namespace UnitTest.Md
         public void Transform_givenMixing_generatesExpectedResult()
         {
             var text = Util.LoadText("Mixing.md");
-            var markdown = new Markdown.Avalonia.Markdown();
-            markdown.AssetPathRoot = AssetPath;
+            var markdown = new Markdown.Avalonia.Markdown() { AssetPathRoot = AssetPath };
 
             var result = markdown.Transform(text);
             Approvals.Verify(Util.AsXaml(result));
@@ -131,8 +129,7 @@ namespace UnitTest.Md
         public void Transform_givenMixing2_generatesExpectedResult()
         {
             var text = Util.LoadText("Mixing2.md");
-            var markdown = new Markdown.Avalonia.Markdown();
-            markdown.AssetPathRoot = AssetPath;
+            var markdown = new Markdown.Avalonia.Markdown() { AssetPathRoot = AssetPath };
 
             var result = markdown.Transform(text);
             Approvals.Verify(Util.AsXaml(result));
@@ -143,8 +140,7 @@ namespace UnitTest.Md
         public void Transform_givenCodes_generatesExpectedResult()
         {
             var text = Util.LoadText("Codes.md");
-            var markdown = new Markdown.Avalonia.Markdown();
-            markdown.AssetPathRoot = AssetPath;
+            var markdown = new Markdown.Avalonia.Markdown() { AssetPathRoot = AssetPath };
 
             var result = markdown.Transform(text);
             Approvals.Verify(Util.AsXaml(result));
@@ -155,8 +151,7 @@ namespace UnitTest.Md
         public void Transform_givenContainer_generatesExpectedResult()
         {
             var text = Util.LoadText("ContainerBlock.md");
-            var markdown = new Markdown.Avalonia.Markdown();
-            markdown.AssetPathRoot = AssetPath;
+            var markdown = new Markdown.Avalonia.Markdown() { AssetPathRoot = AssetPath };
 
             var result = markdown.Transform(text);
             Approvals.Verify(Util.AsXaml(result));
@@ -167,8 +162,7 @@ namespace UnitTest.Md
         public void Transform_givenEmoji()
         {
             var text = Util.LoadText("Emoji.md");
-            var markdown = new Markdown.Avalonia.Markdown();
-            markdown.AssetPathRoot = AssetPath;
+            var markdown = new Markdown.Avalonia.Markdown() { AssetPathRoot = AssetPath };
 
             var result = markdown.Transform(text);
             Approvals.Verify(Util.AsXaml(result));
@@ -178,10 +172,12 @@ namespace UnitTest.Md
         [RunOnUI]
         public void CheckSwitch()
         {
-            var markdown = new Markdown.Avalonia.Markdown();
-            markdown.ContainerBlockHandler = new Markdown.Avalonia.ContainerSwitch() {
-                { "test", new EmptyBorder("TestBorder1")},
-                { "test2", new EmptyBorder("TestBorder2")},
+            var markdown = new Markdown.Avalonia.Markdown
+            {
+                ContainerBlockHandler = new Markdown.Avalonia.ContainerSwitch() {
+                    { "test", new EmptyBorder("TestBorder1")},
+                    { "test2", new EmptyBorder("TestBorder2")},
+                }
             };
 
             {

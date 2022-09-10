@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,8 @@ namespace Markdown.Avalonia.Utils
 {
     public class DefaultBitmapLoader : IBitmapLoader
     {
+        private static readonly HttpClient _httpclient = new();
+
         public string AssetPathRoot { set; private get; }
         private IAssetLoader? AssetLoader { get; }
         private string[] AssetAssemblyNames { get; }
@@ -117,8 +120,8 @@ namespace Markdown.Avalonia.Utils
                 {
                     case "http":
                     case "https":
-                        using (var wc = new System.Net.WebClient())
-                        using (var strm = new MemoryStream(wc.DownloadData(url)))
+                        using (var res = _httpclient.GetAsync(url).Result)
+                        using (var strm = res.Content.ReadAsStreamAsync().Result)
                             imgSource = new Bitmap(strm);
                         break;
 

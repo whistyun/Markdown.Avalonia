@@ -14,7 +14,7 @@ namespace Markdown.Avalonia.SyntaxHigh
 
             list.Add(
                 new KeyValuePair<string, Action<Styles>>(
-                    nameof(MarkdownStyle.DefaultTheme),
+                    nameof(MarkdownStyle.SimpleTheme),
                     styles =>
                     {
                         var appendStyles = new AppendixOfDefaultTheme();

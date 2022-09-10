@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Automation.Peers;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -99,6 +100,7 @@ namespace ColorTextBlock.Avalonia
         private bool _isPressed;
         private CGeometry? _entered;
         private CGeometry? _pressed;
+        private string? _text;
 
         public IBrush? Background
         {
@@ -185,6 +187,11 @@ namespace ColorTextBlock.Avalonia
                     _content.CollectionChanged += ContentCollectionChangedd;
                 }
             }
+        }
+
+        public string Text
+        {
+            get => _text ??= String.Join("", Content.Select(c => c.AsString()));
         }
 
         public CTextBlock()
@@ -329,16 +336,20 @@ namespace ColorTextBlock.Avalonia
                 this.Bind(BaseHeightProperty, target.GetBindingObservable(BaseHeightProperty));
         }
 
-        private void ContentCollectionChangedd(object sender, NotifyCollectionChangedEventArgs e)
+        private void ContentCollectionChangedd(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            void Attach(IEnumerable<CInline> newItems)
+            void Attach(IEnumerable<CInline>? newItems)
             {
+                if (newItems is null) return;
+
                 foreach (CInline item in newItems)
                     LogicalChildren.Add(item);
             }
 
-            void Detach(IEnumerable<CInline> removeItems)
+            void Detach(IEnumerable<CInline>? removeItems)
             {
+                if (removeItems is null) return;
+
                 foreach (CInline item in removeItems)
                     LogicalChildren.Remove(item);
             }
@@ -347,16 +358,16 @@ namespace ColorTextBlock.Avalonia
             {
                 case NotifyCollectionChangedAction.Reset:
                 case NotifyCollectionChangedAction.Remove:
-                    Detach(e.OldItems.Cast<CInline>());
+                    Detach(e.OldItems?.Cast<CInline>());
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
-                    Detach(e.OldItems.Cast<CInline>());
-                    Attach(e.NewItems.Cast<CInline>());
+                    Detach(e.OldItems?.Cast<CInline>());
+                    Attach(e.NewItems?.Cast<CInline>());
                     break;
 
                 case NotifyCollectionChangedAction.Add:
-                    Attach(e.NewItems.Cast<CInline>());
+                    Attach(e.NewItems?.Cast<CInline>());
                     break;
             }
         }
@@ -369,7 +380,6 @@ namespace ColorTextBlock.Avalonia
                 InvalidateArrange();
             }
         }
-
 
         internal void OnMeasureSourceChanged()
         {
@@ -537,7 +547,6 @@ namespace ColorTextBlock.Avalonia
             return new Size(width, height);
         }
 
-
         public override void Render(DrawingContext context)
         {
             UpdateGeometry();
@@ -551,7 +560,31 @@ namespace ColorTextBlock.Avalonia
                 metry.Render(context);
             }
         }
+
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new CTextBlockAutomationPeer(this);
+        }
     }
+
+    public class CTextBlockAutomationPeer : ControlAutomationPeer
+    {
+        public CTextBlockAutomationPeer(CTextBlock owner) : base(owner)
+        { }
+
+        public new CTextBlock Owner
+            => (CTextBlock)base.Owner;
+
+        protected override AutomationControlType GetAutomationControlTypeCore()
+            => AutomationControlType.Text;
+
+        protected override string? GetNameCore()
+            => Owner.Text;
+
+        protected override bool IsControlElementCore()
+            => Owner.TemplatedParent is null && base.IsControlElementCore();
+    }
+
 
     class LineInfo
     {

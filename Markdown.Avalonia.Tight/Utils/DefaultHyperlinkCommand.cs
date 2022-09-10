@@ -25,15 +25,15 @@ namespace Markdown.Avalonia.Utils
             }
         }
 
-        public bool CanExecute(object parameter)
+        public bool CanExecute(object? parameter)
         {
-            return true;
+            return parameter is string;
         }
 
-        public void Execute(object parameter)
+        public void Execute(object? parameter)
         {
-            var url = (string)parameter;
-            GoTo(url);
+            var url = parameter as string;
+            GoTo(url ?? "");
         }
 
         public static void GoTo(string url)

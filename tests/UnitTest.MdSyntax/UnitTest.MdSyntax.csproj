@@ -5,17 +5,9 @@
   <PropertyGroup>
     <TargetFrameworks>$(TestTargetFrameworks)</TargetFrameworks>
     <IsPackable>false</IsPackable>
+    <LangVersion>9</LangVersion>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Texts\*" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Texts\Codes.md" />
-    <None Remove="Texts\ContainerBlock.md" />
-    <None Remove="Texts\Mixing2.md" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="$(TestAvaloniaVersion)" />
@@ -27,5 +19,11 @@
     <ProjectReference Include="..\..\Markdown.Avalonia.SyntaxHigh\Markdown.Avalonia.SyntaxHigh.csproj" />
     <ProjectReference Include="..\..\Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj" />
     <ProjectReference Include="..\UnitTest.Base\UnitTest.Base.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Texts\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
