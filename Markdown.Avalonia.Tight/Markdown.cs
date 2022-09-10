@@ -178,7 +178,7 @@ namespace Markdown.Avalonia
             TopLevelBlockParsers = new[]{
                 Parser.Create<Control>(_codeBlockFirst     , GetConverterOrNull(nameof(CodeBlocksWithLangEvaluator   )), CodeBlocksWithLangEvaluator   ),
                 Parser.Create<Control>(_containerBlockFirst, GetConverterOrNull(nameof(ContainerBlockEvaluator       )), ContainerBlockEvaluator       ),
-                Parser.Create<Control>( _listNested        , GetConverterOrNull(nameof(ListEvaluator                 )), ListEvaluator                 ),
+                Parser.Create<Control>(_listNested         , GetConverterOrNull(nameof(ListEvaluator                 )), ListEvaluator                 ),
             };
 
             SubLevelBlockParsers = new[] {
@@ -241,9 +241,9 @@ namespace Markdown.Avalonia
 
         #region grammer - paragraph
 
-        private static readonly Regex _align = new Regex(@"^p([<=>])\.", RegexOptions.Compiled);
-        private static readonly Regex _newlinesLeadingTrailing = new Regex(@"^\n+|\n+\z", RegexOptions.Compiled);
-        private static readonly Regex _newlinesMultiple = new Regex(@"\n{2,}", RegexOptions.Compiled);
+        private static readonly Regex _align = new(@"^p([<=>])\.", RegexOptions.Compiled);
+        private static readonly Regex _newlinesLeadingTrailing = new(@"^\n+|\n+\z", RegexOptions.Compiled);
+        private static readonly Regex _newlinesMultiple = new(@"\n{2,}", RegexOptions.Compiled);
 
         /// <summary>
         /// splits on two or more newlines, to form "paragraphs";    
@@ -298,7 +298,7 @@ namespace Markdown.Avalonia
 
         #region grammer - image or href
 
-        private static readonly Regex _imageOrHrefInline = new Regex(string.Format(@"
+        private static readonly Regex _imageOrHrefInline = new(string.Format(@"
                 (                           # wrap whole match in $1
                     (!)?                    # image maker = $2
                     \[
@@ -342,16 +342,18 @@ namespace Markdown.Avalonia
             string url = match.Groups[4].Value;
             string title = match.Groups[7].Value;
 
-            var link = new CHyperlink(RunSpanGamut(linkText));
-            link.Command = (urlTxt) =>
+            var link = new CHyperlink(RunSpanGamut(linkText))
             {
-                if (HyperlinkCommand != null && HyperlinkCommand.CanExecute(urlTxt))
+                Command = (urlTxt) =>
                 {
-                    HyperlinkCommand.Execute(urlTxt);
-                }
-            };
+                    if (HyperlinkCommand != null && HyperlinkCommand.CanExecute(urlTxt))
+                    {
+                        HyperlinkCommand.Execute(urlTxt);
+                    }
+                },
 
-            link.CommandParameter = url;
+                CommandParameter = url
+            };
 
             if (!String.IsNullOrEmpty(title)
                 && !title.Any(ch => !Char.IsLetterOrDigit(ch)))
@@ -395,7 +397,7 @@ namespace Markdown.Avalonia
         /// Header 2  
         /// --------  
         /// </remarks>
-        private static readonly Regex _headerSetext = new Regex(@"
+        private static readonly Regex _headerSetext = new(@"
                 ^(.+?)
                 [ ]*
                 \n
@@ -411,7 +413,7 @@ namespace Markdown.Avalonia
         /// ...  
         /// ###### Header 6  
         /// </remarks>
-        private static readonly Regex _headerAtx = new Regex(@"
+        private static readonly Regex _headerAtx = new(@"
                 ^(\#{1,6})  # $1 = string of #'s
                 [ ]*
                 (.+?)       # $2 = Header text
@@ -479,7 +481,7 @@ namespace Markdown.Avalonia
         /// <remarks>
         /// < Note
         /// </remarks>
-        private static readonly Regex _note = new Regex(@"
+        private static readonly Regex _note = new(@"
                 ^(\<)       # $1 = starting marker <
                 [ ]*
                 (.+?)       # $2 = Header text
@@ -546,7 +548,7 @@ namespace Markdown.Avalonia
         /// ---
         /// - - -
         /// </remarks>
-        private static readonly Regex _horizontalRules = new Regex(@"
+        private static readonly Regex _horizontalRules = new(@"
                 ^[ ]{0,3}                   # Leading space
                     ([-=*_])                # $1: First marker ([markers])
                     (?>                     # Repeated marker group
@@ -625,14 +627,14 @@ namespace Markdown.Avalonia
               )
             )", _firstListMaker, _subseqListMaker, _listDepth - 1);
 
-        private static readonly Regex _startNoIndentRule = new Regex(@"\A[ ]{0,2}(?<hrm>[-=*_])([ ]{0,2}\k<hrm>){2,}",
+        private static readonly Regex _startNoIndentRule = new(@"\A[ ]{0,2}(?<hrm>[-=*_])([ ]{0,2}\k<hrm>){2,}",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        private static readonly Regex _startNoIndentSublistMarker = new Regex(@"\A" + _subseqListMaker, RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+        private static readonly Regex _startNoIndentSublistMarker = new(@"\A" + _subseqListMaker, RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        private static readonly Regex _startQuoteOrHeader = new Regex(@"\A(\#{1,6}[ ]|>|```)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+        private static readonly Regex _startQuoteOrHeader = new(@"\A(\#{1,6}[ ]|>|```)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        private static readonly Regex _listNested = new Regex(@"^" + _wholeList,
+        private static readonly Regex _listNested = new(@"^" + _wholeList,
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private IEnumerable<Control> ListEvaluator(Match match)
@@ -641,7 +643,7 @@ namespace Markdown.Avalonia
             (TextMarkerStyle textMarker, string markerPattern, int indentAppending)
                 = GetTextMarkerStyle(match.Groups["mkr"].Value);
 
-            Regex markerRegex = new Regex(@"\A" + markerPattern, RegexOptions.Compiled);
+            Regex markerRegex = new(@"\A" + markerPattern, RegexOptions.Compiled);
 
             // count indent from first marker with indent
             int countIndent = TextUtil.CountIndent(match.Groups["mkr_i"].Value);
@@ -707,7 +709,7 @@ namespace Markdown.Avalonia
             grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
             grid.ColumnDefinitions.Add(new ColumnDefinition());
 
-            CTextBlock? FindFirstFrom(IControl ctrl)
+            static CTextBlock? FindFirstFrom(IControl ctrl)
             {
                 if (ctrl is IPanel pnl)
                 {
@@ -811,7 +813,6 @@ namespace Markdown.Avalonia
         private Control ListItemEvaluator(Match match)
         {
             string item = match.Groups[4].Value;
-            string leadingLine = match.Groups[1].Value;
 
             var status = new ParseStatus()
             {
@@ -880,7 +881,7 @@ namespace Markdown.Avalonia
 
         #region grammer - table
 
-        private static readonly Regex _table = new Regex(@"
+        private static readonly Regex _table = new(@"
             (                               # whole table
                 [ \n]*
                 (?<hdr>                     # table header
@@ -905,7 +906,7 @@ namespace Markdown.Avalonia
             var styleTxt = match.Groups["col"].Value.Trim();
             var rowTxt = match.Groups["row"].Value.Trim();
 
-            string ExtractCoverBar(string txt)
+            static string ExtractCoverBar(string txt)
             {
                 if (txt[0] == '|')
                     txt = txt.Substring(1);
@@ -958,8 +959,7 @@ namespace Markdown.Avalonia
 
             table.Classes.Add(TableClass);
 
-            var result = new Border();
-            result.Child = table;
+            var result = new Border { Child = table };
             result.Classes.Add(TableClass);
 
             return result;
@@ -997,7 +997,7 @@ namespace Markdown.Avalonia
 
         #region grammer - container block
 
-        private static Regex _containerBlockFirst = new Regex(@"
+        private static readonly Regex _containerBlockFirst = new(@"
                     ^          # Character before opening
                     [ ]{0,3}
                     (:{3,})          # $1 = Opening run of `
@@ -1014,7 +1014,7 @@ namespace Markdown.Avalonia
 
             if (result == null)
             {
-                Border _retVal = CodeBlocksEvaluator(null, match.Value);
+                Border _retVal = CodeBlocksEvaluator(match.Value);
                 _retVal.Classes.Add(NoContainerClass);
                 return _retVal;
             }
@@ -1027,7 +1027,7 @@ namespace Markdown.Avalonia
 
         #region grammer - code block
 
-        private static Regex _codeBlockFirst = new Regex(@"
+        private static readonly Regex _codeBlockFirst = new(@"
                     ^          # Character before opening
                     [ ]{0,3}
                     (`{3,})          # $1 = Opening run of `
@@ -1038,7 +1038,7 @@ namespace Markdown.Avalonia
                     \1
                     (?!`)[\n]+", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
 
-        private static Regex _indentCodeBlock = new Regex(@"
+        private static readonly Regex _indentCodeBlock = new(@"
                     (?:\A|^[ ]*\n)
                     (
                     [ ]{4}.+
@@ -1048,15 +1048,15 @@ namespace Markdown.Avalonia
                     ", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
 
         private Border CodeBlocksWithLangEvaluator(Match match)
-            => CodeBlocksEvaluator(match.Groups[2].Value, match.Groups[3].Value);
+            => CodeBlocksEvaluator(match.Groups[3].Value);
 
         private Border CodeBlocksWithoutLangEvaluator(Match match)
         {
             var detentTxt = String.Join("\n", match.Groups[1].Value.Split('\n').Select(line => TextUtil.DetentLineBestEffort(line, 4)));
-            return CodeBlocksEvaluator(null, _newlinesLeadingTrailing.Replace(detentTxt, ""));
+            return CodeBlocksEvaluator(_newlinesLeadingTrailing.Replace(detentTxt, ""));
         }
 
-        private Border CodeBlocksEvaluator(string? lang, string code)
+        private Border CodeBlocksEvaluator(string code)
         {
             var ctxt = new TextBlock()
             {
@@ -1081,7 +1081,7 @@ namespace Markdown.Avalonia
 
         #region grammer - code
 
-        private static Regex _codeSpan = new Regex(@"
+        private static readonly Regex _codeSpan = new(@"
                     (?<!\\)   # Character before opening ` can't be a backslash
                     (`+)      # $1 = Opening run of `
                     (.+?)     # $2 = The code block
@@ -1134,16 +1134,16 @@ namespace Markdown.Avalonia
 
         #region grammer - textdecorations
 
-        private static readonly Regex _strictBold = new Regex(@"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)",
+        private static readonly Regex _strictBold = new(@"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
-        private static readonly Regex _strictItalic = new Regex(@"([\W_]|^) (\*|_) (?=\S) ([^\r\*_]*?\S) \2 ([\W_]|$)",
+        private static readonly Regex _strictItalic = new(@"([\W_]|^) (\*|_) (?=\S) ([^\r\*_]*?\S) \2 ([\W_]|$)",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
-        private static readonly Regex _strikethrough = new Regex(@"(~~) (?=\S) (.+?) (?<=\S) \1",
+        private static readonly Regex _strikethrough = new(@"(~~) (?=\S) (.+?) (?<=\S) \1",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
-        private static readonly Regex _underline = new Regex(@"(__) (?=\S) (.+?) (?<=\S) \1",
+        private static readonly Regex _underline = new(@"(__) (?=\S) (.+?) (?<=\S) \1",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
-        private static readonly Regex _color = new Regex(@"%\{[ \t]*color[ \t]*:([^\}]+)\}", RegexOptions.Compiled);
+        private static readonly Regex _color = new(@"%\{[ \t]*color[ \t]*:([^\}]+)\}", RegexOptions.Compiled);
 
         /// <summary>
         /// Turn Markdown *italics* and **bold** into HTML strong and em tags
@@ -1418,8 +1418,8 @@ namespace Markdown.Avalonia
                 try
                 {
                     var color = colorLbl.StartsWith("#") ?
-                        (IBrush)new BrushConverter().ConvertFrom(colorLbl) :
-                        (IBrush)new BrushConverter().ConvertFromString(colorLbl);
+                        (IBrush?)new BrushConverter().ConvertFrom(colorLbl) :
+                        (IBrush?)new BrushConverter().ConvertFromString(colorLbl);
 
                     span.Foreground = color;
                 }
@@ -1487,8 +1487,8 @@ namespace Markdown.Avalonia
 
         #region grammer - text
 
-        private static Regex _eoln = new Regex("\\s+");
-        private static Regex _lbrk = new Regex(@"\ {2,}\n");
+        private static readonly Regex _eoln = new("\\s+");
+        private static readonly Regex _lbrk = new(@"\ {2,}\n");
 
         private IEnumerable<CRun> DoText(string text)
         {
@@ -1509,7 +1509,7 @@ namespace Markdown.Avalonia
 
         #region grammer - blockquote
 
-        private static Regex _blockquoteFirst = new Regex(@"
+        private static readonly Regex _blockquoteFirst = new(@"
             ^
             ([>].*)
             (\n[>].*)*

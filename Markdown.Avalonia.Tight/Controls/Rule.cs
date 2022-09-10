@@ -71,28 +71,31 @@ namespace Markdown.Avalonia.Controls
             this.HorizontalAlignment = HAlign.Stretch;
             this.VerticalAlignment = VAlign.Center;
 
-            this.Classes.Add(Enum.GetName(typeof(RuleType), ruleType));
+            var cls = Enum.GetName(typeof(RuleType), ruleType);
+            if (cls is null)
+                throw new ArgumentException(nameof(ruleType));
+
+            this.Classes.Add(cls);
         }
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            switch (Type)
+            return Type switch
             {
-                case RuleType.Single:
-                    return new Size(10, LineMargin * 2 + SingleLineWidth);
+                RuleType.Single
+                    => new Size(10, LineMargin * 2 + SingleLineWidth),
 
-                case RuleType.TwoLines:
-                    return new Size(10, LineMargin * 2 + SingleLineWidth * 3);
+                RuleType.TwoLines
+                    => new Size(10, LineMargin * 2 + SingleLineWidth * 3),
 
-                case RuleType.Bold:
-                    return new Size(10, LineMargin * 2 + BoldLineWidth);
+                RuleType.Bold
+                    => new Size(10, LineMargin * 2 + BoldLineWidth),
 
-                case RuleType.BoldWithSingle:
-                    return new Size(10, LineMargin * 2 + SingleLineWidth * 2 + BoldLineWidth);
+                RuleType.BoldWithSingle
+                    => new Size(10, LineMargin * 2 + SingleLineWidth * 2 + BoldLineWidth),
 
-                default:
-                    throw new InvalidOperationException();
-            }
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         public override void Render(DrawingContext context)

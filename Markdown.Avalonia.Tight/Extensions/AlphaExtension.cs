@@ -17,33 +17,28 @@ namespace Markdown.Avalonia.Extensions
 {
     public class AlphaExtension : MarkupExtension
     {
-        string BrushName;
-        float Alpha;
+        private readonly string _brushName;
+        private readonly float _alpha;
 
         public AlphaExtension(string colorKey) : this(colorKey, 1f) { }
 
         public AlphaExtension(string colorKey, float alpha)
         {
-            this.BrushName = colorKey;
-            this.Alpha = alpha;
+            this._brushName = colorKey;
+            this._alpha = alpha;
         }
 
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-            var dyExt = new DynamicResourceExtension(BrushName);
+            var dyExt = new DynamicResourceExtension(_brushName);
 
             var brush = dyExt.ProvideValue(serviceProvider);
 
             return new MultiBinding()
             {
                 Bindings = new IBinding[] { brush },
-                Converter = new AlphaConverter(Alpha)
+                Converter = new AlphaConverter(_alpha)
             };
-        }
-
-        private T GetServiceFrom<T>(IServiceProvider serviceProvider)
-        {
-            return (T)serviceProvider.GetService(typeof(T));
         }
 
         class AlphaConverter : IMultiValueConverter

@@ -336,16 +336,20 @@ namespace ColorTextBlock.Avalonia
                 this.Bind(BaseHeightProperty, target.GetBindingObservable(BaseHeightProperty));
         }
 
-        private void ContentCollectionChangedd(object sender, NotifyCollectionChangedEventArgs e)
+        private void ContentCollectionChangedd(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            void Attach(IEnumerable<CInline> newItems)
+            void Attach(IEnumerable<CInline>? newItems)
             {
+                if (newItems is null) return;
+
                 foreach (CInline item in newItems)
                     LogicalChildren.Add(item);
             }
 
-            void Detach(IEnumerable<CInline> removeItems)
+            void Detach(IEnumerable<CInline>? removeItems)
             {
+                if (removeItems is null) return;
+
                 foreach (CInline item in removeItems)
                     LogicalChildren.Remove(item);
             }
@@ -354,16 +358,16 @@ namespace ColorTextBlock.Avalonia
             {
                 case NotifyCollectionChangedAction.Reset:
                 case NotifyCollectionChangedAction.Remove:
-                    Detach(e.OldItems.Cast<CInline>());
+                    Detach(e.OldItems?.Cast<CInline>());
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
-                    Detach(e.OldItems.Cast<CInline>());
-                    Attach(e.NewItems.Cast<CInline>());
+                    Detach(e.OldItems?.Cast<CInline>());
+                    Attach(e.NewItems?.Cast<CInline>());
                     break;
 
                 case NotifyCollectionChangedAction.Add:
-                    Attach(e.NewItems.Cast<CInline>());
+                    Attach(e.NewItems?.Cast<CInline>());
                     break;
             }
         }

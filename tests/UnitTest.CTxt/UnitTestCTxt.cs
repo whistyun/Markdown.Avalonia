@@ -253,7 +253,7 @@ namespace UnitTest.CTxt
 
     class MetryHolder : AvaloniaObject
     {
-        private static readonly Vector Dpi = new Vector(250, 250);
+        private static readonly Vector Dpi = new(250, 250);
 
         public Bitmap Image { get; set; }
 
@@ -310,7 +310,7 @@ namespace UnitTest.CTxt
 
             using (ctx.PushPostTransform(Matrix.CreateTranslation(vis.Bounds.Position)))
             using (ctx.PushOpacity(vis.Opacity))
-            using (vis.OpacityMask != null ? ctx.PushOpacityMask(vis.OpacityMask, sz) : default(DrawingContext.PushedState))
+            using (vis.OpacityMask != null ? ctx.PushOpacityMask(vis.OpacityMask, sz) : default)
             {
                 vis.Render(ctx);
 

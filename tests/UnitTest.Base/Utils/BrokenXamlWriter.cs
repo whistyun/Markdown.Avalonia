@@ -28,15 +28,15 @@ namespace UnitTest.Base.Utils
         /// <summary>
         /// xmlns-previx vs XmlNamespace
         /// </summary>
-        private HashSet<Assembly> RegisteredAssemblies = new HashSet<Assembly>();
-        private Dictionary<string, XmlNamespace> XmlNamespaces = new Dictionary<string, XmlNamespace>();
+        private readonly HashSet<Assembly> _registeredAssemblies = new();
+        private readonly Dictionary<string, XmlNamespace> _xmlNamespaces = new();
 
-        private List<AvaloniaProperty> AttachedProperties = new List<AvaloniaProperty>();
+        private readonly List<AvaloniaProperty> _attachedProperties = new();
 
 
         public void RegisterAssembly(Assembly asm)
         {
-            if (RegisteredAssemblies.Contains(asm))
+            if (_registeredAssemblies.Contains(asm))
                 return;
 
             /*
@@ -49,15 +49,15 @@ namespace UnitTest.Base.Utils
                 ClassNamespace[] clrspc = group.Select(def => new ClassNamespace(asm, def.ClrNamespace))
                                   .ToArray();
 
-                if (XmlNamespaces.Count == 0)
+                if (_xmlNamespaces.Count == 0)
                 {
-                    XmlNamespaces[string.Empty]
+                    _xmlNamespaces[string.Empty]
                         = new XmlNamespace(string.Empty, xmlurl, clrspc);
 
                     continue;
                 }
 
-                XmlNamespace alreadyRegistered = XmlNamespaces.Values.Where(xpc => xpc.Namespace == xmlurl).FirstOrDefault();
+                XmlNamespace alreadyRegistered = _xmlNamespaces.Values.Where(xpc => xpc.Namespace == xmlurl).FirstOrDefault();
 
                 if (alreadyRegistered is null)
                 {
@@ -65,7 +65,7 @@ namespace UnitTest.Base.Utils
 
                     string prefix = GeneratePrefixFor(asm);
 
-                    XmlNamespaces[prefix]
+                    _xmlNamespaces[prefix]
                         = new XmlNamespace(prefix, xmlurl, clrspc);
                 }
                 else
@@ -96,11 +96,11 @@ namespace UnitTest.Base.Utils
                     .Where(fld => fld.FieldType.GetGenericTypeDefinition() == typeof(AttachedProperty<>))
                     .Select(fld => (AvaloniaProperty)fld.GetValue(null));
 
-            AttachedProperties.AddRange(attachecProperties);
+            _attachedProperties.AddRange(attachecProperties);
 
 
 
-            RegisteredAssemblies.Add(asm);
+            _registeredAssemblies.Add(asm);
         }
 
         private string GeneratePrefixFor(Assembly asm)
@@ -112,14 +112,14 @@ namespace UnitTest.Base.Utils
             // When full is 'yoghurt', Try 'y', 'yo', 'yog', ...
             string prefix = Enumerable.Range(1, full.Length)
                                       .Select(len => full.Substring(0, len))
-                                      .Where(chip => !XmlNamespaces.ContainsKey(chip))
+                                      .Where(chip => !_xmlNamespaces.ContainsKey(chip))
                                       .FirstOrDefault();
 
             // 'yogurt2', 'yogurt3', 'yogurt4', ...
             for (var idx = 2; prefix is null; ++idx)
             {
                 var chip = full + idx;
-                if (!XmlNamespaces.ContainsKey(chip))
+                if (!_xmlNamespaces.ContainsKey(chip))
                 {
                     prefix = chip;
                     break;
@@ -133,7 +133,7 @@ namespace UnitTest.Base.Utils
         {
             Assembly asm = type.Assembly;
 
-            if (!RegisteredAssemblies.Contains(asm))
+            if (!_registeredAssemblies.Contains(asm))
             {
                 RegisterAssembly(asm);
             }
@@ -141,7 +141,7 @@ namespace UnitTest.Base.Utils
             string nmspc = type.Namespace;
 
             // already registered?
-            KeyValuePair<string, XmlNamespace>[] keyAndValues = XmlNamespaces
+            KeyValuePair<string, XmlNamespace>[] keyAndValues = _xmlNamespaces
                 .Where(entry => entry.Value.ClassSpaces
                                      .Any(clsnmspc => clsnmspc.Assembly == asm && clsnmspc.Namespace == nmspc))
                 .ToArray();
@@ -158,7 +158,7 @@ namespace UnitTest.Base.Utils
 
             var xmlspc = new XmlNamespace(prefix, xmlurl, new ClassNamespace(asm, nmspc));
 
-            XmlNamespaces[prefix] = xmlspc;
+            _xmlNamespaces[prefix] = xmlspc;
 
             return xmlspc.Prefix;
         }
@@ -260,7 +260,7 @@ namespace UnitTest.Base.Utils
             }
 
 
-            var attachAvaProps = AttachedProperties.Where(prop => !node.Attributes.Any(attr => attr.AvaloniaProperty == prop));
+            var attachAvaProps = _attachedProperties.Where(prop => !node.Attributes.Any(attr => attr.AvaloniaProperty == prop));
             node.Attributes.AddRange(
                 CollectChangedValue(obj, attachAvaProps)
                     .Select(tpl => new ObjectProperty()
@@ -326,7 +326,7 @@ namespace UnitTest.Base.Utils
             }
             else
             {
-                return Document.CreateElement(prefix, name, XmlNamespaces[prefix].Namespace);
+                return Document.CreateElement(prefix, name, _xmlNamespaces[prefix].Namespace);
             }
         }
 
@@ -349,7 +349,7 @@ namespace UnitTest.Base.Utils
             }
             else
             {
-                return Document.CreateAttribute(prefix, name, XmlNamespaces[prefix].Namespace);
+                return Document.CreateAttribute(prefix, name, _xmlNamespaces[prefix].Namespace);
             }
         }
 
@@ -357,13 +357,13 @@ namespace UnitTest.Base.Utils
         {
             var valueType = value.GetType();
 
-            var root = Document.CreateElement("", valueType.Name, XmlNamespaces[""].Namespace);
+            var root = Document.CreateElement("", valueType.Name, _xmlNamespaces[""].Namespace);
 
             Document.AppendChild(root);
 
             ApplyTo(root, (AvaloniaObject)value);
 
-            foreach (var xmlSpc in XmlNamespaces.Values)
+            foreach (var xmlSpc in _xmlNamespaces.Values)
             {
                 if (string.IsNullOrEmpty(xmlSpc.Prefix)) continue;
 
@@ -461,17 +461,6 @@ namespace UnitTest.Base.Utils
                 ApplyTo(element, aobj);
             }
         }
-
-        #region helper
-
-        private bool ObjectEquals(object left, object right)
-        {
-            if (left == right) return true;
-            if (left is null) return false;
-            return left.Equals(right);
-        }
-
-        #endregion
     }
 
     class XmlNamespace

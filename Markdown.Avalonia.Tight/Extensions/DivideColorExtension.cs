@@ -14,61 +14,61 @@ namespace Markdown.Avalonia.Extensions
 {
     public class DivideColorExtension : MarkupExtension
     {
-        private string FrmKey;
-        private string ToKey;
-        private double Relate;
+        private readonly string _frmKey;
+        private readonly string _toKey;
+        private readonly double _relate;
 
         public DivideColorExtension(string frm, string to, double relate)
         {
-            this.FrmKey = frm;
-            this.ToKey = to;
-            this.Relate = relate;
+            this._frmKey = frm;
+            this._toKey = to;
+            this._relate = relate;
         }
 
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
             IBinding left;
-            if (Color.TryParse(FrmKey, out var leftColor))
+            if (Color.TryParse(_frmKey, out var leftColor))
             {
                 left = new StaticBinding(leftColor);
             }
             else
             {
-                var lftExt = new DynamicResourceExtension(FrmKey);
+                var lftExt = new DynamicResourceExtension(_frmKey);
                 left = lftExt.ProvideValue(serviceProvider);
             }
 
             IBinding right;
-            if (Color.TryParse(ToKey, out var rightColor))
+            if (Color.TryParse(_toKey, out var rightColor))
             {
                 right = new StaticBinding(rightColor);
             }
             else
             {
-                var rgtExt = new DynamicResourceExtension(ToKey);
+                var rgtExt = new DynamicResourceExtension(_toKey);
                 right = rgtExt.ProvideValue(serviceProvider);
             }
 
             return new MultiBinding()
             {
                 Bindings = new IBinding[] { left, right },
-                Converter = new DivideConverter(Relate)
+                Converter = new DivideConverter(_relate)
             };
         }
     }
 
     class StaticBinding : IBinding
     {
-        object Value;
+        private readonly object _value;
 
         public StaticBinding(object value)
         {
-            Value = value;
+            _value = value;
         }
 
         public InstancedBinding? Initiate(IAvaloniaObject target, AvaloniaProperty? targetProperty, object? anchor = null, bool enableDataValidation = false)
         {
-            return InstancedBinding.OneWay(new StaticBindingObservable(Value));
+            return InstancedBinding.OneWay(new StaticBindingObservable(_value));
         }
 
         class StaticBindingObservable : IObservable<object>
@@ -80,8 +80,7 @@ namespace Markdown.Avalonia.Extensions
                 Value = value;
             }
 
-            ConcurrentDictionary<StaticTicket, IObserver<object>> Cache
-                = new ConcurrentDictionary<StaticTicket, IObserver<object>>();
+            private readonly ConcurrentDictionary<StaticTicket, IObserver<object>> _cache = new();
 
             public IDisposable Subscribe(IObserver<object> observer)
             {
@@ -102,7 +101,7 @@ namespace Markdown.Avalonia.Extensions
 
             public void Remove(StaticTicket nemui)
             {
-                Cache.TryRemove(nemui, out var notinterest);
+                _cache.TryRemove(nemui, out var _);
             }
         }
 
@@ -113,32 +112,31 @@ namespace Markdown.Avalonia.Extensions
 
         class StaticTicket : IDisposable
         {
-
-            private StaticBindingObservable Owner;
-            private Guid guid = new Guid();
+            private readonly StaticBindingObservable _owner;
+            private readonly Guid _guid = new();
 
             public StaticTicket(StaticBindingObservable owner)
             {
-                this.Owner = owner;
+                this._owner = owner;
             }
 
 
             ~StaticTicket() => Dispose();
 
             public override int GetHashCode()
-                => guid.GetHashCode();
+                => _guid.GetHashCode();
 
-            public override bool Equals(object obj)
+            public override bool Equals(object? obj)
             {
                 if (obj is StaticTicket nemu)
-                    return nemu.guid.Equals(nemu.guid);
+                    return nemu._guid.Equals(nemu._guid);
 
                 return false;
             }
 
             public void Dispose()
             {
-                Owner.Remove(this);
+                _owner.Remove(this);
                 GC.SuppressFinalize(this);
             }
         }
@@ -172,7 +170,7 @@ namespace Markdown.Avalonia.Extensions
             else
                 return values[0];
 
-            byte Calc(byte l, byte r, double d)
+            static byte Calc(byte l, byte r, double d)
                 => (byte)(l * (1 - d) + r * d);
 
             return new SolidColorBrush(

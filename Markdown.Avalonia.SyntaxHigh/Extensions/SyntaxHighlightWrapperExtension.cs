@@ -53,9 +53,9 @@ namespace Markdown.Avalonia.SyntaxHigh.Extensions
 
         class SyntaxHighlightWrapperConverter : IMultiValueConverter
         {
-            public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
+            public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
             {
-                string codeLang = values[1] is string l ? l : null;
+                string? codeLang = values[1] is string l ? l : null;
 
                 if (String.IsNullOrEmpty(codeLang))
                     return null;
@@ -110,7 +110,7 @@ namespace Markdown.Avalonia.SyntaxHigh.Extensions
                 _namedColors[name] = newCol;
             }
 
-            MainRuleSet = Wrap(baseDef.MainRuleSet);
+            MainRuleSet = Wrap(baseDef.MainRuleSet)!;
         }
 
         public string Name => "Re:" + _baseDef.Name;
@@ -118,17 +118,17 @@ namespace Markdown.Avalonia.SyntaxHigh.Extensions
         public IEnumerable<HighlightingColor> NamedHighlightingColors => _namedColors.Values;
         public IDictionary<string, string> Properties => _baseDef.Properties;
 
-        public HighlightingColor GetNamedColor(string name)
+        public HighlightingColor? GetNamedColor(string name)
         {
             return _namedColors.TryGetValue(name, out var color) ? color : null;
         }
 
-        public HighlightingRuleSet GetNamedRuleSet(string name)
+        public HighlightingRuleSet? GetNamedRuleSet(string name)
         {
             return _namedRuleSet.TryGetValue(name, out var rset) ? rset : null;
         }
 
-        private HighlightingRuleSet Wrap(HighlightingRuleSet ruleSet)
+        private HighlightingRuleSet? Wrap(HighlightingRuleSet ruleSet)
         {
             if (ruleSet is null) return null;
 
@@ -178,7 +178,7 @@ namespace Markdown.Avalonia.SyntaxHigh.Extensions
             return copySet;
         }
 
-        private HighlightingColor Wrap(HighlightingColor color)
+        private HighlightingColor? Wrap(HighlightingColor color)
         {
             if (color is null) return null;
 
@@ -304,21 +304,19 @@ namespace Markdown.Avalonia.SyntaxHigh.Extensions
 
             int x = (int)(Saturation * (1 - Math.Abs((Hue / 60f) % 2 - 1)));
 
-            Color FromRgb(int r, int g, int b)
+            static Color FromRgb(int r, int g, int b)
                 => Color.FromRgb((byte)r, (byte)g, (byte)b);
 
 
-            switch (Hue / 60)
+            return (Hue / 60) switch
             {
-                default:
-                case 0: return FromRgb(Value, Value - Saturation + x, Value - Saturation);
-                case 1: return FromRgb(Value - Saturation + x, Value, Value - Saturation);
-                case 2: return FromRgb(Value - Saturation, Value, Value - Saturation + x);
-                case 3: return FromRgb(Value - Saturation, Value - Saturation + x, Value);
-                case 4: return FromRgb(Value - Saturation + x, Value - Saturation, Value);
-                case 5:
-                case 6: return FromRgb(Value, Value - Saturation, Value - Saturation + x);
-            }
+                1 => FromRgb(Value - Saturation + x, Value, Value - Saturation),
+                2 => FromRgb(Value - Saturation, Value, Value - Saturation + x),
+                3 => FromRgb(Value - Saturation, Value - Saturation + x, Value),
+                4 => FromRgb(Value - Saturation + x, Value - Saturation, Value),
+                5 or 6 => FromRgb(Value, Value - Saturation, Value - Saturation + x),
+                _ => FromRgb(Value, Value - Saturation + x, Value - Saturation),
+            };
         }
     }
 }

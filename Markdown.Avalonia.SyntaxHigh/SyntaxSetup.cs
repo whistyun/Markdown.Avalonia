@@ -50,7 +50,7 @@ namespace Markdown.Avalonia.SyntaxHigh
             else
             {
                 // check wheither style is set
-                if (!ThemeDetector.IsAvalonEditSetup)
+                if (!ThemeDetector.IsAvalonEditSetup && Application.Current is not null)
                 {
                     var aeStyle = new StyleInclude(new Uri("avares://Markdown.Avalonia/"))
                     {

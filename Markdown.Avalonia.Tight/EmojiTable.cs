@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -29,23 +31,29 @@ namespace Markdown.Avalonia
             var dic = new ConcurrentDictionary<string, string>();
 
             Assembly asm = Assembly.GetCallingAssembly();
-            using (var stream = asm.GetManifestResourceStream(resourceName))
-            using (var reader = new StreamReader(stream, true))
+            using var stream = asm.GetManifestResourceStream(resourceName);
+            Debug.Assert(stream is not null);
+
+            using var reader = new StreamReader(stream, true);
+
+            string? line;
+            while ((line = reader.ReadLine()) is not null)
             {
-                string line;
-                while ((line = reader.ReadLine()) is not null)
-                {
-                    var elms = line.Split('\t');
-                    dic[elms[1]] = elms[0];
-                }
+                var elms = line.Split('\t');
+                dic[elms[1]] = elms[0];
             }
 
             return dic;
         }
 
+#if NET6_0_OR_GREATER
+        public static bool TryGet(string keyword, [MaybeNullWhen(false)] out string? emoji)
+#else
         public static bool TryGet(string keyword, out string emoji)
+#endif
         {
             if (s_keywords is null) s_keywords = LoadTxt();
+
             return s_keywords.TryGetValue(keyword, out emoji);
         }
 

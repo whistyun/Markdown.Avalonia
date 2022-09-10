@@ -6,6 +6,8 @@
     <OutputType>WinExe</OutputType>
     <IsPackable>false</IsPackable>
     <TargetFrameworks>$(DemoAppTargetFrameworks)</TargetFrameworks>
+    <LangVersion>9</LangVersion>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />

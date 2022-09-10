@@ -13,16 +13,16 @@ namespace Markdown.Avalonia.Extensions
 {
     public class ComplementaryExtension : MarkupExtension
     {
-        string BrushName;
+        private readonly string _brushName;
 
         public ComplementaryExtension(string colorKey)
         {
-            this.BrushName = colorKey;
+            this._brushName = colorKey;
         }
 
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-            var dyExt = new DynamicResourceExtension(BrushName);
+            var dyExt = new DynamicResourceExtension(_brushName);
 
             var brush = dyExt.ProvideValue(serviceProvider);
 
