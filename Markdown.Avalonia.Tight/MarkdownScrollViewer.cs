@@ -66,7 +66,10 @@ namespace Markdown.Avalonia
 
         public MarkdownScrollViewer()
         {
-            _engine = new Markdown();
+            var md = new Markdown();
+            md.CascadeResources.SetParent(this);
+
+            _engine = md;
 
             if (nvl(ThemeDetector.IsFluentUsed))
             {
@@ -118,6 +121,9 @@ namespace Markdown.Avalonia
                     throw new ArgumentNullException(nameof(Engine));
 
                 _engine = value;
+
+                if (_engine is Markdown md)
+                    md.CascadeResources.SetParent(this);
 
                 if (AssetPathRoot != null)
                     _engine.AssetPathRoot = AssetPathRoot;
