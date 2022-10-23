@@ -142,6 +142,16 @@ namespace Markdown.Avalonia
 
         private Bitmap ImageNotFound { get; }
 
+        public CascadeDictionary CascadeResources { get; } = new CascadeDictionary();
+
+        public IResourceDictionary Resources
+        {
+            get => CascadeResources.Owner;
+            set => CascadeResources.Owner = value;
+        }
+
+        public bool UseResource { get; set; }
+
         #region dependencyobject property
 
         public static readonly DirectProperty<Markdown, ICommand?> HyperlinkCommandProperty =
@@ -369,6 +379,42 @@ namespace Markdown.Avalonia
             string altText = match.Groups[3].Value;
             string urlTxt = match.Groups[4].Value;
             string title = match.Groups[7].Value;
+
+            if (UseResource && CascadeResources.TryGet(urlTxt, out var resourceVal))
+            {
+                if (resourceVal is Control control)
+                {
+                    return new CInlineUIContainer(control);
+                }
+
+                CImage cimg = null;
+                if (resourceVal is Bitmap renderedImage)
+                {
+                    cimg = new CImage(renderedImage);
+                }
+                if (resourceVal is IEnumerable<Byte> byteEnum)
+                {
+                    try
+                    {
+                        using (var memstream = new MemoryStream(byteEnum.ToArray()))
+                        {
+                            var bitmap = new Bitmap(memstream);
+                            cimg = new CImage(bitmap);
+                        }
+                    }
+                    catch { }
+                }
+
+                if (cimg != null)
+                {
+                    if (!String.IsNullOrEmpty(title)
+                        && !title.Any(ch => !Char.IsLetterOrDigit(ch)))
+                    {
+                        cimg.Classes.Add(title);
+                    }
+                    return cimg;
+                }
+            }
 
             var image = new CImage(
                 Task.Run(() => BitmapLoader?.Get(urlTxt)),
