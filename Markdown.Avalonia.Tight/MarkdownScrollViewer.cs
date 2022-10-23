@@ -106,6 +106,11 @@ namespace Markdown.Avalonia
             {
                 _engine = value;
 
+                if (_engine is Markdown md)
+                {
+                    md.CascadeResources.SetParent(this);
+                }
+
                 if (AssetPathRoot != null)
                     _engine.AssetPathRoot = AssetPathRoot;
             }

@@ -4,10 +4,12 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Metadata;
+using Avalonia.VisualTree;
 using ColorTextBlock.Avalonia.Geometries;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 
@@ -93,6 +95,7 @@ namespace ColorTextBlock.Avalonia
         private double computedBaseHeight;
         private AvaloniaList<CInline> _content;
         private List<CGeometry> metries;
+        private List<CInlineUIContainer> containers;
 
         public IBrush Background
         {
@@ -172,10 +175,10 @@ namespace ColorTextBlock.Avalonia
                 if (SetAndRaise(ContentProperty, ref _content, value))
                 {
                     olds.CollectionChanged -= ContentCollectionChangedd;
-                    foreach (var oldrun in olds)
-                        LogicalChildren.Remove(oldrun);
 
-                    LogicalChildren.AddRange(_content);
+                    DetachChildren(olds);
+                    AttachChildren(_content);
+
                     _content.CollectionChanged += ContentCollectionChangedd;
                 }
             }
@@ -187,6 +190,7 @@ namespace ColorTextBlock.Avalonia
             _content.CollectionChanged += ContentCollectionChangedd;
 
             metries = new List<CGeometry>();
+            containers = new List<CInlineUIContainer>();
         }
 
         public CTextBlock(string text) : this()
@@ -329,35 +333,84 @@ namespace ColorTextBlock.Avalonia
 
         private void ContentCollectionChangedd(object sender, NotifyCollectionChangedEventArgs e)
         {
-            void Attach(IEnumerable<CInline> newItems)
-            {
-                foreach (CInline item in newItems)
-                    LogicalChildren.Add(item);
-            }
-
-            void Detach(IEnumerable<CInline> removeItems)
-            {
-                foreach (CInline item in removeItems)
-                    LogicalChildren.Remove(item);
-            }
-
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Reset:
                 case NotifyCollectionChangedAction.Remove:
-                    Detach(e.OldItems.Cast<CInline>());
+                    DetachChildren(e.OldItems.Cast<CInline>());
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
-                    Detach(e.OldItems.Cast<CInline>());
-                    Attach(e.NewItems.Cast<CInline>());
+                    DetachChildren(e.OldItems.Cast<CInline>());
+                    AttachChildren(e.NewItems.Cast<CInline>());
                     break;
 
                 case NotifyCollectionChangedAction.Add:
-                    Attach(e.NewItems.Cast<CInline>());
+                    AttachChildren(e.NewItems.Cast<CInline>());
                     break;
             }
         }
+
+
+        private void AttachChildren(IEnumerable<CInline> newItems)
+        {
+            foreach (CInline item in newItems)
+            {
+                LogicalChildren.Add(item);
+                AttachForVisual(item);
+            }
+
+            void AttachForVisual(CInline item)
+            {
+                if (item is CInlineUIContainer container)
+                {
+                    var content = container.Content;
+
+                    var visparent = container.Content.GetVisualParent();
+                    if (visparent is CTextBlock cblock)
+                    {
+                        cblock.VisualChildren.Remove(content);
+                        cblock.LogicalChildren.Remove(content);
+                    }
+                    else if(visparent is object){
+                        Debug.Print("Control has another parent");
+                        return;
+                    }
+
+                    VisualChildren.Add(container.Content);
+                    LogicalChildren.Add(container.Content);
+
+                    containers.Add(container);
+                }
+                else if (item is CSpan span)
+                    foreach (var child in span.Content)
+                        AttachForVisual(child);
+            }
+        }
+
+        private void DetachChildren(IEnumerable<CInline> removeItems)
+        {
+            foreach (CInline item in removeItems)
+            {
+                LogicalChildren.Remove(item);
+                DetachForVisual(item);
+            }
+
+            void DetachForVisual(CInline item)
+            {
+                if (item is CInlineUIContainer container)
+                {
+                    VisualChildren.Remove(container.Content);
+                    LogicalChildren.Remove(container.Content);
+
+                    containers.Remove(container);
+                }
+                else if (item is CSpan span)
+                    foreach (var child in span.Content)
+                        DetachForVisual(child);
+            }
+        }
+
 
         private void CheckHaveToMeasure()
         {
@@ -498,8 +551,21 @@ namespace ColorTextBlock.Avalonia
 
             foreach (CGeometry metry in metries) metry.RepaintRequested += RepaintRequested;
 
+            InvalidateArrange();
+
             return new Size(width, height);
         }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            foreach (var container in containers)
+            {
+                var indicator = container.Indicator;
+                container.Content.Arrange(new Rect(indicator.Left, indicator.Top, indicator.Width, indicator.Height));
+            }
+            return finalSize;
+        }
+
 
         public override void Render(DrawingContext context)
         {

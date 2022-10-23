@@ -20,8 +20,7 @@ Links with image [![faviicon](https://www.google.com/favicon.ico)](https://www.g
 
 ### Image ###
 #### Remote images ####
-![image1](http://placehold.it/300x25)  
-![imageleft](http://placehold.it/150x25/0000FF "blue")![imageright](http://placehold.it/150x25/00FFFF "cyan")
+![image1](https://github.com/whistyun/Markdown.Avalonia/raw/master/docs/img.demo/scrn1.png)
 #### Local and resource images ####
 ![localimage](LocalPath.png)
 ![ResourceImage](Assets/ResourceImage.png)
