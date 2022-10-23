@@ -106,6 +106,10 @@ namespace Markdown.Avalonia
             {
                 _engine = value;
 
+                _engine.CascadeResources.SetParent(this);
+                _engine.CascadeResources.SetParent(this);
+                _engine.UseResource = _useResource;
+
                 if (AssetPathRoot != null)
                     _engine.AssetPathRoot = AssetPathRoot;
             }
@@ -304,6 +308,18 @@ namespace Markdown.Avalonia
 
                     MarkdownStyle = (IStyle)prop.GetValue(null);
                 }
+            }
+        }
+
+        private bool _useResource;
+        public bool UseResource
+        {
+            get => _useResource;
+            set
+            {
+                _engine.UseResource = value;
+                _useResource = value;
+                UpdateMarkdown();
             }
         }
 

@@ -28,7 +28,7 @@
     <None Update="LocalPath.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="MainWindow.md">
+    <None Update="Assets\MainWindow.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

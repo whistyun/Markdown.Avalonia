@@ -64,12 +64,6 @@ namespace Markdown.AvaloniaDemo.ViewModels
 
         public MainWindowViewModel()
         {
-            using (var stream = new FileStream("MainWindow.md", FileMode.Open))
-            using (var reader = new StreamReader(stream))
-            {
-                Text = reader.ReadToEnd();
-            }
-
             Styles = new List<StyleViewModel>();
             Styles.Add(new StyleViewModel() { Name = nameof(MarkdownStyle.Standard) });
             Styles.Add(new StyleViewModel() { Name = nameof(MarkdownStyle.DefaultTheme) });
@@ -95,8 +89,16 @@ namespace Markdown.AvaloniaDemo.ViewModels
 
 
             var loader = AvaloniaLocator.Current.GetService<IAssetLoader>();
-            using (var strm = loader.Open(new Uri("avares://Markdown.AvaloniaDemo/Assets/XamlTemplate.txt")))
-            using (var reader = new StreamReader(strm))
+
+            using (var stream = loader.Open(new Uri("avares://Markdown.AvaloniaDemo/Assets/MainWindow.md")))
+            using (var reader = new StreamReader(stream))
+            {
+                Text = reader.ReadToEnd();
+            }
+
+
+            using (var stream = loader.Open(new Uri("avares://Markdown.AvaloniaDemo/Assets/XamlTemplate.txt")))
+            using (var reader = new StreamReader(stream))
             {
                 EdittingStyleXamlText = reader.ReadToEnd();
             }
