@@ -142,13 +142,15 @@ namespace Markdown.Avalonia
 
         private Bitmap ImageNotFound { get; }
 
-        internal CascadeDictionary CascadeResources { get; } = new CascadeDictionary();
+        public CascadeDictionary CascadeResources { get; } = new CascadeDictionary();
 
         public IResourceDictionary Resources
         {
             get => CascadeResources.Owner;
             set => CascadeResources.Owner = value;
         }
+
+        public bool UseResource { get; set; }
 
         #region dependencyobject property
 
@@ -378,7 +380,7 @@ namespace Markdown.Avalonia
             string urlTxt = match.Groups[4].Value;
             string title = match.Groups[7].Value;
 
-            if (CascadeResources.TryGet(urlTxt, out var resourceVal))
+            if (UseResource && CascadeResources.TryGet(urlTxt, out var resourceVal))
             {
                 if (resourceVal is Control control)
                 {

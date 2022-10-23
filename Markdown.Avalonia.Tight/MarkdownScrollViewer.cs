@@ -122,10 +122,10 @@ namespace Markdown.Avalonia
 
                 _engine = value;
 
-                if (_engine is Markdown md)
-                    md.CascadeResources.SetParent(this);
+                _engine.CascadeResources.SetParent(this);
+                _engine.UseResource = _useResource;
 
-                if (AssetPathRoot != null)
+                if (AssetPathRoot is not null)
                     _engine.AssetPathRoot = AssetPathRoot;
             }
             get => _engine;
@@ -337,6 +337,17 @@ namespace Markdown.Avalonia
                 }
 
                 static bool nvl(bool? vl) => vl.HasValue && vl.Value;
+            }
+        }
+
+        private bool _useResource;
+        public bool UseResource
+        {
+            get => _useResource;
+            set
+            {
+                _engine.UseResource = value;
+                _useResource = value;
             }
         }
 

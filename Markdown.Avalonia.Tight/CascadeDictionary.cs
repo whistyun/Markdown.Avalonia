@@ -4,11 +4,11 @@ using System;
 
 namespace Markdown.Avalonia
 {
-    internal class CascadeDictionary
+    public class CascadeDictionary
     {
         public IResourceDictionary Owner { get; set; } = new ResourceDictionary();
 
-        public WeakReference<IStyledElement> Parent { get; set; }
+        public WeakReference<IStyledElement>? Parent { get; set; }
 
         public void SetParent(IStyledElement element)
         {
@@ -20,7 +20,7 @@ namespace Markdown.Avalonia
             if (Owner.TryGetResource(key, out val))
                 return true;
 
-            IStyledElement node;
+            IStyledElement? node;
 
             if (Parent is null)
                 return false;
