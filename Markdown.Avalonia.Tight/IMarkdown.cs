@@ -13,8 +13,12 @@ namespace Markdown.Avalonia
         ICommand HyperlinkCommand { get; set; }
         IBitmapLoader BitmapLoader { get; set; }
 
+        bool UseResource { get; set; }
+        CascadeDictionary CascadeResources { get; }
+        IResourceDictionary Resources { get; set; }
+
         IContainerBlockHandler ContainerBlockHandler { get; set; }
-            
+
         Control Transform(string text);
     }
 }

@@ -4,7 +4,7 @@ using System;
 
 namespace Markdown.Avalonia
 {
-    internal class CascadeDictionary
+    public class CascadeDictionary
     {
         public IResourceDictionary Owner { get; set; } = new ResourceDictionary();
 

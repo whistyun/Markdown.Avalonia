@@ -132,8 +132,9 @@ namespace Markdown.Avalonia
 
         public IContainerBlockHandler ContainerBlockHandler { get; set; }
 
+        public bool UseResource { get; set; }
 
-        internal CascadeDictionary CascadeResources { get; } = new CascadeDictionary();
+        public CascadeDictionary CascadeResources { get; } = new CascadeDictionary();
 
         public IResourceDictionary Resources
         {
@@ -398,7 +399,7 @@ namespace Markdown.Avalonia
             string urlTxt = match.Groups[4].Value;
             string title = match.Groups[7].Value;
 
-            if (CascadeResources.TryGet(urlTxt, out var resourceVal))
+            if (UseResource && CascadeResources.TryGet(urlTxt, out var resourceVal))
             {
                 if (resourceVal is Control control)
                 {
