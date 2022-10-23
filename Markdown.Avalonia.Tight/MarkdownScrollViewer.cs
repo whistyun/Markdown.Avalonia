@@ -319,6 +319,7 @@ namespace Markdown.Avalonia
             {
                 _engine.UseResource = value;
                 _useResource = value;
+                UpdateMarkdown();
             }
         }
 
