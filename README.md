@@ -15,13 +15,16 @@ It can render Markdown with avalonia.
 
 https://www.nuget.org/packages/Markdown.Avalonia/
 
-The table of compability with Avalonia's version
-| AvaloniaUI      | Markdown.Avalonia |
-|-----------------|-------------------|
-| 11.0.0-preview1 | 11.0.0-a1～a2     |
-| 0.10.1～0.10.6  | 0.10.4            |
-| 0.10.0          | 0.10.1～0.10.3    |
-| 0.9.11          | 0.9.0-a1～a7      |
+The table of compability with Avalonia's version.
+
+
+| AvaloniaUI         | Markdown.Avalonia |
+|--------------------|-------------------|
+| 11.0.0-preview3    | 11.0.0-a5         |
+| 11.0.0-preview1～2 | 11.0.0-a1～a4     |
+| 0.10.1～0.10.6     | 0.10.4            |
+| 0.10.0             | 0.10.1～0.10.3    |
+| 0.9.11             | 0.9.0-a1～a7      |
 
 ## [How to use](https://github.com/whistyun/Markdown.Avalonia/wiki/How-to-use)
 
