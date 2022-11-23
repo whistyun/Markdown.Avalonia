@@ -45,6 +45,12 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System.Net.Http" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="StyleCollections\MarkdownStyleFluentAvalonia.axaml.cs">
+      <DependentUpon>MarkdownStyleFluentAvalonia.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
   
   <!-- see https://stackoverflow.com/questions/41979310/including-referenced-project-dlls-in-nuget-package-net-core-rc3-csproj-file
   <PropertyGroup>
