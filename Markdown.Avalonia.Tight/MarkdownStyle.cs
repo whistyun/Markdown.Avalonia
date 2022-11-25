@@ -71,6 +71,11 @@ namespace Markdown.Avalonia
             get => Filter(nameof(FluentTheme), new MarkdownStyleFluentTheme());
         }
 
+        public static Styles FluentAvalonia
+        {
+            get => Filter(nameof(FluentAvalonia), new MarkdownStyleFluentAvalonia());
+        }
+
         public static Styles GithubLike
         {
             get => Filter(nameof(GithubLike), new MarkdownStyleGithubLike());

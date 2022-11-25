@@ -71,7 +71,12 @@ namespace Markdown.Avalonia
 
             _engine = md;
 
-            if (nvl(ThemeDetector.IsFluentUsed))
+            if (nvl(ThemeDetector.IsFluentAvaloniaUsed))
+            {
+                _markdownStyleName = nameof(MdStyle.FluentAvalonia);
+                _markdownStyle = MdStyle.FluentAvalonia;
+            }
+            else if (nvl(ThemeDetector.IsFluentUsed))
             {
                 _markdownStyleName = nameof(MdStyle.FluentTheme);
                 _markdownStyle = MdStyle.FluentTheme;
@@ -321,6 +326,7 @@ namespace Markdown.Avalonia
                 if (_markdownStyleName is null)
                 {
                     MarkdownStyle =
+                        nvl(ThemeDetector.IsFluentAvaloniaUsed) ? MdStyle.FluentAvalonia :
                         nvl(ThemeDetector.IsFluentUsed) ? MdStyle.FluentTheme :
                         nvl(ThemeDetector.IsSimpleUsed) ? MdStyle.SimpleTheme :
                         MdStyle.Standard;
