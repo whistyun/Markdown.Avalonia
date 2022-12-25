@@ -1,4 +1,4 @@
-name: .NET
+name: .NET on win
 
 on:
   pull_request:

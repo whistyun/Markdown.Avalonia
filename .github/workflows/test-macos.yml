@@ -1,4 +1,4 @@
-name: .NET
+name: .NET on macos
 
 on:
   pull_request:
