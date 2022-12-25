@@ -1,0 +1,35 @@
+name: .NET on macos
+
+on:
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        versions: [ 11.0.0-preview4 ]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+          submodules: 'true'
+    - name: Clean
+      run: dotnet clean
+      env:
+        AVA_VER: ${{ matrix.versions }}
+    - name: Restore
+      run: dotnet restore
+      env:
+        AVA_VER: ${{ matrix.versions }}
+    - name: Build
+      run: dotnet build --no-restore
+      env:
+        AVA_VER: ${{ matrix.versions }}
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+      env:
+        AVA_VER: ${{ matrix.versions }}
