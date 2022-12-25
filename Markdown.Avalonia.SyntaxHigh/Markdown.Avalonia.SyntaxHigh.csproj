@@ -29,6 +29,9 @@
     <Compile Update="StyleCollections\AppendixOfDefaultTheme.axaml.cs">
       <DependentUpon>AppendixOfDefaultTheme.axaml</DependentUpon>
     </Compile>
+    <Compile Update="StyleCollections\AppendixOfFluentAvalonia.axaml.cs">
+      <DependentUpon>AppendixOfFluentAvalonia.axaml</DependentUpon>
+    </Compile>
     <Compile Update="StyleCollections\AppendixOfFluentTheme.axaml.cs">
       <DependentUpon>AppendixOfFluentTheme.axaml</DependentUpon>
     </Compile>

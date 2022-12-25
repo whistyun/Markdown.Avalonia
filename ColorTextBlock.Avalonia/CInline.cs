@@ -153,13 +153,20 @@ namespace ColorTextBlock.Avalonia
 
         protected void RequestRender()
         {
-            if (Parent is CInline cline)
+            try
             {
-                cline.RequestRender();
+                if (Parent is CInline cline)
+                {
+                    cline.RequestRender();
+                }
+                if (Parent is Layoutable layout)
+                {
+                    layout.InvalidateVisual();
+                }
             }
-            if (Parent is Layoutable layout)
+            catch
             {
-                layout.InvalidateVisual();
+                // An error occured sometimes with FluentAvalonia.
             }
         }
 

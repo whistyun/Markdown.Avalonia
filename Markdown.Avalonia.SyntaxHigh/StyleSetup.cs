@@ -34,6 +34,16 @@ namespace Markdown.Avalonia.SyntaxHigh
                 )
             );
 
+            list.Add(
+                new KeyValuePair<string, Action<Styles>>(
+                    nameof(MarkdownStyle.FluentAvalonia),
+                    styles =>
+                    {
+                        var appendStyles = new AppendixOfFluentAvalonia();
+                        styles.Add(appendStyles[0]);
+                    }
+                )
+            );
             return list;
         }
     }

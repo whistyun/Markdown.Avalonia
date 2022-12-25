@@ -1,0 +1,15 @@
+﻿<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Markdown.AvaloniaFluentAvaloniaDemo"
+             xmlns:sty="using:FluentAvalonia.Styling"
+             x:Class="Markdown.AvaloniaFluentAvaloniaDemo.App">
+  <Application.DataTemplates>
+    <local:ViewLocator/>
+  </Application.DataTemplates>
+
+  <Application.Styles>
+    <!-- Light, Dark, or HighContrast -->
+    <sty:FluentAvaloniaTheme PreferSystemTheme="False" RequestedTheme="Light"/>
+    <StyleInclude Source="/Assets/AppendingStyles.axaml"/>
+  </Application.Styles>
+</Application>
