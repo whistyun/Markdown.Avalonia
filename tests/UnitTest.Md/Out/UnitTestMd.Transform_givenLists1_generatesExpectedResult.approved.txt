@@ -163,11 +163,46 @@
         <c:CRun Text="asterisk 3" />
       </c:CTextBlock>
     </StackPanel>
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="3">
+      <c:CRun Text="•" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="3">
+      <c:CTextBlock Classes="Paragraph">
+        <c:CBold>
+          <c:CRun Text="bold" />
+        </c:CBold>
+      </c:CTextBlock>
+    </StackPanel>
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="4">
+      <c:CRun Text="•" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="4">
+      <c:CTextBlock Classes="Paragraph">
+        <c:CItalic>
+          <c:CRun Text="italic" />
+        </c:CItalic>
+      </c:CTextBlock>
+    </StackPanel>
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="5">
+      <c:CRun Text="•" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="5">
+      <c:CTextBlock Classes="Paragraph">
+        <c:CBold>
+          <c:CItalic>
+            <c:CRun Text="bold italic" />
+          </c:CItalic>
+        </c:CBold>
+      </c:CTextBlock>
+    </StackPanel>
     <Grid.ColumnDefinitions>
       <ColumnDefinition />
       <ColumnDefinition />
     </Grid.ColumnDefinitions>
     <Grid.RowDefinitions>
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
       <RowDefinition />
       <RowDefinition />
       <RowDefinition />

@@ -711,7 +711,7 @@ namespace Markdown.Avalonia
         private static readonly string _wholeList = string.Format(@"
             (?<whltxt>                      # whole list
               (?<mkr_i>                     # list marker with indent
-                (?![ ]{{0,3}}(?<hrm>[-=*_])([ ]{{0,2}}\k<hrm>){{2,}})
+                (?![ ]{{0,3}}(?<hrm>[-=*_])([ ]{{0,2}}\k<hrm>){{2,}}[ ]*\n)
                 (?<idt>[ ]{{0,{2}}})
                 (?<mkr>{0})                 # first list item marker
                 [ ]+
@@ -729,7 +729,7 @@ namespace Markdown.Avalonia
               )
             )", _firstListMaker, _subseqListMaker, _listDepth - 1);
 
-        private static readonly Regex _startNoIndentRule = new Regex(@"\A[ ]{0,2}(?<hrm>[-=*_])([ ]{0,2}\k<hrm>){2,}",
+        private static readonly Regex _startNoIndentRule = new Regex(@"\A[ ]{0,2}(?<hrm>[-=*_])([ ]{0,2}\k<hrm>){2,}[ ]*$",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static readonly Regex _startNoIndentSublistMarker = new Regex(@"\A" + _subseqListMaker, RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);

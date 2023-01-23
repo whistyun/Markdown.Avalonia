@@ -30,6 +30,12 @@ Asterisks loose:
 
 *	asterisk 3
 
+*	**bold**
+
+*	*italic*
+
+*	***bold italic***
+
 * * *
 
 Pluses tight:
