@@ -90,8 +90,9 @@
   </Style>
   <Style Selector="TextBlock.CodeBlock">
     <Style.Setters>
+      <Setter Property="FontFamily" Value="menlo,monaco,consolas,droid sans mono,inconsolata,courier new,monospace,dejavu sans mono"/>
       <Setter Property="FontSize"   Value="11.9"/>
-      <Setter Property="Foreground"      Value="DarkBlue"/>
+      <Setter Property="Foreground" Value="DarkBlue"/>
     </Style.Setters>
   </Style>
   <Style Selector="Border.NoContainer">
