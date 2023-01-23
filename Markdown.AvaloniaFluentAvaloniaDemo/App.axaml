@@ -9,7 +9,7 @@
 
   <Application.Styles>
     <!-- Light, Dark, or HighContrast -->
-    <sty:FluentAvaloniaTheme PreferSystemTheme="False" RequestedTheme="Light"/>
+    <sty:FluentAvaloniaTheme />
     <StyleInclude Source="/Assets/AppendingStyles.axaml"/>
   </Application.Styles>
 </Application>
