@@ -10,11 +10,16 @@
     <Authors>whistyun</Authors>
     <Copyright>Copyright (c) 2021 whistyun</Copyright>
     <PackageProjectUrl>https://github.com/whistyun/Markdown.Avalonia</PackageProjectUrl>
+    <PackageReadmeFile>Markdown.Avalonia.SyntaxHigh.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Company />
     <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\pack_readme\Markdown.Avalonia.SyntaxHigh.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
