@@ -58,6 +58,12 @@
       </ScrollViewer>
     </Border.Child>
   </Border>
+  <m:Rule BoldLineWidth="2" Classes="Bold" />
+  <m:Rule BoldLineWidth="2" Classes="Bold" />
+  <m:Rule BoldLineWidth="2" Classes="Bold" />
+  <m:Rule BoldLineWidth="2" Classes="Bold" />
+  <m:Rule BoldLineWidth="2" Classes="Bold" />
+  <m:Rule BoldLineWidth="2" Classes="Bold" />
   <c:CTextBlock Classes="Paragraph">
     <c:CRun Text="Underscores:" />
   </c:CTextBlock>
