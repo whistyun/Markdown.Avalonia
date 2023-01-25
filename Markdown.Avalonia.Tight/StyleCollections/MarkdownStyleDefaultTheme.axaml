@@ -111,6 +111,7 @@
   </Style>
   <Style Selector="TextBlock.CodeBlock">
     <Style.Setters>
+      <Setter Property="FontFamily"      Value="menlo,monaco,consolas,droid sans mono,inconsolata,courier new,monospace,dejavu sans mono"/>
       <Setter Property="Foreground"      Value="{mde:DivideColor Blue, ThemeForegroundColor, 0.45}"/>
     </Style.Setters>
   </Style>
