@@ -93,8 +93,10 @@ namespace Markdown.Avalonia
 
         public const string TableClass = "Table";
         public const string TableHeaderClass = "TableHeader";
+        public const string TableFirstRowClass = "FirstTableRow";
         public const string TableRowOddClass = "OddTableRow";
         public const string TableRowEvenClass = "EvenTableRow";
+        public const string TableLastRowClass = "LastTableRow";
 
         public const string ListClass = "List";
         public const string ListMarkerClass = "ListMarker";
@@ -998,6 +1000,11 @@ namespace Markdown.Avalonia
                 foreach (Border cell in CreateTableRow(mdtable.Details[rowIdx], rowIdx + 1))
                 {
                     cell.Classes.Add((rowIdx & 1) == 0 ? TableRowOddClass : TableRowEvenClass);
+
+                    if (rowIdx == 0)
+                        cell.Classes.Add(TableFirstRowClass);
+                    if (rowIdx == mdtable.Details.Count - 1)
+                        cell.Classes.Add(TableLastRowClass);
 
                     table.Children.Add(cell);
                 }
