@@ -181,28 +181,28 @@
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="0" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="a1234567890" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="1" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="1" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="b1234567890" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="2" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="2" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="c1234567890" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="3" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="3" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="d1234567890" />
@@ -285,28 +285,28 @@
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="5">
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="0" Grid.Row="5">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="あ" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="1" Grid.Row="5">
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="1" Grid.Row="5">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="い" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="2" Grid.Row="5">
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="2" Grid.Row="5">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="う" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="3" Grid.Row="5">
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="3" Grid.Row="5">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="え" />

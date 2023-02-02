@@ -6,7 +6,7 @@
       x:Class="Markdown.Avalonia.SyntaxHigh.StyleCollections.AppendixOfFluentAvalonia"
       >
   <Style Selector="avedit|TextEditor">
-    <Setter Property="SyntaxHighlighting" Value="{mde:SyntaxHighlightWrapper ControlStrongFillColorDefault}"/>
+    <Setter Property="SyntaxHighlighting" Value="{mde:SyntaxHighlightWrapper TextFillColorPrimaryBrush}"/>
     <Setter Property="FontFamily" Value="menlo,monaco,consolas,droid sans mono,inconsolata,courier new,monospace,dejavu sans mono"/>
     <Setter Property="VerticalScrollBarVisibility" Value="Disabled"/>
   </Style>

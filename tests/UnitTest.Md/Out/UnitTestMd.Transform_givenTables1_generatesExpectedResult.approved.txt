@@ -10,7 +10,7 @@
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow,LastTableRow" Grid.Column="0" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="asdf" />
@@ -58,56 +58,56 @@
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="0" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="a" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="1" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="1" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="b" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="2" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="2" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="c" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="3" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="3" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="d" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="EvenTableRow" Grid.Column="0" Grid.Row="2">
+        <Border Classes="EvenTableRow,LastTableRow" Grid.Column="0" Grid.Row="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="a" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="EvenTableRow" Grid.Column="1" Grid.Row="2">
+        <Border Classes="EvenTableRow,LastTableRow" Grid.Column="1" Grid.Row="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="b" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="EvenTableRow" Grid.Column="2" Grid.Row="2">
+        <Border Classes="EvenTableRow,LastTableRow" Grid.Column="2" Grid.Row="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="c" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="EvenTableRow" Grid.Column="3" Grid.Row="2">
+        <Border Classes="EvenTableRow,LastTableRow" Grid.Column="3" Grid.Row="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="d" />
@@ -160,64 +160,64 @@
           </Border.Child>
         </Border>
         <Border Classes="TableHeader" Grid.Column="4" Grid.Row="0" />
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="0" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="a" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="1" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="1" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="b" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="2" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="2" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="c" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="3" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="3" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="d" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="4" Grid.Row="1" />
-        <Border Classes="EvenTableRow" Grid.Column="0" Grid.Row="2">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="4" Grid.Row="1" />
+        <Border Classes="EvenTableRow,LastTableRow" Grid.Column="0" Grid.Row="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="a" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="EvenTableRow" Grid.Column="1" Grid.Row="2">
+        <Border Classes="EvenTableRow,LastTableRow" Grid.Column="1" Grid.Row="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="b" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="EvenTableRow" Grid.Column="2" Grid.Row="2">
+        <Border Classes="EvenTableRow,LastTableRow" Grid.Column="2" Grid.Row="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="c" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="EvenTableRow" Grid.Column="3" Grid.Row="2">
+        <Border Classes="EvenTableRow,LastTableRow" Grid.Column="3" Grid.Row="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="d" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="EvenTableRow" Grid.Column="4" Grid.Row="2">
+        <Border Classes="EvenTableRow,LastTableRow" Grid.Column="4" Grid.Row="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="e" />
@@ -273,22 +273,22 @@
         <Border Classes="TableHeader" Grid.Column="4" Grid.Row="0" />
         <Border Classes="TableHeader" Grid.Column="5" Grid.Row="0" />
         <Border Classes="TableHeader" Grid.Column="6" Grid.Row="0" />
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="A" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="3" Grid.Row="1" Grid.ColumnSpan="2" Grid.RowSpan="5">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="3" Grid.Row="1" Grid.ColumnSpan="2" Grid.RowSpan="5">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="C" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="5" Grid.Row="1" />
-        <Border Classes="OddTableRow" Grid.Column="6" Grid.Row="1" />
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="5" Grid.Row="1" />
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="6" Grid.Row="1" />
         <Border Classes="EvenTableRow" Grid.Column="0" Grid.Row="2">
           <Border.Child>
             <c:CTextBlock>
@@ -354,11 +354,11 @@
         </Border>
         <Border Classes="EvenTableRow" Grid.Column="5" Grid.Row="4" />
         <Border Classes="EvenTableRow" Grid.Column="6" Grid.Row="4" />
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="5" />
-        <Border Classes="OddTableRow" Grid.Column="1" Grid.Row="5" />
-        <Border Classes="OddTableRow" Grid.Column="2" Grid.Row="5" />
-        <Border Classes="OddTableRow" Grid.Column="5" Grid.Row="5" />
-        <Border Classes="OddTableRow" Grid.Column="6" Grid.Row="5" />
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="0" Grid.Row="5" />
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="1" Grid.Row="5" />
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="2" Grid.Row="5" />
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="5" Grid.Row="5" />
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="6" Grid.Row="5" />
         <Grid.ColumnDefinitions>
           <ColumnDefinition />
           <ColumnDefinition />
@@ -392,16 +392,16 @@
         <Border Classes="TableHeader" Grid.Column="1" Grid.Row="0" />
         <Border Classes="TableHeader" Grid.Column="2" Grid.Row="0" />
         <Border Classes="TableHeader" Grid.Column="3" Grid.Row="0" />
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="0" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="alpha" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="1" Grid.Row="1" />
-        <Border Classes="OddTableRow" Grid.Column="2" Grid.Row="1" />
-        <Border Classes="OddTableRow" Grid.Column="3" Grid.Row="1" />
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="1" Grid.Row="1" />
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="2" Grid.Row="1" />
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="3" Grid.Row="1" />
         <Border Classes="EvenTableRow" Grid.Column="0" Grid.Row="2">
           <Border.Child>
             <c:CTextBlock>
@@ -418,14 +418,14 @@
         </Border>
         <Border Classes="EvenTableRow" Grid.Column="2" Grid.Row="2" />
         <Border Classes="EvenTableRow" Grid.Column="3" Grid.Row="2" />
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3">
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="delta" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="3" Grid.Row="3">
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="3" Grid.Row="3">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="epsilon" />
@@ -478,14 +478,14 @@
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="1-1" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="1-2" />
@@ -562,7 +562,7 @@
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="3">
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="3">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="7-1" />
@@ -619,14 +619,14 @@
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="1-1" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="1-2" />
@@ -695,7 +695,7 @@
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="3">
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="3">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="7-1" />
@@ -753,56 +753,56 @@
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="0" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="a" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="1" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="1" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="b" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="2" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="2" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="c" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="3" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="3" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="d" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="EvenTableRow" Grid.Column="0" Grid.Row="2">
+        <Border Classes="EvenTableRow,LastTableRow" Grid.Column="0" Grid.Row="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="a" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="EvenTableRow" Grid.Column="1" Grid.Row="2">
+        <Border Classes="EvenTableRow,LastTableRow" Grid.Column="1" Grid.Row="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="b" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="EvenTableRow" Grid.Column="2" Grid.Row="2">
+        <Border Classes="EvenTableRow,LastTableRow" Grid.Column="2" Grid.Row="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="c" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="EvenTableRow" Grid.Column="3" Grid.Row="2">
+        <Border Classes="EvenTableRow,LastTableRow" Grid.Column="3" Grid.Row="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="d" />
@@ -856,19 +856,19 @@
         </Border>
         <Border Classes="TableHeader" Grid.Column="4" Grid.Row="0" />
         <Border Classes="TableHeader" Grid.Column="5" Grid.Row="0" />
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="A" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="3" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="3" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock />
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="4" Grid.Row="1" Grid.ColumnSpan="2" Grid.RowSpan="4">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="4" Grid.Row="1" Grid.ColumnSpan="2" Grid.RowSpan="4">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="C" />
@@ -931,21 +931,21 @@
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="EvenTableRow" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2">
+        <Border Classes="EvenTableRow,LastTableRow" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="a" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="EvenTableRow" Grid.Column="2" Grid.Row="4">
+        <Border Classes="EvenTableRow,LastTableRow" Grid.Column="2" Grid.Row="4">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="b" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="EvenTableRow" Grid.Column="3" Grid.Row="4" />
+        <Border Classes="EvenTableRow,LastTableRow" Grid.Column="3" Grid.Row="4" />
         <Grid.ColumnDefinitions>
           <ColumnDefinition />
           <ColumnDefinition />
@@ -978,14 +978,14 @@
           </Border.Child>
         </Border>
         <Border Classes="TableHeader" Grid.Column="1" Grid.Row="0" />
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="0" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="alpha" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="1" Grid.Row="1" />
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="1" Grid.Row="1" />
         <Border Classes="EvenTableRow" Grid.Column="0" Grid.Row="2">
           <Border.Child>
             <c:CTextBlock>
@@ -1002,14 +1002,14 @@
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="3">
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="0" Grid.Row="3">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="\a. delta" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="1" Grid.Row="3">
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="1" Grid.Row="3">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="epsilon" />
@@ -1063,28 +1063,28 @@
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="0" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="a1234567890" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="1" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="1" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="b1234567890" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="2" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="2" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="c1234567890" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="3" Grid.Row="1">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="3" Grid.Row="1">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="d1234567890" />
@@ -1161,28 +1161,28 @@
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="5">
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="0" Grid.Row="5">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="あ" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="1" Grid.Row="5">
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="1" Grid.Row="5">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="い" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="2" Grid.Row="5">
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="2" Grid.Row="5">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="う" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="3" Grid.Row="5">
+        <Border Classes="OddTableRow,LastTableRow" Grid.Column="3" Grid.Row="5">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="え" />
@@ -1230,14 +1230,14 @@
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="1" Grid.RowSpan="4">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="0" Grid.Row="1" Grid.RowSpan="4">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="alpha" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Grid.RowSpan="2">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Grid.RowSpan="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="beta" />
@@ -1246,7 +1246,7 @@
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="OddTableRow" Grid.Column="3" Grid.Row="1" Grid.RowSpan="2">
+        <Border Classes="OddTableRow,FirstTableRow" Grid.Column="3" Grid.Row="1" Grid.RowSpan="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="Farms" />
@@ -1302,14 +1302,14 @@
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="EvenTableRow" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="2">
+        <Border Classes="EvenTableRow,LastTableRow" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="2">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="bar3" />
             </c:CTextBlock>
           </Border.Child>
         </Border>
-        <Border Classes="EvenTableRow" Grid.Column="3" Grid.Row="6">
+        <Border Classes="EvenTableRow,LastTableRow" Grid.Column="3" Grid.Row="6">
           <Border.Child>
             <c:CTextBlock>
               <c:CRun Text="foo3" />
