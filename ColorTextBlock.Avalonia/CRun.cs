@@ -64,9 +64,9 @@ namespace ColorTextBlock.Avalonia
                                               maxWidth: remainWidth);
 
 
-                var breakPosEnum = new LineBreakEnumerator(firstLineText.AsMemory());
-                int breakPos = breakPosEnum.MoveNext() ?
-                                    breakPosEnum.Current.PositionWrap :
+                var breakPosEnum = new LineBreakEnumerator(firstLineText.AsMemory().Span);
+                int breakPos = breakPosEnum.MoveNext(out var lnbrk) ?
+                                    lnbrk.PositionWrap :
                                     int.MaxValue;
 
 

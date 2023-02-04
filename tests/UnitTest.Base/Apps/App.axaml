@@ -1,9 +1,10 @@
 ﻿<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:UnitTest.Base.Apps"
-             x:Class="UnitTest.Base.Apps.App">
+             x:Class="UnitTest.Base.Apps.App"
+             RequestedThemeVariant="Light">
 
   <Application.Styles>
-    <SimpleTheme Mode="Light"/>
+    <SimpleTheme/>
   </Application.Styles>
 </Application>

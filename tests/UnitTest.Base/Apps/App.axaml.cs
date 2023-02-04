@@ -9,8 +9,6 @@ using Avalonia.Threading;
 using Avalonia.Markup.Xaml;
 
 using System;
-using System.Reactive.Disposables;
-using System.Reactive.Concurrency;
 using Avalonia.Controls.ApplicationLifetimes;
 using System.Collections.Generic;
 using System.Threading;

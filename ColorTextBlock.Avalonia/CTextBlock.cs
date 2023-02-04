@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
-using System.Reactive.Linq;
 
 namespace ColorTextBlock.Avalonia
 {
@@ -76,21 +75,21 @@ namespace ColorTextBlock.Avalonia
                 TextBlock.FontSizeProperty,
                 TextBlock.FontStyleProperty);
 
-            Observable.Merge<AvaloniaPropertyChangedEventArgs>(
-                ContentProperty.Changed,
-                TextBlock.FontSizeProperty.Changed,
-                TextBlock.FontStyleProperty.Changed,
-                TextBlock.FontWeightProperty.Changed,
-                TextWrappingProperty.Changed,
-                BoundsProperty.Changed,
-                TextVerticalAlignmentProperty.Changed,
-                LineHeightProperty.Changed,
-                LineSpacingProperty.Changed
-            ).AddClassHandler<CTextBlock>((x, _) => x.OnMeasureSourceChanged());
-
-            Observable.Merge<AvaloniaPropertyChangedEventArgs>(
-                BaseHeightProperty.Changed
-            ).AddClassHandler<CTextBlock>((x, _) => x.CheckHaveToMeasure());
+            //Observable.Merge<AvaloniaPropertyChangedEventArgs>(
+            //    ContentProperty.Changed,
+            //    TextBlock.FontSizeProperty.Changed,
+            //    TextBlock.FontStyleProperty.Changed,
+            //    TextBlock.FontWeightProperty.Changed,
+            //    TextWrappingProperty.Changed,
+            //    BoundsProperty.Changed,
+            //    TextVerticalAlignmentProperty.Changed,
+            //    LineHeightProperty.Changed,
+            //    LineSpacingProperty.Changed
+            //).AddClassHandler<CTextBlock>((x, _) => x.OnMeasureSourceChanged());
+            //
+            //Observable.Merge<AvaloniaPropertyChangedEventArgs>(
+            //    BaseHeightProperty.Changed
+            //).AddClassHandler<CTextBlock>((x, _) => x.CheckHaveToMeasure());
         }
 
         private double _computedBaseHeight;
@@ -333,6 +332,30 @@ namespace ColorTextBlock.Avalonia
 
         #endregion
 
+        protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+        {
+            base.OnPropertyChanged(change);
+
+            switch (change.Property.Name)
+            {
+                case nameof(Content):
+                case nameof(TextBlock.FontSize):
+                case nameof(TextBlock.FontStyle):
+                case nameof(TextBlock.FontWeight):
+                case nameof(TextWrapping):
+                case nameof(Bounds):
+                case nameof(TextVerticalAlignment):
+                case nameof(LineHeight):
+                case nameof(LineSpacing):
+                    OnMeasureSourceChanged();
+                    break;
+
+                case nameof(BaseHeightProperty):
+                    CheckHaveToMeasure();
+                    break;
+            }
+        }
+
         public void ObserveBaseHeightOf(CTextBlock target)
         {
             if (target is not null)
@@ -345,16 +368,21 @@ namespace ColorTextBlock.Avalonia
             {
                 case NotifyCollectionChangedAction.Reset:
                 case NotifyCollectionChangedAction.Remove:
-                    DetachChildren(e.OldItems?.Cast<CInline>());
+                    if (e.OldItems is not null)
+                        DetachChildren(e.OldItems.Cast<CInline>());
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
-                    DetachChildren(e.OldItems?.Cast<CInline>());
-                    AttachChildren(e.NewItems?.Cast<CInline>());
+                    if (e.OldItems is not null)
+                        DetachChildren(e.OldItems.Cast<CInline>());
+
+                    if (e.NewItems is not null)
+                        AttachChildren(e.NewItems.Cast<CInline>());
                     break;
 
                 case NotifyCollectionChangedAction.Add:
-                    AttachChildren(e.NewItems?.Cast<CInline>());
+                    if (e.NewItems is not null)
+                        AttachChildren(e.NewItems.Cast<CInline>());
                     break;
             }
         }

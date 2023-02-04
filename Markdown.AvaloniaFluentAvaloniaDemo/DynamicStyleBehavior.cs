@@ -29,7 +29,7 @@ namespace Markdown.AvaloniaFluentAvaloniaDemo
             AvaloniaProperty.RegisterAttached<DynamicStyleBehavior, MarkdownScrollViewer, ICommand>(
                 "ValidationResult");
 
-        public static string Validate(IAvaloniaObject obj, string xamlTxt)
+        public static string Validate(AvaloniaObject obj, string xamlTxt)
         {
             var ctrl = obj as MarkdownScrollViewer;
 

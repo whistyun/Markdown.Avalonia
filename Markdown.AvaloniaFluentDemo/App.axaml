@@ -1,7 +1,8 @@
 ﻿<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Markdown.AvaloniaFluentDemo"
-             x:Class="Markdown.AvaloniaFluentDemo.App">
+             x:Class="Markdown.AvaloniaFluentDemo.App"
+             RequestedThemeVariant="Light">
   <Application.DataTemplates>
     <local:ViewLocator/>
   </Application.DataTemplates>
@@ -10,7 +11,7 @@
     <!--
     <StyleInclude Source="avares://Avalonia.Themes.Fluent/FluentDark.xaml"/>
     -->
-    <FluentTheme Mode="Dark" DensityStyle="Compact"/>
+    <FluentTheme/>
     <StyleInclude Source="/Assets/AppendingStyles.axaml"/>
   </Application.Styles>
 </Application>

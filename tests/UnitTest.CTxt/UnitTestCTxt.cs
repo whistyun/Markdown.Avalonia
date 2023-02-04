@@ -136,14 +136,9 @@ namespace UnitTest.CTxt
                 var markdown = new Markdown.Avalonia.Markdown();
                 var control = markdown.Transform(text);
 
-                control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Simple/"))
-                {
-                    Source = new Uri("avares://Avalonia.Themes.Simple/Controls/SimpleControls.xaml")
-                });
-                control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Simple/"))
-                {
-                    Source = new Uri("avares://Avalonia.Themes.Simple/Accents/BaseLight.xaml")
-                });
+                var theme = new Avalonia.Themes.Simple.SimpleTheme();
+                control.Styles.Add(theme);
+
                 control.Styles.Add(MarkdownStyle.SimpleTheme);
                 control.Resources.Add("FontSizeNormal", 16d);
 
@@ -168,14 +163,9 @@ namespace UnitTest.CTxt
             var markdown = new Markdown.Avalonia.Markdown();
             var control = markdown.Transform(text);
 
-            control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Simple/"))
-            {
-                Source = new Uri("avares://Avalonia.Themes.Simple/Controls/SimpleControls.xaml")
-            });
-            control.Styles.Add(new StyleInclude(new Uri("avares://Avalonia.Themes.Simple/"))
-            {
-                Source = new Uri("avares://Avalonia.Themes.Simple/Accents/BaseLight.xaml")
-            });
+            var theme = new Avalonia.Themes.Simple.SimpleTheme();
+            control.Styles.Add(theme);
+
             control.Styles.Add(MarkdownStyle.SimpleTheme);
             control.Resources.Add("FontSizeNormal", 16d);
 
@@ -303,7 +293,7 @@ namespace UnitTest.CTxt
             Image = bitmap;
         }
 
-        private void RenderHelper(IVisual vis, DrawingContext ctx)
+        private void RenderHelper(Visual vis, DrawingContext ctx)
         {
             var sz = new Rect(vis.Bounds.Size);
             var bnd = vis.Bounds;
@@ -318,7 +308,7 @@ namespace UnitTest.CTxt
                                             .Where(fld => fld.Name == "VisualChildren")
                                             .First();
 
-                var children = (IAvaloniaList<IVisual>)childrenProp.GetValue(vis);
+                var children = (IAvaloniaList<Visual>)childrenProp.GetValue(vis);
                 foreach (var child in children)
                     RenderHelper(child, ctx);
             }

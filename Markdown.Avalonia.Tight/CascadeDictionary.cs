@@ -8,19 +8,19 @@ namespace Markdown.Avalonia
     {
         public IResourceDictionary Owner { get; set; } = new ResourceDictionary();
 
-        public WeakReference<IStyledElement>? Parent { get; set; }
+        public WeakReference<StyledElement>? Parent { get; set; }
 
-        public void SetParent(IStyledElement element)
+        public void SetParent(StyledElement element)
         {
-            Parent = new WeakReference<IStyledElement>(element);
+            Parent = new WeakReference<StyledElement>(element);
         }
 
         public bool TryGet(object key, out object val)
         {
-            if (Owner.TryGetResource(key, out val))
+            if (Owner.TryGetResource(key, null, out val))
                 return true;
 
-            IStyledElement? node;
+            StyledElement? node;
 
             if (Parent is null)
                 return false;

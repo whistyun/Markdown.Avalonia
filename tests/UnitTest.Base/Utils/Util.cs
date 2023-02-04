@@ -87,7 +87,7 @@ namespace UnitTest.Base.Utils
             return "dotnet";
         }
 
-        public static IEnumerable<T> FindControlsByClassName<T>(IControl ctrl, string classNm) where T : IControl
+        public static IEnumerable<T> FindControlsByClassName<T>(Control ctrl, string classNm) where T : Control
         {
             if (ctrl.Classes.Contains(classNm))
                 yield return (T)ctrl;
