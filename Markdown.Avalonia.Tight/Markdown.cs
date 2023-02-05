@@ -757,9 +757,9 @@ namespace Markdown.Avalonia
             grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
             grid.ColumnDefinitions.Add(new ColumnDefinition());
 
-            static CTextBlock? FindFirstFrom(IControl ctrl)
+            static CTextBlock? FindFirstFrom(Control ctrl)
             {
-                if (ctrl is IPanel pnl)
+                if (ctrl is Panel pnl)
                 {
                     foreach (var chld in pnl.Children)
                     {
@@ -1662,8 +1662,8 @@ namespace Markdown.Avalonia
         #region helper - parse
 
         private TResult Create<TResult, TContent>(IEnumerable<TContent> content)
-            where TResult : IPanel, new()
-            where TContent : IControl
+            where TResult : Panel, new()
+            where TContent : Control
         {
             var result = new TResult();
             foreach (var c in content)

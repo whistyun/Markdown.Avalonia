@@ -5,7 +5,6 @@ using Avalonia.Media;
 using ColorTextBlock.Avalonia.Geometries;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Reactive.Linq;
 
 namespace ColorTextBlock.Avalonia
 {

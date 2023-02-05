@@ -8,7 +8,6 @@ using ColorTextBlock.Avalonia.Geometries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
 
 namespace ColorTextBlock.Avalonia
 {
@@ -37,18 +36,6 @@ namespace ColorTextBlock.Avalonia
 
         static CSpan()
         {
-            Observable.Merge<AvaloniaPropertyChangedEventArgs>(
-                BorderThicknessProperty.Changed,
-                CornerRadiusProperty.Changed,
-                BoxShadowProperty.Changed,
-                PaddingProperty.Changed,
-                MarginProperty.Changed
-            ).AddClassHandler<CSpan>((x, _) => x.OnBorderPropertyChanged(true));
-
-            Observable.Merge<AvaloniaPropertyChangedEventArgs>(
-                BorderBrushProperty.Changed
-            ).AddClassHandler<CSpan>((x, _) => x.OnBorderPropertyChanged(false));
-
             ContentProperty.Changed.AddClassHandler<CSpan>(
                 (x, e) =>
                 {
@@ -126,6 +113,26 @@ namespace ColorTextBlock.Avalonia
         public CSpan(IEnumerable<CInline> inlines)
         {
             Content = inlines.ToArray();
+        }
+
+        protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+        {
+            base.OnPropertyChanged(change);
+
+            switch (change.Property.Name)
+            {
+                case nameof(BorderThickness):
+                case nameof(CornerRadius):
+                case nameof(BoxShadow):
+                case nameof(Padding):
+                case nameof(Margin):
+                    OnBorderPropertyChanged(true);
+                    break;
+
+                case nameof(BorderBrush):
+                    OnBorderPropertyChanged(false);
+                    break;
+            }
         }
 
         private void OnBorderPropertyChanged(bool requestMeasure)

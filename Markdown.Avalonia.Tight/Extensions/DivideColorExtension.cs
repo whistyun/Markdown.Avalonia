@@ -66,7 +66,7 @@ namespace Markdown.Avalonia.Extensions
             _value = value;
         }
 
-        public InstancedBinding? Initiate(IAvaloniaObject target, AvaloniaProperty? targetProperty, object? anchor = null, bool enableDataValidation = false)
+        public InstancedBinding? Initiate(AvaloniaObject target, AvaloniaProperty? targetProperty, object? anchor = null, bool enableDataValidation = false)
         {
             return InstancedBinding.OneWay(new StaticBindingObservable(_value));
         }

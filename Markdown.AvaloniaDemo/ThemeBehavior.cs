@@ -19,7 +19,7 @@ namespace Markdown.AvaloniaDemo
             AvaloniaProperty.RegisterAttached<ThemeBehavior, Control, Uri>(
                 "StyleUri", coerce: Validate);
 
-        public static Uri Validate(IAvaloniaObject obj, Uri src)
+        public static Uri Validate(AvaloniaObject obj, Uri src)
         {
             var ctrl = obj as Control;
             var style = new StyleInclude(new Uri("avares://Markdown.AvaloniaDemo/Styles"))

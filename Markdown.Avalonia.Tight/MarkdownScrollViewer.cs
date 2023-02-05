@@ -48,7 +48,7 @@ namespace Markdown.Avalonia
                 o => o.AssetPathRoot,
                 (o, v) => o.AssetPathRoot = v);
 
-        public static readonly StyledPropertyBase<bool> SaveScrollValueWhenContentUpdatedProperty =
+        public static readonly StyledProperty<bool> SaveScrollValueWhenContentUpdatedProperty =
             AvaloniaProperty.Register<MarkdownScrollViewer, bool>(
                 nameof(SaveScrollValueWhenContentUpdated),
                 defaultValue: false);
