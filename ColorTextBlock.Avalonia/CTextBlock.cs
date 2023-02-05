@@ -74,22 +74,6 @@ namespace ColorTextBlock.Avalonia
                 TextBlock.FontWeightProperty,
                 TextBlock.FontSizeProperty,
                 TextBlock.FontStyleProperty);
-
-            //Observable.Merge<AvaloniaPropertyChangedEventArgs>(
-            //    ContentProperty.Changed,
-            //    TextBlock.FontSizeProperty.Changed,
-            //    TextBlock.FontStyleProperty.Changed,
-            //    TextBlock.FontWeightProperty.Changed,
-            //    TextWrappingProperty.Changed,
-            //    BoundsProperty.Changed,
-            //    TextVerticalAlignmentProperty.Changed,
-            //    LineHeightProperty.Changed,
-            //    LineSpacingProperty.Changed
-            //).AddClassHandler<CTextBlock>((x, _) => x.OnMeasureSourceChanged());
-            //
-            //Observable.Merge<AvaloniaPropertyChangedEventArgs>(
-            //    BaseHeightProperty.Changed
-            //).AddClassHandler<CTextBlock>((x, _) => x.CheckHaveToMeasure());
         }
 
         private double _computedBaseHeight;
