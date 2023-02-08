@@ -15,7 +15,7 @@
   <PropertyGroup>
     <AvaloniaVersion>11.0.0-preview5</AvaloniaVersion>
     <DemoAvaloniaVersion>11.0.0-preview5</DemoAvaloniaVersion>
-	<AvaloniaEditVersion>11.0.0-preview1</AvaloniaEditVersion>
+	<AvaloniaEditVersion>11.0.0-preview5</AvaloniaEditVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(AVA_VER)' != '' ">
@@ -26,7 +26,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>11.0.0-a9</PackageVersion>
+    <PackageVersion>11.0.0-a10</PackageVersion>
   </PropertyGroup>
 
 </Project>
