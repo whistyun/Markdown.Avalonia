@@ -21,13 +21,11 @@ namespace ColorTextBlock.Avalonia.Fonts
                 "dejavu sans mono",
             };
 
-            var monospaceName = FontManager.Current.GetInstalledFontFamilyNames()
-                                           .Where(name => RequestFamilies.Any(reqNm => name.ToLower().Contains(reqNm)))
+            var monospaceName = FontManager.Current.SystemFonts
+                                           .Where(family => RequestFamilies.Any(reqNm => family.Name.ToLower().Contains(reqNm)))
                                            .FirstOrDefault();
 
-            return String.IsNullOrEmpty(monospaceName) ?
-                null :
-                new FontFamily(monospaceName);
+            return monospaceName;
         }
     }
 }

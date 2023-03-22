@@ -285,8 +285,7 @@ namespace UnitTest.CTxt
 
             var bitmap = new RenderTargetBitmap(PixelSize.FromSizeWithDpi(newReqSz, Dpi), Dpi);
 
-            using (var icontext = bitmap.CreateDrawingContext(null))
-            using (var context = new DrawingContext(icontext))
+            using (var context = bitmap.CreateDrawingContext())
             {
                 RenderHelper(ctxt, context);
             }
@@ -299,7 +298,7 @@ namespace UnitTest.CTxt
             var bnd = vis.Bounds;
 
             using (ctx.PushPostTransform(Matrix.CreateTranslation(vis.Bounds.Position)))
-            using (ctx.PushOpacity(vis.Opacity))
+            //using (ctx.PushOpacity(vis.Opacity))
             using (vis.OpacityMask != null ? ctx.PushOpacityMask(vis.OpacityMask, sz) : default)
             {
                 vis.Render(ctx);
