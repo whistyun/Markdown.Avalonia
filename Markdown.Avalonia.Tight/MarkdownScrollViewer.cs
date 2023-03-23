@@ -18,19 +18,23 @@ namespace Markdown.Avalonia
 {
     public class MarkdownScrollViewer : Control
     {
-        public static readonly AvaloniaProperty<Uri?> SourceProperty =
+        public static readonly DirectProperty<MarkdownScrollViewer, Uri?> SourceDirectProperty =
             AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, Uri?>(
                 nameof(Source),
                 o => o.Source,
                 (o, v) => o.Source = v);
 
-        public static readonly AvaloniaProperty<string?> MarkdownProperty =
+        public static readonly AvaloniaProperty<Uri?> SourceProperty = SourceDirectProperty;
+
+        private static readonly DirectProperty<MarkdownScrollViewer, string?> MarkdownDirectProperty =
             AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, string?>(
                 nameof(Markdown),
                 o => o.Markdown,
                 (o, v) => o.Markdown = v);
 
-        public static readonly AvaloniaProperty<IStyle> MarkdownStyleProperty =
+        public static readonly AvaloniaProperty<string?> MarkdownProperty = MarkdownDirectProperty;
+
+        private static readonly AvaloniaProperty<IStyle> MarkdownStyleProperty =
             AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, IStyle>(
                 nameof(MarkdownStyle),
                 o => o.MarkdownStyle,
@@ -229,7 +233,7 @@ namespace Markdown.Avalonia
             get { return _markdown; }
             set
             {
-                if (SetAndRaise(MarkdownProperty, ref _markdown, value))
+                if (SetAndRaise(MarkdownDirectProperty, ref _markdown, value))
                 {
                     UpdateMarkdown();
                 }
@@ -242,7 +246,7 @@ namespace Markdown.Avalonia
             get { return _source; }
             set
             {
-                if (!SetAndRaise(SourceProperty, ref _source, value))
+                if (!SetAndRaise(SourceDirectProperty, ref _source, value))
                     return;
 
                 if (value is null)

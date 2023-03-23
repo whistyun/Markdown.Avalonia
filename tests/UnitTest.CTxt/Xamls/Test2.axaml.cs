@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace UnitTest.CTxt.Xamls
 {
-    public class Test2 : UserControl
+    public partial class Test2 : UserControl
     {
         public Test2()
         {

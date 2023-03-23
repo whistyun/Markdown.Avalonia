@@ -13,16 +13,16 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AvaloniaVersion>11.0.0-preview5</AvaloniaVersion>
-    <DemoAvaloniaVersion>11.0.0-preview5</DemoAvaloniaVersion>
-	<AvaloniaEditVersion>11.0.0-preview5</AvaloniaEditVersion>
+    <AvaloniaVersion>11.0.0-preview6</AvaloniaVersion>
+    <DemoAvaloniaVersion>11.0.0-preview6</DemoAvaloniaVersion>
+    <AvaloniaEditVersion>11.0.0-preview5</AvaloniaEditVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(AVA_VER)' != '' ">
     <TestAvaloniaVersion>$(AVA_VER)</TestAvaloniaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(AVA_VER)' == '' ">
-    <TestAvaloniaVersion>11.0.0-preview5</TestAvaloniaVersion>
+    <TestAvaloniaVersion>11.0.0-preview6</TestAvaloniaVersion>
   </PropertyGroup>
 
   <PropertyGroup>
