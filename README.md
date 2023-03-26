@@ -20,7 +20,7 @@ The table of compability with Avalonia's version.
 
 | AvaloniaUI         | Markdown.Avalonia |
 |--------------------|-------------------|
-| 11.0.0-preview6    | 11.0.0-a10        |
+| 11.0.0-preview6    | 11.0.0-a10, b1    |
 | 11.0.0-preview5    | 11.0.0-a9         |
 | 11.0.0-preview4    | 11.0.0-a6, a8     |
 | 11.0.0-preview3    | 11.0.0-a5         |
