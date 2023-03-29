@@ -14,9 +14,12 @@ It can render Markdown with avalonia.
 ## Nuget
 
 https://www.nuget.org/packages/Markdown.Avalonia/
+https://www.nuget.org/packages/Markdown.Avalonia.Tight/
 
 The table of compability with Avalonia's version.
 
+NOTE: The only release for preview6 is Markdown.Avalonia.Tight.
+Avalonia and Markdown.Avalonia.SyntaxHigh will wait until AvaloniaEdit is released.
 
 | AvaloniaUI         | Markdown.Avalonia |
 |--------------------|-------------------|
