@@ -5,6 +5,8 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Metadata;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using Markdown.Avalonia.Plugins;
+using Markdown.Avalonia.StyleCollections;
 using Markdown.Avalonia.Utils;
 using System;
 using System.IO;
@@ -60,12 +62,18 @@ namespace Markdown.Avalonia
 
 
         private ScrollViewer _viewer;
+        private SetupInfo _setup;
 
         public MarkdownScrollViewer()
         {
-            Engine = new Markdown();
+            _plugins = new MdAvPlugins();
+            _setup = Plugins.CreateInfo();
 
-            this.InitializeComponent();
+            _engine = new Markdown(_setup);
+            _engine.CascadeResources.SetParent(this);
+            _engine.UseResource = _useResource;
+
+            InitializeComponent();
 
             bool nvl(bool? vl) => vl.HasValue && vl.Value;
 
@@ -88,6 +96,18 @@ namespace Markdown.Avalonia
             LogicalChildren.Add(_viewer);
         }
 
+        private void EditStyle(IStyle mdstyle)
+        {
+            if (mdstyle is INamedStyle nameStyle && !nameStyle.IsEditted
+             && mdstyle is Styles styles)
+            {
+                foreach (var edit in _setup.StyleEdits)
+                    edit.Edit(nameStyle.Name, styles);
+
+                nameStyle.IsEditted = true;
+            }
+        }
+
         private void UpdateMarkdown()
         {
             var doc = Engine.Transform(Markdown ?? "");
@@ -105,13 +125,13 @@ namespace Markdown.Avalonia
             set
             {
                 _engine = value;
-
-                _engine.CascadeResources.SetParent(this);
                 _engine.CascadeResources.SetParent(this);
                 _engine.UseResource = _useResource;
+                _engine.SetupInfo = _setup;
 
                 if (AssetPathRoot != null)
                     _engine.AssetPathRoot = AssetPathRoot;
+
             }
             get => _engine;
         }
@@ -272,6 +292,8 @@ namespace Markdown.Avalonia
             {
                 if (_markdownStyle != value)
                 {
+                    EditStyle(value);
+
                     if (_markdownStyle != null)
                         Styles.Remove(_markdownStyle);
 
@@ -308,6 +330,22 @@ namespace Markdown.Avalonia
 
                     MarkdownStyle = (IStyle)prop.GetValue(null);
                 }
+            }
+        }
+
+        private MdAvPlugins _plugins;
+        public MdAvPlugins Plugins
+        {
+            get => _plugins;
+            set
+            {
+                _plugins = value;
+                _setup = Plugins.CreateInfo();
+
+                Engine.SetupInfo = _setup;
+
+                EditStyle(MarkdownStyle);
+                UpdateMarkdown();
             }
         }
 

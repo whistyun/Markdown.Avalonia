@@ -15,56 +15,24 @@ namespace Markdown.Avalonia
 {
     public static class MarkdownStyle
     {
-        private static Dictionary<string, Action<Styles>> StyleOverrideMap;
-
-        static MarkdownStyle()
-        {
-            StyleOverrideMap = new Dictionary<string, Action<Styles>>();
-
-            try
-            {
-                var actions = InterassemblyUtil.InvokeInstanceMethodToGetProperty
-                    <IEnumerable<KeyValuePair<string, Action<Styles>>>>(
-                    "Markdown.Avalonia.SyntaxHigh",
-                    "Markdown.Avalonia.SyntaxHigh.StyleSetup",
-                    "GetOverrideStyles");
-
-                foreach (var action in actions)
-                    StyleOverrideMap[action.Key] = action.Value;
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.GetType().Name + ":" + e.Message);
-            }
-
-        }
-
-        private static Styles Filter(string name, Styles origin)
-        {
-            if (StyleOverrideMap.TryGetValue(name, out var filter))
-                filter(origin);
-
-            return origin;
-        }
-
         public static Styles Standard
         {
-            get => Filter(nameof(Standard), new MarkdownStyleStandard());
+            get => new MarkdownStyleStandard();
         }
 
         public static Styles DefaultTheme
         {
-            get => Filter(nameof(DefaultTheme), new MarkdownStyleDefaultTheme());
+            get => new MarkdownStyleDefaultTheme();
         }
 
         public static Styles FluentTheme
         {
-            get => Filter(nameof(FluentTheme), new MarkdownStyleFluentTheme());
+            get => new MarkdownStyleFluentTheme();
         }
 
         public static Styles GithubLike
         {
-            get => Filter(nameof(GithubLike), new MarkdownStyleGithubLike());
+            get => new MarkdownStyleGithubLike();
         }
     }
 }

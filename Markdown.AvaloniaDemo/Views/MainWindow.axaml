@@ -8,6 +8,7 @@
         xmlns:local="clr-namespace:Markdown.AvaloniaDemo;assembly=Markdown.AvaloniaDemo"
 
         xmlns:md="clr-namespace:Markdown.Avalonia;assembly=Markdown.Avalonia"
+        xmlns:mde="clr-namespace:Markdown.Avalonia.SyntaxHigh;assembly=Markdown.Avalonia.SyntaxHigh"
 
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
         x:Class="Markdown.AvaloniaDemo.Views.MainWindow"
@@ -141,6 +142,14 @@
       local:DynamicStyleBehavior.XamlText="{Binding AppendStyleXamlText}"
       local:DynamicStyleBehavior.ValidationResult="{Binding XamlParseResult}"
       >
+      <md:MarkdownScrollViewer.Plugins>
+        <md:MdAvPlugins>
+          <mde:SyntaxHiglight>
+            <mde:Alias Name="peg" XSHD="avares://Markdown.AvaloniaDemo/Assets/Pegasus-Mode.xshd" />
+          </mde:SyntaxHiglight>
+        </md:MdAvPlugins>
+      </md:MarkdownScrollViewer.Plugins>
+
     </md:MarkdownScrollViewer>
   </Grid>
 

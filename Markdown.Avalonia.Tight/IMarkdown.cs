@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using Markdown.Avalonia.Plugins;
 using Markdown.Avalonia.Utils;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,9 @@ namespace Markdown.Avalonia
         IResourceDictionary Resources { get; set; }
 
         IContainerBlockHandler ContainerBlockHandler { get; set; }
+
+        SetupInfo SetupInfo { get; set; }
+
 
         Control Transform(string text);
     }
