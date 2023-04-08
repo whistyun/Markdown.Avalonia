@@ -8,6 +8,7 @@ using AvaloniaEdit;
 using AvaloniaEdit.Highlighting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -50,13 +51,10 @@ namespace Markdown.Avalonia.SyntaxHigh
             else
             {
                 // check wheither style is set
-                if (!ThemeDetector.IsAvalonEditSetup && Application.Current is not null)
+                if (!ThemeDetector.IsAvalonEditSetup)
                 {
-                    var aeStyle = new StyleInclude(new Uri("avares://Markdown.Avalonia/"))
-                    {
-                        Source = new Uri("avares://AvaloniaEdit/AvaloniaEdit.xaml")
-                    };
-                    Application.Current.Styles.Add(aeStyle);
+                    SetupStyle();
+
                 }
 
                 var txtEdit = new TextEditor();
@@ -72,6 +70,30 @@ namespace Markdown.Avalonia.SyntaxHigh
 
                 return result;
             }
+        }
+
+        private static void SetupStyle()
+        {
+            if (Application.Current is null)
+                return;
+
+            string resourceUriTxt;
+            if (ThemeDetector.IsFluentUsed)
+                resourceUriTxt = "avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml";
+            else if (ThemeDetector.IsSimpleUsed)
+                resourceUriTxt = "avares://AvaloniaEdit/Themes/Simple/AvaloniaEdit.xaml";
+            else
+            {
+                Debug.Print("Markdown.Avalonia.SyntaxHigh can't add style for AvaloniaEdit. See https://github.com/whistyun/Markdown.Avalonia/wiki/Setup-AvaloniaEdit-for-syntax-hightlighting");
+                return;
+            }
+
+            var aeStyle = new StyleInclude(new Uri("avares://Markdown.Avalonia/"))
+            {
+                Source = new Uri(resourceUriTxt)
+            };
+
+            Application.Current.Styles.Add(aeStyle);
         }
     }
 }
