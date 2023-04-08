@@ -1058,8 +1058,7 @@ namespace Markdown.Avalonia
             var table = new Grid();
 
             // table columns
-            while (table.ColumnDefinitions.Count < mdtable.ColCount)
-                table.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+            table.ColumnDefinitions = new AutoScaleColumnDefinitions(mdtable.ColCount, table);
 
             // table header
             table.RowDefinitions.Add(new RowDefinition());
