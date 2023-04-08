@@ -11,6 +11,7 @@ using Avalonia.Styling;
 using ColorTextBlock.Avalonia;
 using Markdown.Avalonia.Controls;
 using Markdown.Avalonia.Parsers;
+using Markdown.Avalonia.Plugins;
 using Markdown.Avalonia.Tables;
 using Markdown.Avalonia.Utils;
 using System;
@@ -32,34 +33,10 @@ namespace Markdown.Avalonia
 {
     public class Markdown : AvaloniaObject, IMarkdownEngine
     {
-        private static Dictionary<string, Func<Match, Control>> converterMap;
-
         static Markdown()
         {
-            converterMap = new Dictionary<string, Func<Match, Control>>();
-
-            try
-            {
-                var kvps = InterassemblyUtil.InvokeInstanceMethodToGetProperty
-                    <IEnumerable>(
-                    "Markdown.Avalonia.SyntaxHigh",
-                    "Markdown.Avalonia.SyntaxHigh.SyntaxSetup",
-                    "GetOverrideConverters");
-
-                foreach (var kvpObj in kvps)
-                {
-                    if (kvpObj is KeyValuePair<string, Func<Match, Control>> kvp)
-                        converterMap[kvp.Key] = kvp.Value;
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.GetType().Name + ":" + e.Message);
-            }
         }
 
-        private static Func<Match, Control> GetConverterOrNull(string processName)
-            => converterMap.TryGetValue(processName, out var getval) ? getval : null;
 
         #region const
         /// <summary>
@@ -142,6 +119,32 @@ namespace Markdown.Avalonia
             set => CascadeResources.Owner = value;
         }
 
+        private SetupInfo _setupInfo;
+        public SetupInfo SetupInfo
+        {
+            get => _setupInfo;
+            set
+            {
+                _setupInfo = value;
+
+                if (value is null)
+                {
+                    TopLevelBlockParsers = TopLevelBlockParsersBase;
+                    SubLevelBlockParsers = SubLevelBlockParsersBase;
+                }
+                else
+                {
+                    TopLevelBlockParsers = TopLevelBlockParsersBase
+                                                .Select(p => value.Override(p))
+                                                .ToArray();
+
+                    SubLevelBlockParsers = SubLevelBlockParsersBase
+                                                .Select(p => value.Override(p))
+                                                .ToArray();
+                }
+            }
+        }
+
         private Bitmap ImageNotFound { get; }
 
         #region dependencyobject property
@@ -160,12 +163,18 @@ namespace Markdown.Avalonia
 
         #region ParseTree
 
-        private Parser<Control>[] TopLevelBlockParsers { get; }
-        private Parser<Control>[] SubLevelBlockParsers { get; }
+        private Parser<Control>[] TopLevelBlockParsersBase { get; }
+        private Parser<Control>[] SubLevelBlockParsersBase { get; }
+
+        private Parser<Control>[] TopLevelBlockParsers { get; set; }
+        private Parser<Control>[] SubLevelBlockParsers { get; set; }
 
         #endregion
 
-        public Markdown()
+        public Markdown() : this(new SetupInfo().Builtin())
+        { }
+
+        public Markdown(SetupInfo info)
         {
             _assetPathRoot = Environment.CurrentDirectory;
 
@@ -176,22 +185,23 @@ namespace Markdown.Avalonia
             using (var strm = assetLoader.Open(new Uri($"avares://Markdown.Avalonia/Assets/ImageNotFound.bmp")))
                 ImageNotFound = new Bitmap(strm);
 
-            TopLevelBlockParsers = new[]{
-                Parser.Create<Control>(_codeBlockFirst     , GetConverterOrNull(nameof(CodeBlocksWithLangEvaluator   )), CodeBlocksWithLangEvaluator   ),
-                Parser.Create<Control>(_containerBlockFirst, GetConverterOrNull(nameof(ContainerBlockEvaluator       )), ContainerBlockEvaluator       ),
-                Parser.Create<Control>( _listNested        , GetConverterOrNull(nameof(ListEvaluator                 )), ListEvaluator                 ),
+            TopLevelBlockParsersBase = new[]{
+                Parser.Create<Control>(_codeBlockFirst     , nameof(CodeBlocksWithLangEvaluator   ), CodeBlocksWithLangEvaluator   ),
+                Parser.Create<Control>(_containerBlockFirst, nameof(ContainerBlockEvaluator       ), ContainerBlockEvaluator       ),
+                Parser.Create<Control>( _listNested        , nameof(ListEvaluator                 ), ListEvaluator                 ),
             };
 
-            SubLevelBlockParsers = new[] {
-                Parser.Create<Control>(_blockquoteFirst    , GetConverterOrNull(nameof(BlockquotesEvaluator          )), BlockquotesEvaluator          ),
-                Parser.Create<Control>(_headerSetext       , GetConverterOrNull(nameof(SetextHeaderEvaluator         )), SetextHeaderEvaluator         ),
-                Parser.Create<Control>(_headerAtx          , GetConverterOrNull(nameof(AtxHeaderEvaluator            )), AtxHeaderEvaluator            ),
-                Parser.Create<Control>(_horizontalRules    , GetConverterOrNull(nameof(RuleEvaluator                 )), RuleEvaluator                 ),
-                Parser.Create<Control>(_table              , GetConverterOrNull(nameof(TableEvalutor                 )), TableEvalutor                 ),
-                Parser.Create<Control>(_note               , GetConverterOrNull(nameof(NoteEvaluator                 )), NoteEvaluator                 ),
-                Parser.Create<Control>(_indentCodeBlock    , GetConverterOrNull(nameof(CodeBlocksWithoutLangEvaluator)), CodeBlocksWithoutLangEvaluator),
+            SubLevelBlockParsersBase = new[] {
+                Parser.Create<Control>(_blockquoteFirst    , nameof(BlockquotesEvaluator          ), BlockquotesEvaluator          ),
+                Parser.Create<Control>(_headerSetext       , nameof(SetextHeaderEvaluator         ), SetextHeaderEvaluator         ),
+                Parser.Create<Control>(_headerAtx          , nameof(AtxHeaderEvaluator            ), AtxHeaderEvaluator            ),
+                Parser.Create<Control>(_horizontalRules    , nameof(RuleEvaluator                 ), RuleEvaluator                 ),
+                Parser.Create<Control>(_table              , nameof(TableEvalutor                 ), TableEvalutor                 ),
+                Parser.Create<Control>(_note               , nameof(NoteEvaluator                 ), NoteEvaluator                 ),
+                Parser.Create<Control>(_indentCodeBlock    , nameof(CodeBlocksWithoutLangEvaluator), CodeBlocksWithoutLangEvaluator),
             };
 
+            SetupInfo = info;
         }
 
         /// <inheritdoc/>
@@ -225,11 +235,10 @@ namespace Markdown.Avalonia
                 Helper.ThrowArgNull(nameof(text));
             }
 
-            return Evaluates(
+            return EvaluateBlock(
                 text, status,
                 TopLevelBlockParsers,
-                SubLevelBlockParsers,
-                FormParagraphs
+                SubLevelBlockParsers
             );
         }
 
@@ -1049,8 +1058,7 @@ namespace Markdown.Avalonia
             var table = new Grid();
 
             // table columns
-            while (table.ColumnDefinitions.Count < mdtable.ColCount)
-                table.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+            table.ColumnDefinitions = new AutoScaleColumnDefinitions(mdtable.ColCount, table);
 
             // table header
             table.RowDefinitions.Add(new RowDefinition());
@@ -1803,11 +1811,10 @@ namespace Markdown.Avalonia
             return result;
         }
 
-        private IEnumerable<T> Evaluates<T>(
+        private IEnumerable<Control> EvaluateBlock(
                 string text, ParseStatus status,
-                Parser<T>[] primary,
-                Parser<T>[] secondly,
-                Func<string, ParseStatus, IEnumerable<T>> rest
+                Parser<Control>[] primary,
+                Parser<Control>[] secondly
             )
         {
             if (text is null)
@@ -1817,54 +1824,67 @@ namespace Markdown.Avalonia
 
             var index = 0;
             var length = text.Length;
-            var rtn = new List<T>();
+            var rtn = new List<Control>();
+
+            var candidates = new List<Candidate>();
 
             while (true)
             {
-                int bestIndex = Int32.MaxValue;
-                Match bestMatch = null;
-                Parser<T> bestParser = null;
+                candidates.Clear();
 
                 foreach (var parser in primary)
                 {
-                    var match = parser.Match(text, index, length, status);
-                    if (match.Success && match.Index < bestIndex)
-                    {
-                        bestIndex = match.Index;
-                        bestMatch = match;
-                        bestParser = parser;
-                    }
+                    var match = parser.Pattern.Match(text, index, length);
+                    if (match.Success) candidates.Add(new Candidate(match, parser));
                 }
 
-                if (bestParser == null) break;
+                if (candidates.Count == 0) break;
 
-                if (bestIndex > index)
+                candidates.Sort();
+
+                int bestBegin = 0;
+                int bestEnd = 0;
+                IEnumerable<Control> result = null;
+
+                foreach (var c in candidates)
                 {
-                    EvaluateRest(rtn, text, index, bestIndex - index, status, secondly, 0, rest);
+                    result = c.Parser.Convert(text, c.Match, status, this, out bestBegin, out bestEnd);
+                    if (result is null)
+                        continue;
+
+                    break;
                 }
 
-                rtn.AddRange(bestParser.Convert(bestMatch, status));
 
-                var newIndex = bestIndex + bestMatch.Length;
-                length -= newIndex - index;
-                index = newIndex;
+                if (result is null) break;
+
+
+                if (bestBegin > index)
+                {
+                    EvaluateBlockRest(text, index, bestBegin - index, status, secondly, 0, rtn);
+                }
+
+                rtn.AddRange(result);
+
+                length -= bestEnd - index;
+                index = bestEnd;
             }
+
 
             if (index < text.Length)
             {
-                EvaluateRest(rtn, text, index, text.Length - index, status, secondly, 0, rest);
+                EvaluateBlockRest(text, index, text.Length - index, status, secondly, 0, rtn);
             }
 
             return rtn;
 
         }
 
-        private void EvaluateRest<T>(
-            List<T> resultIn,
+        private void EvaluateBlockRest(
             string text, int index, int length,
             ParseStatus status,
-            Parser<T>[] parsers, int parserStart,
-            Func<string, ParseStatus, IEnumerable<T>> rest)
+            Parser<Control>[] parsers, int parserStart,
+            List<Control> outto)
         {
             for (; parserStart < parsers.Length; ++parserStart)
             {
@@ -1872,19 +1892,22 @@ namespace Markdown.Avalonia
 
                 for (; ; )
                 {
-                    var match = parser.Match(text, index, length, status);
+                    var match = parser.Pattern.Match(text, index, length);
                     if (!match.Success) break;
 
-                    if (match.Index > index)
+                    var rslt = parser.Convert(text, match, status, this, out int parseBegin, out int parserEnd);
+                    if (rslt is null) break;
+
+
+                    if (parseBegin > index)
                     {
-                        EvaluateRest(resultIn, text, index, match.Index - index, status, parsers, parserStart + 1, rest);
+                        EvaluateBlockRest(text, index, parseBegin - index, status, parsers, parserStart + 1, outto);
                     }
 
-                    resultIn.AddRange(parser.Convert(match, status));
+                    outto.AddRange(rslt);
 
-                    var newIndex = match.Index + match.Length;
-                    length -= newIndex - index;
-                    index = newIndex;
+                    length -= parserEnd - index;
+                    index = parserEnd;
                 }
 
                 if (length == 0) break;
@@ -1893,7 +1916,7 @@ namespace Markdown.Avalonia
             if (length != 0)
             {
                 var suffix = text.Substring(index, length);
-                resultIn.AddRange(rest(suffix, status));
+                outto.AddRange(FormParagraphs(suffix, status));
             }
         }
 
@@ -1936,4 +1959,18 @@ namespace Markdown.Avalonia
         #endregion
     }
 
+    internal struct Candidate : IComparable<Candidate>
+    {
+        public Match Match { get; }
+        public Parser<Control> Parser { get; }
+
+        public Candidate(Match result, Parser<Control> parser)
+        {
+            Match = result;
+            Parser = parser;
+        }
+
+        public int CompareTo(Candidate other)
+            => Match.Index.CompareTo(other.Match.Index);
+    }
 }

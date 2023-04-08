@@ -1,29 +1,44 @@
-﻿using Avalonia;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using AvaloniaEdit;
-using AvaloniaEdit.Highlighting;
+using Markdown.Avalonia.Plugins;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
+using Avalonia;
+using System.Collections.ObjectModel;
+using Markdown.Avalonia.SyntaxHigh.Extensions;
+using Markdown.Avalonia.Parsers;
 
 namespace Markdown.Avalonia.SyntaxHigh
 {
-    public class SyntaxSetup
+    internal class SyntaxOverride : IBlockOverride
     {
-        public IEnumerable<KeyValuePair<string, Func<Match, Control>>> GetOverrideConverters()
+        private SyntaxHighlightProvider _provider;
+
+
+        public string ParserName => "CodeBlocksWithLangEvaluator";
+
+
+        public SyntaxOverride(ObservableCollection<Alias> aliases)
         {
-            yield return new KeyValuePair<string, Func<Match, Control>>(
-                "CodeBlocksWithLangEvaluator",
-                CodeBlocksEvaluator);
+            _provider = new SyntaxHighlightProvider(aliases);
         }
 
-        private Border CodeBlocksEvaluator(Match match)
+
+        public IEnumerable<Control> Convert(
+            string text,
+            Match match,
+            ParseStatus status,
+            IMarkdownEngine engine,
+            out int parseTextBegin, out int parseTextEnd)
         {
+            parseTextBegin = match.Index;
+            parseTextEnd = match.Index + match.Length;
+
             var lang = match.Groups[2].Value;
             var code = match.Groups[3].Value;
 
@@ -45,7 +60,7 @@ namespace Markdown.Avalonia.SyntaxHigh
                 result.Classes.Add(Markdown.CodeBlockClass);
                 result.Child = scrl;
 
-                return result;
+                return new Control[] { result };
             }
             else
             {
@@ -60,9 +75,8 @@ namespace Markdown.Avalonia.SyntaxHigh
                 }
 
                 var txtEdit = new TextEditor();
-                var highlight = HighlightingManager.Instance.GetDefinitionByExtension("." + lang);
                 txtEdit.Tag = lang;
-                //txtEdit.SetValue(TextEditor.SyntaxHighlightingProperty, highlight);
+                txtEdit.SetValue(SyntaxHighlightWrapperExtension.ProviderProperty, _provider);
 
                 txtEdit.Text = code;
                 txtEdit.HorizontalAlignment = HorizontalAlignment.Stretch;
@@ -72,8 +86,12 @@ namespace Markdown.Avalonia.SyntaxHigh
                 result.Classes.Add(Markdown.CodeBlockClass);
                 result.Child = txtEdit;
 
-                return result;
+                return new Control[] { result };
             }
         }
+
+
+
+
     }
 }
