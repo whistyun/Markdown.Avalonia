@@ -22,14 +22,25 @@ namespace UnitTest.Base.Utils
 
             public override TestResult Execute(TestExecutionContext context)
             {
-                var resultTask = Dispatcher.UIThread.InvokeAsync<object>(() => RunTest(context));
+                var dispatcher = Dispatcher.UIThread;
 
-                resultTask.Wait();
+                if (dispatcher.CheckAccess())
+                {
+                    return (TestResult)RunTest(context);
+                }
+                else
+                {
+                    var resultTask = Dispatcher.UIThread.InvokeAsync<object>(() => RunTest(context));
 
-                if (resultTask.Result is Exception ex)
-                    throw ex;
+                    if (resultTask.Status != DispatcherOperationStatus.Aborted
+                     && resultTask.Status != DispatcherOperationStatus.Completed)
+                        resultTask.Wait();
 
-                return (TestResult)resultTask.Result;
+                    if (resultTask.Result is Exception ex)
+                        throw ex;
+
+                    return (TestResult)resultTask.Result;
+                }
             }
 
             private object RunTest(TestExecutionContext context)

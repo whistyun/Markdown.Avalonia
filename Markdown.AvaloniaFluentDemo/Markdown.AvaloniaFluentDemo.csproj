@@ -26,8 +26,7 @@
     <Compile Include="..\tests\UnitTest.Base\Utils\Util.cs" Link="Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj" />
-    <ProjectReference Include="..\Markdown.Avalonia.SyntaxHigh\Markdown.Avalonia.SyntaxHigh.csproj" />
+    <ProjectReference Include="..\Markdown.Avalonia\Markdown.Avalonia.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="LocalPath.png">
