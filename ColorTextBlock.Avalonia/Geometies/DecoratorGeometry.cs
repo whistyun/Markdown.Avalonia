@@ -149,7 +149,7 @@ namespace ColorTextBlock.Avalonia.Geometries
 
         public override void Render(DrawingContext ctx)
         {
-            using (ctx.PushPreTransform(Matrix.CreateTranslation(Left + Decorate.Margin.Left, Top + Decorate.Margin.Top)))
+            using (ctx.PushTransform(Matrix.CreateTranslation(Left + Decorate.Margin.Left, Top + Decorate.Margin.Top)))
             {
                 Decorate.Background = Owner.Background;
                 Decorate.Arrange(new Rect(0, 0, Width, Height));

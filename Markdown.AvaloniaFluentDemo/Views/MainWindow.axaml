@@ -71,7 +71,7 @@
               Grid.Row="0"
               Grid.Column="1"
               SelectedItem="{Binding SelectedTheme}"
-              Items="{Binding Themes}"
+              ItemsSource="{Binding Themes}"
               >
             <ComboBox.ItemTemplate>
               <DataTemplate>

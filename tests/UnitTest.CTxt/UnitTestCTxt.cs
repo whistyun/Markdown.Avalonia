@@ -24,7 +24,7 @@ using UnitTest.CTxt.Xamls;
 
 namespace UnitTest.CTxt
 {
-    [UseReporter(typeof(DiffReporter))]
+    //[UseReporter(typeof(DiffReporter))]
     public class UnitTestCTxt : UnitTestBase
     {
         public UnitTestCTxt()
@@ -39,7 +39,7 @@ namespace UnitTest.CTxt
             var tst1 = new Test1();
             var ctxt = (CTextBlock)tst1.Content;
 
-            var info = new MetryHolder(ctxt, 385, 1000);
+            var info = new MetryHolder(ctxt, 360, 1000);
 
             Approvals.Verify(
                 new ApprovalImageWriter(info.Image),
@@ -297,7 +297,7 @@ namespace UnitTest.CTxt
             var sz = new Rect(vis.Bounds.Size);
             var bnd = vis.Bounds;
 
-            using (ctx.PushPostTransform(Matrix.CreateTranslation(vis.Bounds.Position)))
+            using (ctx.PushTransform(Matrix.CreateTranslation(vis.Bounds.Position)))
             //using (ctx.PushOpacity(vis.Opacity))
             using (vis.OpacityMask != null ? ctx.PushOpacityMask(vis.OpacityMask, sz) : default)
             {
