@@ -26,7 +26,12 @@ namespace UnitTest.Base.Utils
 
                 if (dispatcher.CheckAccess())
                 {
-                    return (TestResult)RunTest(context);
+                    var result = RunTest(context);
+
+                    if (result is Exception ex)
+                        throw ex;
+
+                    return (TestResult)result;
                 }
                 else
                 {

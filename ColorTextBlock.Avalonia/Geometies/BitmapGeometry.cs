@@ -23,9 +23,7 @@ namespace ColorTextBlock.Avalonia.Geometries
             ctx.DrawImage(
                 Bitmap,
                 new Rect(Bitmap.Size),
-                new Rect(Left, Top, Width, Height),
-                BitmapInterpolationMode.HighQuality
-                );
+                new Rect(Left, Top, Width, Height));
         }
     }
 }

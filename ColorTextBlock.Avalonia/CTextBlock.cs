@@ -4,7 +4,9 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Metadata;
+using Avalonia.Platform;
 using Avalonia.Utilities;
 using Avalonia.VisualTree;
 using ColorTextBlock.Avalonia.Geometries;
@@ -186,6 +188,8 @@ namespace ColorTextBlock.Avalonia
 
             _metries = new List<CGeometry>();
             _containers = new List<CInlineUIContainer>();
+
+            RenderOptions.SetBitmapInterpolationMode(this, BitmapInterpolationMode.HighQuality);
         }
 
         public CTextBlock(string text) : this()
