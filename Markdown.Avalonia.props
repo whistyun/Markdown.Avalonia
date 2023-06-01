@@ -13,8 +13,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AvaloniaVersion>11.0.0-preview8</AvaloniaVersion>
-    <DemoAvaloniaVersion>11.0.0-preview8</DemoAvaloniaVersion>
+    <AvaloniaVersion>11.0.0-rc1</AvaloniaVersion>
+    <DemoAvaloniaVersion>11.0.0-rc1</DemoAvaloniaVersion>
     <EnableAvaloniaEdit>disabled</EnableAvaloniaEdit>
     <AvaloniaEditVersion>11.0.0-preview6</AvaloniaEditVersion>
   </PropertyGroup>
