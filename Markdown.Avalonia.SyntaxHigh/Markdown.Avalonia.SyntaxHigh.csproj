@@ -18,12 +18,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\pack_readme\Markdown.Avalonia.SyntaxHigh.md" Pack="true" PackagePath="\"/>
+    <None Include="..\pack_readme\Markdown.Avalonia.SyntaxHigh.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.AvaloniaEdit" Version="$(AvaloniaEditVersion)" />
+    <PackageReference Include="Avalonia" Version="11.0.0-rc1.1" />
+    <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.0.0-rc1.1" />
   </ItemGroup>
   
   <ItemGroup>

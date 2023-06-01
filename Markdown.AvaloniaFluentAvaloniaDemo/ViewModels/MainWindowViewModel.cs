@@ -89,8 +89,7 @@ namespace Markdown.AvaloniaFluentAvaloniaDemo.ViewModels
                 Text = reader.ReadToEnd();
             }
 
-            var loader = AvaloniaLocator.Current.GetService<IAssetLoader>();
-            using (var strm = loader.Open(new Uri("avares://Markdown.AvaloniaFluentAvaloniaDemo/Assets/XamlTemplate.txt")))
+            using (var strm = AssetLoader.Open(new Uri("avares://Markdown.AvaloniaFluentAvaloniaDemo/Assets/XamlTemplate.txt")))
             using (var reader = new StreamReader(strm))
             {
                 EdittingStyleXamlText = reader.ReadToEnd();
