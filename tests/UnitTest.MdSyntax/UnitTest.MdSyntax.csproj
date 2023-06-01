@@ -10,8 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.0-rc1.1" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.0-rc1.1" />
+    <PackageReference Include="Avalonia" Version="$(TestAvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Desktop" Version="$(TestAvaloniaVersion)" />
   </ItemGroup>
 
   <ItemGroup>
