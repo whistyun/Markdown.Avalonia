@@ -34,13 +34,6 @@ namespace Markdown.AvaloniaFluentDemo.ViewModels
             set => this.RaiseAndSetIfChanged(ref _appendStyleXamlText, value);
         }
 
-        private ThemeViewModel _selectedTheme;
-        public ThemeViewModel SelectedTheme
-        {
-            get => _selectedTheme;
-            set => this.RaiseAndSetIfChanged(ref _selectedTheme, value);
-        }
-
         private string _ErrorInfo;
         public string ErrorInfo
         {
@@ -84,8 +77,6 @@ namespace Markdown.AvaloniaFluentDemo.ViewModels
             }
         }
 
-        public List<ThemeViewModel> Themes { set; get; }
-
         public void XamlParseResult(string result) => ErrorInfo = result;
 
         public void TryParse() => AppendStyleXamlText = EdittingStyleXamlText;
@@ -97,21 +88,6 @@ namespace Markdown.AvaloniaFluentDemo.ViewModels
             {
                 Text = reader.ReadToEnd();
             }
-
-            Themes = new List<ThemeViewModel>
-            {
-                new ThemeViewModel()
-                {
-                    Name = "FluentLight",
-                    Source = new Uri("avares://Avalonia.Themes.Fluent/FluentLight.xaml")
-                },
-
-                new ThemeViewModel()
-                {
-                    Name = "FluentDark",
-                    Source = new Uri("avares://Avalonia.Themes.Fluent/FluentDark.xaml")
-                }
-            };
 
             using (var strm = AssetLoader.Open(new Uri("avares://Markdown.AvaloniaFluentDemo/Assets/XamlTemplate.txt")))
             using (var reader = new StreamReader(strm))
@@ -125,11 +101,5 @@ namespace Markdown.AvaloniaFluentDemo.ViewModels
 
         public void ApplySource()
             => Source = new Uri(SourceText);
-    }
-
-    public class ThemeViewModel
-    {
-        public string Name { get; set; }
-        public Uri Source { get; set; }
     }
 }

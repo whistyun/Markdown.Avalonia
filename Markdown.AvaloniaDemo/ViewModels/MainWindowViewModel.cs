@@ -3,11 +3,13 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using Avalonia.Themes.Simple;
 using Markdown.Avalonia;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Markdown.AvaloniaDemo.ViewModels
 {
@@ -41,13 +43,6 @@ namespace Markdown.AvaloniaDemo.ViewModels
             set => this.RaiseAndSetIfChanged(ref _selectedStyle, value);
         }
 
-        private ThemeViewModel _selectedTheme;
-        public ThemeViewModel SelectedTheme
-        {
-            get => _selectedTheme;
-            set => this.RaiseAndSetIfChanged(ref _selectedTheme, value);
-        }
-
         private string _ErrorInfo;
         public string ErrorInfo
         {
@@ -56,7 +51,6 @@ namespace Markdown.AvaloniaDemo.ViewModels
         }
 
         public List<StyleViewModel> Styles { set; get; }
-        public List<ThemeViewModel> Themes { set; get; }
 
         public void XamlParseResult(string result) => ErrorInfo = result;
 
@@ -79,25 +73,6 @@ namespace Markdown.AvaloniaDemo.ViewModels
 
             SelectedStyle = Styles[1];
 
-
-            Themes = new List<ThemeViewModel>
-            {
-                new ThemeViewModel()
-                {
-                    Name = "BaseLight",
-                    Source = new Uri("avares://Avalonia.Themes.Simple/Accents/BaseLight.xaml")
-                },
-
-                new ThemeViewModel()
-                {
-                    Name = "BaseDark",
-                    Source = new Uri("avares://Avalonia.Themes.Simple/Accents/BaseDark.xaml")
-                }
-            };
-
-            SelectedTheme = Themes[0];
-
-
             using (var strm = AssetLoader.Open(new Uri("avares://Markdown.AvaloniaDemo/Assets/XamlTemplate.txt")))
             using (var reader = new StreamReader(strm))
             {
@@ -109,11 +84,5 @@ namespace Markdown.AvaloniaDemo.ViewModels
     public class StyleViewModel
     {
         public string Name { get; set; }
-    }
-
-    public class ThemeViewModel
-    {
-        public string Name { get; set; }
-        public Uri Source { get; set; }
     }
 }

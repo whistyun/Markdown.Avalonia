@@ -13,8 +13,6 @@
         x:Class="Markdown.AvaloniaDemo.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="Markdown.AvaloniaDemo"
-        
-        local:ThemeBehavior.StyleUri="{Binding SelectedTheme.Source}"
         >
 
   <Design.DataContext>
@@ -58,7 +56,6 @@
           </Grid.ColumnDefinitions>
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="10*"/>
           </Grid.RowDefinitions>
 
@@ -66,29 +63,10 @@
               Grid.Row="0"
               Grid.Column="0"
               VerticalAlignment="Center"
-              Text="Theme"/>
-
-          <TextBlock
-              Grid.Row="1"
-              Grid.Column="0"
-              VerticalAlignment="Center"
               Text="Markdown Style"/>
 
           <ComboBox
               Grid.Row="0"
-              Grid.Column="1"
-              SelectedItem="{Binding SelectedTheme}"
-              ItemsSource="{Binding Themes}"
-              >
-            <ComboBox.ItemTemplate>
-              <DataTemplate>
-                <TextBlock Text="{Binding Name}"/>
-              </DataTemplate>
-            </ComboBox.ItemTemplate>
-          </ComboBox>
-
-          <ComboBox
-              Grid.Row="1"
               Grid.Column="1"
               SelectedItem="{Binding SelectedStyle}"
               ItemsSource="{Binding Styles}"
@@ -101,7 +79,7 @@
           </ComboBox>
 
           <Border
-              Grid.Row="2"
+              Grid.Row="1"
               Grid.Column="0"
               Grid.ColumnSpan="2"
               Padding="1"
