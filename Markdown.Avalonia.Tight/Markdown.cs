@@ -185,8 +185,7 @@ namespace Markdown.Avalonia
             ImageNotFound = new Lazy<Bitmap>(
                 () =>
                 {
-                    var assetLoader = Helper.GetAssetLoader();
-                    using var strm = assetLoader.Open(new Uri($"avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"));
+                    using var strm = AssetLoader.Open(new Uri($"avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"));
                     return new Bitmap(strm);
                 });
 

@@ -278,9 +278,7 @@ namespace Markdown.Avalonia
                         break;
 
                     case "avares":
-                        var loader = Helper.GetAssetLoader();
-
-                        using (var strm = loader.Open(_source))
+                        using (var strm = AssetLoader.Open(_source))
                         using (var reader = new StreamReader(strm, true))
                             Markdown = reader.ReadToEnd();
                         break;

@@ -12,14 +12,5 @@ namespace Markdown.Avalonia.Utils
         {
             throw new InvalidOperationException(msg);
         }
-
-        public static IAssetLoader GetAssetLoader()
-        {
-            var assetLoader = AvaloniaLocator.Current.GetService<IAssetLoader>();
-            if (assetLoader is null)
-                throw new InvalidOperationException("Failed get service 'IAssetLoader'");
-
-            return assetLoader;
-        }
     }
 }
