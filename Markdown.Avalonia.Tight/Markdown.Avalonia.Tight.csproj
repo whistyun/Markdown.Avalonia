@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Svg" Version="11.0.0-rc1.1" />
   </ItemGroup>
 
   <ItemGroup>
