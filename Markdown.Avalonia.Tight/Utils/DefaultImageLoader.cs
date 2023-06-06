@@ -11,19 +11,20 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia.Media;
 
 namespace Markdown.Avalonia.Utils
 {
-    public class DefaultBitmapLoader : IBitmapLoader
+    public class DefaultImageLoader : IImageLoader
     {
         private static readonly HttpClient _httpclient = new();
 
         public string AssetPathRoot { set; private get; }
         private string[] AssetAssemblyNames { get; }
 
-        private ConcurrentDictionary<Uri, WeakReference<Bitmap>> Cache;
+        private ConcurrentDictionary<Uri, WeakReference<IImage>> Cache;
 
-        public DefaultBitmapLoader()
+        public DefaultImageLoader()
         {
             AssetPathRoot = Environment.CurrentDirectory;
 
@@ -35,7 +36,7 @@ namespace Markdown.Avalonia.Utils
                             .Distinct()
                             .ToArray();
 
-            Cache = new ConcurrentDictionary<Uri, WeakReference<Bitmap>>();
+            Cache = new ConcurrentDictionary<Uri, WeakReference<IImage>>();
         }
 
 
@@ -45,19 +46,19 @@ namespace Markdown.Avalonia.Utils
             {
                 if (!entry.Value.TryGetTarget(out var _))
                 {
-                    ((IDictionary<Uri, WeakReference<Bitmap>>)Cache).Remove(entry.Key);
+                    ((IDictionary<Uri, WeakReference<IImage>>)Cache).Remove(entry.Key);
                 }
             }
         }
 
-        public Task<Bitmap?> GetAsync(string urlTxt)
+        public Task<IImage?> GetAsync(string urlTxt)
         {
             return Task.Run(() => Get(urlTxt));
         }
 
-        public Bitmap? Get(string urlTxt)
+        public IImage? Get(string urlTxt)
         {
-            Bitmap? imgSource = null;
+            IImage? imgSource = null;
 
             // check network
             if (Uri.TryCreate(urlTxt, UriKind.Absolute, out var url))
@@ -98,7 +99,7 @@ namespace Markdown.Avalonia.Utils
             return imgSource;
         }
 
-        public Bitmap? Get(Uri url)
+        public IImage? Get(Uri url)
         {
             if (Cache.TryGetValue(url, out var reference))
             {
@@ -110,7 +111,7 @@ namespace Markdown.Avalonia.Utils
 
             Compact();
 
-            Bitmap imgSource;
+            IImage imgSource;
 
             try
             {
@@ -144,7 +145,7 @@ namespace Markdown.Avalonia.Utils
                 return null;
             }
 
-            Cache[url] = new WeakReference<Bitmap>(imgSource);
+            Cache[url] = new WeakReference<IImage>(imgSource);
 
             return imgSource;
         }

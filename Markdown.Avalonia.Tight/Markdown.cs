@@ -117,17 +117,17 @@ namespace Markdown.Avalonia
             set
             {
                 _assetPathRoot = value;
-                if (BitmapLoader is not null)
-                    BitmapLoader.AssetPathRoot = value;
+                if (ImageLoader is not null)
+                    ImageLoader.AssetPathRoot = value;
             }
         }
 
         /// <inheritdoc/>
         public ICommand? HyperlinkCommand { get; set; }
 
-        private IBitmapLoader? _loader;
+        private IImageLoader? _loader;
         /// <inheritdoc/>
-        public IBitmapLoader? BitmapLoader
+        public IImageLoader? ImageLoader
         {
             get => _loader;
             set
@@ -161,10 +161,10 @@ namespace Markdown.Avalonia
                 mdEng => mdEng.HyperlinkCommand,
                 (mdEng, command) => mdEng.HyperlinkCommand = command);
 
-        public static readonly DirectProperty<Markdown, IBitmapLoader?> BitmapLoaderProperty =
-            AvaloniaProperty.RegisterDirect<Markdown, IBitmapLoader?>(nameof(BitmapLoader),
-                mdEng => mdEng.BitmapLoader,
-                (mdEng, loader) => mdEng.BitmapLoader = loader);
+        public static readonly DirectProperty<Markdown, IImageLoader?> ImageLoaderProperty =
+            AvaloniaProperty.RegisterDirect<Markdown, IImageLoader?>(nameof(ImageLoader),
+                mdEng => mdEng.ImageLoader,
+                (mdEng, loader) => mdEng.ImageLoader = loader);
 
         #endregion
 
@@ -180,7 +180,7 @@ namespace Markdown.Avalonia
             _assetPathRoot = Environment.CurrentDirectory;
 
             HyperlinkCommand = new DefaultHyperlinkCommand();
-            BitmapLoader = new DefaultBitmapLoader();
+            ImageLoader = new DefaultImageLoader();
 
             ImageNotFound = new Lazy<Bitmap>(
                 () =>
@@ -394,7 +394,7 @@ namespace Markdown.Avalonia
                 }
 
                 CImage cimg = null;
-                if (resourceVal is Bitmap renderedImage)
+                if (resourceVal is IImage renderedImage)
                 {
                     cimg = new CImage(renderedImage);
                 }
@@ -423,7 +423,7 @@ namespace Markdown.Avalonia
             }
 
             var image = new CImage(
-                Task.Run(() => BitmapLoader?.Get(urlTxt)),
+                Task.Run(() => ImageLoader?.Get(urlTxt)),
                 ImageNotFound.Value);
 
             if (!String.IsNullOrEmpty(title)

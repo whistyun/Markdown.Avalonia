@@ -3,16 +3,17 @@ using Avalonia.Platform;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Avalonia.Media;
 
 namespace Markdown.Avalonia.Utils
 {
-    public interface IBitmapLoader
+    public interface IImageLoader
     {
         /// <summary>
         /// local file root path or url, the default is current directory.
         /// </summary>
         string AssetPathRoot { set; }
 
-        Bitmap? Get(string urlTxt);
+        IImage? Get(string urlTxt);
     }
 }

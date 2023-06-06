@@ -11,7 +11,7 @@ namespace Markdown.Avalonia
     {
         string AssetPathRoot { get; set; }
         ICommand? HyperlinkCommand { get; set; }
-        IBitmapLoader? BitmapLoader { get; set; }
+        IImageLoader? ImageLoader { get; set; }
 
         bool UseResource { get; set; }
         CascadeDictionary CascadeResources { get; }
