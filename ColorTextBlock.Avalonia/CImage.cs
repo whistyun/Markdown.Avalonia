@@ -30,6 +30,12 @@ namespace ColorTextBlock.Avalonia
         public static readonly StyledProperty<bool> FittingWhenProtrudeProperty =
             AvaloniaProperty.Register<CImage, bool>(nameof(FittingWhenProtrude), defaultValue: true);
 
+        /// <summary>
+        /// Save aspect ratio if one of <see cref="LayoutHeightProperty"/> or <see cref="LayoutWidthProperty"/> set.
+        /// </summary>
+        public static readonly StyledProperty<bool> SaveAspectRatioProperty =
+            AvaloniaProperty.Register<CImage, bool>(nameof(SaveAspectRatio));
+
         public double? LayoutWidth
         {
             get { return GetValue(LayoutWidthProperty); }
@@ -51,6 +57,12 @@ namespace ColorTextBlock.Avalonia
         {
             get { return GetValue(FittingWhenProtrudeProperty); }
             set { SetValue(FittingWhenProtrudeProperty, value); }
+        }
+
+        public bool SaveAspectRatio
+        {
+            get => GetValue(SaveAspectRatioProperty);
+            set => SetValue(SaveAspectRatioProperty, value);
         }
 
         public Task<IImage?>? Task { get; }
@@ -120,11 +132,21 @@ namespace ColorTextBlock.Avalonia
             if (LayoutWidth.HasValue)
             {
                 imageWidth = LayoutWidth.Value;
+                if (SaveAspectRatio && !LayoutHeight.HasValue)
+                {
+                    var aspect = Image.Size.Height / Image.Size.Width;
+                    imageHeight = aspect * imageWidth;
+                }
             }
 
             if (LayoutHeight.HasValue)
             {
                 imageHeight = LayoutHeight.Value;
+                if (SaveAspectRatio && !LayoutWidth.HasValue)
+                {
+                    var aspect = Image.Size.Width / Image.Size.Height;
+                    imageWidth = aspect * imageHeight;
+                }
             }
 
             if (imageWidth > remainWidth)
