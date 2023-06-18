@@ -32,38 +32,6 @@ namespace Markdown.Avalonia
 {
     public class Markdown : AvaloniaObject, IMarkdownEngine
     {
-        private static readonly Dictionary<string, Func<Match, Control>> s_converterMap;
-
-        static Markdown()
-        {
-            s_converterMap = new Dictionary<string, Func<Match, Control>>();
-
-            try
-            {
-                var kvps = InterassemblyUtil.InvokeInstanceMethodToGetProperty
-                    <IEnumerable>(
-                    "Markdown.Avalonia.SyntaxHigh",
-                    "Markdown.Avalonia.SyntaxHigh.SyntaxSetup",
-                    "GetOverrideConverters");
-
-                if (kvps is null)
-                    throw new NullReferenceException("kvps");
-
-                foreach (var kvpObj in kvps)
-                {
-                    if (kvpObj is KeyValuePair<string, Func<Match, Control>> kvp)
-                        s_converterMap[kvp.Key] = kvp.Value;
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.GetType().Name + ":" + e.Message);
-            }
-        }
-
-        private static Func<Match, Control>? GetConverterOrNull(string processName)
-            => s_converterMap.TryGetValue(processName, out var getval) ? getval : null;
-
         #region const
         /// <summary>
         /// maximum nested depth of [] and () supported by the transform; implementation detail
@@ -188,19 +156,19 @@ namespace Markdown.Avalonia
                 ImageNotFound = new Bitmap(strm);
 
             TopLevelBlockParsers = new[]{
-                Parser.Create<Control>(_codeBlockFirst     , GetConverterOrNull(nameof(CodeBlocksWithLangEvaluator   )), CodeBlocksWithLangEvaluator   ),
-                Parser.Create<Control>(_containerBlockFirst, GetConverterOrNull(nameof(ContainerBlockEvaluator       )), ContainerBlockEvaluator       ),
-                Parser.Create<Control>(_listNested         , GetConverterOrNull(nameof(ListEvaluator                 )), ListEvaluator                 ),
+                Parser.Create<Control>(_codeBlockFirst     , nameof(CodeBlocksWithLangEvaluator   ), CodeBlocksWithLangEvaluator   ),
+                Parser.Create<Control>(_containerBlockFirst, nameof(ContainerBlockEvaluator       ), ContainerBlockEvaluator       ),
+                Parser.Create<Control>(_listNested         , nameof(ListEvaluator                 ), ListEvaluator                 ),
             };
 
             SubLevelBlockParsers = new[] {
-                Parser.Create<Control>(_blockquoteFirst    , GetConverterOrNull(nameof(BlockquotesEvaluator          )), BlockquotesEvaluator          ),
-                Parser.Create<Control>(_headerSetext       , GetConverterOrNull(nameof(SetextHeaderEvaluator         )), SetextHeaderEvaluator         ),
-                Parser.Create<Control>(_headerAtx          , GetConverterOrNull(nameof(AtxHeaderEvaluator            )), AtxHeaderEvaluator            ),
-                Parser.Create<Control>(_horizontalRules    , GetConverterOrNull(nameof(RuleEvaluator                 )), RuleEvaluator                 ),
-                Parser.Create<Control>(_table              , GetConverterOrNull(nameof(TableEvalutor                 )), TableEvalutor                 ),
-                Parser.Create<Control>(_note               , GetConverterOrNull(nameof(NoteEvaluator                 )), NoteEvaluator                 ),
-                Parser.Create<Control>(_indentCodeBlock    , GetConverterOrNull(nameof(CodeBlocksWithoutLangEvaluator)), CodeBlocksWithoutLangEvaluator),
+                Parser.Create<Control>(_blockquoteFirst    , nameof(BlockquotesEvaluator          ), BlockquotesEvaluator          ),
+                Parser.Create<Control>(_headerSetext       , nameof(SetextHeaderEvaluator         ), SetextHeaderEvaluator         ),
+                Parser.Create<Control>(_headerAtx          , nameof(AtxHeaderEvaluator            ), AtxHeaderEvaluator            ),
+                Parser.Create<Control>(_horizontalRules    , nameof(RuleEvaluator                 ), RuleEvaluator                 ),
+                Parser.Create<Control>(_table              , nameof(TableEvalutor                 ), TableEvalutor                 ),
+                Parser.Create<Control>(_note               , nameof(NoteEvaluator                 ), NoteEvaluator                 ),
+                Parser.Create<Control>(_indentCodeBlock    , nameof(CodeBlocksWithoutLangEvaluator), CodeBlocksWithoutLangEvaluator),
             };
 
         }
@@ -1693,7 +1661,7 @@ namespace Markdown.Avalonia
 
                 foreach (var parser in primary)
                 {
-                    var match = parser.Match(text, index, length, status);
+                    var match = parser.Pattern.Match(text, index, length);
                     if (match.Success && match.Index < bestIndex)
                     {
                         bestIndex = match.Index;
@@ -1704,14 +1672,15 @@ namespace Markdown.Avalonia
 
                 if (bestParser is null || bestMatch is null) break;
 
+                var result = bestParser.Convert(text, bestMatch, status, this, out bestIndex, out int newIndex);
+
                 if (bestIndex > index)
                 {
                     EvaluateRest(rtn, text, index, bestIndex - index, status, secondly, 0, rest);
                 }
 
-                rtn.AddRange(bestParser.Convert(bestMatch, status));
+                rtn.AddRange(result);
 
-                var newIndex = bestIndex + bestMatch.Length;
                 length -= newIndex - index;
                 index = newIndex;
             }
@@ -1738,17 +1707,18 @@ namespace Markdown.Avalonia
 
                 for (; ; )
                 {
-                    var match = parser.Match(text, index, length, status);
+                    var match = parser.Pattern.Match(text, index, length);
                     if (!match.Success) break;
 
-                    if (match.Index > index)
+                    var result = parser.Convert(text, match, status, this, out var matchStartIndex, out int newIndex);
+
+                    if (matchStartIndex > index)
                     {
                         EvaluateRest(resultIn, text, index, match.Index - index, status, parsers, parserStart + 1, rest);
                     }
 
-                    resultIn.AddRange(parser.Convert(match, status));
+                    resultIn.AddRange(result);
 
-                    var newIndex = match.Index + match.Length;
                     length -= newIndex - index;
                     index = newIndex;
                 }

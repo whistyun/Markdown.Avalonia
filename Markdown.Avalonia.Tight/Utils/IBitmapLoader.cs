@@ -6,6 +6,7 @@ using System.Text;
 
 namespace Markdown.Avalonia.Utils
 {
+    [Obsolete("")]
     public interface IBitmapLoader
     {
         /// <summary>
