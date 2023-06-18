@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Input;
 using Avalonia.Media;
 using ColorTextBlock.Avalonia.Geometries;
 using System;
@@ -47,23 +48,27 @@ namespace ColorTextBlock.Avalonia
 
             foreach (CGeometry metry in metrics)
             {
-                metry.OnClick = () => Command?.Invoke(CommandParameter ?? string.Empty);
+                metry.OnClick = ctrl => Command?.Invoke(CommandParameter ?? string.Empty);
 
-                metry.OnMousePressed = () =>
+                metry.OnMousePressed = ctrl =>
                 {
                     PseudoClasses.Add(":pressed");
                 };
 
-                metry.OnMouseReleased = () =>
+                metry.OnMouseReleased = ctrl =>
                 {
                     PseudoClasses.Remove(":pressed");
                 };
 
-                metry.OnMouseEnter = () =>
+                metry.OnMouseEnter = ctrl =>
                 {
                     PseudoClasses.Add(":pointerover");
                     PseudoClasses.Add(":hover");
 
+                    try {
+                        ctrl.Cursor = new Cursor(StandardCursorType.Hand);
+                    }
+                    catch { /*I cannot assume Cursor.ctor doesn't throw an exception.*/ }
 
                     IEnumerable<TextGeometry> tmetries =
                         (metry is DecoratorGeometry d) ?
@@ -83,10 +88,12 @@ namespace ColorTextBlock.Avalonia
                     }
                 };
 
-                metry.OnMouseLeave = () =>
+                metry.OnMouseLeave = ctrl =>
                 {
                     PseudoClasses.Remove(":pointerover");
                     PseudoClasses.Remove(":hover");
+
+                    ctrl.Cursor = Cursor.Default;
 
                     IEnumerable<TextGeometry> tmetries =
                         (metry is DecoratorGeometry d) ?

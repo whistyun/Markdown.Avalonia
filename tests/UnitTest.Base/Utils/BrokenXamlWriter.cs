@@ -226,7 +226,8 @@ namespace UnitTest.Base.Utils
                                .Where(pinf => !attrAvaProps.Any(nd => nd.Name == pinf.Name))
                                // ignore content property
                                .Where(pinf => pinf != contentProp)
-                               .Where(pinf => pinf.CanWrite && pinf.CanWrite)
+                               // has getter and setter
+                               .Where(pinf => pinf.CanWrite && pinf.CanRead)
                                .Where(pinf => pinf.GetSetMethod() != null)
                                .Where(pinf => pinf.GetGetMethod() != null && pinf.GetGetMethod().GetParameters().Length == 0);
 
@@ -238,17 +239,56 @@ namespace UnitTest.Base.Utils
                 {
                     switch (pinf.Name)
                     {
-                        case nameof(Control.Classes):
-                            if (elm.Classes.Count == 0 || (elm.Classes.Count == 1 && String.IsNullOrEmpty(elm.Classes[0])))
-                                continue;
-                            break;
-
                         case nameof(StyledElement.Resources):
                             if (elm.Resources.Count == 0)
                                 continue;
                             break;
                     }
                 }
+
+                node.Attributes.Add(new ObjectProperty()
+                {
+                    Owner = obj,
+                    AttributeName = pinf.Name,
+                    PropertyInfo = pinf,
+                    Value = pinf.GetValue(obj)
+                });
+            }
+
+
+            var addableProps = objType.GetProperties()
+                   // ignore avalonia property
+                   .Where(pinf => !attrAvaProps.Any(nd => nd.Name == pinf.Name))
+                   // ignore content property
+                   .Where(pinf => pinf != contentProp)
+                   .Where(pinf => pinf.CanRead)
+                   .Where(pinf => pinf.GetSetMethod() == null)
+                   .Where(pinf => pinf.GetGetMethod() != null && pinf.GetGetMethod().GetParameters().Length == 0);
+
+            foreach (var pinf in addableProps)
+            {
+                object value = pinf.GetValue(obj);
+
+                if (obj is StyledElement elm)
+                {
+                    switch (pinf.Name)
+                    {
+                        case nameof(Control.Classes):
+                            if (elm.Classes.Count == 0 || (elm.Classes.Count == 1 && String.IsNullOrEmpty(elm.Classes[0])))
+                                continue;
+                            break;
+                    }
+                }
+
+                if (value is null)
+                    continue;
+
+                if (value is not IList)
+                    continue;
+
+                var list = (IList)value;
+                if (list.Count == 0)
+                    continue;
 
                 node.Attributes.Add(new ObjectProperty()
                 {

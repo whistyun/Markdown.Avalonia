@@ -13,59 +13,59 @@ namespace ColorTextBlock.Avalonia.Geometries
         public CGeometry[] Targets { get; }
         public Border Decorate { get; }
 
-        private Action? _OnMouseEnter;
-        private Action? _OnMouseLeave;
-        private Action? _OnMousePressed;
-        private Action? _OnMouseReleased;
-        private Action? _OnClick;
+        private Action<Control>? _OnMouseEnter;
+        private Action<Control>? _OnMouseLeave;
+        private Action<Control>? _OnMousePressed;
+        private Action<Control>? _OnMouseReleased;
+        private Action<Control>? _OnClick;
 
-        public override Action? OnMouseEnter
+        public override Action<Control>? OnMouseEnter
         {
-            get => () =>
+            get => ctrl =>
             {
-                _OnMouseEnter?.Invoke();
+                _OnMouseEnter?.Invoke(ctrl);
                 foreach (var target in Targets)
-                    target.OnMouseEnter?.Invoke();
+                    target.OnMouseEnter?.Invoke(ctrl);
             };
             set => _OnMouseEnter = value;
         }
-        public override Action? OnMouseLeave
+        public override Action<Control>? OnMouseLeave
         {
-            get => () =>
+            get => ctrl =>
             {
-                _OnMouseLeave?.Invoke();
+                _OnMouseLeave?.Invoke(ctrl);
                 foreach (var target in Targets)
-                    target.OnMouseLeave?.Invoke();
+                    target.OnMouseLeave?.Invoke(ctrl);
             };
             set => _OnMouseLeave = value;
         }
-        public override Action? OnMousePressed
+        public override Action<Control>? OnMousePressed
         {
-            get => () =>
+            get => ctrl =>
             {
-                _OnMousePressed?.Invoke();
+                _OnMousePressed?.Invoke(ctrl);
                 foreach (var target in Targets)
-                    target.OnMousePressed?.Invoke();
+                    target.OnMousePressed?.Invoke(ctrl);
             };
             set => _OnMousePressed = value;
         }
-        public override Action? OnMouseReleased
+        public override Action<Control>? OnMouseReleased
         {
-            get => () =>
+            get => ctrl =>
             {
-                _OnMouseReleased?.Invoke();
+                _OnMouseReleased?.Invoke(ctrl);
                 foreach (var target in Targets)
-                    target.OnMouseReleased?.Invoke();
+                    target.OnMouseReleased?.Invoke(ctrl);
             };
             set => _OnMouseReleased = value;
         }
-        public override Action? OnClick
+        public override Action<Control>? OnClick
         {
-            get => () =>
+            get => ctrl =>
             {
-                _OnClick?.Invoke();
+                _OnClick?.Invoke(ctrl);
                 foreach (var target in Targets)
-                    target.OnClick?.Invoke();
+                    target.OnClick?.Invoke(ctrl);
             };
             set => _OnClick = value;
         }
@@ -149,7 +149,7 @@ namespace ColorTextBlock.Avalonia.Geometries
 
         public override void Render(DrawingContext ctx)
         {
-            using (ctx.PushPreTransform(Matrix.CreateTranslation(Left + Decorate.Margin.Left, Top + Decorate.Margin.Top)))
+            using (ctx.PushTransform(Matrix.CreateTranslation(Left + Decorate.Margin.Left, Top + Decorate.Margin.Top)))
             {
                 Decorate.Background = Owner.Background;
                 Decorate.Arrange(new Rect(0, 0, Width, Height));

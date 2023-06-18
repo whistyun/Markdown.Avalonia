@@ -4,7 +4,9 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Metadata;
+using Avalonia.Platform;
 using Avalonia.Utilities;
 using Avalonia.VisualTree;
 using ColorTextBlock.Avalonia.Geometries;
@@ -186,6 +188,8 @@ namespace ColorTextBlock.Avalonia
 
             _metries = new List<CGeometry>();
             _containers = new List<CInlineUIContainer>();
+
+            RenderOptions.SetBitmapInterpolationMode(this, BitmapInterpolationMode.HighQuality);
         }
 
         public CTextBlock(string text) : this()
@@ -206,7 +210,7 @@ namespace ColorTextBlock.Avalonia
 
             if (_entered is not null)
             {
-                _entered.OnMouseLeave?.Invoke();
+                _entered.OnMouseLeave?.Invoke(this);
                 _entered = null;
             }
         }
@@ -233,7 +237,7 @@ namespace ColorTextBlock.Avalonia
 
                 if (!isEntered(_entered))
                 {
-                    _entered.OnMouseLeave?.Invoke();
+                    _entered.OnMouseLeave?.Invoke(this);
                     _entered = null;
                 }
                 else return;
@@ -243,7 +247,7 @@ namespace ColorTextBlock.Avalonia
             {
                 if (isEntered(metry))
                 {
-                    metry.OnMouseEnter?.Invoke();
+                    metry.OnMouseEnter?.Invoke(this);
                     _entered = metry;
                     break;
                 }
@@ -273,7 +277,7 @@ namespace ColorTextBlock.Avalonia
                 {
                     if (isEntered(metry))
                     {
-                        metry.OnMousePressed?.Invoke();
+                        metry.OnMousePressed?.Invoke(this);
                         _pressed = metry;
                         break;
                     }
@@ -292,7 +296,7 @@ namespace ColorTextBlock.Avalonia
 
                 if (_pressed is not null)
                 {
-                    _pressed.OnMouseReleased?.Invoke();
+                    _pressed.OnMouseReleased?.Invoke(this);
                     _pressed = null;
                 }
 
@@ -307,7 +311,7 @@ namespace ColorTextBlock.Avalonia
                     if (0 <= relX && relX <= metry.Width
                         && 0 <= relY && relY <= metry.Height)
                     {
-                        metry.OnClick?.Invoke();
+                        metry.OnClick?.Invoke(this);
                         break;
                     }
                 }

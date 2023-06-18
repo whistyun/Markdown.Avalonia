@@ -20,7 +20,6 @@ namespace Markdown.Avalonia.Utils
         private static readonly HttpClient _httpclient = new();
 
         public string AssetPathRoot { set; private get; }
-        private IAssetLoader? AssetLoader { get; }
         private string[] AssetAssemblyNames { get; }
 
         private ConcurrentDictionary<Uri, WeakReference<Bitmap>> Cache;
@@ -28,7 +27,6 @@ namespace Markdown.Avalonia.Utils
         public DefaultBitmapLoader()
         {
             AssetPathRoot = Environment.CurrentDirectory;
-            AssetLoader = Helper.GetAssetLoader();
 
             var stack = new StackTrace();
             this.AssetAssemblyNames = stack.GetFrames()
@@ -134,9 +132,6 @@ namespace Markdown.Avalonia.Utils
                         break;
 
                     case "avares":
-                        if (AssetLoader is null) return null;
-                        if (!AssetLoader.Exists(url)) return null;
-
                         using (var strm = AssetLoader.Open(url))
                             imgSource = new Bitmap(strm);
                         break;

@@ -13,8 +13,6 @@
         x:Class="Markdown.AvaloniaFluentDemo.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="Markdown.AvaloniaFluentDemo"
-        
-        local:ThemeBehavior.StyleUri="{Binding SelectedTheme.Source}"
         >
 
   <Design.DataContext>
@@ -57,31 +55,11 @@
             <ColumnDefinition Width="10*"/>
           </Grid.ColumnDefinitions>
           <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="10*"/>
           </Grid.RowDefinitions>
 
-          <TextBlock
-              Grid.Row="0"
-              Grid.Column="0"
-              VerticalAlignment="Center"
-              Text="Theme"/>
-
-          <ComboBox
-              Grid.Row="0"
-              Grid.Column="1"
-              SelectedItem="{Binding SelectedTheme}"
-              Items="{Binding Themes}"
-              >
-            <ComboBox.ItemTemplate>
-              <DataTemplate>
-                <TextBlock Text="{Binding Name}"/>
-              </DataTemplate>
-            </ComboBox.ItemTemplate>
-          </ComboBox>
-
           <Border
-              Grid.Row="1"
+              Grid.Row="0"
               Grid.Column="0"
               Grid.ColumnSpan="2"
               Padding="1"

@@ -110,7 +110,7 @@ namespace Markdown.Avalonia
 
         public IContainerBlockHandler? ContainerBlockHandler { get; set; }
 
-        private Bitmap ImageNotFound { get; }
+        private Lazy<Bitmap> ImageNotFound { get; }
 
         public CascadeDictionary CascadeResources { get; } = new CascadeDictionary();
 
@@ -150,10 +150,14 @@ namespace Markdown.Avalonia
             HyperlinkCommand = new DefaultHyperlinkCommand();
             BitmapLoader = new DefaultBitmapLoader();
 
-            var assetLoader = Helper.GetAssetLoader();
+            ImageNotFound = new Lazy<Bitmap>(
+                () =>
+                {
+                    using var strm = AssetLoader.Open(new Uri($"avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"));
+                    return new Bitmap(strm);
+                });
 
-            using (var strm = assetLoader.Open(new Uri($"avares://Markdown.Avalonia/Assets/ImageNotFound.bmp")))
-                ImageNotFound = new Bitmap(strm);
+
 
             TopLevelBlockParsers = new[]{
                 Parser.Create<Control>(_codeBlockFirst     , nameof(CodeBlocksWithLangEvaluator   ), CodeBlocksWithLangEvaluator   ),
@@ -388,7 +392,7 @@ namespace Markdown.Avalonia
 
             var image = new CImage(
                 Task.Run(() => BitmapLoader?.Get(urlTxt)),
-                ImageNotFound);
+                ImageNotFound.Value);
 
             if (!String.IsNullOrEmpty(title)
                 && !title.Any(ch => !Char.IsLetterOrDigit(ch)))
