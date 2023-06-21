@@ -47,8 +47,6 @@ namespace Markdown.Avalonia.Utils
     {
         private static readonly HttpClient s_httpclient = new();
 
-        private IAssetLoader? _loader;
-
         public string? AssetPathRoot { set; private get; }
         public Uri? SourceBasePath { set; private get; }
         public IEnumerable<string>? CallerAssemblyNames { set; private get; }
@@ -134,18 +132,10 @@ namespace Markdown.Avalonia.Utils
                     return File.OpenRead(url.LocalPath);
 
                 case "avares":
-                    if (_loader is null)
-                    {
-                        _loader = Helper.GetAssetLoader();
-
-                        if (_loader is null)
-                            return null;
-                    }
-
-                    if (!_loader.Exists(url))
+                    if (!AssetLoader.Exists(url))
                         return null;
 
-                    return _loader.Open(url);
+                    return AssetLoader.Open(url);
 
                 default:
                     throw new InvalidDataException($"unsupport scheme '{url.Scheme}'");

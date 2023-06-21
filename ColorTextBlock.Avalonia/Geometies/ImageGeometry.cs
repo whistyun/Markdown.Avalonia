@@ -4,16 +4,16 @@ using Avalonia.Media.Imaging;
 
 namespace ColorTextBlock.Avalonia.Geometries
 {
-    public class BitmapGeometry : CGeometry
+    public class ImageGeometry : CGeometry
     {
         public new double Width { get; }
         public new double Height { get; }
-        public Bitmap Bitmap { get; }
+        public IImage Image { get; }
 
-        internal BitmapGeometry(Bitmap bitmap, double width, double height,
+        internal ImageGeometry(IImage image, double width, double height,
             TextVerticalAlignment alignment) : base(width, height, height, alignment, false)
         {
-            this.Bitmap = bitmap;
+            this.Image = image;
             this.Width = width;
             this.Height = height;
         }
@@ -21,8 +21,8 @@ namespace ColorTextBlock.Avalonia.Geometries
         public override void Render(DrawingContext ctx)
         {
             ctx.DrawImage(
-                Bitmap,
-                new Rect(Bitmap.Size),
+                Image,
+                new Rect(Image.Size),
                 new Rect(Left, Top, Width, Height));
         }
     }

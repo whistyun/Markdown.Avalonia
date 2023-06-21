@@ -391,7 +391,7 @@ namespace Markdown.Avalonia
             }
 
             var image = new CImage(
-                Task.Run(() => BitmapLoader?.Get(urlTxt)),
+                Task.Run(() => (IImage?)BitmapLoader?.Get(urlTxt)),
                 ImageNotFound.Value);
 
             if (!String.IsNullOrEmpty(title)
