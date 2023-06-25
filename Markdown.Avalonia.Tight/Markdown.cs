@@ -1502,8 +1502,6 @@ namespace Markdown.Avalonia
         private static readonly Regex _underline = new(@"(__) (?=\S) (.+?) (?<=\S) \1",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
-        private static readonly Regex _color = new(@"%\{[ \t]*color[ \t]*:([^\}]+)\}", RegexOptions.Compiled);
-
         /// <summary>
         /// Turn Markdown *italics* and **bold** into HTML strong and em tags
         /// </summary>
@@ -1742,40 +1740,76 @@ namespace Markdown.Avalonia
 
         private CInline? ParseAsColor(string text, ref int start)
         {
-            var mch = _color.Match(text, start);
+            if (start + 1 >= text.Length)
+                return null;
 
-            if (mch.Success && start == mch.Index)
+            if (text[start + 1] != '{')
+                return null;
+
+            int end = text.IndexOf('}', start + 1);
+
+            if (end == -1)
+                return null;
+
+            var styleTxts = text.Substring(start + 2, end - (start + 2));
+
+            int bgnIdx = end + 1;
+            int endIdx = EscapedIndexOf(text, bgnIdx, '%');
+
+            CSpan span;
+            if (endIdx == -1)
             {
-                int bgnIdx = start + mch.Value.Length;
-                int endIdx = EscapedIndexOf(text, bgnIdx, '%');
-
-                CSpan span;
-                if (endIdx == -1)
-                {
-                    endIdx = text.Length - 1;
-                    span = new CSpan(PrivateRunSpanGamut(text.Substring(bgnIdx)));
-                }
-                else
-                {
-                    span = new CSpan(PrivateRunSpanGamut(text.Substring(bgnIdx, endIdx - bgnIdx)));
-                }
-
-                var colorLbl = mch.Groups[1].Value;
-
-                try
-                {
-                    var color = colorLbl.StartsWith("#") ?
-                        (IBrush?)new BrushConverter().ConvertFrom(colorLbl) :
-                        (IBrush?)new BrushConverter().ConvertFromString(colorLbl);
-
-                    span.Foreground = color;
-                }
-                catch { }
-
-                start = endIdx;
-                return span;
+                endIdx = text.Length - 1;
+                span = new CSpan(PrivateRunSpanGamut(text.Substring(bgnIdx)));
             }
-            else return null;
+            else
+            {
+                span = new CSpan(PrivateRunSpanGamut(text.Substring(bgnIdx, endIdx - bgnIdx)));
+            }
+
+            foreach (var styleTxt in styleTxts.Split(';'))
+            {
+                var nameAndVal = styleTxt.Split(':');
+
+                if (nameAndVal.Length != 2)
+                    return null;
+
+                var name = nameAndVal[0].Trim();
+                var colorLbl = nameAndVal[1].Trim();
+
+                switch (name)
+                {
+                    case "color":
+                        try
+                        {
+                            var color = colorLbl.StartsWith("#") ?
+                                (IBrush?)new BrushConverter().ConvertFrom(colorLbl) :
+                                (IBrush?)new BrushConverter().ConvertFromString(colorLbl);
+
+                            span.Foreground = color;
+                        }
+                        catch { }
+                        break;
+
+                    case "background":
+                        try
+                        {
+                            var color = colorLbl.StartsWith("#") ?
+                                (IBrush?)new BrushConverter().ConvertFrom(colorLbl) :
+                                (IBrush?)new BrushConverter().ConvertFromString(colorLbl);
+
+                            span.Background = color;
+                        }
+                        catch { }
+                        break;
+
+                    default:
+                        return null;
+                }
+            }
+
+            start = endIdx;
+            return span;
         }
 
 
