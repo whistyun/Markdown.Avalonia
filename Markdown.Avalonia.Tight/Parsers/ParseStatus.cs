@@ -6,11 +6,13 @@ namespace Markdown.Avalonia.Parsers
 {
     public struct ParseStatus
     {
-        public static readonly ParseStatus Init = new ParseStatus
-        {
-            SupportTextAlignment = true
-        };
+        public static readonly ParseStatus Init = new ParseStatus(true);
 
-        public bool SupportTextAlignment { get; internal set; }
+        public bool SupportTextAlignment { get; }
+
+        public ParseStatus(bool supportTextAlignment)
+        {
+            SupportTextAlignment = supportTextAlignment;
+        }
     }
 }

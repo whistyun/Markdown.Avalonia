@@ -15,17 +15,17 @@ namespace Markdown.AvaloniaDemo
 {
     public class DynamicStyleBehavior
     {
-        public static AttachedProperty<string> MyIdProperty =
+        public static readonly AttachedProperty<string> MyIdProperty =
             AvaloniaProperty.RegisterAttached<DynamicStyleBehavior, Styles, string>("MyId");
 
-        public static AttachedProperty<string> MyLastParsedProperty =
+        public static readonly AttachedProperty<string> MyLastParsedProperty =
             AvaloniaProperty.RegisterAttached<DynamicStyleBehavior, MarkdownScrollViewer, string>("MyLastParsed");
 
-        public static AttachedProperty<string> XamlTextProperty =
+        public static readonly AttachedProperty<string> XamlTextProperty =
             AvaloniaProperty.RegisterAttached<DynamicStyleBehavior, MarkdownScrollViewer, string>(
                 "XamlText", coerce: Validate);
 
-        public static AttachedProperty<ICommand> ValidationResultProperty =
+        public static readonly AttachedProperty<ICommand> ValidationResultProperty =
             AvaloniaProperty.RegisterAttached<DynamicStyleBehavior, MarkdownScrollViewer, ICommand>(
                 "ValidationResult");
 

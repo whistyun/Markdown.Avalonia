@@ -7,7 +7,8 @@
         xmlns:vm="clr-namespace:Markdown.AvaloniaFluentDemo.ViewModels;assembly=Markdown.AvaloniaFluentDemo"
         xmlns:local="clr-namespace:Markdown.AvaloniaFluentDemo;assembly=Markdown.AvaloniaFluentDemo"
 
-        xmlns:md="clr-namespace:Markdown.Avalonia;assembly=Markdown.Avalonia"
+        xmlns:md="https://github.com/whistyun/Markdown.Avalonia.Tight"
+        xmlns:mdsvg="https://github.com/whistyun/Markdown.Avalonia.Svg"
 
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
         x:Class="Markdown.AvaloniaFluentDemo.Views.MainWindow"
@@ -146,6 +147,13 @@
       
           local:DynamicStyleBehavior.XamlText="{Binding AppendStyleXamlText}"
           local:DynamicStyleBehavior.ValidationResult="{Binding XamlParseResult}">
+
+          <md:MarkdownScrollViewer.Plugins>
+            <md:MdAvPlugins>
+              <mdsvg:SvgFormat/>
+            </md:MdAvPlugins>
+          </md:MarkdownScrollViewer.Plugins>
+
         </md:MarkdownScrollViewer>
       </TabItem>
 

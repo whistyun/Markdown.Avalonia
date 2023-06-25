@@ -30,7 +30,11 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Include="..\pack_readme\Markdown.Avalonia.Svg.md" Pack="true" PackagePath="\"/>
+    <None Include="..\pack_readme\Markdown.Avalonia.Svg.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj" />
   </ItemGroup>
 
 </Project>

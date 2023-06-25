@@ -1,4 +1,6 @@
 ﻿using Avalonia.Controls;
+using ColorTextBlock.Avalonia;
+using Markdown.Avalonia.Parsers;
 using Markdown.Avalonia.Utils;
 using System;
 using System.Collections.Generic;
@@ -11,18 +13,23 @@ namespace Markdown.Avalonia
     {
         string AssetPathRoot { get; set; }
 
-        [Obsolete]
         ICommand? HyperlinkCommand { get; set; }
-        [Obsolete]
+
+        [Obsolete("Please use Plugins propety. see https://github.com/whistyun/Markdown.Avalonia/wiki/How-to-migrages-to-ver11")]
         IBitmapLoader? BitmapLoader { get; set; }
-        [Obsolete]
+        [Obsolete("Please use Plugins propety. see https://github.com/whistyun/Markdown.Avalonia/wiki/How-to-migrages-to-ver11")]
         IContainerBlockHandler? ContainerBlockHandler { get; set; }
+
+        MdAvPlugins Plugins { get; set; }
 
         bool UseResource { get; set; }
         CascadeDictionary CascadeResources { get; }
         public IResourceDictionary Resources { get; set; }
 
-            
         Control Transform(string text);
+
+        IEnumerable<Control> RunBlockGamut(string? text, ParseStatus status);
+
+        IEnumerable<CInline> RunSpanGamut(string? text);
     }
 }

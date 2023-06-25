@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
@@ -11,6 +12,7 @@ using Avalonia.Styling;
 using ColorTextBlock.Avalonia;
 using Markdown.Avalonia.Controls;
 using Markdown.Avalonia.Parsers;
+using Markdown.Avalonia.Plugins;
 using Markdown.Avalonia.Tables;
 using Markdown.Avalonia.Utils;
 using System;
@@ -23,6 +25,7 @@ using System.Linq;
 using System.Net.Cache;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -85,16 +88,27 @@ namespace Markdown.Avalonia
             set
             {
                 _assetPathRoot = value;
+#pragma warning disable CS0618
                 if (BitmapLoader is not null)
                     BitmapLoader.AssetPathRoot = value;
+#pragma warning restore CS0618
+                if (_setupInfo is not null)
+                    _setupInfo.PathResolver.AssetPathRoot = value;
             }
         }
+
+        private string[] _assetAssemblyNames;
+        public IEnumerable<string> AssetAssemblyNames => _assetAssemblyNames;
 
         /// <inheritdoc/>
         public ICommand? HyperlinkCommand { get; set; }
 
+        public MdAvPlugins Plugins { get; set; }
+
+        [Obsolete]
         private IBitmapLoader? _loader;
         /// <inheritdoc/>
+        [Obsolete("Please use Plugins propety. see https://github.com/whistyun/Markdown.Avalonia/wiki/How-to-migrages-to-ver11")]
         public IBitmapLoader? BitmapLoader
         {
             get => _loader;
@@ -108,7 +122,16 @@ namespace Markdown.Avalonia
             }
         }
 
-        public IContainerBlockHandler? ContainerBlockHandler { get; set; }
+        private IContainerBlockHandler? _containerBlockHandler;
+        public IContainerBlockHandler? ContainerBlockHandler
+        {
+            get => _containerBlockHandler ?? _setupInfo?.ContainerBlock;
+            [Obsolete("Please use Plugins propety. see https://github.com/whistyun/Markdown.Avalonia/wiki/How-to-migrages-to-ver11")]
+            set
+            {
+                _containerBlockHandler = value;
+            }
+        }
 
         private Lazy<Bitmap> ImageNotFound { get; }
 
@@ -129,6 +152,7 @@ namespace Markdown.Avalonia
                 mdEng => mdEng.HyperlinkCommand,
                 (mdEng, command) => mdEng.HyperlinkCommand = command);
 
+        [Obsolete("Please use Plugins propety. see https://github.com/whistyun/Markdown.Avalonia/wiki/How-to-migrages-to-ver11")]
         public static readonly DirectProperty<Markdown, IBitmapLoader?> BitmapLoaderProperty =
             AvaloniaProperty.RegisterDirect<Markdown, IBitmapLoader?>(nameof(BitmapLoader),
                 mdEng => mdEng.BitmapLoader,
@@ -136,10 +160,15 @@ namespace Markdown.Avalonia
 
         #endregion
 
-        #region ParseTree
+        #region ParseInfo
 
-        private Parser<Control>[] TopLevelBlockParsers { get; }
-        private Parser<Control>[] SubLevelBlockParsers { get; }
+        private SetupInfo? _setupInfo;
+        private BlockParser[] _topBlockParsers;
+        private BlockParser[] _blockParsers;
+        private InlineParser[] _inlines;
+        private bool _supportTextAlignment;
+        private bool _supportStrikethrough;
+        private bool _supportTextileInline;
 
         #endregion
 
@@ -147,8 +176,16 @@ namespace Markdown.Avalonia
         {
             _assetPathRoot = Environment.CurrentDirectory;
 
+            var stack = new StackTrace();
+            _assetAssemblyNames = stack.GetFrames()
+                            .Select(frm => frm?.GetMethod()?.DeclaringType?.Assembly?.GetName()?.Name)
+                            .OfType<string>()
+                            .Where(name => !name.Equals("Markdown.Avalonia"))
+                            .Distinct()
+                            .ToArray();
+
             HyperlinkCommand = new DefaultHyperlinkCommand();
-            BitmapLoader = new DefaultBitmapLoader();
+            Plugins = new MdAvPlugins();
 
             ImageNotFound = new Lazy<Bitmap>(
                 () =>
@@ -156,26 +193,103 @@ namespace Markdown.Avalonia
                     using var strm = AssetLoader.Open(new Uri($"avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"));
                     return new Bitmap(strm);
                 });
-
-
-
-            TopLevelBlockParsers = new[]{
-                Parser.Create<Control>(_codeBlockFirst     , nameof(CodeBlocksWithLangEvaluator   ), CodeBlocksWithLangEvaluator   ),
-                Parser.Create<Control>(_containerBlockFirst, nameof(ContainerBlockEvaluator       ), ContainerBlockEvaluator       ),
-                Parser.Create<Control>(_listNested         , nameof(ListEvaluator                 ), ListEvaluator                 ),
-            };
-
-            SubLevelBlockParsers = new[] {
-                Parser.Create<Control>(_blockquoteFirst    , nameof(BlockquotesEvaluator          ), BlockquotesEvaluator          ),
-                Parser.Create<Control>(_headerSetext       , nameof(SetextHeaderEvaluator         ), SetextHeaderEvaluator         ),
-                Parser.Create<Control>(_headerAtx          , nameof(AtxHeaderEvaluator            ), AtxHeaderEvaluator            ),
-                Parser.Create<Control>(_horizontalRules    , nameof(RuleEvaluator                 ), RuleEvaluator                 ),
-                Parser.Create<Control>(_table              , nameof(TableEvalutor                 ), TableEvalutor                 ),
-                Parser.Create<Control>(_note               , nameof(NoteEvaluator                 ), NoteEvaluator                 ),
-                Parser.Create<Control>(_indentCodeBlock    , nameof(CodeBlocksWithoutLangEvaluator), CodeBlocksWithoutLangEvaluator),
-            };
-
         }
+
+        private void SetupParser()
+        {
+            var info = Plugins.Info;
+            if (ReferenceEquals(info, _setupInfo))
+                return;
+
+            var topBlocks = new List<BlockParser>();
+            var subBlocks = new List<BlockParser>();
+            var inlines = new List<InlineParser>();
+
+
+            // top-level block parser
+
+            if (info.EnableListMarkerExt)
+            {
+                topBlocks.Add(BlockParser.New(_extListNested, nameof(ListEvaluator), ExtListEvaluator));
+            }
+            else
+            {
+                topBlocks.Add(BlockParser.New(_commonListNested, nameof(ListEvaluator), CommonListEvaluator));
+            }
+
+            topBlocks.Add(BlockParser.New(_codeBlockFirst, nameof(CodeBlocksWithLangEvaluator), CodeBlocksWithLangEvaluator));
+
+            if (info.EnableContainerBlockExt)
+            {
+                topBlocks.Add(BlockParser.New(_containerBlockFirst, nameof(ContainerBlockEvaluator), ContainerBlockEvaluator));
+            }
+
+
+            // sub-level block parser
+
+            subBlocks.Add(BlockParser.New(_blockquoteFirst, nameof(BlockquotesEvaluator), BlockquotesEvaluator));
+            subBlocks.Add(BlockParser.New(_headerSetext, nameof(SetextHeaderEvaluator), SetextHeaderEvaluator));
+            subBlocks.Add(BlockParser.New(_headerAtx, nameof(AtxHeaderEvaluator), AtxHeaderEvaluator));
+
+            if (info.EnableRuleExt)
+            {
+                subBlocks.Add(BlockParser.New(_horizontalRules, nameof(RuleEvaluator), RuleEvaluator));
+            }
+            else
+            {
+                subBlocks.Add(BlockParser.New(_horizontalCommonRules, nameof(RuleEvaluator), RuleCommonEvaluator));
+            }
+
+            if (info.EnableTableBlock)
+            {
+                subBlocks.Add(BlockParser.New(_table, nameof(TableEvalutor), TableEvalutor));
+            }
+
+            if (info.EnableNoteBlock)
+            {
+                subBlocks.Add(BlockParser.New(_note, nameof(NoteEvaluator), NoteEvaluator));
+            }
+
+            subBlocks.Add(BlockParser.New(_indentCodeBlock, nameof(CodeBlocksWithoutLangEvaluator), CodeBlocksWithoutLangEvaluator));
+
+
+            // inline parser
+
+            inlines.Add(InlineParser.New(_codeSpan, nameof(CodeSpanEvaluator), CodeSpanEvaluator));
+            inlines.Add(InlineParser.New(_imageOrHrefInline, nameof(ImageOrHrefInlineEvaluator), ImageOrHrefInlineEvaluator));
+
+            if (StrictBoldItalic)
+            {
+                inlines.Add(InlineParser.New(_strictBold, nameof(BoldEvaluator), BoldEvaluator));
+                inlines.Add(InlineParser.New(_strictItalic, nameof(ItalicEvaluator), ItalicEvaluator));
+
+                if (info.EnableStrikethrough)
+                    inlines.Add(InlineParser.New(_strikethrough, nameof(StrikethroughEvaluator), StrikethroughEvaluator));
+            }
+
+
+            // parser registered by plugin
+
+            topBlocks.AddRange(info.TopBlock);
+            subBlocks.AddRange(info.Block);
+            inlines.AddRange(info.Inline);
+
+
+            // inform path info to resolver
+
+            info.PathResolver.AssetPathRoot = AssetPathRoot;
+            info.PathResolver.CallerAssemblyNames = AssetAssemblyNames;
+
+
+            _topBlockParsers = topBlocks.Select(p => info.Override(p)).ToArray();
+            _blockParsers = subBlocks.Select(p => info.Override(p)).ToArray();
+            _inlines = inlines.ToArray();
+            _supportTextAlignment = info.EnableTextAlignment;
+            _supportStrikethrough = info.EnableStrikethrough;
+            _supportTextileInline = info.EnableTextileInline;
+            _setupInfo = info;
+        }
+
 
         /// <inheritdoc/>
         public Control Transform(string? text)
@@ -185,14 +299,12 @@ namespace Markdown.Avalonia
                 throw new ArgumentNullException(nameof(text));
             }
 
+            SetupParser();
+
             text = TextUtil.Normalize(text, _tabWidth);
 
-            var status = new ParseStatus()
-            {
-                SupportTextAlignment = true
-            };
-
-            var document = Create<StackPanel, Control>(RunBlockGamut(text, status));
+            var status = new ParseStatus(true & _supportTextAlignment);
+            var document = Create<StackPanel, Control>(PrivateRunBlockGamut(text, status));
             document.Orientation = Orientation.Vertical;
 
             return document;
@@ -201,25 +313,174 @@ namespace Markdown.Avalonia
         /// <summary>
         /// Perform transformations that form block-level tags like paragraphs, headers, and list items.
         /// </summary>
-        private IEnumerable<Control> RunBlockGamut(string text, ParseStatus status)
+        public IEnumerable<Control> RunBlockGamut(string? text, ParseStatus status)
         {
-            return Evaluates(
-                text, status,
-                TopLevelBlockParsers,
-                SubLevelBlockParsers,
-                FormParagraphs
-            );
+            if (text is null)
+            {
+                throw new ArgumentNullException(nameof(text));
+            }
+
+            SetupParser();
+
+            text = TextUtil.Normalize(text, _tabWidth);
+
+            return PrivateRunBlockGamut(text, status);
         }
 
         /// <summary>
         /// Perform transformations that occur *within* block-level tags like paragraphs, headers, and list items.
         /// </summary>
-        private IEnumerable<CInline> RunSpanGamut(string text)
+        public IEnumerable<CInline> RunSpanGamut(string? text)
         {
-            return DoCodeSpans(text,
-                s0 => DoImagesOrHrefs(s0,
-                s1 => DoTextDecorations(s1,
-                s2 => DoText(s2))));
+            if (text is null)
+            {
+                throw new ArgumentNullException(nameof(text));
+            }
+
+            SetupParser();
+
+            text = TextUtil.Normalize(text, _tabWidth);
+
+            return PrivateRunSpanGamut(text);
+        }
+
+        private IEnumerable<Control> PrivateRunBlockGamut(string text, ParseStatus status)
+        {
+            var index = 0;
+            var length = text.Length;
+            var rtn = new List<Control>();
+
+            var candidates = new List<Candidate<BlockParser>>();
+
+            for (; ; )
+            {
+                candidates.Clear();
+
+                foreach (var parser in _topBlockParsers)
+                {
+                    var match = parser.Pattern.Match(text, index, length);
+                    if (match.Success) candidates.Add(new Candidate<BlockParser>(match, parser));
+                }
+
+                if (candidates.Count == 0) break;
+
+                candidates.Sort();
+
+                int bestBegin = 0;
+                int bestEnd = 0;
+                IEnumerable<Control>? result = null;
+
+                foreach (var c in candidates)
+                {
+                    result = c.Parser.Convert(text, c.Match, status, this, out bestBegin, out bestEnd);
+                    if (result is not null) break;
+                }
+
+                if (result is null) break;
+
+                if (bestBegin > index)
+                {
+                    RunBlockRest(text, index, bestBegin - index, status, 0, rtn);
+                }
+
+                rtn.AddRange(result);
+
+                length -= bestEnd - index;
+                index = bestEnd;
+            }
+
+            if (index < text.Length)
+            {
+                RunBlockRest(text, index, text.Length - index, status, 0, rtn);
+            }
+
+            return rtn;
+
+
+            void RunBlockRest(
+               string text, int index, int length,
+               ParseStatus status,
+                int parserStart,
+               List<Control> outto)
+            {
+                for (; parserStart < _blockParsers.Length; ++parserStart)
+                {
+                    var parser = _blockParsers[parserStart];
+
+                    for (; ; )
+                    {
+                        var match = parser.Pattern.Match(text, index, length);
+                        if (!match.Success) break;
+
+                        var rslt = parser.Convert(text, match, status, this, out int parseBegin, out int parserEnd);
+                        if (rslt is null) break;
+
+                        if (parseBegin > index)
+                        {
+                            RunBlockRest(text, index, parseBegin - index, status, parserStart + 1, outto);
+                        }
+                        outto.AddRange(rslt);
+
+                        length -= parserEnd - index;
+                        index = parserEnd;
+                    }
+
+                    if (length == 0) break;
+                }
+
+                if (length != 0)
+                {
+                    outto.AddRange(FormParagraphs(text.Substring(index, length), status));
+                }
+            }
+        }
+
+        private IEnumerable<CInline> PrivateRunSpanGamut(string text)
+        {
+            var rtn = new List<CInline>();
+            RunSpanRest(text, 0, text.Length, 0, rtn);
+            return rtn;
+
+            void RunSpanRest(
+                string text, int index, int length,
+                int parserStart,
+                List<CInline> outto)
+            {
+                for (; parserStart < _inlines.Length; ++parserStart)
+                {
+                    var parser = _inlines[parserStart];
+
+                    for (; ; )
+                    {
+                        var match = parser.Pattern.Match(text, index, length);
+                        if (!match.Success) break;
+
+                        var rslt = parser.Convert(text, match, this, out int parseBegin, out int parserEnd);
+                        if (rslt is null) break;
+
+                        if (parseBegin > index)
+                        {
+                            RunSpanRest(text, index, parseBegin - index, parserStart + 1, outto);
+                        }
+                        outto.AddRange(rslt);
+
+                        length -= parserEnd - index;
+                        index = parserEnd;
+                    }
+
+                    if (length == 0) break;
+                }
+
+                if (length != 0)
+                {
+                    var subtext = text.Substring(index, length);
+
+                    outto.AddRange(
+                        StrictBoldItalic ?
+                            DoText(subtext) :
+                            DoTextDecorations(subtext, s => DoText(s)));
+                }
+            }
         }
 
 
@@ -267,7 +528,7 @@ namespace Markdown.Avalonia
                     }
                 }
 
-                var ctbox = new CTextBlock(RunSpanGamut(chip));
+                var ctbox = new CTextBlock(PrivateRunSpanGamut(chip));
 
                 if (indiAlignment.HasValue)
                     ctbox.TextAlignment = indiAlignment.Value;
@@ -303,11 +564,6 @@ namespace Markdown.Avalonia
                   RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
 
-        private IEnumerable<CInline> DoImagesOrHrefs(string text, Func<string, IEnumerable<CInline>> defaultHandler)
-        {
-            return Evaluate(text, _imageOrHrefInline, ImageOrHrefInlineEvaluator, defaultHandler);
-        }
-
         private CInline ImageOrHrefInlineEvaluator(Match match)
         {
             if (String.IsNullOrEmpty(match.Groups[2].Value))
@@ -320,13 +576,14 @@ namespace Markdown.Avalonia
             }
         }
 
+
         private CInline TreatsAsHref(Match match)
         {
             string linkText = match.Groups[3].Value;
             string url = match.Groups[4].Value;
             string title = match.Groups[7].Value;
 
-            var link = new CHyperlink(RunSpanGamut(linkText))
+            var link = new CHyperlink(PrivateRunSpanGamut(linkText))
             {
                 Command = (urlTxt) =>
                 {
@@ -354,6 +611,11 @@ namespace Markdown.Avalonia
             string urlTxt = match.Groups[4].Value;
             string title = match.Groups[7].Value;
 
+            return LoadImage(urlTxt, title);
+        }
+
+        private CInline LoadImage(string urlTxt, string title)
+        {
             if (UseResource && CascadeResources.TryGet(urlTxt, out var resourceVal))
             {
                 if (resourceVal is Control control)
@@ -361,7 +623,7 @@ namespace Markdown.Avalonia
                     return new CInlineUIContainer(control);
                 }
 
-                CImage cimg = null;
+                CImage? cimg = null;
                 if (resourceVal is Bitmap renderedImage)
                 {
                     cimg = new CImage(renderedImage);
@@ -379,7 +641,7 @@ namespace Markdown.Avalonia
                     catch { }
                 }
 
-                if (cimg != null)
+                if (cimg is not null)
                 {
                     if (!String.IsNullOrEmpty(title)
                         && !title.Any(ch => !Char.IsLetterOrDigit(ch)))
@@ -390,8 +652,14 @@ namespace Markdown.Avalonia
                 }
             }
 
+#pragma warning disable CS0618
+            Task<IImage?> imageTask = BitmapLoader is not null ?
+                Task.Run(() => (IImage?)BitmapLoader?.Get(urlTxt)) :
+#pragma warning restore CS0618
+                LoadImageByPlugin(urlTxt, title);
+
             var image = new CImage(
-                Task.Run(() => (IImage?)BitmapLoader?.Get(urlTxt)),
+                imageTask,
                 ImageNotFound.Value);
 
             if (!String.IsNullOrEmpty(title)
@@ -402,6 +670,50 @@ namespace Markdown.Avalonia
 
             return image;
         }
+
+        private async Task<IImage?> LoadImageByPlugin(string urlTxt, string title)
+        {
+            using var stream = await _setupInfo.PathResolver.ResolveImageResource(urlTxt);
+
+            if (stream is null)
+                return null;
+
+            Stream seekableStream;
+            if (!stream.CanSeek)
+            {
+                seekableStream = new MemoryStream();
+                await stream.CopyToAsync(seekableStream);
+            }
+            else
+            {
+                seekableStream = stream;
+            }
+
+            var reuseStream = new UnclosableStream(seekableStream);
+
+            foreach (var imageResolver in _setupInfo.ImageResolvers)
+            {
+                reuseStream.Position = 0;
+                var image = await imageResolver.Load(reuseStream);
+
+                if (image is not null)
+                {
+                    return image;
+                }
+            }
+
+            try
+            {
+                return new Bitmap(reuseStream);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+
+
 
         #endregion
 
@@ -448,14 +760,14 @@ namespace Markdown.Avalonia
             int level = match.Groups[2].Value.StartsWith("=") ? 1 : 2;
 
             //TODO: Style the paragraph based on the header level
-            return CreateHeader(level, RunSpanGamut(header.Trim()));
+            return CreateHeader(level, PrivateRunSpanGamut(header.Trim()));
         }
 
         private CTextBlock AtxHeaderEvaluator(Match match)
         {
             string header = match.Groups[2].Value;
             int level = match.Groups[1].Value.Length;
-            return CreateHeader(level, RunSpanGamut(header));
+            return CreateHeader(level, PrivateRunSpanGamut(header));
         }
 
         private CTextBlock CreateHeader(int level, IEnumerable<CInline> content)
@@ -537,7 +849,7 @@ namespace Markdown.Avalonia
                 }
             }
 
-            return NoteComment(RunSpanGamut(text), indiAlignment);
+            return NoteComment(PrivateRunSpanGamut(text), indiAlignment);
         }
 
         private Border NoteComment(IEnumerable<CInline> content, TextAlignment? indiAlignment)
@@ -579,6 +891,17 @@ namespace Markdown.Avalonia
                     \n                      # End of line.
                 ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
+        private static readonly Regex _horizontalCommonRules = new(@"
+                ^[ ]{0,3}                   # Leading space
+                    ([-*_])                 # $1: First marker ([markers])
+                    (?>                     # Repeated marker group
+                        [ ]{0,2}            # Zero, one, or two spaces.
+                        \1                  # Marker character
+                    ){2,}                   # Group repeated at least twice
+                    [ ]*                    # Trailing spaces
+                    \n                      # End of line.
+                ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
         /// <summary>
         /// Single line separator.
         /// </summary>
@@ -594,6 +917,10 @@ namespace Markdown.Avalonia
             };
         }
 
+        private Rule RuleCommonEvaluator(Match match)
+        {
+            return new Rule(RuleType.Single);
+        }
         #endregion
 
 
@@ -601,8 +928,10 @@ namespace Markdown.Avalonia
 
         // `alphabet order` and `roman number` must start 'a.'～'c.' and 'i,'～'iii,'.
         // This restrict is avoid to treat "Yes," as list marker.
-        private const string _firstListMaker = @"(?:[*+=-]|\d+[.]|[a-c][.]|[i]{1,3}[,]|[A-C][.]|[I]{1,3}[,])";
-        private const string _subseqListMaker = @"(?:[*+=-]|\d+[.]|[a-c][.]|[cdilmvx]+[,]|[A-C][.]|[CDILMVX]+[,])";
+        private const string _extFirstListMaker = @"(?:[*+=-]|\d+[.]|[a-c][.]|[i]{1,3}[,]|[A-C][.]|[I]{1,3}[,])";
+        private const string _extSubseqListMaker = @"(?:[*+=-]|\d+[.]|[a-c][.]|[cdilmvx]+[,]|[A-C][.]|[CDILMVX]+[,])";
+
+        private const string _commonListMaker = @"(?:[*+-]|\d+[.])";
 
         //private const string _markerUL = @"[*+=-]";
         //private const string _markerOL = @"\d+[.]|\p{L}+[.,]";
@@ -626,7 +955,8 @@ namespace Markdown.Avalonia
         /// </summary>
         private const int _listDepth = 4;
 
-        private static readonly string _wholeList = string.Format(@"
+        private static readonly string _wholeListFormat = @"
+            ^
             (?<whltxt>                      # whole list
               (?<mkr_i>                     # list marker with indent
                 (?![ ]{{0,3}}(?<hrm>[-=*_])([ ]{{0,2}}\k<hrm>){{2,}}[ ]*\n)
@@ -645,19 +975,35 @@ namespace Markdown.Avalonia
                     {1}[ ]+
                   )
               )
-            )", _firstListMaker, _subseqListMaker, _listDepth - 1);
+            )";
 
         private static readonly Regex _startNoIndentRule = new(@"\A[ ]{0,2}(?<hrm>[-=*_])([ ]{0,2}\k<hrm>){2,}[ ]*$",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        private static readonly Regex _startNoIndentSublistMarker = new(@"\A" + _subseqListMaker, RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+        private static readonly Regex _startNoIndentSublistMarker = new(@"\A" + _extSubseqListMaker, RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         private static readonly Regex _startQuoteOrHeader = new(@"\A(\#{1,6}[ ]|>|```)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        private static readonly Regex _listNested = new(@"^" + _wholeList,
+        private static readonly Regex _startNoIndentCommonSublistMarker = new(@"\A" + _commonListMaker, RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
+        private static readonly Regex _commonListNested = new(
+            String.Format(_wholeListFormat, _commonListMaker, _commonListMaker, _listDepth - 1),
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        private IEnumerable<Control> ListEvaluator(Match match)
+        private static readonly Regex _startNoIndentExtSublistMarker = new(@"\A" + _extSubseqListMaker, RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
+        private static readonly Regex _extListNested = new(
+            String.Format(_wholeListFormat, _extFirstListMaker, _extSubseqListMaker, _listDepth - 1),
+            RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+
+
+        private IEnumerable<Control> ExtListEvaluator(Match match)
+            => ListEvaluator(match, _startNoIndentExtSublistMarker);
+
+        private IEnumerable<Control> CommonListEvaluator(Match match)
+            => ListEvaluator(match, _startNoIndentCommonSublistMarker);
+
+        private IEnumerable<Control> ListEvaluator(Match match, Regex sublistMarker)
         {
             // Check text marker style.
             (TextMarkerStyle textMarker, string markerPattern, int indentAppending)
@@ -696,7 +1042,7 @@ namespace Markdown.Avalonia
                             isInOuterList = true;
                         }
                         // is it had list marker?
-                        else if (_startNoIndentSublistMarker.IsMatch(stripedLine))
+                        else if (sublistMarker.IsMatch(stripedLine))
                         {
                             // is it same marker as now processed?
                             var targetMarkerMch = markerRegex.Match(stripedLine);
@@ -779,7 +1125,7 @@ namespace Markdown.Avalonia
 
             if (outerListBuildre.Length != 0)
             {
-                foreach (var ctrl in RunBlockGamut(outerListBuildre.ToString(), ParseStatus.Init))
+                foreach (var ctrl in PrivateRunBlockGamut(outerListBuildre.ToString(), ParseStatus.Init))
                     yield return ctrl;
             }
         }
@@ -834,14 +1180,11 @@ namespace Markdown.Avalonia
         {
             string item = match.Groups[4].Value;
 
-            var status = new ParseStatus()
-            {
-                SupportTextAlignment = false
-            };
+            var status = new ParseStatus(false);
 
             // we could correct any bad indentation here..
             // recursion for sub-lists
-            return Create<StackPanel, Control>(RunBlockGamut(item, status));
+            return Create<StackPanel, Control>(PrivateRunBlockGamut(item, status));
         }
 
         /// <summary>
@@ -998,7 +1341,7 @@ namespace Markdown.Avalonia
 
                 if (!(mdcell.Text is null))
                 {
-                    var txtbx = new CTextBlock(RunSpanGamut(mdcell.Text));
+                    var txtbx = new CTextBlock(PrivateRunSpanGamut(mdcell.Text));
                     cell.Child = txtbx;
 
                     if (mdcell.Horizontal.HasValue)
@@ -1037,7 +1380,7 @@ namespace Markdown.Avalonia
         {
             var result = ContainerBlockHandler?.ProvideControl(AssetPathRoot, match.Groups[2].Value, match.Groups[3].Value);
 
-            if (result == null)
+            if (result is null)
             {
                 Border _retVal = CodeBlocksEvaluator(match.Value);
                 _retVal.Classes.Add(NoContainerClass);
@@ -1106,6 +1449,27 @@ namespace Markdown.Avalonia
 
         #region grammer - code
 
+        //    * You can use multiple backticks as the delimiters if you want to
+        //        include literal backticks in the code span. So, this input:
+        //
+        //        Just type ``foo `bar` baz`` at the prompt.
+        //
+        //        Will translate to:
+        //
+        //          <p>Just type <code>foo `bar` baz</code> at the prompt.</p>
+        //
+        //        There's no arbitrary limit to the number of backticks you
+        //        can use as delimters. If you need three consecutive backticks
+        //        in your code, use four for delimiters, etc.
+        //
+        //    * You can use spaces to get literal backticks at the edges:
+        //
+        //          ... type `` `bar` `` ...
+        //
+        //        Turns to:
+        //
+        //          ... type <code>`bar`</code> ...         
+        //
         private static readonly Regex _codeSpan = new(@"
                     (?<!\\)   # Character before opening ` can't be a backslash
                     (`+)      # $1 = Opening run of `
@@ -1113,36 +1477,6 @@ namespace Markdown.Avalonia
                     (?<!`)
                     \1
                     (?!`)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
-
-        /// <summary>
-        /// Turn Markdown `code spans` into HTML code tags
-        /// </summary>
-        private IEnumerable<CInline> DoCodeSpans(string text, Func<string, IEnumerable<CInline>> defaultHandler)
-        {
-            //    * You can use multiple backticks as the delimiters if you want to
-            //        include literal backticks in the code span. So, this input:
-            //
-            //        Just type ``foo `bar` baz`` at the prompt.
-            //
-            //        Will translate to:
-            //
-            //          <p>Just type <code>foo `bar` baz</code> at the prompt.</p>
-            //
-            //        There's no arbitrary limit to the number of backticks you
-            //        can use as delimters. If you need three consecutive backticks
-            //        in your code, use four for delimiters, etc.
-            //
-            //    * You can use spaces to get literal backticks at the edges:
-            //
-            //          ... type `` `bar` `` ...
-            //
-            //        Turns to:
-            //
-            //          ... type <code>`bar`</code> ...         
-            //
-
-            return Evaluate(text, _codeSpan, CodeSpanEvaluator, defaultHandler);
-        }
 
         private CCode CodeSpanEvaluator(Match match)
         {
@@ -1175,148 +1509,136 @@ namespace Markdown.Avalonia
         /// </summary>
         private IEnumerable<CInline> DoTextDecorations(string text, Func<string, IEnumerable<CInline>> defaultHandler)
         {
-            // <strong> must go first, then <em>
-            if (StrictBoldItalic)
+            var rtn = new List<CInline>();
+
+            var buff = new StringBuilder();
+
+            void HandleBefore()
             {
-                return Evaluate<CInline>(text, _strictBold, m => BoldEvaluator(m, 3),
-                    s1 => Evaluate<CInline>(s1, _strictItalic, m => ItalicEvaluator(m, 3),
-                    s2 => Evaluate<CInline>(s2, _strikethrough, m => StrikethroughEvaluator(m, 2),
-                    s3 => Evaluate<CInline>(s3, _underline, m => UnderlineEvaluator(m, 2),
-                    s4 => defaultHandler(s4)))));
-            }
-            else
-            {
-                var rtn = new List<CInline>();
-
-                var buff = new StringBuilder();
-
-                void HandleBefore()
-                {
-                    if (buff.Length > 0)
-                    {
-                        rtn.AddRange(defaultHandler(buff.ToString()));
-                        buff.Clear();
-                    }
-                }
-
-                for (var i = 0; i < text.Length; ++i)
-                {
-                    var ch = text[i];
-                    switch (ch)
-                    {
-                        default:
-                            buff.Append(ch);
-                            break;
-
-                        case '\\': // escape
-                            if (++i < text.Length)
-                            {
-                                switch (text[i])
-                                {
-                                    default:
-                                        buff.Append('\\').Append(text[i]);
-                                        break;
-
-                                    case '\\': // escape
-                                    case ':': // bold? or italic
-                                    case '*': // bold? or italic
-                                    case '~': // strikethrough?
-                                    case '_': // underline?
-                                    case '%': // color?
-                                        buff.Append(text[i]);
-                                        break;
-                                }
-                            }
-                            else
-                                buff.Append('\\');
-
-                            break;
-
-                        case ':': // emoji?
-                            {
-                                var nxtI = text.IndexOf(':', i + 1);
-                                if (nxtI != -1 && EmojiTable.TryGet(text.Substring(i + 1, nxtI - i - 1), out var emoji))
-                                {
-                                    buff.Append(emoji);
-                                    i = nxtI;
-                                }
-                                else buff.Append(':');
-                                break;
-                            }
-
-                        case '*': // bold? or italic
-                            {
-                                var oldI = i;
-                                var inline = ParseAsBoldOrItalic(text, ref i);
-                                if (inline == null)
-                                {
-                                    buff.Append(text, oldI, i - oldI + 1);
-                                }
-                                else
-                                {
-                                    HandleBefore();
-                                    rtn.Add(inline);
-                                }
-                                break;
-                            }
-
-                        case '~': // strikethrough?
-                            {
-                                var oldI = i;
-                                var inline = ParseAsStrikethrough(text, ref i);
-                                if (inline == null)
-                                {
-                                    buff.Append(text, oldI, i - oldI + 1);
-                                }
-                                else
-                                {
-                                    HandleBefore();
-                                    rtn.Add(inline);
-                                }
-                                break;
-                            }
-
-                        case '_': // underline?
-                            {
-                                var oldI = i;
-                                var inline = ParseAsUnderline(text, ref i);
-                                if (inline == null)
-                                {
-                                    buff.Append(text, oldI, i - oldI + 1);
-                                }
-                                else
-                                {
-                                    HandleBefore();
-                                    rtn.Add(inline);
-                                }
-                                break;
-                            }
-
-                        case '%': // color?
-                            {
-                                var oldI = i;
-                                var inline = ParseAsColor(text, ref i);
-                                if (inline == null)
-                                {
-                                    buff.Append(text, oldI, i - oldI + 1);
-                                }
-                                else
-                                {
-                                    HandleBefore();
-                                    rtn.Add(inline);
-                                }
-                                break;
-                            }
-                    }
-                }
-
                 if (buff.Length > 0)
                 {
                     rtn.AddRange(defaultHandler(buff.ToString()));
+                    buff.Clear();
                 }
-
-                return rtn;
             }
+
+            for (var i = 0; i < text.Length; ++i)
+            {
+                var ch = text[i];
+                switch (ch)
+                {
+                    default:
+                        buff.Append(ch);
+                        break;
+
+                    case '\\': // escape
+                        if (++i < text.Length)
+                        {
+                            switch (text[i])
+                            {
+                                default:
+                                    buff.Append('\\').Append(text[i]);
+                                    break;
+
+                                case '\\': // escape
+                                case ':': // bold? or italic
+                                case '*': // bold? or italic
+                                case '~': // strikethrough?
+                                case '_': // underline?
+                                case '%': // color?
+                                    buff.Append(text[i]);
+                                    break;
+                            }
+                        }
+                        else
+                            buff.Append('\\');
+
+                        break;
+
+                    case ':': // emoji?
+                        {
+                            var nxtI = text.IndexOf(':', i + 1);
+                            if (nxtI != -1 && EmojiTable.TryGet(text.Substring(i + 1, nxtI - i - 1), out var emoji))
+                            {
+                                buff.Append(emoji);
+                                i = nxtI;
+                            }
+                            else buff.Append(':');
+                            break;
+                        }
+
+                    case '*': // bold? or italic
+                        {
+                            var oldI = i;
+                            var inline = ParseAsBoldOrItalic(text, ref i);
+                            if (inline == null)
+                            {
+                                buff.Append(text, oldI, i - oldI + 1);
+                            }
+                            else
+                            {
+                                HandleBefore();
+                                rtn.Add(inline);
+                            }
+                            break;
+                        }
+
+                    case '~': // strikethrough?
+                        {
+                            var oldI = i;
+                            var inline = ParseAsStrikethrough(text, ref i);
+                            if (inline == null)
+                            {
+                                buff.Append(text, oldI, i - oldI + 1);
+                            }
+                            else
+                            {
+                                HandleBefore();
+                                rtn.Add(inline);
+                            }
+                            break;
+                        }
+
+                    case '_': // underline?
+                        {
+                            var oldI = i;
+                            var inline = ParseAsUnderline(text, ref i);
+                            if (inline == null)
+                            {
+                                buff.Append(text, oldI, i - oldI + 1);
+                            }
+                            else
+                            {
+                                HandleBefore();
+                                rtn.Add(inline);
+                            }
+                            break;
+                        }
+
+                    case '%': // color?
+                        {
+                            var oldI = i;
+                            var inline = ParseAsColor(text, ref i);
+                            if (inline == null)
+                            {
+                                buff.Append(text, oldI, i - oldI + 1);
+                            }
+                            else
+                            {
+                                HandleBefore();
+                                rtn.Add(inline);
+                            }
+                            break;
+                        }
+                }
+            }
+
+            if (buff.Length > 0)
+            {
+                rtn.AddRange(defaultHandler(buff.ToString()));
+            }
+
+            return rtn;
         }
 
         private CUnderline? ParseAsUnderline(string text, ref int start)
@@ -1334,7 +1656,7 @@ namespace Markdown.Avalonia
                 int end = last;
 
                 start = end + cnt - 1;
-                var span = new CUnderline(RunSpanGamut(text.Substring(bgn, end - bgn)));
+                var span = new CUnderline(PrivateRunSpanGamut(text.Substring(bgn, end - bgn)));
                 return span;
             }
             else
@@ -1359,7 +1681,7 @@ namespace Markdown.Avalonia
                 int end = last;
 
                 start = end + cnt - 1;
-                var span = new CStrikethrough(RunSpanGamut(text.Substring(bgn, end - bgn)));
+                var span = new CStrikethrough(PrivateRunSpanGamut(text.Substring(bgn, end - bgn)));
                 return span;
             }
             else
@@ -1390,13 +1712,13 @@ namespace Markdown.Avalonia
                         {
                             start = end + cnt - 1;
 
-                            var span = new CItalic(RunSpanGamut(text.Substring(bgn, end - bgn)));
+                            var span = new CItalic(PrivateRunSpanGamut(text.Substring(bgn, end - bgn)));
                             return span;
                         }
                     case 2: // bold
                         {
                             start = end + cnt - 1;
-                            var span = new CBold(RunSpanGamut(text.Substring(bgn, end - bgn)));
+                            var span = new CBold(PrivateRunSpanGamut(text.Substring(bgn, end - bgn)));
                             return span;
                         }
 
@@ -1405,7 +1727,7 @@ namespace Markdown.Avalonia
                             bgn = start + 3;
                             start = end + 3 - 1;
 
-                            var inline = new CItalic(RunSpanGamut(text.Substring(bgn, end - bgn)));
+                            var inline = new CItalic(PrivateRunSpanGamut(text.Substring(bgn, end - bgn)));
                             var span = new CBold(new[] { inline });
                             return span;
                         }
@@ -1431,11 +1753,11 @@ namespace Markdown.Avalonia
                 if (endIdx == -1)
                 {
                     endIdx = text.Length - 1;
-                    span = new CSpan(RunSpanGamut(text.Substring(bgnIdx)));
+                    span = new CSpan(PrivateRunSpanGamut(text.Substring(bgnIdx)));
                 }
                 else
                 {
-                    span = new CSpan(RunSpanGamut(text.Substring(bgnIdx, endIdx - bgnIdx)));
+                    span = new CSpan(PrivateRunSpanGamut(text.Substring(bgnIdx, endIdx - bgnIdx)));
                 }
 
                 var colorLbl = mch.Groups[1].Value;
@@ -1480,32 +1802,32 @@ namespace Markdown.Avalonia
             return count;
         }
 
-        private CItalic ItalicEvaluator(Match match, int contentGroup)
+        private CItalic ItalicEvaluator(Match match)
         {
-            var content = match.Groups[contentGroup].Value;
+            var content = match.Groups[3].Value;
 
-            return new CItalic(RunSpanGamut(content));
+            return new CItalic(PrivateRunSpanGamut(content));
         }
 
-        private CBold BoldEvaluator(Match match, int contentGroup)
+        private CBold BoldEvaluator(Match match)
         {
-            var content = match.Groups[contentGroup].Value;
+            var content = match.Groups[3].Value;
 
-            return new CBold(RunSpanGamut(content));
+            return new CBold(PrivateRunSpanGamut(content));
         }
 
-        private CStrikethrough StrikethroughEvaluator(Match match, int contentGroup)
+        private CStrikethrough StrikethroughEvaluator(Match match)
         {
-            var content = match.Groups[contentGroup].Value;
+            var content = match.Groups[2].Value;
 
-            return new CStrikethrough(RunSpanGamut(content));
+            return new CStrikethrough(PrivateRunSpanGamut(content));
         }
 
-        private CUnderline UnderlineEvaluator(Match match, int contentGroup)
+        private CUnderline UnderlineEvaluator(Match match)
         {
-            var content = match.Groups[contentGroup].Value;
+            var content = match.Groups[2].Value;
 
-            return new CUnderline(RunSpanGamut(content));
+            return new CUnderline(PrivateRunSpanGamut(content));
         }
 
         #endregion
@@ -1557,11 +1879,8 @@ namespace Markdown.Avalonia
                         .ToArray()
             );
 
-            var status = new ParseStatus()
-            {
-                SupportTextAlignment = true
-            };
-            var blocks = RunBlockGamut(trimmedTxt + "\n", status);
+            var status = new ParseStatus(true);
+            var blocks = PrivateRunBlockGamut(trimmedTxt + "\n", status);
 
             var panel = Create<StackPanel, Control>(blocks);
             panel.Orientation = Orientation.Vertical;
@@ -1646,129 +1965,147 @@ namespace Markdown.Avalonia
             return result;
         }
 
-        private IEnumerable<T> Evaluates<T>(
-                string text, ParseStatus status,
-                Parser<T>[] primary,
-                Parser<T>[] secondly,
-                Func<string, ParseStatus, IEnumerable<T>> rest
-            )
-        {
-            var index = 0;
-            var length = text.Length;
-            var rtn = new List<T>();
 
-            while (true)
-            {
-                int bestIndex = Int32.MaxValue;
-                Match? bestMatch = null;
-                Parser<T>? bestParser = null;
-
-                foreach (var parser in primary)
-                {
-                    var match = parser.Pattern.Match(text, index, length);
-                    if (match.Success && match.Index < bestIndex)
-                    {
-                        bestIndex = match.Index;
-                        bestMatch = match;
-                        bestParser = parser;
-                    }
-                }
-
-                if (bestParser is null || bestMatch is null) break;
-
-                var result = bestParser.Convert(text, bestMatch, status, this, out bestIndex, out int newIndex);
-
-                if (bestIndex > index)
-                {
-                    EvaluateRest(rtn, text, index, bestIndex - index, status, secondly, 0, rest);
-                }
-
-                rtn.AddRange(result);
-
-                length -= newIndex - index;
-                index = newIndex;
-            }
-
-            if (index < text.Length)
-            {
-                EvaluateRest(rtn, text, index, text.Length - index, status, secondly, 0, rest);
-            }
-
-            return rtn;
-
-        }
-
-        private void EvaluateRest<T>(
-            List<T> resultIn,
-            string text, int index, int length,
-            ParseStatus status,
-            Parser<T>[] parsers, int parserStart,
-            Func<string, ParseStatus, IEnumerable<T>> rest)
-        {
-            for (; parserStart < parsers.Length; ++parserStart)
-            {
-                var parser = parsers[parserStart];
-
-                for (; ; )
-                {
-                    var match = parser.Pattern.Match(text, index, length);
-                    if (!match.Success) break;
-
-                    var result = parser.Convert(text, match, status, this, out var matchStartIndex, out int newIndex);
-
-                    if (matchStartIndex > index)
-                    {
-                        EvaluateRest(resultIn, text, index, match.Index - index, status, parsers, parserStart + 1, rest);
-                    }
-
-                    resultIn.AddRange(result);
-
-                    length -= newIndex - index;
-                    index = newIndex;
-                }
-
-                if (length == 0) break;
-            }
-
-            if (length != 0)
-            {
-                var suffix = text.Substring(index, length);
-                resultIn.AddRange(rest(suffix, status));
-            }
-        }
-
-
-        private IEnumerable<T> Evaluate<T>(string text, Regex expression, Func<Match, T> build, Func<string, IEnumerable<T>> rest)
-        {
-            var matches = expression.Matches(text);
-            var index = 0;
-            foreach (Match m in matches)
-            {
-                if (m.Index > index)
-                {
-                    var prefix = text.Substring(index, m.Index - index);
-                    foreach (var t in rest(prefix))
-                    {
-                        yield return t;
-                    }
-                }
-
-                yield return build(m);
-
-                index = m.Index + m.Length;
-            }
-
-            if (index < text.Length)
-            {
-                var suffix = text.Substring(index, text.Length - index);
-                foreach (var t in rest(suffix))
-                {
-                    yield return t;
-                }
-            }
-        }
+        //private IEnumerable<T> Evaluates<T>(
+        //        string text, ParseStatus status,
+        //        BlockParser<T>[] primary,
+        //        BlockParser<T>[] secondly,
+        //        Func<string, ParseStatus, IEnumerable<T>> rest
+        //    )
+        //{
+        //    var index = 0;
+        //    var length = text.Length;
+        //    var rtn = new List<T>();
+        //
+        //    while (true)
+        //    {
+        //        int bestIndex = Int32.MaxValue;
+        //        Match? bestMatch = null;
+        //        BlockParser<T>? bestParser = null;
+        //
+        //        foreach (var parser in primary)
+        //        {
+        //            var match = parser.Pattern.Match(text, index, length);
+        //            if (match.Success && match.Index < bestIndex)
+        //            {
+        //                bestIndex = match.Index;
+        //                bestMatch = match;
+        //                bestParser = parser;
+        //            }
+        //        }
+        //
+        //        if (bestParser is null || bestMatch is null) break;
+        //
+        //        var result = bestParser.Convert(text, bestMatch, status, this, out bestIndex, out int newIndex);
+        //
+        //        if (bestIndex > index)
+        //        {
+        //            EvaluateRest(rtn, text, index, bestIndex - index, status, secondly, 0, rest);
+        //        }
+        //
+        //        rtn.AddRange(result);
+        //
+        //        length -= newIndex - index;
+        //        index = newIndex;
+        //    }
+        //
+        //    if (index < text.Length)
+        //    {
+        //        EvaluateRest(rtn, text, index, text.Length - index, status, secondly, 0, rest);
+        //    }
+        //
+        //    return rtn;
+        //
+        //}
+        //
+        //private void EvaluateRest<T>(
+        //    List<T> resultIn,
+        //    string text, int index, int length,
+        //    ParseStatus status,
+        //    BlockParser<T>[] parsers, int parserStart,
+        //    Func<string, ParseStatus, IEnumerable<T>> rest)
+        //{
+        //    for (; parserStart < parsers.Length; ++parserStart)
+        //    {
+        //        var parser = parsers[parserStart];
+        //
+        //        for (; ; )
+        //        {
+        //            var match = parser.Pattern.Match(text, index, length);
+        //            if (!match.Success) break;
+        //
+        //            var result = parser.Convert(text, match, status, this, out var matchStartIndex, out int newIndex);
+        //
+        //            if (matchStartIndex > index)
+        //            {
+        //                EvaluateRest(resultIn, text, index, match.Index - index, status, parsers, parserStart + 1, rest);
+        //            }
+        //
+        //            resultIn.AddRange(result);
+        //
+        //            length -= newIndex - index;
+        //            index = newIndex;
+        //        }
+        //
+        //        if (length == 0) break;
+        //    }
+        //
+        //    if (length != 0)
+        //    {
+        //        var suffix = text.Substring(index, length);
+        //        resultIn.AddRange(rest(suffix, status));
+        //    }
+        //}
 
         #endregion
     }
 
+    internal struct Candidate<T> : IComparable<Candidate<T>>
+    {
+        public Match Match { get; }
+        public T Parser { get; }
+
+        public Candidate(Match result, T parser)
+        {
+            Match = result;
+            Parser = parser;
+        }
+
+        public int CompareTo(Candidate<T> other)
+            => Match.Index.CompareTo(other.Match.Index);
+    }
+
+    internal class UnclosableStream : Stream
+    {
+        private Stream _stream;
+
+        public UnclosableStream(Stream stream)
+        {
+            _stream = stream;
+        }
+
+        public override bool CanRead => _stream.CanRead;
+        public override bool CanSeek => _stream.CanSeek;
+        public override bool CanWrite => _stream.CanWrite;
+        public override long Length => _stream.Length;
+
+        public override long Position
+        {
+            get => _stream.Position;
+            set => _stream.Position = value;
+        }
+
+        public override void Flush() { }
+        public override void Close() { }
+
+        public override int Read(byte[] buffer, int offset, int count) => _stream.Read(buffer, offset, count);
+        public override long Seek(long offset, SeekOrigin origin) => _stream.Seek(offset, origin);
+
+        public override void SetLength(long value) => _stream.SetLength(value);
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

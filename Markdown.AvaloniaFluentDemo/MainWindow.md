@@ -24,6 +24,7 @@ Links with image [![faviicon](https://www.google.com/favicon.ico)](https://www.g
 #### Local and resource images ####
 ![localimage](LocalPath.png)
 ![ResourceImage](Assets/ResourceImage.png)
+![Svg](Assets/Vector.svg)
 
 ### List ###
 #### ul

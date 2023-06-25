@@ -113,8 +113,12 @@ namespace ColorTextBlock.Avalonia
                     System.Threading.Tasks.Task.Run(() =>
                     {
                         Task.Wait();
-                        Image = Task.IsFaulted ? WhenError : Task.Result ?? WhenError;
-                        Dispatcher.UIThread.InvokeAsync(RequestMeasure);
+                        Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            Image = Task.IsFaulted ? WhenError : Task.Result ?? WhenError;
+                            RequestMeasure();
+                        });
+
                     });
                 }
             }

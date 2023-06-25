@@ -1,27 +1,25 @@
 ﻿using Avalonia.Metadata;
 using Markdown.Avalonia.Plugins;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Markdown.Avalonia
 {
     public class MdAvPlugins
     {
+        private SetupInfo? _cache;
 
         [Content]
         public ObservableCollection<IMdAvPlugin> Plugins { get; }
 
+        public SetupInfo Info => _cache ??= CreateInfo();
+
         public MdAvPlugins()
         {
             Plugins = new ObservableCollection<IMdAvPlugin>();
+            Plugins.CollectionChanged += (s, e) => _cache = null;
         }
 
-
-        internal SetupInfo CreateInfo()
+        protected virtual SetupInfo CreateInfo()
         {
             var setupInf = new SetupInfo();
             bool hasBuiltin = false;
@@ -35,6 +33,8 @@ namespace Markdown.Avalonia
 
             if (!hasBuiltin)
                 setupInf.Builtin();
+
+            setupInf.Freeze();
 
             return setupInf;
         }

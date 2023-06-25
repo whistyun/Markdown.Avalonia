@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-16"?>
-<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="https://github.com/whistyun/Markdown.Avalonia.Tight" xmlns:ma="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
   <c:CTextBlock Classes="Paragraph">
     <c:CRun Text="First we have a simple numeric list" />
   </c:CTextBlock>
@@ -173,7 +173,7 @@
       <RowDefinition />
     </Grid.RowDefinitions>
   </Grid>
-  <m:Rule BoldLineWidth="2" Classes="Bold" />
+  <ma:Rule BoldLineWidth="2" Classes="Bold" />
   <c:CTextBlock Classes="Paragraph">
     <c:CRun Text="Pluses tight:" />
   </c:CTextBlock>
@@ -250,7 +250,7 @@
       <RowDefinition />
     </Grid.RowDefinitions>
   </Grid>
-  <m:Rule BoldLineWidth="2" Classes="Bold" />
+  <ma:Rule BoldLineWidth="2" Classes="Bold" />
   <c:CTextBlock Classes="Paragraph">
     <c:CRun Text="Minuses tight:" />
   </c:CTextBlock>
@@ -1004,7 +1004,7 @@
       <RowDefinition />
     </Grid.RowDefinitions>
   </Grid>
-  <m:Rule BoldLineWidth="2" Classes="TwoLines" />
+  <ma:Rule BoldLineWidth="2" Classes="TwoLines" />
   <Grid Classes="List" xmlns="">
     <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
       <c:CRun Text="i." />
@@ -1022,7 +1022,7 @@
       <RowDefinition />
     </Grid.RowDefinitions>
   </Grid>
-  <m:Rule BoldLineWidth="2" Classes="TwoLines" />
+  <ma:Rule BoldLineWidth="2" Classes="TwoLines" />
   <Grid Classes="List" xmlns="">
     <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
       <c:CRun Text="i." />
@@ -1040,11 +1040,11 @@
       <RowDefinition />
     </Grid.RowDefinitions>
   </Grid>
-  <m:Rule BoldLineWidth="2" Classes="TwoLines" />
+  <ma:Rule BoldLineWidth="2" Classes="TwoLines" />
   <c:CTextBlock Classes="Paragraph">
     <c:CRun Text="iiii, one" />
   </c:CTextBlock>
-  <m:Rule BoldLineWidth="2" Classes="Bold" />
+  <ma:Rule BoldLineWidth="2" Classes="Bold" />
   <Grid Classes="List" xmlns="">
     <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
       <c:CRun Text="•" />
@@ -1062,7 +1062,7 @@
       <RowDefinition />
     </Grid.RowDefinitions>
   </Grid>
-  <m:Rule BoldLineWidth="2" Classes="Bold" />
+  <ma:Rule BoldLineWidth="2" Classes="Bold" />
   <Grid Classes="List" xmlns="">
     <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
       <c:CRun Text="•" />
@@ -1080,7 +1080,7 @@
       <RowDefinition />
     </Grid.RowDefinitions>
   </Grid>
-  <m:Rule BoldLineWidth="2" Classes="Bold" />
+  <ma:Rule BoldLineWidth="2" Classes="Bold" />
   <Grid Classes="List" xmlns="">
     <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
       <c:CRun Text="•" />
@@ -1098,7 +1098,7 @@
       <RowDefinition />
     </Grid.RowDefinitions>
   </Grid>
-  <m:Rule BoldLineWidth="2" Classes="Bold" />
+  <ma:Rule BoldLineWidth="2" Classes="Bold" />
   <Grid Classes="List" xmlns="">
     <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
       <c:CRun Text="•" />
@@ -1191,7 +1191,7 @@
   <c:CTextBlock Classes="Heading2">
     <c:CRun Text="head" />
   </c:CTextBlock>
-  <m:Rule BoldLineWidth="2" Classes="Bold" />
+  <ma:Rule BoldLineWidth="2" Classes="Bold" />
   <Grid Classes="List" xmlns="">
     <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
       <c:CRun Text="•" />
@@ -1200,7 +1200,7 @@
       <c:CTextBlock Classes="Paragraph">
         <c:CRun Text="one" />
       </c:CTextBlock>
-      <m:Rule BoldLineWidth="2" Classes="Bold" />
+      <ma:Rule BoldLineWidth="2" Classes="Bold" />
     </StackPanel>
     <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="1">
       <c:CRun Text="•" />

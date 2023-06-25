@@ -1,32 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using Avalonia.Svg;
 using Svg.Model;
-using Avalonia.Metadata;
 using Avalonia.Media;
+using Markdown.Avalonia.Utils;
+using System.Threading.Tasks;
 
 namespace Markdown.Avalonia.Svg
 {
-    internal class SvgImageLoader
+    internal class SvgImageResolver : IImageResolver
     {
         private static readonly AvaloniaAssetLoader _svgAssetLoader = new();
 
-
-        public IImage? Load(Stream stream)
+        public async Task<IImage?> Load(Stream stream)
         {
-            if (IsSvgFile(stream))
+            var task = Task.Run(() =>
             {
-                var document = SvgExtensions.Open(stream);
-                var picture = document is { } ? SvgExtensions.ToModel(document, _svgAssetLoader, out _, out _) : default;
-                return new VectorImage() { Source = new SvgSource() { Picture = picture } };
-            }
+                if (IsSvgFile(stream))
+                {
+                    var document = SvgExtensions.Open(stream);
+                    var picture = document is { } ? SvgExtensions.ToModel(document, _svgAssetLoader, out _, out _) : default;
+                    var svgsrc = new SvgSource() { Picture = picture };
+                    return (IImage)new VectorImage() { Source = svgsrc };
+                }
 
-            return null;
+                return null;
+            });
+
+            return await task;
         }
 
         private static bool IsSvgFile(Stream fileStream)

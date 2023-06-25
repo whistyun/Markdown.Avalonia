@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-16"?>
-<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="https://github.com/whistyun/Markdown.Avalonia.Tight" xmlns:ma="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
   <Border Classes="Table" xmlns="">
     <Border.Child>
       <Grid Classes="Table">
@@ -721,7 +721,7 @@
       </Grid>
     </Border.Child>
   </Border>
-  <m:Rule BoldLineWidth="2" Classes="Single" />
+  <ma:Rule BoldLineWidth="2" Classes="Single" />
   <Border Classes="Table" xmlns="">
     <Border.Child>
       <Grid Classes="Table">
@@ -964,7 +964,7 @@
       </Grid>
     </Border.Child>
   </Border>
-  <m:Rule BoldLineWidth="2" Classes="Single" />
+  <ma:Rule BoldLineWidth="2" Classes="Single" />
   <Border Classes="Table" xmlns="">
     <Border.Child>
       <Grid Classes="Table">
@@ -1031,7 +1031,7 @@
       </Grid>
     </Border.Child>
   </Border>
-  <m:Rule BoldLineWidth="2" Classes="Single" />
+  <ma:Rule BoldLineWidth="2" Classes="Single" />
   <Border Classes="Table" xmlns="">
     <Border.Child>
       <Grid Classes="Table">
