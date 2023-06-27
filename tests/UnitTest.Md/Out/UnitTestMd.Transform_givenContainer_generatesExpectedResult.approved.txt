@@ -133,7 +133,7 @@
     <Border.Child>
       <ScrollViewer Classes="CodeBlock">
         <ScrollViewer.Content>
-          <TextBlock Text="::: md&#xA;&#xA;* list1&#xA;* list2&#xA;&#xA;```cs&#xA;#define FooBar&#xA;```&#xA;:::&#xA;&#xA;&#xA;" Classes="CodeBlock" />
+          <TextBlock Text="::: md&#xA;&#xA;* list1&#xA;* list2&#xA;&#xA;```cs&#xA;#define FooBar&#xA;```&#xA;:::&#xA;" Classes="CodeBlock" />
         </ScrollViewer.Content>
       </ScrollViewer>
     </Border.Child>

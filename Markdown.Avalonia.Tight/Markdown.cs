@@ -1450,7 +1450,7 @@ namespace Markdown.Avalonia
 
         private Border? CodeBlocksWithLangEvaluator(string text, Match match, out int parseTextBegin, out int parseTextEnd)
         {
-            var closeTagPattern = new Regex($"\n{match.Groups[1].Value}[ ]*\n");
+            var closeTagPattern = new Regex($"\n[ ]*{match.Groups[1].Value}[ ]*\n");
             var closeTagMatch = closeTagPattern.Match(text, match.Index + match.Length);
 
             int codeEndIndex;
