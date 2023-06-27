@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown.Avalonia.Tight", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ColorTextBlock.Avalonia", "ColorTextBlock.Avalonia\ColorTextBlock.Avalonia.csproj", "{E4F9286F-A812-476E-A37D-EE2B8ED5D958}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown.AvaloniaDemo", "Markdown.AvaloniaDemo\Markdown.AvaloniaDemo.csproj", "{51318A0F-CB37-4DA2-8AE1-BB985B0A4028}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown.AvaloniaDemo", "demos\Markdown.AvaloniaDemo\Markdown.AvaloniaDemo.csproj", "{51318A0F-CB37-4DA2-8AE1-BB985B0A4028}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown.AvaloniaFluentDemo", "Markdown.AvaloniaFluentDemo\Markdown.AvaloniaFluentDemo.csproj", "{BC6B016B-B353-4E73-A98E-556DC70E5850}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown.AvaloniaFluentDemo", "demos\Markdown.AvaloniaFluentDemo\Markdown.AvaloniaFluentDemo.csproj", "{BC6B016B-B353-4E73-A98E-556DC70E5850}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{AD84CF32-2208-43FD-95CE-31DF8DFEB2CD}"
 EndProject
@@ -25,9 +25,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTest.MdSyntax", "tests\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown.Avalonia.SyntaxHigh", "Markdown.Avalonia.SyntaxHigh\Markdown.Avalonia.SyntaxHigh.csproj", "{B3438E36-4598-49FB-8E52-65C231978E4D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown.AvaloniaFluentAvaloniaDemo", "Markdown.AvaloniaFluentAvaloniaDemo\Markdown.AvaloniaFluentAvaloniaDemo.csproj", "{58E76A9C-D28E-45BD-85F2-885FF3E4B363}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown.AvaloniaFluentAvaloniaDemo", "demos\Markdown.AvaloniaFluentAvaloniaDemo\Markdown.AvaloniaFluentAvaloniaDemo.csproj", "{58E76A9C-D28E-45BD-85F2-885FF3E4B363}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Markdown.Avalonia.Svg", "Markdown.Avalonia.Svg\Markdown.Avalonia.Svg.csproj", "{0514B7E7-23D6-4B9D-8943-995AE57493C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown.Avalonia.Svg", "Markdown.Avalonia.Svg\Markdown.Avalonia.Svg.csproj", "{0514B7E7-23D6-4B9D-8943-995AE57493C1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "demos", "demos", "{8F902BB3-7573-4180-A911-6CC019E999CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -188,10 +190,13 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{51318A0F-CB37-4DA2-8AE1-BB985B0A4028} = {8F902BB3-7573-4180-A911-6CC019E999CC}
+		{BC6B016B-B353-4E73-A98E-556DC70E5850} = {8F902BB3-7573-4180-A911-6CC019E999CC}
 		{B5F20CDD-025F-4BD8-A1AF-0F3EC9B6E8E4} = {AD84CF32-2208-43FD-95CE-31DF8DFEB2CD}
 		{A3A5D851-4041-403A-95F9-F4ADBA9602A0} = {AD84CF32-2208-43FD-95CE-31DF8DFEB2CD}
 		{C763BC05-5587-479E-8225-AA33F1F8F55B} = {AD84CF32-2208-43FD-95CE-31DF8DFEB2CD}
 		{BC356FD7-5D47-495A-9255-A4199AA8E3A1} = {AD84CF32-2208-43FD-95CE-31DF8DFEB2CD}
+		{58E76A9C-D28E-45BD-85F2-885FF3E4B363} = {8F902BB3-7573-4180-A911-6CC019E999CC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A7580602-9393-4620-89A0-6BFD34FFB7E0}

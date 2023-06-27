@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\Markdown.Avalonia.props" />
+  <Import Project="..\..\Markdown.Avalonia.props" />
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -23,12 +23,12 @@
     <None Remove="Assets\XamlTemplate.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\tests\UnitTest.Base\Utils\BrokenXamlWriter.cs" Link="BrokenXamlWriter.cs" />
-    <Compile Include="..\tests\UnitTest.Base\Utils\Util.cs" Link="Util.cs" />
+    <Compile Include="..\..\tests\UnitTest.Base\Utils\BrokenXamlWriter.cs" Link="BrokenXamlWriter.cs" />
+    <Compile Include="..\..\tests\UnitTest.Base\Utils\Util.cs" Link="Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj" />
-    <ProjectReference Include="..\Markdown.Avalonia.Svg\Markdown.Avalonia.Svg.csproj" />
+    <ProjectReference Include="..\..\Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj" />
+    <ProjectReference Include="..\..\Markdown.Avalonia.Svg\Markdown.Avalonia.Svg.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="LocalPath.png">
