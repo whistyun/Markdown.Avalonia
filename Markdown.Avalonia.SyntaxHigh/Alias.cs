@@ -4,13 +4,13 @@ namespace Markdown.Avalonia.SyntaxHigh
 {
     public class Alias
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        private string _realName;
-        private Uri _xshd;
+        private string? _realName;
+        private Uri? _xshd;
 
 
-        public string RealName
+        public string? RealName
         {
             get => _realName;
             set
@@ -19,7 +19,7 @@ namespace Markdown.Avalonia.SyntaxHigh
                 Validation(nameof(RealName));
             }
         }
-        public Uri XSHD
+        public Uri? XSHD
         {
             get => _xshd;
             set

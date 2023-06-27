@@ -69,7 +69,7 @@ namespace Markdown.Avalonia.SyntaxHigh.Extensions
 
                 var highlight = provider is null ?
                     HighlightingManager.Instance.GetDefinitionByExtension("." + codeLang) :
-                    provider.Solve(codeLang);
+                    provider.Solve(codeLang!);
 
                 if (highlight is null) return null;
 

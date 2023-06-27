@@ -26,8 +26,7 @@ namespace Markdown.Avalonia.SyntaxHigh
             _nameSolver = new Dictionary<string, string>();
             _definitions = new Dictionary<string, IHighlightingDefinition>();
 
-            _aliases.CollectionChanged += (s, e) =>
-            AliasesCollectionChanged(e);
+            _aliases.CollectionChanged += (s, e) => AliasesCollectionChanged(e);
             AliasesCollectionChanged(null);
         }
 
@@ -45,7 +44,7 @@ namespace Markdown.Avalonia.SyntaxHigh
             return HighlightingManager.Instance.GetDefinitionByExtension("." + lang);
         }
 
-        private void AliasesCollectionChanged(NotifyCollectionChangedEventArgs arg)
+        private void AliasesCollectionChanged(NotifyCollectionChangedEventArgs? arg)
         {
             IEnumerable<Alias> adding;
 
@@ -109,7 +108,7 @@ namespace Markdown.Avalonia.SyntaxHigh
                         null;
 
                 case "avares":
-                    return AssetLoader.Exists(source)?
+                    return AssetLoader.Exists(source) ?
                         Open(AssetLoader.Open(source)) :
                         null;
 

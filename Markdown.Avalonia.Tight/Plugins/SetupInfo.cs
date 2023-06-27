@@ -262,7 +262,7 @@ namespace Markdown.Avalonia.Plugins
                 _overrider = overrider;
             }
 
-            public override IEnumerable<Control> Convert(
+            public override IEnumerable<Control>? Convert(
                 string text,
                 Match firstMatch,
                 ParseStatus status,

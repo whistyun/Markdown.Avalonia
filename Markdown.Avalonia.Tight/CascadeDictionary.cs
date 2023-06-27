@@ -1,6 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography;
 
 namespace Markdown.Avalonia
 {
@@ -15,27 +17,38 @@ namespace Markdown.Avalonia
             Parent = new WeakReference<StyledElement>(element);
         }
 
+#if NET6_0_OR_GREATER
+        public bool TryGet(object key, [MaybeNullWhen(false)] out object? val)
+#else
         public bool TryGet(object key, out object val)
+#endif
         {
-            if (Owner.TryGetResource(key, null, out val))
+            if (Owner.TryGetResource(key, null, out var ownerRsc))
+            {
+                val = ownerRsc!;
                 return true;
+            }
 
             StyledElement? node;
 
-            if (Parent is null)
+            if (Parent is null || !Parent.TryGetTarget(out node))
+            {
+                val = null!;
                 return false;
-
-            if (!Parent.TryGetTarget(out node))
-                return false;
+            }
 
             while (node is object)
             {
-                if (node.TryGetResource(key, out val))
+                if (node.TryGetResource(key, out var rsc))
+                {
+                    val = rsc!;
                     return true;
+                }
 
                 node = node.Parent;
             }
 
+            val = null!;
             return false;
         }
     }

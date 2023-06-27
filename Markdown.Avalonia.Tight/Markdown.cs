@@ -162,13 +162,14 @@ namespace Markdown.Avalonia
 
         #region ParseInfo
 
-        private SetupInfo? _setupInfo;
+        private SetupInfo _setupInfo;
         private BlockParser[] _topBlockParsers;
         private BlockParser[] _blockParsers;
         private InlineParser[] _inlines;
         private bool _supportTextAlignment;
         private bool _supportStrikethrough;
         private bool _supportTextileInline;
+        private Dictionary<string, WeakReference<IImage>> _cache = new();
 
         #endregion
 
@@ -186,6 +187,12 @@ namespace Markdown.Avalonia
 
             HyperlinkCommand = new DefaultHyperlinkCommand();
             Plugins = new MdAvPlugins();
+
+            _setupInfo = null!;
+            _topBlockParsers = null!;
+            _blockParsers = null!;
+            _inlines = null!;
+            SetupParser();
 
             ImageNotFound = new Lazy<Bitmap>(
                 () =>
@@ -288,6 +295,7 @@ namespace Markdown.Avalonia
             _supportStrikethrough = info.EnableStrikethrough;
             _supportTextileInline = info.EnableTextileInline;
             _setupInfo = info;
+            _cache.Clear();
         }
 
 
@@ -652,15 +660,24 @@ namespace Markdown.Avalonia
                 }
             }
 
-#pragma warning disable CS0618
-            Task<IImage?> imageTask = BitmapLoader is not null ?
-                Task.Run(() => (IImage?)BitmapLoader?.Get(urlTxt)) :
-#pragma warning restore CS0618
-                LoadImageByPlugin(urlTxt, title);
+            CImage image;
 
-            var image = new CImage(
-                imageTask,
-                ImageNotFound.Value);
+            if (_cache.TryGetValue(urlTxt, out var bitmapRef) && bitmapRef.TryGetTarget(out var cachedBitmap))
+            {
+                image = new CImage(cachedBitmap ?? ImageNotFound.Value);
+            }
+            else
+            {
+#pragma warning disable CS0618
+                var imageTask = BitmapLoader is not null ?
+                    Task.Run(() => (IImage?)BitmapLoader?.Get(urlTxt)) :
+#pragma warning restore CS0618
+                    LoadImageByPlugin(urlTxt, title);
+
+                image = new CImage(
+                        imageTask,
+                        ImageNotFound.Value);
+            }
 
             if (!String.IsNullOrEmpty(title)
                 && !title.Any(ch => !Char.IsLetterOrDigit(ch)))
@@ -673,10 +690,26 @@ namespace Markdown.Avalonia
 
         private async Task<IImage?> LoadImageByPlugin(string urlTxt, string title)
         {
-            using var stream = await _setupInfo.PathResolver.ResolveImageResource(urlTxt);
+            foreach (var key in _cache.Keys.ToArray())
+            {
+                if (_cache[key].TryGetTarget(out var _))
+                    _cache.Remove(key);
+            }
 
-            if (stream is null)
+
+            var streamTask = _setupInfo.PathResolver.ResolveImageResource(urlTxt);
+            if (streamTask is null)
+            {
+                _cache[urlTxt] = new WeakReference<IImage>(ImageNotFound.Value);
                 return null;
+            }
+
+            using var stream = await streamTask;
+            if (stream is null)
+            {
+                _cache[urlTxt] = new WeakReference<IImage>(ImageNotFound.Value);
+                return null;
+            }
 
             Stream seekableStream;
             if (!stream.CanSeek)
@@ -698,16 +731,20 @@ namespace Markdown.Avalonia
 
                 if (image is not null)
                 {
+                    _cache[urlTxt] = new WeakReference<IImage>(image);
                     return image;
                 }
             }
 
             try
             {
-                return new Bitmap(reuseStream);
+                var image = new Bitmap(reuseStream);
+                _cache[urlTxt] = new WeakReference<IImage>(image);
+                return image;
             }
             catch
             {
+                _cache[urlTxt] = new WeakReference<IImage>(ImageNotFound.Value);
                 return null;
             }
         }

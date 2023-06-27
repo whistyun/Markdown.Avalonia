@@ -35,7 +35,7 @@ namespace Markdown.Avalonia.Controls
             _grid.LayoutUpdated += _grid_LayoutUpdated;
         }
 
-        private void _grid_LayoutUpdated(object sender, EventArgs e)
+        private void _grid_LayoutUpdated(object? sender, EventArgs e)
         {
             if (!GetIsEnabled(_grid))
             {
