@@ -13,36 +13,62 @@ using System.Collections.ObjectModel;
 using Markdown.Avalonia.SyntaxHigh.Extensions;
 using Markdown.Avalonia.Parsers;
 using System.Diagnostics;
+using System.Security.Cryptography.X509Certificates;
+using Avalonia.Metadata;
 
 namespace Markdown.Avalonia.SyntaxHigh
 {
     internal class SyntaxOverride : IBlockOverride
     {
         private SyntaxHighlightProvider _provider;
-
+        private SetupInfo _info;
 
         public string ParserName => "CodeBlocksWithLangEvaluator";
 
 
-        public SyntaxOverride(ObservableCollection<Alias> aliases)
+        public SyntaxOverride(ObservableCollection<Alias> aliases, SetupInfo info)
         {
             _provider = new SyntaxHighlightProvider(aliases);
+            _info = info;
         }
 
-
-        public IEnumerable<Control> Convert(
+        public IEnumerable<Control>? Convert(
             string text,
             Match match,
             ParseStatus status,
             IMarkdownEngine engine,
             out int parseTextBegin, out int parseTextEnd)
         {
+            var closeTagPattern = new Regex($"\n{match.Groups[1].Value}[ ]*\n");
+            var closeTagMatch = closeTagPattern.Match(text, match.Index + match.Length);
+
+            int codeEndIndex;
+            if (closeTagMatch.Success)
+            {
+                codeEndIndex = closeTagMatch.Index;
+                parseTextEnd = closeTagMatch.Index + closeTagMatch.Length;
+            }
+            else if (_info.EnablePreRenderingCodeBlock)
+            {
+                codeEndIndex = text.Length;
+                parseTextEnd = text.Length;
+            }
+            else
+            {
+                parseTextBegin = parseTextEnd = -1;
+                return null;
+            }
+
             parseTextBegin = match.Index;
-            parseTextEnd = match.Index + match.Length;
 
-            var lang = match.Groups[2].Value;
-            var code = match.Groups[3].Value;
+            string code = text.Substring(match.Index + match.Length, codeEndIndex - (match.Index + match.Length));
+            string lang = match.Groups[2].Value;
 
+            return Convert(lang, code);
+        }
+
+        private IEnumerable<Control> Convert(string lang, string code)
+        {
             if (String.IsNullOrEmpty(lang))
             {
                 var ctxt = new TextBlock()
@@ -61,7 +87,7 @@ namespace Markdown.Avalonia.SyntaxHigh
                 result.Classes.Add(Markdown.CodeBlockClass);
                 result.Child = scrl;
 
-                return new Control[] { result };
+                yield return result;
             }
             else
             {
@@ -83,7 +109,7 @@ namespace Markdown.Avalonia.SyntaxHigh
                 result.Classes.Add(Markdown.CodeBlockClass);
                 result.Child = txtEdit;
 
-                return new Control[] { result };
+                yield return result;
             }
         }
 

@@ -151,6 +151,7 @@
           <md:MarkdownScrollViewer.Plugins>
             <md:MdAvPlugins>
               <mdsvg:SvgFormat/>
+              <md:ChatAISetup/>
             </md:MdAvPlugins>
           </md:MarkdownScrollViewer.Plugins>
 

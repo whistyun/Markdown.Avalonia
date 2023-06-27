@@ -26,7 +26,7 @@ namespace Markdown.Avalonia.SyntaxHigh
 
         public void Setup(SetupInfo info)
         {
-            info.Register(new SyntaxOverride(Aliases));
+            info.Register(new SyntaxOverride(Aliases, info));
             info.Register(new StyleEdit());
         }
     }

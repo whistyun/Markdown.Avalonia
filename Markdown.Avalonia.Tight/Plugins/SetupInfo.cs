@@ -29,6 +29,8 @@ namespace Markdown.Avalonia.Plugins
         private bool _EnableListMarkerExt = true;
         private bool _EnableContainerBlockExt = true;
         private bool _EnableTextileInline = true;
+        private bool _EnablePreRenderingCodeBlock = false;
+
         private List<IContainerBlockHandler> ContainerBlocks { get; }
         private IPathResolver DefaultPathResolver => _defaultPathResolver ??= new DefaultPathResolver();
 
@@ -134,6 +136,17 @@ namespace Markdown.Avalonia.Plugins
                 _EnableTextileInline = value;
             }
         }
+
+        public bool EnablePreRenderingCodeBlock
+        {
+            get => _EnablePreRenderingCodeBlock;
+            set
+            {
+                CheckChangeable();
+                _EnablePreRenderingCodeBlock = value;
+            }
+        }
+
 
         public void Register(IBlockOverride overrider)
         {

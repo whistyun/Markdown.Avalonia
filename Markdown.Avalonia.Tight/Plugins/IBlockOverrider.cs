@@ -13,7 +13,7 @@ namespace Markdown.Avalonia.Plugins
     {
         string ParserName { get; }
 
-        IEnumerable<Control> Convert(
+        IEnumerable<Control>? Convert(
             string text, Match firstMatch, ParseStatus status,
             IMarkdownEngine engine,
             out int parseTextBegin, out int parseTextEnd);

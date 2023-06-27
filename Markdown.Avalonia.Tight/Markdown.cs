@@ -217,7 +217,7 @@ namespace Markdown.Avalonia
                 topBlocks.Add(BlockParser.New(_commonListNested, nameof(ListEvaluator), CommonListEvaluator));
             }
 
-            topBlocks.Add(BlockParser.New(_codeBlockFirst, nameof(CodeBlocksWithLangEvaluator), CodeBlocksWithLangEvaluator));
+            topBlocks.Add(BlockParser.New(_codeBlockBegin, nameof(CodeBlocksWithLangEvaluator), CodeBlocksWithLangEvaluator));
 
             if (info.EnableContainerBlockExt)
             {
@@ -1394,16 +1394,13 @@ namespace Markdown.Avalonia
 
         #region grammer - code block
 
-        private static readonly Regex _codeBlockFirst = new(@"
+        private static readonly Regex _codeBlockBegin = new(@"
                     ^          # Character before opening
                     [ ]{0,3}
                     (`{3,})          # $1 = Opening run of `
                     ([^\n`]*)        # $2 = The code lang
-                    \n
-                    ((.|\n)+?)       # $3 = The code block
-                    \n[ ]*
-                    \1
-                    (?!`)[\n]+", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
+                    \n", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
+
 
         private static readonly Regex _indentCodeBlock = new(@"
                     (?:\A|^[ ]*\n)
@@ -1414,8 +1411,33 @@ namespace Markdown.Avalonia
                     )
                     ", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
 
-        private Border CodeBlocksWithLangEvaluator(Match match)
-            => CodeBlocksEvaluator(match.Groups[3].Value);
+        private Border? CodeBlocksWithLangEvaluator(string text, Match match, out int parseTextBegin, out int parseTextEnd)
+        {
+            var closeTagPattern = new Regex($"\n{match.Groups[1].Value}[ ]*\n");
+            var closeTagMatch = closeTagPattern.Match(text, match.Index + match.Length);
+
+            int codeEndIndex;
+            if (closeTagMatch.Success)
+            {
+                codeEndIndex = closeTagMatch.Index;
+                parseTextEnd = closeTagMatch.Index + closeTagMatch.Length;
+            }
+            else if (_setupInfo.EnablePreRenderingCodeBlock)
+            {
+                codeEndIndex = text.Length;
+                parseTextEnd = text.Length;
+            }
+            else
+            {
+                parseTextBegin = parseTextEnd = -1;
+                return null;
+            }
+
+            parseTextBegin = match.Index;
+
+            string code = text.Substring(match.Index + match.Length, codeEndIndex - (match.Index + match.Length));
+            return CodeBlocksEvaluator(code);
+        }
 
         private Border CodeBlocksWithoutLangEvaluator(Match match)
         {
