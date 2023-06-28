@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\Markdown.Avalonia.props" />
 
@@ -6,6 +6,8 @@
     <TargetFrameworks>$(PackageTargetFrameworks)</TargetFrameworks>
     <Version>$(PackageVersion)</Version>
     <Authors>Bevan Arps(original); whistyun</Authors>
+    <AssemblyName>Markdown.Avalonia.Full</AssemblyName>
+    <RootNamespace>Markdown.Avalonia.Full</RootNamespace>
     <Company />
     <Description>Markdown Controls for Avalonia</Description>
     <Copyright>Copyright (c) 2010 Bevan Arps, 2020 whistyun</Copyright>
@@ -23,10 +25,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\pack_readme\Markdown.Avalonia.md" Pack="true" PackagePath="\"/>
+    <None Include="..\pack_readme\Markdown.Avalonia.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Markdown.Avalonia.Svg\Markdown.Avalonia.Svg.csproj" />
     <ProjectReference Include="..\Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(EnableAvaloniaEdit)' == 'enabled'">

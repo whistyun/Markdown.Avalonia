@@ -1,0 +1,172 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+
+        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+        xmlns:vm="clr-namespace:Markdown.AvaloniaFluentDemo.ViewModels;assembly=Markdown.AvaloniaFluentDemo"
+        xmlns:local="clr-namespace:Markdown.AvaloniaFluentDemo;assembly=Markdown.AvaloniaFluentDemo"
+
+        xmlns:md="https://github.com/whistyun/Markdown.Avalonia.Tight"
+        xmlns:mdsvg="https://github.com/whistyun/Markdown.Avalonia.Svg"
+
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
+        x:Class="Markdown.AvaloniaFluentDemo.Views.MainWindow"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Markdown.AvaloniaFluentDemo"
+        >
+
+  <Design.DataContext>
+    <vm:MainWindowViewModel/>
+  </Design.DataContext>
+
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="10*"/>
+      <ColumnDefinition Width="10*"/>
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="10*"/>
+    </Grid.RowDefinitions>
+
+    <TabControl
+      Grid.Row="0"
+      Grid.Column="0"
+      VerticalAlignment="Stretch">
+
+      <TabItem
+          Header="Source"
+          Grid.Row="0"
+          Grid.Column="0"
+          >
+
+        <TextBox
+          VerticalAlignment="Stretch"
+          AcceptsReturn="True"
+          Text="{Binding Text}"
+          TextWrapping="Wrap"
+          />
+
+      </TabItem>
+
+      <TabItem Header="Style">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="10*"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="10*"/>
+          </Grid.RowDefinitions>
+
+          <Border
+              Grid.Row="0"
+              Grid.Column="0"
+              Grid.ColumnSpan="2"
+              Padding="1"
+              Margin="1"
+              BorderThickness="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}">
+
+            <DockPanel LastChildFill="True">
+              <DockPanel DockPanel.Dock="Top" LastChildFill="False">
+                <TextBlock DockPanel.Dock="Left">Append Styles</TextBlock>
+                <Button DockPanel.Dock="Right" Content="Parse" Command="{Binding TryParse}"/>
+              </DockPanel>
+
+              <Expander Header="Error" DockPanel.Dock="Bottom" IsExpanded="True">
+                <TextBlock Foreground="Red"
+                           Text="{Binding ErrorInfo}"/>
+              </Expander>
+              <TextBox
+                  AcceptsReturn="True"
+                  TextWrapping="NoWrap"
+                  Text="{Binding EdittingStyleXamlText}"
+                  />
+            </DockPanel>
+          </Border>
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="Other">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="10*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+
+          <TextBlock Grid.Row="0" Grid.Column="0"
+              VerticalAlignment="Center">
+            AssetPathRoot
+          </TextBlock>
+
+          <TextBox Grid.Row="0" Grid.Column="1"
+                   Text="{Binding AssetPathRootText}" />
+
+          <Button Grid.Row="0" Grid.Column="2"
+                  Content="Apply"
+                  Command="{Binding ApplyAssetPathRoot}" />
+
+          <TextBlock Grid.Row="1" Grid.Column="0"
+              VerticalAlignment="Center">
+            Source
+          </TextBlock>
+
+          <TextBox Grid.Row="1" Grid.Column="1"
+                   Text="{Binding SourceText}"/>
+
+          <Button Grid.Row="1" Grid.Column="2"
+                  Content="Apply"
+                  Command="{Binding ApplySource}" />
+
+        </Grid>
+
+      </TabItem>
+
+    </TabControl>
+
+    <TabControl
+          Grid.Row="0"
+          Grid.Column="1"
+          VerticalAlignment="Stretch">
+
+      <TabItem Header="View">
+        <md:MarkdownScrollViewer
+          x:Name="MarkdownViewer"
+          SaveScrollValueWhenContentUpdated="True"
+          
+          Markdown="{Binding Text}"
+
+          AssetPathRoot="{Binding AssetPathRoot}"
+          Source="{Binding Source}"
+      
+          local:DynamicStyleBehavior.XamlText="{Binding AppendStyleXamlText}"
+          local:DynamicStyleBehavior.ValidationResult="{Binding XamlParseResult}">
+
+          <md:MarkdownScrollViewer.Plugins>
+            <md:MdAvPlugins>
+              <mdsvg:SvgFormat/>
+              <md:ChatAISetup/>
+            </md:MdAvPlugins>
+          </md:MarkdownScrollViewer.Plugins>
+
+        </md:MarkdownScrollViewer>
+      </TabItem>
+
+      <TabItem Header="Xaml (broken)" x:Name="SourceTab">
+        <TextBox
+            x:Name="MarkdownSource"
+            AcceptsReturn="True"
+            TextWrapping="NoWrap"
+            />
+      </TabItem>
+    </TabControl>
+
+  </Grid>
+
+</Window>

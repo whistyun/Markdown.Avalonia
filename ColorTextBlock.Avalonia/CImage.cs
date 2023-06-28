@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia.Media;
 
 namespace ColorTextBlock.Avalonia
 {
@@ -64,11 +65,11 @@ namespace ColorTextBlock.Avalonia
             set => SetValue(SaveAspectRatioProperty, value);
         }
 
-        public Task<Bitmap?>? Task { get; }
-        private Bitmap WhenError { get; }
-        public Bitmap? Image { private set; get; }
+        public Task<IImage?>? Task { get; }
+        private IImage WhenError { get; }
+        public IImage? Image { private set; get; }
 
-        public CImage(Task<Bitmap?> task, Bitmap whenError)
+        public CImage(Task<IImage?> task, IImage whenError)
         {
             if (task is null) throw new NullReferenceException(nameof(task));
             if (whenError is null) throw new NullReferenceException(nameof(whenError));
@@ -77,10 +78,10 @@ namespace ColorTextBlock.Avalonia
             this.WhenError = whenError;
         }
 
-        public CImage(Bitmap bitmap)
+        public CImage(IImage image)
         {
-            if (bitmap is null) throw new NullReferenceException(nameof(bitmap));
-            this.WhenError = this.Image = bitmap;
+            if (image is null) throw new NullReferenceException(nameof(image));
+            this.WhenError = this.Image = image;
         }
 
         protected override IEnumerable<CGeometry> MeasureOverride(
@@ -112,8 +113,12 @@ namespace ColorTextBlock.Avalonia
                     System.Threading.Tasks.Task.Run(() =>
                     {
                         Task.Wait();
-                        Image = Task.IsFaulted ? WhenError : Task.Result ?? WhenError;
-                        Dispatcher.UIThread.InvokeAsync(RequestMeasure);
+                        Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            Image = Task.IsFaulted ? WhenError : Task.Result ?? WhenError;
+                            RequestMeasure();
+                        });
+
                     });
                 }
             }
@@ -163,7 +168,7 @@ namespace ColorTextBlock.Avalonia
                 }
             }
 
-            yield return new BitmapGeometry(Image, imageWidth, imageHeight,
+            yield return new ImageGeometry(Image, imageWidth, imageHeight,
                 TextVerticalAlignment);
         }
 

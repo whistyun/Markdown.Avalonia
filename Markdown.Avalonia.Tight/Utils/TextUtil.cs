@@ -159,10 +159,12 @@ namespace Markdown.Avalonia.Utils
 
             if (valid)
                 output.Append(line);
-            output.Append('\n');
+
+            if (output.Length >= 1 && output[output.Length - 1] != '\n')
+                output.Append('\n');
 
             // add two newlines to the end before return
-            return output.Append("\n\n").ToString();
+            return output.ToString();
         }
 
     }

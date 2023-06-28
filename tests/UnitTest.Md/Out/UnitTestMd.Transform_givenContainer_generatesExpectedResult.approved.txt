@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="https://github.com/whistyun/Markdown.Avalonia.Tight" xmlns:ma="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
   <Border Classes="CodeBlock,NoContainer" xmlns="">
     <Border.Child>
       <ScrollViewer Classes="CodeBlock">
@@ -74,7 +74,7 @@
       <RowDefinition />
     </Grid.RowDefinitions>
   </Grid>
-  <m:Rule BoldLineWidth="2" Classes="Bold" />
+  <ma:Rule BoldLineWidth="2" Classes="Bold" />
   <Grid Classes="List" xmlns="">
     <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
       <c:CRun Text="▪" />
@@ -101,7 +101,7 @@
       <RowDefinition />
     </Grid.RowDefinitions>
   </Grid>
-  <m:Rule BoldLineWidth="2" Classes="TwoLines" />
+  <ma:Rule BoldLineWidth="2" Classes="TwoLines" />
   <Grid Classes="List" xmlns="">
     <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
       <c:CRun Text="1." />
@@ -128,12 +128,12 @@
       <RowDefinition />
     </Grid.RowDefinitions>
   </Grid>
-  <m:Rule BoldLineWidth="2" Classes="TwoLines" />
+  <ma:Rule BoldLineWidth="2" Classes="TwoLines" />
   <Border Classes="CodeBlock,NoContainer" xmlns="">
     <Border.Child>
       <ScrollViewer Classes="CodeBlock">
         <ScrollViewer.Content>
-          <TextBlock Text="::: md&#xA;&#xA;* list1&#xA;* list2&#xA;&#xA;```cs&#xA;#define FooBar&#xA;```&#xA;:::&#xA;&#xA;&#xA;" Classes="CodeBlock" />
+          <TextBlock Text="::: md&#xA;&#xA;* list1&#xA;* list2&#xA;&#xA;```cs&#xA;#define FooBar&#xA;```&#xA;:::&#xA;" Classes="CodeBlock" />
         </ScrollViewer.Content>
       </ScrollViewer>
     </Border.Child>

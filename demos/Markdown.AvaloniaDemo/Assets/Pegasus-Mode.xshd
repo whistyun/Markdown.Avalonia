@@ -1,0 +1,153 @@
+﻿<?xml version="1.0"?>
+<SyntaxDefinition name="Pegasus" extensions=".peg" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <!-- The named colors 'Comment' and 'String' are used in SharpDevelop to detect if a line is inside a multiline string/comment -->
+  <Color name="Comment" foreground="Green" exampleText="// comment" />
+  <Color name="Regex" foreground="Red" exampleText="string text = &quot;Hello, World!&quot;"/>
+  <Color name="String" foreground="Blue" exampleText="string text = &quot;Hello, World!&quot;"/>
+  <Color name="StringInterpolation" foreground="Black" exampleText="string text = $&quot;Hello, {name}!&quot;"/>
+  <Color name="Char" foreground="Magenta" exampleText="char linefeed = '\n';"/>
+  <Color name="Preprocessor" foreground="Green" exampleText="#region Title" />
+  <Color name="Punctuation" exampleText="a(b.c);" />
+  <Color name="ValueTypeKeywords" fontWeight="bold" foreground="Red" exampleText="bool b = true;" />
+  <Color name="ReferenceTypeKeywords" foreground="Red" exampleText="object o;" />
+  <Color name="MethodCall" foreground="MidnightBlue" fontWeight="bold" exampleText="o.ToString();"/>
+  <Color name="NumberLiteral" foreground="DarkBlue" exampleText="3.1415f"/>
+  <Color name="ThisOrBaseReference" fontWeight="bold" exampleText="this.Do(); base.Do();"/>
+  <Color name="NullOrValueKeywords" fontWeight="bold" exampleText="if (value == null)"/>
+  <Color name="Keywords" fontWeight="bold" foreground="Blue" exampleText="if (a) {} else {}"/>
+  <Color name="FlagWords" foreground="Blue" exampleText="-public"/>
+  <Color name="GotoKeywords" foreground="Navy" exampleText="continue; return null;"/>
+  <Color name="ContextKeywords" foreground="Navy" exampleText="var a = from x in y select z;"/>
+  <Color name="ExceptionKeywords" fontWeight="bold" foreground="Teal" exampleText="try {} catch {} finally {}"/>
+  <Color name="CheckedKeyword" fontWeight="bold" foreground="DarkGray" exampleText="checked {}"/>
+  <Color name="UnsafeKeywords" foreground="Olive" exampleText="unsafe { fixed (..) {} }"/>
+  <Color name="OperatorKeywords" fontWeight="bold" foreground="Pink" exampleText="public static implicit operator..."/>
+  <Color name="ParameterModifiers" fontWeight="bold" foreground="DeepPink" exampleText="(ref int a, params int[] b)"/>
+  <Color name="Modifiers" foreground="Brown" exampleText="static readonly int a;"/>
+  <Color name="Visibility" fontWeight="bold" foreground="Blue" exampleText="public override void ToString();"/>
+  <Color name="NamespaceKeywords" fontWeight="bold" foreground="Green" exampleText="namespace A.B { using System; }"/>
+  <Color name="GetSetAddRemove" foreground="SaddleBrown" exampleText="int Prop { get; set; }"/>
+  <Color name="TrueFalse" fontWeight="bold" foreground="DarkCyan" exampleText="b = false; a = true;" />
+  <Color name="TypeKeywords" fontWeight="bold" foreground="DarkCyan" exampleText="if (x is int) { a = x as int; type = typeof(int); size = sizeof(int); c = new object(); }"/>
+  <Color name="SemanticKeywords" fontWeight="bold" foreground="DarkCyan" exampleText="if (args == null) throw new ArgumentNullException(nameof(args));" />
+
+  <Property name="DocCommentMarker" value="///" />
+
+  <RuleSet name="CommentMarkerSet">
+    <Keywords fontWeight="bold" foreground="Red">
+      <Word>TODO</Word>
+      <Word>FIXME</Word>
+    </Keywords>
+    <Keywords fontWeight="bold" foreground="#E0E000">
+      <Word>HACK</Word>
+      <Word>UNDONE</Word>
+    </Keywords>
+  </RuleSet>
+
+  <RuleSet name="CSCode">
+    <Import ruleSet="C#/" />
+    <Span ruleSet="CSCode" multiline="true">
+      <Begin>\{</Begin>
+      <End>\}</End>
+    </Span>
+  </RuleSet>
+
+  <!-- This is the main ruleset. -->
+  <RuleSet>
+    <Keywords color="SemanticKeywords">
+      <Word>\#error</Word>
+      <Word>\#parse</Word>
+    </Keywords>
+    <Keywords color="Keywords">
+      <Word>@namespace</Word>
+      <Word>@accessibility</Word>
+      <Word>@classname</Word>
+      <Word>@ignorecase</Word>
+      <Word>@resources</Word>
+      <Word>@start</Word>
+      <Word>@trace</Word>
+      <Word>@using</Word>
+      <Word>@members</Word>
+    </Keywords>
+    <Keywords color="FlagWords">
+      <Word>-memoize</Word>
+      <Word>-lexical</Word>
+      <Word>-export</Word>
+      <Word>-public</Word>
+    </Keywords>
+
+    <Span color="Comment">
+      <Begin color="XmlDoc/DocComment">///(?!/)</Begin>
+      <RuleSet>
+        <Import ruleSet="XmlDoc/DocCommentSet"/>
+        <Import ruleSet="CommentMarkerSet"/>
+      </RuleSet>
+    </Span>
+
+    <Span color="Comment" ruleSet="CommentMarkerSet">
+      <Begin>//</Begin>
+    </Span>
+
+    <Span color="Comment" ruleSet="CommentMarkerSet" multiline="true">
+      <Begin>/\*</Begin>
+      <End>\*/</End>
+    </Span>
+
+    <Span color="Regex">
+      <Begin>\[</Begin>
+      <End>\]</End>
+      <RuleSet>
+        <!-- span for escape sequences -->
+        <Span begin="\\" end="."/>
+      </RuleSet>
+    </Span>
+
+    <Span color="String">
+      <Begin>"</Begin>
+      <End>"</End>
+      <RuleSet>
+        <!-- span for escape sequences -->
+        <Span begin="\\" end="."/>
+      </RuleSet>
+    </Span>
+
+    <Span color="Char">
+      <Begin>'</Begin>
+      <End>'</End>
+      <RuleSet>
+        <!-- span for escape sequences -->
+        <Span begin="\\" end="."/>
+      </RuleSet>
+    </Span>
+
+    <Span color="String" multiline="true">
+      <Begin>@"</Begin>
+      <End>"</End>
+      <RuleSet>
+        <!-- span for escape sequences -->
+        <Span begin='""' end=""/>
+      </RuleSet>
+    </Span>
+
+    <Span color="String">
+      <Begin>\$"</Begin>
+      <End>"</End>
+      <RuleSet>
+        <!-- span for escape sequences -->
+        <Span begin="\\" end="."/>
+        <Span begin="\{\{" end=""/>
+        <!-- string interpolation -->
+        <Span begin="{" end="}" color="StringInterpolation" ruleSet=""/>
+      </RuleSet>
+    </Span>
+
+    <Span ruleSet="CSCode" multiline="true">
+      <Begin>\{</Begin>
+      <End>\}</End>
+    </Span>
+
+    <Rule color="Punctuation">
+      [?,.;(){}+\-/%*&lt;&gt;^+~!|&amp;]+
+    </Rule>
+  </RuleSet>
+</SyntaxDefinition>

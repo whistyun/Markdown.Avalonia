@@ -75,7 +75,7 @@
     <Border.Child>
       <ScrollViewer Classes="CodeBlock">
         <ScrollViewer.Content>
-          <TextBlock Text="::: plugin&#xA;* one&#xA;* two&#xA;* three&#xA;:::&#xA;&#xA;&#xA;" Classes="CodeBlock" />
+          <TextBlock Text="::: plugin&#xA;* one&#xA;* two&#xA;* three&#xA;:::&#xA;" Classes="CodeBlock" />
         </ScrollViewer.Content>
       </ScrollViewer>
     </Border.Child>
