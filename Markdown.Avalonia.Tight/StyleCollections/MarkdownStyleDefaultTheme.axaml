@@ -79,6 +79,12 @@
     </Style.Setters>
   </Style>
 
+  <Style Selector="Grid.Table">
+    <Style.Setters>
+      <Setter Property="mdc:AutoScaleColumnDefinitions.IsEnabled" Value="True"/>
+    </Style.Setters>
+  </Style>
+
   <Style Selector="Border.TableHeader">
     <Style.Setters>
       <Setter Property="Background" Value="{mde:Alpha ThemeForegroundColor, 0.3}"/>

@@ -141,6 +141,12 @@
     </Style.Setters>
   </Style>
 
+  <Style Selector="Grid.Table">
+    <Style.Setters>
+      <Setter Property="mdc:AutoScaleColumnDefinitions.IsEnabled" Value="True"/>
+    </Style.Setters>
+  </Style>
+
   <Style Selector="Border.TableHeader ctxt|CTextBlock">
     <Style.Setters>
       <Setter Property="FontWeight" Value="Bold"/>

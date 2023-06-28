@@ -15,44 +15,9 @@ namespace Markdown.Avalonia
 {
     public static class MarkdownStyle
     {
-        private static readonly Dictionary<string, Action<Styles>> s_styleOverrideMap;
-
-        static MarkdownStyle()
-        {
-            s_styleOverrideMap = new Dictionary<string, Action<Styles>>();
-
-            try
-            {
-                var actions = InterassemblyUtil.InvokeInstanceMethodToGetProperty
-                    <IEnumerable<KeyValuePair<string, Action<Styles>>>>(
-                    "Markdown.Avalonia.SyntaxHigh",
-                    "Markdown.Avalonia.SyntaxHigh.StyleSetup",
-                    "GetOverrideStyles");
-
-                if (actions is null)
-                    throw new NullReferenceException("action");
-
-                foreach (var action in actions)
-                    s_styleOverrideMap[action.Key] = action.Value;
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.GetType().Name + ":" + e.Message);
-            }
-
-        }
-
-        private static Styles Filter(string name, Styles origin)
-        {
-            if (s_styleOverrideMap.TryGetValue(name, out var filter))
-                filter(origin);
-
-            return origin;
-        }
-
         public static Styles Standard
         {
-            get => Filter(nameof(Standard), new MarkdownStyleStandard());
+            get => new MarkdownStyleStandard();
         }
 
         [Obsolete("Use SimpleTheme instead")]
@@ -63,22 +28,22 @@ namespace Markdown.Avalonia
 
         public static Styles SimpleTheme
         {
-            get => Filter(nameof(SimpleTheme), new MarkdownStyleDefaultTheme());
+            get => new MarkdownStyleDefaultTheme();
         }
 
         public static Styles FluentTheme
         {
-            get => Filter(nameof(FluentTheme), new MarkdownStyleFluentTheme());
+            get => new MarkdownStyleFluentTheme();
         }
 
         public static Styles FluentAvalonia
         {
-            get => Filter(nameof(FluentAvalonia), new MarkdownStyleFluentAvalonia());
+            get => new MarkdownStyleFluentAvalonia();
         }
 
         public static Styles GithubLike
         {
-            get => Filter(nameof(GithubLike), new MarkdownStyleGithubLike());
+            get => new MarkdownStyleGithubLike();
         }
     }
 }

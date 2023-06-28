@@ -5,6 +5,8 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Metadata;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using Markdown.Avalonia.Plugins;
+using Markdown.Avalonia.StyleCollections;
 using Markdown.Avalonia.Utils;
 using System;
 using System.IO;
@@ -67,11 +69,17 @@ namespace Markdown.Avalonia
         private static readonly HttpClient _httpclient = new();
 
         private readonly ScrollViewer _viewer;
+        private SetupInfo _setup;
 
         public MarkdownScrollViewer()
         {
+            _plugins = new MdAvPlugins();
+            _setup = Plugins.Info;
+
             var md = new Markdown();
             md.CascadeResources.SetParent(this);
+            md.UseResource = _useResource;
+            md.Plugins = _plugins;
 
             _engine = md;
 
@@ -110,6 +118,18 @@ namespace Markdown.Avalonia
             static bool nvl(bool? vl) => vl.HasValue && vl.Value;
         }
 
+        private void EditStyle(IStyle mdstyle)
+        {
+            if (mdstyle is INamedStyle nameStyle && !nameStyle.IsEditted
+             && mdstyle is Styles styles)
+            {
+                foreach (var edit in _setup.StyleEdits)
+                    edit.Edit(nameStyle.Name, styles);
+
+                nameStyle.IsEditted = true;
+            }
+        }
+
         private void UpdateMarkdown()
         {
             var doc = Engine.Transform(Markdown ?? "");
@@ -133,6 +153,7 @@ namespace Markdown.Avalonia
 
                 _engine.CascadeResources.SetParent(this);
                 _engine.UseResource = _useResource;
+                _engine.Plugins = _plugins;
 
                 if (AssetPathRoot is not null)
                     _engine.AssetPathRoot = AssetPathRoot;
@@ -305,6 +326,8 @@ namespace Markdown.Avalonia
 
                 if (_markdownStyle != value)
                 {
+                    EditStyle(value);
+
                     if (_markdownStyle is not null)
                         Styles.Remove(_markdownStyle);
 
@@ -345,6 +368,20 @@ namespace Markdown.Avalonia
                 }
 
                 static bool nvl(bool? vl) => vl.HasValue && vl.Value;
+            }
+        }
+
+        private MdAvPlugins _plugins;
+        public MdAvPlugins Plugins
+        {
+            get => _plugins;
+            set
+            {
+                _plugins = Engine.Plugins = value;
+                _setup = Plugins.Info;
+
+                EditStyle(MarkdownStyle);
+                UpdateMarkdown();
             }
         }
 

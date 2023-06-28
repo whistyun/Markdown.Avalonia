@@ -4,13 +4,15 @@ using System.Text;
 
 namespace Markdown.Avalonia.Parsers
 {
-    struct ParseStatus
+    public struct ParseStatus
     {
-        public static readonly ParseStatus Init = new ParseStatus
-        {
-            SupportTextAlignment = true
-        };
+        public static readonly ParseStatus Init = new ParseStatus(true);
 
-        public bool SupportTextAlignment { get; set; }
+        public bool SupportTextAlignment { get; }
+
+        public ParseStatus(bool supportTextAlignment)
+        {
+            SupportTextAlignment = supportTextAlignment;
+        }
     }
 }

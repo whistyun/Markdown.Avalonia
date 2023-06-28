@@ -88,6 +88,7 @@ namespace ColorTextBlock.Avalonia
         private CGeometry? _entered;
         private CGeometry? _pressed;
         private string? _text;
+        private bool _measureRequested;
 
         public IBrush? Background
         {
@@ -439,6 +440,7 @@ namespace ColorTextBlock.Avalonia
         {
             if (_computedBaseHeight != GetValue(BaseHeightProperty))
             {
+                _measureRequested = true;
                 InvalidateMeasure();
                 InvalidateArrange();
             }
@@ -447,6 +449,7 @@ namespace ColorTextBlock.Avalonia
         internal void OnMeasureSourceChanged()
         {
             SetValue(BaseHeightProperty, default);
+            _measureRequested = true;
             InvalidateMeasure();
             InvalidateArrange();
         }
@@ -482,8 +485,9 @@ namespace ColorTextBlock.Avalonia
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            if (_measured.Width == 0d || !MathUtilities.AreClose(availableSize.Width, _constraint.Width))
+            if (_measured.Width == 0d || !MathUtilities.AreClose(availableSize.Width, _constraint.Width) || _measureRequested)
             {
+                _measureRequested = false;
                 _constraint = availableSize;
                 _measured = UpdateGeometry();
             }
@@ -619,7 +623,6 @@ namespace ColorTextBlock.Avalonia
 
         public override void Render(DrawingContext context)
         {
-            UpdateGeometry();
             if (Background != null)
             {
                 context.FillRectangle(Background, new Rect(0, 0, Bounds.Width, Bounds.Height));
