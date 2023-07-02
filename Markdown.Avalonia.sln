@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown.Avalonia.Svg", "Ma
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "demos", "demos", "{8F902BB3-7573-4180-A911-6CC019E999CC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Markdown.Avalonia.Html", "Markdown.Avalonia.Html\Markdown.Avalonia.Html.csproj", "{CDAC497D-BF0F-48F0-A156-8DE2DAB15492}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -185,6 +187,18 @@ Global
 		{0514B7E7-23D6-4B9D-8943-995AE57493C1}.Release|x64.Build.0 = Release|Any CPU
 		{0514B7E7-23D6-4B9D-8943-995AE57493C1}.Release|x86.ActiveCfg = Release|Any CPU
 		{0514B7E7-23D6-4B9D-8943-995AE57493C1}.Release|x86.Build.0 = Release|Any CPU
+		{CDAC497D-BF0F-48F0-A156-8DE2DAB15492}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDAC497D-BF0F-48F0-A156-8DE2DAB15492}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDAC497D-BF0F-48F0-A156-8DE2DAB15492}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CDAC497D-BF0F-48F0-A156-8DE2DAB15492}.Debug|x64.Build.0 = Debug|Any CPU
+		{CDAC497D-BF0F-48F0-A156-8DE2DAB15492}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CDAC497D-BF0F-48F0-A156-8DE2DAB15492}.Debug|x86.Build.0 = Debug|Any CPU
+		{CDAC497D-BF0F-48F0-A156-8DE2DAB15492}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDAC497D-BF0F-48F0-A156-8DE2DAB15492}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDAC497D-BF0F-48F0-A156-8DE2DAB15492}.Release|x64.ActiveCfg = Release|Any CPU
+		{CDAC497D-BF0F-48F0-A156-8DE2DAB15492}.Release|x64.Build.0 = Release|Any CPU
+		{CDAC497D-BF0F-48F0-A156-8DE2DAB15492}.Release|x86.ActiveCfg = Release|Any CPU
+		{CDAC497D-BF0F-48F0-A156-8DE2DAB15492}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -100,8 +100,16 @@ namespace Markdown.Avalonia
         private string[] _assetAssemblyNames;
         public IEnumerable<string> AssetAssemblyNames => _assetAssemblyNames;
 
+        private ICommand? _hyperlinkCommand;
         /// <inheritdoc/>
-        public ICommand? HyperlinkCommand { get; set; }
+        public ICommand? HyperlinkCommand
+        {
+            get => _hyperlinkCommand ?? _setupInfo?.HyperlinkCommand;
+            set
+            {
+                _hyperlinkCommand = value;
+            }
+        }
 
         public MdAvPlugins Plugins { get; set; }
 
@@ -126,14 +134,11 @@ namespace Markdown.Avalonia
         public IContainerBlockHandler? ContainerBlockHandler
         {
             get => _containerBlockHandler ?? _setupInfo?.ContainerBlock;
-            [Obsolete("Please use Plugins propety. see https://github.com/whistyun/Markdown.Avalonia/wiki/How-to-migrages-to-ver11")]
             set
             {
                 _containerBlockHandler = value;
             }
         }
-
-        private Lazy<Bitmap> ImageNotFound { get; }
 
         public CascadeDictionary CascadeResources { get; } = new CascadeDictionary();
 
@@ -169,7 +174,6 @@ namespace Markdown.Avalonia
         private bool _supportTextAlignment;
         private bool _supportStrikethrough;
         private bool _supportTextileInline;
-        private Dictionary<string, WeakReference<IImage>> _cache = new();
 
         #endregion
 
@@ -185,7 +189,6 @@ namespace Markdown.Avalonia
                             .Distinct()
                             .ToArray();
 
-            HyperlinkCommand = new DefaultHyperlinkCommand();
             Plugins = new MdAvPlugins();
 
             _setupInfo = null!;
@@ -193,13 +196,6 @@ namespace Markdown.Avalonia
             _blockParsers = null!;
             _inlines = null!;
             SetupParser();
-
-            ImageNotFound = new Lazy<Bitmap>(
-                () =>
-                {
-                    using var strm = AssetLoader.Open(new Uri($"avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"));
-                    return new Bitmap(strm);
-                });
         }
 
         private void SetupParser()
@@ -283,9 +279,12 @@ namespace Markdown.Avalonia
 
 
             // inform path info to resolver
-
             info.PathResolver.AssetPathRoot = AssetPathRoot;
             info.PathResolver.CallerAssemblyNames = AssetAssemblyNames;
+
+            info.Overwrite(_hyperlinkCommand);
+            info.Overwrite(_containerBlockHandler);
+            info.Overwrite(_loader);
 
 
             _topBlockParsers = topBlocks.Select(p => info.Override(p)).ToArray();
@@ -295,7 +294,6 @@ namespace Markdown.Avalonia
             _supportStrikethrough = info.EnableStrikethrough;
             _supportTextileInline = info.EnableTextileInline;
             _setupInfo = info;
-            _cache.Clear();
         }
 
 
@@ -660,24 +658,7 @@ namespace Markdown.Avalonia
                 }
             }
 
-            CImage image;
-
-            if (_cache.TryGetValue(urlTxt, out var bitmapRef) && bitmapRef.TryGetTarget(out var cachedBitmap))
-            {
-                image = new CImage(cachedBitmap ?? ImageNotFound.Value);
-            }
-            else
-            {
-#pragma warning disable CS0618
-                var imageTask = BitmapLoader is not null ?
-                    Task.Run(() => (IImage?)BitmapLoader?.Get(urlTxt)) :
-#pragma warning restore CS0618
-                    LoadImageByPlugin(urlTxt, title);
-
-                image = new CImage(
-                        imageTask,
-                        ImageNotFound.Value);
-            }
+            CImage image = _setupInfo.LoadImage(urlTxt);
 
             if (!String.IsNullOrEmpty(title)
                 && !title.Any(ch => !Char.IsLetterOrDigit(ch)))
@@ -687,69 +668,6 @@ namespace Markdown.Avalonia
 
             return image;
         }
-
-        private async Task<IImage?> LoadImageByPlugin(string urlTxt, string title)
-        {
-            foreach (var key in _cache.Keys.ToArray())
-            {
-                if (_cache[key].TryGetTarget(out var _))
-                    _cache.Remove(key);
-            }
-
-
-            var streamTask = _setupInfo.PathResolver.ResolveImageResource(urlTxt);
-            if (streamTask is null)
-            {
-                _cache[urlTxt] = new WeakReference<IImage>(ImageNotFound.Value);
-                return null;
-            }
-
-            using var stream = await streamTask;
-            if (stream is null)
-            {
-                _cache[urlTxt] = new WeakReference<IImage>(ImageNotFound.Value);
-                return null;
-            }
-
-            Stream seekableStream;
-            if (!stream.CanSeek)
-            {
-                seekableStream = new MemoryStream();
-                await stream.CopyToAsync(seekableStream);
-            }
-            else
-            {
-                seekableStream = stream;
-            }
-
-            var reuseStream = new UnclosableStream(seekableStream);
-
-            foreach (var imageResolver in _setupInfo.ImageResolvers)
-            {
-                reuseStream.Position = 0;
-                var image = await imageResolver.Load(reuseStream);
-
-                if (image is not null)
-                {
-                    _cache[urlTxt] = new WeakReference<IImage>(image);
-                    return image;
-                }
-            }
-
-            try
-            {
-                var image = new Bitmap(reuseStream);
-                _cache[urlTxt] = new WeakReference<IImage>(image);
-                return image;
-            }
-            catch
-            {
-                _cache[urlTxt] = new WeakReference<IImage>(ImageNotFound.Value);
-                return null;
-            }
-        }
-
-
 
 
         #endregion

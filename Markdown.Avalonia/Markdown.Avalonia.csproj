@@ -12,6 +12,7 @@
     <Description>Markdown Controls for Avalonia</Description>
     <Copyright>Copyright (c) 2010 Bevan Arps, 2020 whistyun</Copyright>
     <PackageProjectUrl>https://github.com/whistyun/Markdown.Avalonia</PackageProjectUrl>
+    <LangVersion>9</LangVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>Markdown.Avalonia.md</PackageReadmeFile>
     <PackageTags>Markdown Avalonia Avaloniaui</PackageTags>
@@ -29,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Markdown.Avalonia.Html\Markdown.Avalonia.Html.csproj" />
     <ProjectReference Include="..\Markdown.Avalonia.Svg\Markdown.Avalonia.Svg.csproj" />
     <ProjectReference Include="..\Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj" />
   </ItemGroup>

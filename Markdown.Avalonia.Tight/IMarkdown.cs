@@ -17,7 +17,7 @@ namespace Markdown.Avalonia
 
         [Obsolete("Please use Plugins propety. see https://github.com/whistyun/Markdown.Avalonia/wiki/How-to-migrages-to-ver11")]
         IBitmapLoader? BitmapLoader { get; set; }
-        [Obsolete("Please use Plugins propety. see https://github.com/whistyun/Markdown.Avalonia/wiki/How-to-migrages-to-ver11")]
+
         IContainerBlockHandler? ContainerBlockHandler { get; set; }
 
         MdAvPlugins Plugins { get; set; }

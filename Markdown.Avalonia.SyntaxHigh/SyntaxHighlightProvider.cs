@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace Markdown.Avalonia.SyntaxHigh
 {
-    internal class SyntaxHighlightProvider
+    public class SyntaxHighlightProvider
     {
         private ObservableCollection<Alias> _aliases;
 

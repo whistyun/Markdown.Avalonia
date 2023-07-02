@@ -1,4 +1,5 @@
-﻿using Avalonia;
+﻿
+using Avalonia;
 using Avalonia.Automation.Peers;
 using Avalonia.Collections;
 using Avalonia.Controls;
@@ -196,6 +197,10 @@ namespace ColorTextBlock.Avalonia
         public CTextBlock(string text) : this()
         {
             _content.Add(new CRun() { Text = text });
+        }
+
+        public CTextBlock(params CInline[] inlines) : this((IEnumerable<CInline>)inlines)
+        {
         }
 
         public CTextBlock(IEnumerable<CInline> inlines) : this()

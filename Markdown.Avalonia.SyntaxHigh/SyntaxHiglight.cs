@@ -19,7 +19,7 @@ using System.Collections.ObjectModel;
 
 namespace Markdown.Avalonia.SyntaxHigh
 {
-    public class SyntaxHiglight : IMdAvPlugin
+    public class SyntaxHighlight : IMdAvPlugin
     {
         [Content]
         public ObservableCollection<Alias> Aliases { get; } = new ObservableCollection<Alias>();

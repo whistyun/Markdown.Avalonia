@@ -1,4 +1,5 @@
-﻿using Markdown.Avalonia.Plugins;
+﻿using Markdonw.Avalonia.Html;
+using Markdown.Avalonia.Plugins;
 using Markdown.Avalonia.Svg;
 using Markdown.Avalonia.SyntaxHigh;
 using System;
@@ -22,19 +23,36 @@ namespace Markdown.Avalonia.Full
 
             var hasSyntaxHigh = false;
             var hasSvgFormat = false;
+            var hasHtml = false;
 
-            foreach (var plugin in Plugins)
+            SyntaxHighlight? syntaxPlugin = null;
+
+            (
+                IEnumerable<IMdAvPlugin> orderedPlugin,
+                Dictionary<Type, IMdAvPlugin> dic
+            ) = ComputeOrderedPlugins();
+
+            foreach (var plugin in orderedPlugin)
             {
+                if (plugin is IMdAvPluginRequestAnother another)
+                {
+                    another.Inject(another.DependsOn.Select(dep => dic[dep]));
+                }
+
                 plugin.Setup(setupInf);
 
-                hasSyntaxHigh |= plugin is SyntaxHiglight;
+                if (plugin is SyntaxHighlight light)
+                {
+                    hasSyntaxHigh = true;
+                    syntaxPlugin = light;
+                }
                 hasSvgFormat |= plugin is SvgFormat;
-
+                hasHtml |= plugin is HtmlPlugin;
             }
 
             if (!hasSyntaxHigh)
             {
-                var syntaxPlugin = new SyntaxHiglight();
+                syntaxPlugin = new SyntaxHighlight();
                 syntaxPlugin.Setup(setupInf);
             }
 
@@ -43,6 +61,22 @@ namespace Markdown.Avalonia.Full
                 var svgPlugin = new SvgFormat();
                 svgPlugin.Setup(setupInf);
             }
+
+            if (!hasHtml)
+            {
+                var htmlPlugin = new HtmlPlugin();
+                htmlPlugin.Inject(new[] { syntaxPlugin });
+                htmlPlugin.Setup(setupInf);
+            }
+
+            if (PathResolver is not null)
+                setupInf.SetOnce(PathResolver);
+
+            if (ContainerBlockHandler is not null)
+                setupInf.SetOnce(ContainerBlockHandler);
+
+            if (HyperlinkCommand is not null)
+                setupInf.SetOnce(HyperlinkCommand);
 
             setupInf.Freeze();
 

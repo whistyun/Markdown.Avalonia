@@ -122,9 +122,9 @@
       >
       <md:MarkdownScrollViewer.Plugins>
         <md:MdAvPlugins>
-          <mde:SyntaxHiglight>
+          <mde:SyntaxHighlight>
             <mde:Alias Name="peg" XSHD="avares://Markdown.AvaloniaDemo/Assets/Pegasus-Mode.xshd" />
-          </mde:SyntaxHiglight>
+          </mde:SyntaxHighlight>
         </md:MdAvPlugins>
       </md:MarkdownScrollViewer.Plugins>
 
