@@ -2,7 +2,6 @@
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Layout;
-using Avalonia.Media;
 using ColorTextBlock.Avalonia;
 using HtmlAgilityPack;
 using Markdonw.Avalonia.Html.Core.Utils;
@@ -250,6 +249,14 @@ namespace Markdonw.Avalonia.Html.Core.Parsers
         public void ExtraModifyCenter(StackPanel center, HtmlNode node, ReplaceManager manager)
         {
             center.HorizontalAlignment = HorizontalAlignment.Center;
+
+            foreach (var child in center.Children)
+            {
+                if (child is CTextBlock cbox)
+                {
+                    cbox.HorizontalAlignment = HorizontalAlignment.Center;
+                }
+            }
         }
 
         public static IEnumerable<TypicalParseInfo> Load(string resourcePath)
