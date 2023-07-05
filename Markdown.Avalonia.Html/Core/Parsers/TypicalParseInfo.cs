@@ -165,6 +165,33 @@ namespace Markdown.Avalonia.Html.Core.Parsers
                 }
                 else if (tag is CSpan span)
                 {
+                    if (!SetupCSpan(span))
+                    {
+                        generated = EnumerableExt.Empty<StyledElement>();
+                        return false;
+                    }
+                }
+                else if (tag is CCode code)
+                {
+                    var codecontent = (AvaloniaList<CInline>)code.Content;
+                    var codespan = new CSpan();
+                    codecontent.Add(codespan);
+
+                    if (!SetupCSpan(codespan))
+                    {
+                        generated = EnumerableExt.Empty<StyledElement>();
+                        return false;
+                    }
+                }
+                else if (tag is not CLineBreak)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                generated = new[] { tag };
+
+                bool SetupCSpan(CSpan span)
+                {
                     var content = (AvaloniaList<CInline>)span.Content;
 
                     var parseResult = manager.ParseChildrenJagging(node).ToArray();
@@ -180,18 +207,10 @@ namespace Markdown.Avalonia.Html.Core.Parsers
                             foreach (var inline in para.Content.ToArray())
                                 content.Add(inline);
                     }
-                    else
-                    {
-                        generated = EnumerableExt.Empty<StyledElement>();
-                        return false;
-                    }
-                }
-                else if (tag is not CLineBreak)
-                {
-                    throw new InvalidOperationException();
-                }
+                    else return false;
 
-                generated = new[] { tag };
+                    return true;
+                }
             }
 
             // apply tag

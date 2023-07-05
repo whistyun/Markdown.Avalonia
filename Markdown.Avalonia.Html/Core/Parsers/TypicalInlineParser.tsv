@@ -17,6 +17,6 @@ strong     | ColorTextBlock.Avalonia.CBold      | TagBold              |
 sub        | ColorTextBlock.Avalonia.CSpan      | TagSubscript         | Subscript
 sup        | ColorTextBlock.Avalonia.CSpan      | TagSuperscript       | Superscript
 u          | ColorTextBlock.Avalonia.CUnderline | TagUnderline         |
-code       | ColorTextBlock.Avalonia.CSpan      | TagCodeSpan          |
-kbd        | ColorTextBlock.Avalonia.CSpan      | TagCodeSpan          |
-var        | ColorTextBlock.Avalonia.CSpan      | TagCodeSpan          |
+code       | ColorTextBlock.Avalonia.CCode      | TagCodeSpan          |
+kbd        | ColorTextBlock.Avalonia.CCode      | TagCodeSpan          |
+var        | ColorTextBlock.Avalonia.CCode      | TagCodeSpan          |
