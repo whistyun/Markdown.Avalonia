@@ -4,7 +4,7 @@ using HtmlAgilityPack;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Markdonw.Avalonia.Html.Core.Parsers
+namespace Markdown.Avalonia.Html.Core.Parsers
 {
     public class TypicalBlockParser : IBlockTagParser
     {

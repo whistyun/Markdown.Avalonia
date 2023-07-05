@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace Markdonw.Avalonia.Html.Core.Utils
+namespace Markdown.Avalonia.Html.Core.Utils
 {
     internal static class EnumerableExt
     {

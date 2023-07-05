@@ -140,11 +140,11 @@ namespace ColorTextBlock.Avalonia
             {
                 cline.RequestMeasure();
             }
-            if (Parent is CTextBlock ctxt)
+            else if (Parent is CTextBlock ctxt)
             {
                 ctxt.OnMeasureSourceChanged();
             }
-            if (Parent is Layoutable layout)
+            else if (Parent is Layoutable layout)
             {
                 layout.InvalidateMeasure();
             }
@@ -158,7 +158,7 @@ namespace ColorTextBlock.Avalonia
                 {
                     cline.RequestRender();
                 }
-                if (Parent is Layoutable layout)
+                else if (Parent is Layoutable layout)
                 {
                     layout.InvalidateVisual();
                 }

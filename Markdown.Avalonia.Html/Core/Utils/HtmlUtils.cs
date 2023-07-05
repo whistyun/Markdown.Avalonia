@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Markdonw.Avalonia.Html.Core.Utils
+namespace Markdown.Avalonia.Html.Core.Utils
 {
     class HtmlUtils
     {

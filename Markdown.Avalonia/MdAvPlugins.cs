@@ -1,4 +1,4 @@
-﻿using Markdonw.Avalonia.Html;
+﻿using Markdown.Avalonia.Html;
 using Markdown.Avalonia.Plugins;
 using Markdown.Avalonia.Svg;
 using Markdown.Avalonia.SyntaxHigh;

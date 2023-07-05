@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Markdonw.Avalonia.Html.Core
+namespace Markdown.Avalonia.Html.Core
 {
     public struct TextRange
     {

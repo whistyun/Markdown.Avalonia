@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-16"?>
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+  <c:CTextBlock>
+    <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" Command="{x:Null}" CommandParameter="{x:Null}" Classes="Hyperlink">
+      <c:CRun Text="asdf " />
+    </c:CHyperlink>
+    <c:CRun Text="" />
+    <c:CLineBreak Text="&#xA;" />
+    <c:CRun Text="" />
+    <c:CSpan Classes="Abbr">
+      <c:CRun Text="asdf " />
+    </c:CSpan>
+    <c:CRun Text="" />
+    <c:CLineBreak Text="&#xA;" />
+    <c:CRun Text="" />
+    <c:CSpan Classes="Abbr">
+      <c:CRun Text="asdf " />
+    </c:CSpan>
+    <c:CRun Text="" />
+    <c:CLineBreak Text="&#xA;" />
+    <c:CRun Text="" />
+    <c:CBold Classes="Bold">
+      <c:CRun Text="asdf " />
+    </c:CBold>
+    <c:CRun Text="" />
+    <c:CLineBreak Text="&#xA;" />
+    <c:CRun Text="" />
+    <c:CSpan Classes="Bdi">
+      <c:CRun Text="asdf " />
+    </c:CSpan>
+    <c:CRun Text="" />
+    <c:CLineBreak Text="&#xA;" />
+    <c:CRun Text="" />
+    <c:CSpan Classes="Cite">
+      <c:CRun Text="asdf " />
+    </c:CSpan>
+    <c:CRun Text="" />
+    <c:CLineBreak Text="&#xA;" />
+    <c:CRun Text="" />
+    <c:CSpan IsStrikethrough="True" Classes="Strikethrough">
+      <c:CRun Text="asdf " />
+    </c:CSpan>
+    <c:CRun Text="" />
+    <c:CLineBreak Text="&#xA;" />
+    <c:CRun Text="" />
+    <c:CItalic Classes="Italic">
+      <c:CRun Text="asdf " />
+    </c:CItalic>
+    <c:CRun Text="" />
+    <c:CLineBreak Text="&#xA;" />
+    <c:CRun Text="" />
+    <c:CItalic Classes="Italic">
+      <c:CRun Text="asdf " />
+    </c:CItalic>
+    <c:CRun Text="" />
+    <c:CLineBreak Text="&#xA;" />
+    <c:CRun Text="" />
+    <c:CUnderline Classes="Underline">
+      <c:CRun Text="asdf " />
+    </c:CUnderline>
+    <c:CRun Text="" />
+    <c:CLineBreak Text="&#xA;" />
+    <c:CRun Text="" />
+    <c:CSpan Classes="Mark">
+      <c:CRun Text="asdf " />
+    </c:CSpan>
+    <c:CRun Text="" />
+    <c:CLineBreak Text="&#xA;" />
+    <c:CRun Text="" />
+    <c:CSpan IsStrikethrough="True" Classes="Strikethrough">
+      <c:CRun Text="asdf " />
+    </c:CSpan>
+    <c:CRun Text="" />
+    <c:CLineBreak Text="&#xA;" />
+    <c:CRun Text="" />
+    <c:CSpan IsStrikethrough="True" Classes="Strikethrough">
+      <c:CRun Text="asdf " />
+    </c:CSpan>
+    <c:CRun Text="" />
+    <c:CLineBreak Text="&#xA;" />
+    <c:CRun Text="" />
+    <c:CBold Classes="Bold">
+      <c:CRun Text="asdf " />
+    </c:CBold>
+    <c:CRun Text="" />
+    <c:CLineBreak Text="&#xA;" />
+    <c:CRun Text="" />
+    <c:CSpan Classes="Subscript">
+      <c:CRun Text="asdf " />
+    </c:CSpan>
+    <c:CRun Text="" />
+    <c:CLineBreak Text="&#xA;" />
+    <c:CRun Text="" />
+    <c:CSpan Classes="Superscript">
+      <c:CRun Text="asdf " />
+    </c:CSpan>
+    <c:CRun Text="" />
+    <c:CLineBreak Text="&#xA;" />
+    <c:CRun Text="" />
+    <c:CUnderline Classes="Underline">
+      <c:CRun Text="asdf" />
+    </c:CUnderline>
+  </c:CTextBlock>
+</StackPanel>

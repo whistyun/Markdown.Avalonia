@@ -1,11 +1,11 @@
 ﻿#HtmlTag   | FlowDocumentTag                    | TagName              | ExtraModify
-address    | Avalonia.Controls.StackPanel       | TagAddress           |
-article    | Avalonia.Controls.StackPanel       | TagArticle           |
-aside      | Avalonia.Controls.StackPanel       | TagAside             |
-blockquote | Avalonia.Controls.StackPanel       | TagBlockquote        |
-center     | Avalonia.Controls.StackPanel       | TagCenter            | Center
+address    | #border                            | TagAddress           |
+article    | #border                            | TagArticle           |
+aside      | #border                            | TagAside             |
+blockquote | #border                            | TagBlockquote        |
+center     | #border                            | TagCenter            | Center
 div        | #blocks                            |                      |
-footer     | Avalonia.Controls.StackPanel       | TagFooter            |
+footer     | #border                            | TagFooter            |
 h1         | #blocks                            | TagHeading1          |
 h2         | #blocks                            | TagHeading2          |
 h3         | #blocks                            | TagHeading3          |

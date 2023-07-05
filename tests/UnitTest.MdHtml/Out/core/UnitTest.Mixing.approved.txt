@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-16"?>
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="https://github.com/whistyun/Markdown.Avalonia.Tight" xmlns:ma="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+  <c:CTextBlock Classes="Heading1">
+    <c:CRun Text="Html Mixing" />
+  </c:CTextBlock>
+  <c:CTextBlock Classes="Heading2">
+    <c:CRun Text="Html style" />
+  </c:CTextBlock>
+  <c:CTextBlock>
+    <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="http://example.com" Classes="Hyperlink">
+      <c:CImage />
+      <c:CRun Text=" asdf " />
+      <c:CItalic>
+        <c:CRun Text="asdf" />
+      </c:CItalic>
+      <c:CRun Text=" asdf" />
+    </c:CHyperlink>
+  </c:CTextBlock>
+  <ma:Rule BoldLineWidth="2" Classes="Bold" />
+  <c:CTextBlock Classes="Heading2">
+    <c:CRun Text="Html style" />
+  </c:CTextBlock>
+  <c:CTextBlock>
+    <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="http://example.com" Classes="Hyperlink">
+      <c:CRun Text="![](https://img.shields.io/nuget/v/AssemblyInfoHelper.svg) asdf *asdf* asdf" />
+    </c:CHyperlink>
+  </c:CTextBlock>
+  <ma:Rule BoldLineWidth="2" Classes="Bold" />
+  <Border Classes="Table" xmlns="">
+    <Border.Child>
+      <Grid Classes="Table">
+        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="1" Grid.RowSpan="1">
+          <Border.Child>
+            <Grid Classes="List">
+              <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+                <c:CRun Text="•" />
+              </c:CTextBlock>
+              <StackPanel Grid.Column="1" Grid.Row="0">
+                <c:CTextBlock Classes="Paragraph">
+                  <c:CRun Text="one" />
+                </c:CTextBlock>
+              </StackPanel>
+              <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="1">
+                <c:CRun Text="•" />
+              </c:CTextBlock>
+              <StackPanel Grid.Column="1" Grid.Row="1">
+                <c:CTextBlock Classes="Paragraph">
+                  <c:CRun Text="two" />
+                </c:CTextBlock>
+              </StackPanel>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+              </Grid.RowDefinitions>
+            </Grid>
+          </Border.Child>
+        </Border>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+          <RowDefinition />
+        </Grid.RowDefinitions>
+      </Grid>
+    </Border.Child>
+  </Border>
+  <ma:Rule BoldLineWidth="2" Classes="Bold" />
+  <Border Classes="Table" xmlns="">
+    <Border.Child>
+      <Grid Classes="Table">
+        <Border Classes="OddTableRow" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="1" Grid.RowSpan="1">
+          <Border.Child>
+            <c:CTextBlock>
+              <c:CRun Text="* one * two" />
+            </c:CTextBlock>
+          </Border.Child>
+        </Border>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+          <RowDefinition />
+        </Grid.RowDefinitions>
+      </Grid>
+    </Border.Child>
+  </Border>
+</StackPanel>

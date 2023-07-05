@@ -3,14 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Markdonw.Avalonia.Html.Core.Utils;
+using Markdown.Avalonia.Html.Core.Utils;
 using Avalonia;
 using Avalonia.Controls;
 using Markdown.Avalonia.Html.Tables;
 using Markdown.Avalonia.Controls;
 using Avalonia.Layout;
 
-namespace Markdonw.Avalonia.Html.Core.Parsers.MarkdigExtensions
+namespace Markdown.Avalonia.Html.Core.Parsers.MarkdigExtensions
 {
     public class GridTableParser : IBlockTagParser, IHasPriority
     {
@@ -130,7 +130,7 @@ namespace Markdonw.Avalonia.Html.Core.Parsers.MarkdigExtensions
             }
             else
             {
-                generated = new[] { grid };
+                generated = new[] { border };
             }
 
             return true;

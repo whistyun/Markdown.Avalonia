@@ -1,7 +1,7 @@
 ﻿using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
-using Markdonw.Avalonia.Html.Core.Utils;
+using Markdown.Avalonia.Html.Core.Utils;
 using System.Windows;
 using System.Linq;
 using Avalonia;
@@ -11,7 +11,7 @@ using System.Reflection;
 using ColorTextBlock.Avalonia;
 using Avalonia.Media;
 
-namespace Markdonw.Avalonia.Html.Core.Parsers
+namespace Markdown.Avalonia.Html.Core.Parsers
 {
     public class OrderListParser : IBlockTagParser
     {
@@ -30,8 +30,8 @@ namespace Markdonw.Avalonia.Html.Core.Parsers
             list.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
             list.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridUnitType.Star)));
 
+            int index = 0;
             int order = 1;
-
 
             var startAttr = node.Attributes["start"];
             if (startAttr is not null && Int32.TryParse(startAttr.Value, out var start))
@@ -54,12 +54,13 @@ namespace Markdonw.Avalonia.Html.Core.Parsers
                 list.Children.Add(markerTxt);
                 list.Children.Add(item);
 
-                Grid.SetRow(markerTxt, order - 1);
+                Grid.SetRow(markerTxt, index);
                 Grid.SetColumn(markerTxt, 0);
 
-                Grid.SetRow(item, order - 1);
+                Grid.SetRow(item, index);
                 Grid.SetColumn(item, 1);
 
+                ++index;
                 ++order;
             }
 

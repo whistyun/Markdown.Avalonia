@@ -9,7 +9,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
-namespace Markdonw.Avalonia.Html.Core.Utils
+namespace Markdown.Avalonia.Html.Core.Utils
 {
     static class DocUtils
     {

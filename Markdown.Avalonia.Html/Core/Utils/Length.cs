@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Markdonw.Avalonia.Html.Core.Utils
+namespace Markdown.Avalonia.Html.Core.Utils
 {
     internal class Length
     {

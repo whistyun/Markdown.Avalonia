@@ -5,7 +5,7 @@ using ColorTextBlock.Avalonia;
 using HtmlAgilityPack;
 using System.Collections.Generic;
 
-namespace Markdonw.Avalonia.Html.Core.Parsers
+namespace Markdown.Avalonia.Html.Core.Parsers
 {
     public class ButtonParser : IInlineTagParser
     {

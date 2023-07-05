@@ -1,4 +1,4 @@
-﻿namespace Markdonw.Avalonia.Html.Core
+﻿namespace Markdown.Avalonia.Html.Core
 {
     /// <summary>
     /// Behavior options about unknown tag.

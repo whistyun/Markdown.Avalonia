@@ -1,5 +1,5 @@
 ﻿using ColorTextBlock.Avalonia;
-using Markdonw.Avalonia.Html.Core;
+using Markdown.Avalonia.Html.Core;
 using Markdown.Avalonia;
 using Markdown.Avalonia.Parsers;
 using Markdown.Avalonia.Plugins;
@@ -7,7 +7,7 @@ using Markdown.Avalonia.SyntaxHigh;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace Markdonw.Avalonia.Html
+namespace Markdown.Avalonia.Html
 {
     public class HtmlInlineParser : InlineParser
     {

@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Input;
-using Markdonw.Avalonia.Html.Core.Parsers;
-using Markdonw.Avalonia.Html.Core.Utils;
-using Markdonw.Avalonia.Html.Core.Parsers.MarkdigExtensions;
+using Markdown.Avalonia.Html.Core.Parsers;
+using Markdown.Avalonia.Html.Core.Utils;
+using Markdown.Avalonia.Html.Core.Parsers.MarkdigExtensions;
 using System.Linq;
 using System.Text;
 using Markdown.Avalonia;
@@ -15,7 +15,7 @@ using Markdown.Avalonia.Parsers;
 using Markdown.Avalonia.Plugins;
 using Markdown.Avalonia.SyntaxHigh;
 
-namespace Markdonw.Avalonia.Html.Core
+namespace Markdown.Avalonia.Html.Core
 {
     public class ReplaceManager
     {

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-16"?>
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="https://github.com/whistyun/Markdown.Avalonia.Tight" xmlns:ma="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+  <Expander Classes=":down" xmlns="">
+    <Expander.Content>
+      <StackPanel>
+        <c:CTextBlock Classes="Heading1">
+          <c:CRun Text="Heading1" />
+        </c:CTextBlock>
+        <Grid Classes="List">
+          <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+            <c:CRun Text="•" />
+          </c:CTextBlock>
+          <StackPanel Grid.Column="1" Grid.Row="0">
+            <c:CTextBlock Classes="Paragraph">
+              <c:CRun Text="list item1" />
+            </c:CTextBlock>
+          </StackPanel>
+          <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="1">
+            <c:CRun Text="•" />
+          </c:CTextBlock>
+          <StackPanel Grid.Column="1" Grid.Row="1">
+            <c:CTextBlock Classes="Paragraph">
+              <c:CRun Text="list item2" />
+            </c:CTextBlock>
+          </StackPanel>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+          </Grid.RowDefinitions>
+        </Grid>
+      </StackPanel>
+    </Expander.Content>
+    <Expander.Header>
+      <StackPanel>
+        <c:CTextBlock>
+          <c:CRun Text="Spoiler warning " />
+          <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="https://www.google.com" Classes="Hyperlink">
+            <c:CRun Text="link" />
+          </c:CHyperlink>
+        </c:CTextBlock>
+      </StackPanel>
+    </Expander.Header>
+  </Expander>
+  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <Expander IsExpanded="True" Classes=":down,:expanded" xmlns="">
+    <Expander.Content>
+      <StackPanel>
+        <c:CTextBlock Classes="Heading1">
+          <c:CRun Text="Heading1" />
+        </c:CTextBlock>
+        <Grid Classes="List">
+          <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+            <c:CRun Text="•" />
+          </c:CTextBlock>
+          <StackPanel Grid.Column="1" Grid.Row="0">
+            <c:CTextBlock Classes="Paragraph">
+              <c:CRun Text="list item1" />
+            </c:CTextBlock>
+          </StackPanel>
+          <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="1">
+            <c:CRun Text="•" />
+          </c:CTextBlock>
+          <StackPanel Grid.Column="1" Grid.Row="1">
+            <c:CTextBlock Classes="Paragraph">
+              <c:CRun Text="list item2" />
+            </c:CTextBlock>
+          </StackPanel>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+          </Grid.RowDefinitions>
+        </Grid>
+      </StackPanel>
+    </Expander.Content>
+    <Expander.Header>
+      <StackPanel>
+        <c:CTextBlock>
+          <c:CRun Text="Spoiler warning" />
+        </c:CTextBlock>
+      </StackPanel>
+    </Expander.Header>
+  </Expander>
+  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <Expander IsExpanded="False" Classes=":down" xmlns="">
+    <Expander.Content>
+      <StackPanel>
+        <c:CTextBlock Classes="Heading1">
+          <c:CRun Text="Heading1" />
+        </c:CTextBlock>
+        <Grid Classes="List">
+          <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+            <c:CRun Text="•" />
+          </c:CTextBlock>
+          <StackPanel Grid.Column="1" Grid.Row="0">
+            <c:CTextBlock Classes="Paragraph">
+              <c:CRun Text="list item1" />
+            </c:CTextBlock>
+          </StackPanel>
+          <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="1">
+            <c:CRun Text="•" />
+          </c:CTextBlock>
+          <StackPanel Grid.Column="1" Grid.Row="1">
+            <c:CTextBlock Classes="Paragraph">
+              <c:CRun Text="list item2" />
+            </c:CTextBlock>
+          </StackPanel>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+          </Grid.RowDefinitions>
+        </Grid>
+      </StackPanel>
+    </Expander.Content>
+    <Expander.Header>
+      <StackPanel>
+        <c:CTextBlock>
+          <c:CRun Text="Spoiler warning" />
+        </c:CTextBlock>
+      </StackPanel>
+    </Expander.Header>
+  </Expander>
+</StackPanel>

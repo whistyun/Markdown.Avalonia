@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace Markdonw.Avalonia.Html.Core.Utils
+namespace Markdown.Avalonia.Html.Core.Utils
 {
     internal static class StringExt
     {

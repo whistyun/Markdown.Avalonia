@@ -4,14 +4,14 @@ using Avalonia.Data.Converters;
 using Avalonia.Layout;
 using ColorTextBlock.Avalonia;
 using HtmlAgilityPack;
-using Markdonw.Avalonia.Html.Core.Utils;
+using Markdown.Avalonia.Html.Core.Utils;
 using Markdown.Avalonia.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace Markdonw.Avalonia.Html.Core.Parsers
+namespace Markdown.Avalonia.Html.Core.Parsers
 {
     public class ImageParser : IInlineTagParser
     {

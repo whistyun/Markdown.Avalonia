@@ -475,7 +475,7 @@ namespace ColorTextBlock.Avalonia
                 var indicator = container.Indicator;
                 if (indicator is null) continue;
 
-                container.Content.Arrange(new Rect(indicator.Left, indicator.Top, indicator.Width, indicator.Height));
+                indicator.Control.Arrange(new Rect(indicator.Left, indicator.Top, indicator.Width, indicator.Height));
             }
             if (MathUtilities.AreClose(_constraint.Width, finalSize.Width))
             {

@@ -3,13 +3,13 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Layout;
 using HtmlAgilityPack;
-using Markdonw.Avalonia.Html.Core.Utils;
+using Markdown.Avalonia.Html.Core.Utils;
 using Markdown.Avalonia;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace Markdonw.Avalonia.Html.Core.Parsers
+namespace Markdown.Avalonia.Html.Core.Parsers
 {
     public class DetailsParser : IBlockTagParser
     {

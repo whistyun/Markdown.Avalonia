@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-16"?>
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+  <c:CTextBlock Classes="Heading1">
+    <c:CBold Classes="Bold">
+      <c:CRun Text="Heading1 " />
+    </c:CBold>
+    <c:CRun Text=" Title" />
+  </c:CTextBlock>
+  <c:CTextBlock Classes="Heading2">
+    <c:CItalic Classes="Italic">
+      <c:CRun Text="Sub " />
+    </c:CItalic>
+    <c:CRun Text=" Titile" />
+  </c:CTextBlock>
+  <c:CTextBlock Classes="Heading3">
+    <c:CRun Text="H3_Title" />
+  </c:CTextBlock>
+  <c:CTextBlock Classes="Heading4">
+    <c:CRun Text="H4_Title" />
+  </c:CTextBlock>
+  <c:CTextBlock Classes="Heading5">
+    <c:CRun Text="H5_Title" />
+  </c:CTextBlock>
+  <c:CTextBlock Classes="Heading6">
+    <c:CRun Text="H6_Title" />
+  </c:CTextBlock>
+  <Border Classes="Address" xmlns="">
+    <Border.Child>
+      <StackPanel Classes="Address">
+        <c:CTextBlock>
+          <c:CRun Text="Written by " />
+          <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="mailto:webmaster@example.com" Classes="Hyperlink">
+            <c:CRun Text="Jon Doe " />
+          </c:CHyperlink>
+          <c:CRun Text="." />
+          <c:CLineBreak Text="&#xA;" />
+          <c:CRun Text="simewhere, someland, somecountry" />
+        </c:CTextBlock>
+      </StackPanel>
+    </Border.Child>
+  </Border>
+  <Border Classes="Article" xmlns="">
+    <Border.Child>
+      <StackPanel Classes="Article">
+        <c:CTextBlock Classes="Heading3">
+          <c:CRun Text="Article         Element" />
+        </c:CTextBlock>
+        <c:CTextBlock>
+          <c:CRun Text="description of         this element..." />
+        </c:CTextBlock>
+      </StackPanel>
+    </Border.Child>
+  </Border>
+  <Border Classes="Aside" xmlns="">
+    <Border.Child>
+      <StackPanel Classes="Aside">
+        <c:CTextBlock Classes="Heading4">
+          <c:CRun Text="ASide         Element" />
+        </c:CTextBlock>
+        <c:CTextBlock>
+          <c:CRun Text="このタグに関する説明を書いてください・・・" />
+        </c:CTextBlock>
+      </StackPanel>
+    </Border.Child>
+  </Border>
+  <Border Classes="Blockquote" xmlns="">
+    <Border.Child>
+      <StackPanel Classes="Blockquote">
+        <Border Classes="Aside">
+          <Border.Child>
+            <StackPanel Classes="Aside">
+              <c:CTextBlock Classes="Heading4">
+                <c:CRun Text="ASide             Element" />
+              </c:CTextBlock>
+              <c:CTextBlock>
+                <c:CRun Text="このタグに関する説明を書いてください・・・" />
+              </c:CTextBlock>
+            </StackPanel>
+          </Border.Child>
+        </Border>
+        <c:CTextBlock>
+          <c:CRun Text="hm?" />
+        </c:CTextBlock>
+      </StackPanel>
+    </Border.Child>
+  </Border>
+  <Border Classes="Center" xmlns="">
+    <Border.Child>
+      <StackPanel Classes="Center">
+        <c:CTextBlock Classes="Heading5">
+          <c:CRun Text="Center Element" />
+        </c:CTextBlock>
+        <c:CTextBlock>
+          <c:CRun Text="center tag center tag center tag..." />
+        </c:CTextBlock>
+      </StackPanel>
+    </Border.Child>
+  </Border>
+  <c:CTextBlock Classes="Heading6">
+    <c:CRun Text="H6_Title" />
+  </c:CTextBlock>
+  <c:CTextBlock>
+    <c:CRun Text="abcdefghi" />
+  </c:CTextBlock>
+  <c:CTextBlock>
+    <c:CRun Text="jklmnopqr" />
+  </c:CTextBlock>
+  <c:CTextBlock>
+    <c:CRun Text="stuvwxyz" />
+  </c:CTextBlock>
+  <c:CTextBlock>
+    <c:CRun Text="abcdefghi" />
+  </c:CTextBlock>
+  <c:CTextBlock>
+    <c:CRun Text="jklmnopqr " />
+    <c:CRun Text="stuvwxyz" />
+  </c:CTextBlock>
+</StackPanel>

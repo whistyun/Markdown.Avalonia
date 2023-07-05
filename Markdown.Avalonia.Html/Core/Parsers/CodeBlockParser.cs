@@ -1,14 +1,14 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using HtmlAgilityPack;
-using Markdonw.Avalonia.Html.Core.Utils;
+using Markdown.Avalonia.Html.Core.Utils;
 using Markdown.Avalonia.SyntaxHigh;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Markdonw.Avalonia.Html.Core.Parsers
+namespace Markdown.Avalonia.Html.Core.Parsers
 {
     public class CodeBlockParser : IBlockTagParser
     {

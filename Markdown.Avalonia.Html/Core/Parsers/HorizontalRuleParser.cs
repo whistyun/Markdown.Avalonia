@@ -4,7 +4,7 @@ using HtmlAgilityPack;
 using Markdown.Avalonia.Controls;
 using System.Collections.Generic;
 
-namespace Markdonw.Avalonia.Html.Core.Parsers
+namespace Markdown.Avalonia.Html.Core.Parsers
 {
     public class HorizontalRuleParser : IBlockTagParser
     {

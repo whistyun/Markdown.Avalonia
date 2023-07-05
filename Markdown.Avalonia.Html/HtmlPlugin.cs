@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Markdonw.Avalonia.Html
+namespace Markdown.Avalonia.Html
 {
     public class HtmlPlugin : IMdAvPluginRequestAnother
     {

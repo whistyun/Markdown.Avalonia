@@ -5,7 +5,7 @@ using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 
-namespace Markdonw.Avalonia.Html.Core.Parsers
+namespace Markdown.Avalonia.Html.Core.Parsers
 {
     public class InputParser : IInlineTagParser
     {

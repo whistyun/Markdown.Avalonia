@@ -329,7 +329,7 @@ namespace Markdown.Avalonia.Plugins
         {
             private SetupInfo _setupInfo;
             private Dictionary<string, WeakReference<IImage>> _cache;
-            private Bitmap _imageNotFound;
+            private Lazy<Bitmap> _imageNotFound;
 
 #pragma warning disable CS0618
             public IBitmapLoader? BitmapLoader { get; set; }
@@ -341,8 +341,11 @@ namespace Markdown.Avalonia.Plugins
                 _setupInfo = info;
                 _cache = new();
 
-                using var strm = AssetLoader.Open(new Uri($"avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"));
-                _imageNotFound = new Bitmap(strm);
+                _imageNotFound = new Lazy<Bitmap>(() =>
+                {
+                    using var strm = AssetLoader.Open(new Uri($"avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"));
+                    return new Bitmap(strm);
+                });
 
             }
 
@@ -350,7 +353,7 @@ namespace Markdown.Avalonia.Plugins
             {
                 if (_cache.TryGetValue(urlTxt, out var bitmapRef) && bitmapRef.TryGetTarget(out var cachedBitmap))
                 {
-                    return new CImage(cachedBitmap ?? _imageNotFound);
+                    return new CImage(cachedBitmap ?? _imageNotFound.Value);
                 }
                 else
                 {
@@ -360,7 +363,7 @@ namespace Markdown.Avalonia.Plugins
 #pragma warning restore CS0618
                         LoadImageByPlugin(urlTxt);
 
-                    return new CImage(imageTask, _imageNotFound);
+                    return new CImage(imageTask, _imageNotFound.Value);
                 }
             }
 
@@ -376,14 +379,14 @@ namespace Markdown.Avalonia.Plugins
                 var streamTask = _setupInfo.PathResolver.ResolveImageResource(urlTxt);
                 if (streamTask is null)
                 {
-                    _cache[urlTxt] = new WeakReference<IImage>(_imageNotFound);
+                    _cache[urlTxt] = new WeakReference<IImage>(_imageNotFound.Value);
                     return null;
                 }
 
                 using var stream = await streamTask;
                 if (stream is null)
                 {
-                    _cache[urlTxt] = new WeakReference<IImage>(_imageNotFound);
+                    _cache[urlTxt] = new WeakReference<IImage>(_imageNotFound.Value);
                     return null;
                 }
 
@@ -420,7 +423,7 @@ namespace Markdown.Avalonia.Plugins
                 }
                 catch
                 {
-                    _cache[urlTxt] = new WeakReference<IImage>(_imageNotFound);
+                    _cache[urlTxt] = new WeakReference<IImage>(_imageNotFound.Value);
                     return null;
                 }
             }

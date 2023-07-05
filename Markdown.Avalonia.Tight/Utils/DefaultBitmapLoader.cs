@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Markdown.Avalonia.Utils
 {
-    [Obsolete("")]
+    [Obsolete("see https://github.com/whistyun/Markdown.Avalonia/wiki/How-to-migrages-to-ver11")]
     public class DefaultBitmapLoader : IBitmapLoader
     {
         private static readonly HttpClient _httpclient = new();

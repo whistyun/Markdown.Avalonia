@@ -1,14 +1,13 @@
-﻿using Markdonw.Avalonia.Html.Core;
+﻿using Markdown.Avalonia.Html.Core;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using TextRange = Markdonw.Avalonia.Html.Core.TextRange;
 using Markdown.Avalonia.Parsers;
 using Markdown.Avalonia;
 using Avalonia.Controls;
 using Markdown.Avalonia.SyntaxHigh;
 using Markdown.Avalonia.Plugins;
 
-namespace Markdonw.Avalonia.Html
+namespace Markdown.Avalonia.Html
 {
     public class HtmlBlockParser : BlockParser
     {

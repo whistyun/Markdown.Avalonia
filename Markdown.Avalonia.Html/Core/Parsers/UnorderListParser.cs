@@ -1,13 +1,13 @@
 ﻿using HtmlAgilityPack;
 using System.Collections.Generic;
-using Markdonw.Avalonia.Html.Core.Utils;
+using Markdown.Avalonia.Html.Core.Utils;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using ColorTextBlock.Avalonia;
 
-namespace Markdonw.Avalonia.Html.Core.Parsers
+namespace Markdown.Avalonia.Html.Core.Parsers
 {
     public class UnorderListParser : IBlockTagParser
     {
@@ -26,7 +26,7 @@ namespace Markdonw.Avalonia.Html.Core.Parsers
             list.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
             list.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridUnitType.Star)));
 
-            int order = 0;
+            int index = 0;
 
             foreach (var listItemTag in node.ChildNodes.CollectTag("li"))
             {
@@ -43,13 +43,13 @@ namespace Markdonw.Avalonia.Html.Core.Parsers
                 list.Children.Add(markerTxt);
                 list.Children.Add(item);
 
-                Grid.SetRow(markerTxt, order);
+                Grid.SetRow(markerTxt, index);
                 Grid.SetColumn(markerTxt, 0);
 
-                Grid.SetRow(item, order);
+                Grid.SetRow(item, index);
                 Grid.SetColumn(item, 1);
 
-                ++order;
+                ++index;
             }
 
             generated = new[] { list };

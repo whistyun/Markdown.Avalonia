@@ -2,11 +2,11 @@
 using Avalonia.Controls;
 using ColorTextBlock.Avalonia;
 using HtmlAgilityPack;
-using Markdonw.Avalonia.Html.Core.Utils;
+using Markdown.Avalonia.Html.Core.Utils;
 using System;
 using System.Collections.Generic;
 
-namespace Markdonw.Avalonia.Html.Core.Parsers
+namespace Markdown.Avalonia.Html.Core.Parsers
 {
     /// <summary>
     /// remove comment element

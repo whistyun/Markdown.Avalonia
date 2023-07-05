@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Markdonw.Avalonia.Html
+namespace Markdown.Avalonia.Html
 {
     internal static class SimpleHtmlUtils
     {

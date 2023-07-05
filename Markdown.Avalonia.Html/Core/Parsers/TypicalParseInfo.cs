@@ -4,14 +4,14 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using ColorTextBlock.Avalonia;
 using HtmlAgilityPack;
-using Markdonw.Avalonia.Html.Core.Utils;
+using Markdown.Avalonia.Html.Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Markdonw.Avalonia.Html.Core.Parsers
+namespace Markdown.Avalonia.Html.Core.Parsers
 {
     public class TypicalParseInfo
     {
@@ -83,6 +83,20 @@ namespace Markdonw.Avalonia.Html.Core.Parsers
             {
                 switch (FlowDocumentTagText)
                 {
+                    case "#border":
+                        var pnl = new StackPanel();
+                        pnl.Orientation = Orientation.Vertical;
+                        var parseResult = manager.ParseChildrenAndGroup(node).ToArray();
+                        foreach (var ctrl in parseResult)
+                            pnl.Children.Add(ctrl);
+
+                        var bdr = new Border();
+                        bdr.Child = pnl;
+
+                        generated = new[] { bdr };
+                        break;
+
+
                     case "#blocks":
                         generated = manager.ParseChildrenAndGroup(node).ToArray();
                         break;
@@ -184,9 +198,13 @@ namespace Markdonw.Avalonia.Html.Core.Parsers
 
             if (TagNameReference is not null)
             {
+                var clsNm = TagName.GetClass();
                 foreach (var tag in generated)
                 {
-                    tag.Classes.Add(TagName.GetClass());
+                    tag.Classes.Add(clsNm);
+
+                    if (tag is Border bdr)
+                        bdr.Child.Classes.Add(clsNm);
                 }
             }
 
@@ -246,11 +264,11 @@ namespace Markdonw.Avalonia.Html.Core.Parsers
             //    span.ToolTip = title;
         }
 
-        public void ExtraModifyCenter(StackPanel center, HtmlNode node, ReplaceManager manager)
+        public void ExtraModifyCenter(Border center, HtmlNode node, ReplaceManager manager)
         {
             center.HorizontalAlignment = HorizontalAlignment.Center;
 
-            foreach (var child in center.Children)
+            foreach (var child in ((StackPanel)center.Child!).Children)
             {
                 if (child is CTextBlock cbox)
                 {

@@ -2,12 +2,12 @@
 using Avalonia.Controls;
 using Avalonia.Layout;
 using HtmlAgilityPack;
-using Markdonw.Avalonia.Html.Core.Utils;
+using Markdown.Avalonia.Html.Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Markdonw.Avalonia.Html.Core.Parsers.MarkdigExtensions
+namespace Markdown.Avalonia.Html.Core.Parsers.MarkdigExtensions
 {
     public class FigureParser : IBlockTagParser
     {
