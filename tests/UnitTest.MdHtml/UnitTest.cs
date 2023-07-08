@@ -16,14 +16,6 @@ namespace UnitTest.MdHtml
     [UseReporter(typeof(DiffReporter))]
     public class UnitTest : UnitTestBase
     {
-        [SetUp]
-        [RunOnUI]
-        public void Setup()
-        {
-            var fwNm = Utils.GetRuntimeName();
-            Approvals.RegisterDefaultNamerCreation(() => new ChangeOutputPathNamer("Out/" + fwNm));
-        }
-
         public MarkdownEngine Engine
         {
             get
