@@ -20,7 +20,7 @@ The table of compability with Avalonia's version.
 
 | AvaloniaUI         | Markdown.Avalonia |
 |--------------------|-------------------|
-| 11.0.0-rc1.1       | 11.0.0-d1         |
+| 11.0.0-rc1.1       | 11.0.0-d1～d2     |
 | 11.0.0-preview8    | 11.0.0-c1         |
 | 11.0.0-preview7    | 11.0.0-b2         |
 | 11.0.0-preview6    | 11.0.0-a10, b1    |
@@ -40,3 +40,18 @@ I make some document in [wiki](https://github.com/whistyun/Markdown.Avalonia/wik
 ## License
 
 Markdown.Avalonia is licensed under the MIT license.
+
+
+## Dependencies (Runtime)
+
+* Markdown.Avalonia.Tight
+  * Avalonia (MIT) https://github.com/AvaloniaUI/Avalonia
+
+* Markdown.Avalonia.SyntaxHigh
+  * AvaloniaEdit (MIT) https://github.com/AvaloniaUI/AvaloniaEdit
+
+* MdXaml.Html
+  * HtmlAgilityPack (MIT) https://github.com/zzzprojects/html-agility-pack
+
+* Markdown.Avalonia.Svg
+  * Avalonia.Svg (MIT) https://github.com/wieslawsoltes/Svg.Skia
