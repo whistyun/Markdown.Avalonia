@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-16"?>
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="https://github.com/whistyun/Markdown.Avalonia.Tight" xmlns:ma="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+  <Grid xmlns="">
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+      <c:CRun Text="1." />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="0">
+      <c:CTextBlock>
+        <c:CRun Text="asdf " />
+        <c:CBold Classes="Bold">
+          <c:CRun Text="fdsa " />
+        </c:CBold>
+        <c:CRun Text=" jkl; " />
+        <c:CItalic Classes="Italic">
+          <c:CRun Text=";lkj" />
+        </c:CItalic>
+      </c:CTextBlock>
+    </StackPanel>
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="1">
+      <c:CRun Text="2." />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="1">
+      <c:CTextBlock>
+        <c:CRun Text="1234567" />
+      </c:CTextBlock>
+    </StackPanel>
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="2">
+      <c:CRun Text="3." />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="2">
+      <c:CTextBlock>
+        <c:CInlineUIContainer>
+          <c:CInlineUIContainer.Content>
+            <RadioButton IsEnabled="False" Classes=":unchecked,:disabled" />
+          </c:CInlineUIContainer.Content>
+        </c:CInlineUIContainer>
+        <c:CRun Text="ねむい" />
+      </c:CTextBlock>
+    </StackPanel>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+    </Grid.RowDefinitions>
+  </Grid>
+  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <Grid xmlns="">
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+      <c:CRun Text="・" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="0">
+      <c:CTextBlock>
+        <c:CRun Text="asdf " />
+        <c:CBold Classes="Bold">
+          <c:CRun Text="fdsa " />
+        </c:CBold>
+        <c:CRun Text=" jkl; " />
+        <c:CItalic Classes="Italic">
+          <c:CRun Text=";lkj" />
+        </c:CItalic>
+      </c:CTextBlock>
+    </StackPanel>
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="1">
+      <c:CRun Text="・" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="1">
+      <c:CTextBlock>
+        <c:CRun Text="1234567" />
+      </c:CTextBlock>
+    </StackPanel>
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="2">
+      <c:CRun Text="・" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="2">
+      <c:CTextBlock>
+        <c:CInlineUIContainer>
+          <c:CInlineUIContainer.Content>
+            <RadioButton IsEnabled="False" Classes=":unchecked,:disabled" />
+          </c:CInlineUIContainer.Content>
+        </c:CInlineUIContainer>
+        <c:CRun Text="ねむい" />
+      </c:CTextBlock>
+    </StackPanel>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+    </Grid.RowDefinitions>
+  </Grid>
+  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <Grid xmlns="">
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+      <c:CRun Text="12." />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="0">
+      <c:CTextBlock>
+        <c:CRun Text="asdf " />
+        <c:CBold Classes="Bold">
+          <c:CRun Text="fdsa " />
+        </c:CBold>
+        <c:CRun Text=" jkl; " />
+        <c:CItalic Classes="Italic">
+          <c:CRun Text=";lkj" />
+        </c:CItalic>
+      </c:CTextBlock>
+    </StackPanel>
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="1">
+      <c:CRun Text="13." />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="1">
+      <c:CTextBlock>
+        <c:CRun Text="1234567" />
+      </c:CTextBlock>
+    </StackPanel>
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="2">
+      <c:CRun Text="14." />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="2">
+      <c:CTextBlock>
+        <c:CInlineUIContainer>
+          <c:CInlineUIContainer.Content>
+            <RadioButton IsEnabled="False" Classes=":unchecked,:disabled" />
+          </c:CInlineUIContainer.Content>
+        </c:CInlineUIContainer>
+        <c:CRun Text="ねむい" />
+      </c:CTextBlock>
+    </StackPanel>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+    </Grid.RowDefinitions>
+  </Grid>
+</StackPanel>

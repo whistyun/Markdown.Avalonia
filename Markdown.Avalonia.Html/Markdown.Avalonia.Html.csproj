@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\Markdown.Avalonia.props" />
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFrameworks>$(PackageTargetFrameworks)</TargetFrameworks>
+    <PackageId>Markdown.Avalonia.Html</PackageId>
+    <Version>$(PackageVersion)</Version>
+    <Authors>whistyun</Authors>
+    <Description>html tag processor for Markdown.Avalonia</Description>     
+    <Copyright>© Simon Baynes 2013; whistyun 2023</Copyright>        
+    <PackageProjectUrl>https://github.com/whistyun/Markdown.Avalonia</PackageProjectUrl>
+    <PackageReadmeFile>Markdown.Avalonia.Html.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Company />
+    <LangVersion>9</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <NoBuild>true</NoBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeSymbols>false</IncludeSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Core\Parsers\TypicalBlockParser.tsv" />
+    <None Remove="Core\Parsers\TypicalInlineParser.tsv" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Core\Parsers\TypicalBlockParser.tsv" />
+    <EmbeddedResource Include="Core\Parsers\TypicalInlineParser.tsv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.42" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="..\pack_readme\Markdown.Avalonia.Html.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\ColorTextBlock.Avalonia\ColorTextBlock.Avalonia.csproj" />
+    <ProjectReference Include="..\Markdown.Avalonia.SyntaxHigh\Markdown.Avalonia.SyntaxHigh.csproj" />
+    <ProjectReference Include="..\Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj" />
+  </ItemGroup>
+
+</Project>

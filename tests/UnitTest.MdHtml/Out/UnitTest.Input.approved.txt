@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-16"?>
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="https://github.com/whistyun/Markdown.Avalonia.Tight" xmlns:ma="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+  <c:CTextBlock>
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <TextBox Text="" IsReadOnly="True" Width="100" SelectedText="" Classes=":empty" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+    <c:CRun Text=" " />
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <TextBox Text="" IsReadOnly="True" Width="98" SelectedText="" Classes=":empty" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+    <c:CRun Text=" " />
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <TextBox Text="" IsReadOnly="True" Width="100" SelectedText="" Classes=":empty" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+    <c:CRun Text=" " />
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <TextBox Text="textbox" IsReadOnly="True" SelectedText="" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+  </c:CTextBlock>
+  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <c:CTextBlock>
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <Button Content="" IsEnabled="False" Width="100" Classes=":disabled" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+    <c:CRun Text=" " />
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <Button Content="" IsEnabled="False" Width="98" Classes=":disabled" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+    <c:CRun Text=" " />
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <Button Content="" IsEnabled="False" Width="100" Classes=":disabled" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+    <c:CRun Text=" " />
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <Button Content="button" IsEnabled="False" Classes=":disabled" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+  </c:CTextBlock>
+  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <c:CTextBlock>
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <Button Content="" IsEnabled="False" Width="100" Classes=":disabled" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+    <c:CRun Text=" " />
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <Button Content="" IsEnabled="False" Width="98" Classes=":disabled" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+    <c:CRun Text=" " />
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <Button Content="" IsEnabled="False" Width="100" Classes=":disabled" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+    <c:CRun Text=" " />
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <Button Content="button" IsEnabled="False" Classes=":disabled" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+  </c:CTextBlock>
+  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <c:CTextBlock>
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <Button Content="" IsEnabled="False" Width="100" Classes=":disabled" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+    <c:CRun Text=" " />
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <Button Content="" IsEnabled="False" Width="98" Classes=":disabled" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+    <c:CRun Text=" " />
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <Button Content="" IsEnabled="False" Width="100" Classes=":disabled" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+    <c:CRun Text=" " />
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <Button Content="button" IsEnabled="False" Classes=":disabled" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+  </c:CTextBlock>
+  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <c:CTextBlock>
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <RadioButton IsEnabled="False" Classes=":unchecked,:disabled" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+    <c:CRun Text=" " />
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <RadioButton IsChecked="True" IsEnabled="False" Classes=":disabled,:checked" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+    <c:CRun Text=" " />
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <RadioButton IsChecked="True" IsEnabled="False" Classes=":disabled,:checked" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+  </c:CTextBlock>
+  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <c:CTextBlock>
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <CheckBox IsEnabled="False" Classes=":unchecked,:disabled" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+    <c:CRun Text=" " />
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <CheckBox IsChecked="True" IsEnabled="False" Classes=":disabled,:checked" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+    <c:CRun Text=" " />
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <CheckBox IsChecked="True" IsEnabled="False" Classes=":disabled,:checked" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+  </c:CTextBlock>
+  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <c:CTextBlock>
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <Slider Minimum="0" Maximum="100" Value="50" IsEnabled="False" Width="100" Classes=":horizontal,:disabled" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+    <c:CRun Text=" " />
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <Slider Minimum="0" Maximum="200" Value="50" IsEnabled="False" Width="100" Classes=":horizontal,:disabled" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+    <c:CRun Text=" " />
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <Slider Minimum="50" Maximum="100" Value="90" IsEnabled="False" Width="100" Classes=":horizontal,:disabled" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+  </c:CTextBlock>
+  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <c:CTextBlock>
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <TextBox Text="asasdfasdfsadfasdfasd&#xA;&#xA;sd&#xA;&#xA;df" AcceptsReturn="True" AcceptsTab="True" SelectedText="" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+  </c:CTextBlock>
+  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <c:CTextBlock>
+    <c:CInlineUIContainer>
+      <c:CInlineUIContainer.Content>
+        <TextBox Text="afsadfasdfasd&#xA;&#xA;sd&#xA;&#xA;df" AcceptsReturn="True" AcceptsTab="True" Width="210" Height="42" SelectedText="" xmlns="" />
+      </c:CInlineUIContainer.Content>
+    </c:CInlineUIContainer>
+  </c:CTextBlock>
+</StackPanel>

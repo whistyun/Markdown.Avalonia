@@ -1,0 +1,22 @@
+﻿#HtmlTag   | FlowDocumentTag                    | TagName              | ExtraModify
+a          | ColorTextBlock.Avalonia.CHyperlink | TagHyperlink         | Hyperlink
+abbr       | ColorTextBlock.Avalonia.CSpan      | TagAbbr              | Acronym
+acronym    | ColorTextBlock.Avalonia.CSpan      | TagAbbr              | Acronym
+b          | ColorTextBlock.Avalonia.CBold      | TagBold              |
+bdi        | ColorTextBlock.Avalonia.CSpan      | TagBdi               |
+br         | ColorTextBlock.Avalonia.CLineBreak |                      |
+cite       | ColorTextBlock.Avalonia.CSpan      | TagCite              |
+del        | ColorTextBlock.Avalonia.CSpan      | TagStrikethrough     | Strikethrough
+em         | ColorTextBlock.Avalonia.CItalic    | TagItalic            |
+i          | ColorTextBlock.Avalonia.CItalic    | TagItalic            |
+ins        | ColorTextBlock.Avalonia.CUnderline | TagUnderline         |
+mark       | ColorTextBlock.Avalonia.CSpan      | TagMark              |
+s          | ColorTextBlock.Avalonia.CSpan      | TagStrikethrough     | Strikethrough
+strike     | ColorTextBlock.Avalonia.CSpan      | TagStrikethrough     | Strikethrough
+strong     | ColorTextBlock.Avalonia.CBold      | TagBold              |
+sub        | ColorTextBlock.Avalonia.CSpan      | TagSubscript         | Subscript
+sup        | ColorTextBlock.Avalonia.CSpan      | TagSuperscript       | Superscript
+u          | ColorTextBlock.Avalonia.CUnderline | TagUnderline         |
+code       | ColorTextBlock.Avalonia.CCode      | TagCodeSpan          |
+kbd        | ColorTextBlock.Avalonia.CCode      | TagCodeSpan          |
+var        | ColorTextBlock.Avalonia.CCode      | TagCodeSpan          |

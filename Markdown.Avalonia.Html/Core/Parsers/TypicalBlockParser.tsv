@@ -1,0 +1,17 @@
+﻿#HtmlTag   | FlowDocumentTag                    | TagName              | ExtraModify
+address    | #border                            | TagAddress           |
+article    | #border                            | TagArticle           |
+aside      | #border                            | TagAside             |
+blockquote | #border                            | TagBlockquote        |
+center     | #border                            | TagCenter            | Center
+div        | #blocks                            |                      |
+footer     | #border                            | TagFooter            |
+h1         | #blocks                            | TagHeading1          |
+h2         | #blocks                            | TagHeading2          |
+h3         | #blocks                            | TagHeading3          |
+h4         | #blocks                            | TagHeading4          |
+h5         | #blocks                            | TagHeading5          |
+h6         | #blocks                            | TagHeading6          |
+noframes   | #blocks                            |                      |
+noscript   | #blocks                            |                      |
+p          | #blocks                            |                      |

@@ -1,9 +1,12 @@
 ﻿using ApprovalTests;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using UnitTest.Base.Apps;
 using UnitTest.Base.Utils;
 
@@ -27,6 +30,15 @@ namespace UnitTest.Base
             var asm = Assembly.GetExecutingAssembly();
             AssetPath = Path.GetDirectoryName(asm.Location);
             disposable = App.Start();
+        }
+
+        [SetUp]
+        public void WaitApplicationStart()
+        {
+            Debug.Print("Begin WaitApplicationStart");
+            while (!App.ApplicationStarted)
+                Thread.Sleep(10);
+            Debug.Print("End WaitApplicationStart");
         }
     }
 }

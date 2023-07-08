@@ -25,7 +25,7 @@ namespace Markdown.Avalonia.SyntaxHigh.Extensions
     /// </remarks>
     public class SyntaxHighlightWrapperExtension : MarkupExtension
     {
-        internal static readonly AvaloniaProperty<SyntaxHighlightProvider> ProviderProperty =
+        public static readonly AvaloniaProperty<SyntaxHighlightProvider> ProviderProperty =
             AvaloniaProperty.Register<TextEditor, SyntaxHighlightProvider>("Provider");
 
         private string ForegroundName;

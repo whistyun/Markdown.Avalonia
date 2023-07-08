@@ -10,7 +10,7 @@ namespace ColorTextBlock.Avalonia
 {
     public class CInlineUIContainer : CInline
     {
-        internal Control Content { get; }
+        public Control? Content { get; set; }
         internal DummyGeometryForControl? Indicator { get; private set; }
 
         public CInlineUIContainer(Control content)
@@ -20,6 +20,12 @@ namespace ColorTextBlock.Avalonia
 
         protected override IEnumerable<CGeometry> MeasureOverride(double entireWidth, double remainWidth)
         {
+            if (Content is null)
+            {
+                Indicator = null;
+                return new CGeometry[0];
+            }
+
             Content.Measure(new Size(remainWidth, Double.PositiveInfinity));
 
             if (Content.DesiredSize.Width > remainWidth)

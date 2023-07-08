@@ -12,4 +12,11 @@ namespace Markdown.Avalonia.Plugins
     {
         void Setup(SetupInfo info);
     }
+
+    public interface IMdAvPluginRequestAnother : IMdAvPlugin
+    {
+        IEnumerable<Type> DependsOn { get; }
+
+        void Inject(IEnumerable<IMdAvPlugin> plugin);
+    }
 }

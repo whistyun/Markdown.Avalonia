@@ -1,4 +1,5 @@
-﻿using Avalonia;
+﻿
+using Avalonia;
 using Avalonia.Automation.Peers;
 using Avalonia.Collections;
 using Avalonia.Controls;
@@ -196,6 +197,10 @@ namespace ColorTextBlock.Avalonia
         public CTextBlock(string text) : this()
         {
             _content.Add(new CRun() { Text = text });
+        }
+
+        public CTextBlock(params CInline[] inlines) : this((IEnumerable<CInline>)inlines)
+        {
         }
 
         public CTextBlock(IEnumerable<CInline> inlines) : this()
@@ -470,7 +475,7 @@ namespace ColorTextBlock.Avalonia
                 var indicator = container.Indicator;
                 if (indicator is null) continue;
 
-                container.Content.Arrange(new Rect(indicator.Left, indicator.Top, indicator.Width, indicator.Height));
+                indicator.Control.Arrange(new Rect(indicator.Left, indicator.Top, indicator.Width, indicator.Height));
             }
             if (MathUtilities.AreClose(_constraint.Width, finalSize.Width))
             {
