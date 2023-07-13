@@ -19,130 +19,89 @@ namespace Markdown.Avalonia.Html.Tables
         {
             var colCntAtDetail = new List<int>();
             var maxColCntInDetails = 1;
+
+            // The list of multi-row cells.
+            // Key: Column index where the target cell is located.
+            var multiRowsAtColIdx = new Dictionary<int, MdSpan>();
+
+            for (var rowIdx = 0; rowIdx < RowGroups.Count; ++rowIdx)
             {
-                var multiRowsAtColIdx = new Dictionary<int, MdSpan>();
-                for (var rowIdx = 0; rowIdx < RowGroups.Count; ++rowIdx)
+                List<TableCell> row = RowGroups[rowIdx];
+
+                var colOffset = 0;
+
+                // Setup ColspanIndex of each cells in the current row.
+                for (int colIdx = 0; colIdx < row.Count;)
                 {
-                    List<TableCell> row = RowGroups[rowIdx];
-
-                    var hasAnyCell = false;
-                    var colOffset = 0;
-
-                    var rowspansColOffset = multiRowsAtColIdx
-                        .Select(ent => ent.Value.ColSpan)
-                        .Sum();
-
-                    /*
-                     * In this row, is space exists to insert cell?
-                     * 
-                     * eg. has space
-                     *    __________________________________
-                     *    | 2x1 cell | 1x1 cell | 1x1 cell |
-                     * -> |          |‾‾‾‾‾‾‾‾‾‾|‾‾‾‾‾‾‾‾‾‾|
-                     *    ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-                     *    
-                     * eg. has no space: multi-rows occupy all space in this row.
-                     *    __________________________________
-                     *    | 2x1 cell |      2x2 cell        |
-                     * -> |          |                      |
-                     *    ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-                     * 
-                     */
-                    if (rowspansColOffset < maxColCntInDetails)
+                    int colSpan;
+                    if (multiRowsAtColIdx.TryGetValue(colOffset, out var span))
                     {
-                        int colIdx;
-                        for (colIdx = 0; colIdx < row.Count;)
+                        colSpan = span.ColSpan;
+                    }
+                    else
+                    {
+                        var cell = (TableCell)row[colIdx];
+                        cell.ColumnIndex = colOffset;
+
+                        colSpan = cell.ColSpan;
+
+                        if (cell.RowSpan > 1)
                         {
-                            int colSpan;
-                            if (multiRowsAtColIdx.TryGetValue(colOffset, out var span))
-                            {
-                                colSpan = span.ColSpan;
-                            }
-                            else
-                            {
-                                hasAnyCell = true;
-
-                                var cell = (TableCell)row[colIdx];
-                                cell.ColumnIndex = colOffset;
-
-                                colSpan = cell.ColSpan;
-
-                                if (cell.RowSpan > 1)
-                                {
-                                    multiRowsAtColIdx[colOffset] =
-                                        new MdSpan(cell.RowSpan, cell.ColSpan);
-                                }
-
-                                ++colIdx;
-                            }
-
-                            colOffset += colSpan;
+                            multiRowsAtColIdx[colOffset] =
+                                new MdSpan(cell.RowSpan, cell.ColSpan);
                         }
 
-                        foreach (var left in multiRowsAtColIdx.Where(tpl => tpl.Key >= colOffset)
-                                                              .OrderBy(tpl => tpl.Key))
-                        {
-                            while (colOffset < left.Key)
-                            {
-                                var cell = new TableCell();
-                                cell.ColumnIndex = colOffset++;
-                                row.Add(cell);
-
-                            }
-                            colOffset += left.Value.ColSpan;
-                        }
+                        ++colIdx;
                     }
 
-                    colOffset += multiRowsAtColIdx
-                        .Where(ent => ent.Key >= colOffset)
-                        .Select(ent => ent.Value.ColSpan)
-                        .Sum();
+                    colOffset += colSpan;
+                }
 
-                    foreach (var spanEntry in multiRowsAtColIdx.ToArray())
+                // Increments end of column index by the sum of the remaining multi-row cells.
+                colOffset += multiRowsAtColIdx
+                    .Where(ent => ent.Key >= colOffset)
+                    .Sum(ent => ent.Value.ColSpan);
+
+                // Removes multi-row cells,   複数行にまたがるセルの削除(必要なら)
+                foreach (var spanEntry in multiRowsAtColIdx.ToArray())
+                {
+                    if (--spanEntry.Value.Life == 0)
                     {
-                        if (--spanEntry.Value.Life == 0)
-                        {
-                            multiRowsAtColIdx.Remove(spanEntry.Key);
-                        }
-                    }
-
-                    colCntAtDetail.Add(colOffset);
-                    maxColCntInDetails = Math.Max(maxColCntInDetails, colOffset);
-
-                    if (!hasAnyCell)
-                    {
-                        RowGroups.Insert(rowIdx, new List<TableCell>());
+                        multiRowsAtColIdx.Remove(spanEntry.Key);
                     }
                 }
 
-                // if any multirow is left, insert an empty row.
-                while (multiRowsAtColIdx.Count > 0)
+                colCntAtDetail.Add(colOffset);
+                maxColCntInDetails = Math.Max(maxColCntInDetails, colOffset);
+            }
+
+            // If multi-row cells remain, insert empty rows.
+            while (multiRowsAtColIdx.Count > 0)
+            {
+                var row = new List<TableCell>();
+                RowGroups.Add(row);
+
+                var colOffset = 0;
+
+                foreach (var spanEntry in multiRowsAtColIdx.OrderBy(tpl => tpl.Key))
                 {
-                    var row = new List<TableCell>();
-                    RowGroups.Add(row);
-
-                    var colOffset = 0;
-
-                    foreach (var spanEntry in multiRowsAtColIdx.OrderBy(tpl => tpl.Key))
+                    while (colOffset < spanEntry.Key)
                     {
-                        while (colOffset < spanEntry.Key)
-                        {
-                            var cell = new TableCell();
-                            cell.ColumnIndex = colOffset++;
-                            row.Add(cell);
+                        var cell = new TableCell();
+                        cell.ColumnIndex = colOffset++;
+                        row.Add(cell);
 
-                        }
-
-                        colOffset += spanEntry.Value.ColSpan;
-
-                        if (--spanEntry.Value.Life == 0)
-                        {
-                            multiRowsAtColIdx.Remove(spanEntry.Key);
-                        }
                     }
 
-                    colCntAtDetail.Add(colOffset);
+                    colOffset += spanEntry.Value.ColSpan;
+
+                    if (--spanEntry.Value.Life == 0)
+                    {
+                        multiRowsAtColIdx.Remove(spanEntry.Key);
+                    }
                 }
+
+                colCntAtDetail.Add(colOffset);
             }
 
             ColCount = maxColCntInDetails;

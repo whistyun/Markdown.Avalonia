@@ -92,11 +92,12 @@ namespace Markdown.Avalonia.Html.Core.Parsers.MarkdigExtensions
                 foreach (var cell in row)
                 {
                     grid.Children.Add(cell.Content);
-                    Grid.SetRow(cell.Content, rowIdx++);
+                    Grid.SetRow(cell.Content, rowIdx);
                     Grid.SetColumn(cell.Content, cell.ColumnIndex);
                     Grid.SetRowSpan(cell.Content, cell.RowSpan);
                     Grid.SetColumnSpan(cell.Content, cell.ColSpan);
                 }
+                ++rowIdx;
             }
 
             grid.Classes.Add(global::Markdown.Avalonia.Markdown.TableClass);
