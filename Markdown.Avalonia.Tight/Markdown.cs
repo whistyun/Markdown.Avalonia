@@ -1889,7 +1889,7 @@ namespace Markdown.Avalonia
                         .ToArray()
             );
 
-            var status = new ParseStatus(true);
+            var status = new ParseStatus(true & _supportTextAlignment);
             var blocks = PrivateRunBlockGamut(trimmedTxt + "\n", status);
 
             var panel = Create<StackPanel, Control>(blocks);
