@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Linq;
 
 namespace Markdown.Avalonia.Html.Core.Parsers
 {
@@ -21,8 +22,6 @@ namespace Markdown.Avalonia.Html.Core.Parsers
         public string? TagNameReference { get; }
         public Tags TagName { get; }
         public string? ExtraModifyName { get; }
-
-        private readonly MethodInfo? _method;
 
         public TypicalParseInfo(string[] line)
         {
@@ -58,10 +57,19 @@ namespace Markdown.Avalonia.Html.Core.Parsers
 
             if (ExtraModifyName is not null)
             {
-                _method = this.GetType().GetMethod("ExtraModify" + ExtraModifyName);
+                switch ("ExtraModify" + ExtraModifyName)
+                {
+                    case nameof(ExtraModifyHyperlink):
+                    case nameof(ExtraModifyStrikethrough):
+                    case nameof(ExtraModifySubscript):
+                    case nameof(ExtraModifySuperscript):
+                    case nameof(ExtraModifyAcronym):
+                    case nameof(ExtraModifyCenter):
+                        break;
 
-                if (_method is null)
-                    throw new InvalidOperationException("unknown method ExtraModify" + ExtraModifyName);
+                    default:
+                        throw new InvalidOperationException("unknown method ExtraModify" + ExtraModifyName);
+                }
             }
 
             static string? GetArrayAt(string[] array, int idx)
@@ -228,11 +236,34 @@ namespace Markdown.Avalonia.Html.Core.Parsers
             }
 
             // extra modify
-            if (_method is not null)
+            if (ExtraModifyName is not null)
             {
-                foreach (var tag in generated)
+                switch ("ExtraModify" + ExtraModifyName)
                 {
-                    _method.Invoke(this, new object[] { tag, node, manager });
+                    case nameof(ExtraModifyHyperlink):
+                        foreach (var tag in generated)
+                            ExtraModifyHyperlink((CHyperlink)tag, node, manager);
+                        break;
+                    case nameof(ExtraModifyStrikethrough):
+                        foreach (var tag in generated)
+                            ExtraModifyStrikethrough((CSpan)tag, node, manager);
+                        break;
+                    case nameof(ExtraModifySubscript):
+                        foreach (var tag in generated)
+                            ExtraModifySubscript((CSpan)tag, node, manager);
+                        break;
+                    case nameof(ExtraModifySuperscript):
+                        foreach (var tag in generated)
+                            ExtraModifySuperscript((CSpan)tag, node, manager);
+                        break;
+                    case nameof(ExtraModifyAcronym):
+                        foreach (var tag in generated)
+                            ExtraModifyAcronym((CSpan)tag, node, manager);
+                        break;
+                    case nameof(ExtraModifyCenter):
+                        foreach (var tag in generated)
+                            ExtraModifyCenter((Border)tag, node, manager);
+                        break;
                 }
             }
 
@@ -296,9 +327,9 @@ namespace Markdown.Avalonia.Html.Core.Parsers
             }
         }
 
-        public static IEnumerable<TypicalParseInfo> Load(string resourcePath)
+        internal static IEnumerable<TypicalParseInfo> Load(string resourcePath)
         {
-            var asm = Assembly.GetExecutingAssembly();
+            var asm = typeof(TypicalBlockParser).Assembly;
             using var stream = asm.GetManifestResourceStream(resourcePath);
 
             if (stream is null)
