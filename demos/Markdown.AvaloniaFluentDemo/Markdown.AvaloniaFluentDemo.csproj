@@ -27,7 +27,7 @@
     <Compile Include="..\..\tests\UnitTest.Base\Utils\Util.cs" Link="Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj" />
+    <ProjectReference Include="..\..\Markdown.Avalonia\Markdown.Avalonia.csproj" />
     <ProjectReference Include="..\..\Markdown.Avalonia.Svg\Markdown.Avalonia.Svg.csproj" />
   </ItemGroup>
   <ItemGroup>

@@ -30,7 +30,7 @@ namespace Markdown.Avalonia
 
             var dic = new ConcurrentDictionary<string, string>();
 
-            Assembly asm = Assembly.GetCallingAssembly();
+            Assembly asm = typeof(EmojiTable).Assembly;
             using var stream = asm.GetManifestResourceStream(resourceName);
             Debug.Assert(stream is not null);
 
