@@ -58,11 +58,15 @@ namespace Markdown.AvaloniaDemo.ViewModels
 
         public MainWindowViewModel()
         {
-            using (var stream = new FileStream("MainWindow.md", FileMode.Open))
-            using (var reader = new StreamReader(stream))
+            try
             {
-                Text = reader.ReadToEnd();
+                using (var stream = new FileStream("MainWindow.md", FileMode.Open))
+                using (var reader = new StreamReader(stream))
+                {
+                    Text = reader.ReadToEnd();
+                }
             }
+            catch { }
 
             Styles = new List<StyleViewModel>
             {

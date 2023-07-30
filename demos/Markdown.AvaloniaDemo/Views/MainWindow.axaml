@@ -12,6 +12,9 @@
 
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
         x:Class="Markdown.AvaloniaDemo.Views.MainWindow"
+        
+        x:DataType="vm:MainWindowViewModel"
+        x:CompileBindings="True"
         Icon="/Assets/avalonia-logo.ico"
         Title="Markdown.AvaloniaDemo"
         >

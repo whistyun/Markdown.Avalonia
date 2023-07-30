@@ -249,16 +249,16 @@ namespace Markdown.Avalonia.Plugins
             try
             {
                 asm = Assembly.Load(BuiltinAsmNm);
+
+                var type = asm.GetType(BuiltinTpNm);
+                if (type != null && Activator.CreateInstance(type) is IMdAvPlugin plugin)
+                {
+                    plugin.Setup(this);
+                }
             }
             catch
             {
                 return this;
-            }
-
-            var type = asm.GetType(BuiltinTpNm);
-            if (type != null && Activator.CreateInstance(type) is IMdAvPlugin plugin)
-            {
-                plugin.Setup(this);
             }
 
             _builtinCalled = true;

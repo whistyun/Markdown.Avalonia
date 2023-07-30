@@ -2,7 +2,7 @@
 
   <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
     <PackageTargetFrameworks>net461;netcoreapp2.0;netstandard2.0;net6</PackageTargetFrameworks>
-    <DemoAppTargetFrameworks>net461;netcoreapp3.1;net6</DemoAppTargetFrameworks>
+    <DemoAppTargetFrameworks>net461;netcoreapp3.1;net6;net7</DemoAppTargetFrameworks>
     <TestTargetFrameworks>net6</TestTargetFrameworks>
   </PropertyGroup>
 
@@ -28,7 +28,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>11.0.0</PackageVersion>
+    <PackageVersion>11.0.1</PackageVersion>
   </PropertyGroup>
 
 </Project>

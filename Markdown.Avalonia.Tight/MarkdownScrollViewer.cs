@@ -112,8 +112,12 @@ namespace Markdown.Avalonia
                 HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             };
+
+            ((ISetLogicalParent)_viewer).SetParent(this);
             VisualChildren.Add(_viewer);
             LogicalChildren.Add(_viewer);
+
+            EditStyle(_markdownStyle);
 
             static bool nvl(bool? vl) => vl.HasValue && vl.Value;
         }
@@ -132,6 +136,9 @@ namespace Markdown.Avalonia
 
         private void UpdateMarkdown()
         {
+            if(_viewer.Content is null && String.IsNullOrEmpty(Markdown))
+                return;
+
             var doc = Engine.Transform(Markdown ?? "");
 
             var ofst = _viewer.Offset;
