@@ -37,10 +37,14 @@ namespace Markdown.Avalonia.Controls
 
         private void _grid_LayoutUpdated(object? sender, EventArgs e)
         {
+            // If auto scale is disabled, use `1 *` for each column.
+            // This is default value used for grid column width in Markdown.Avalonia.
             if (!GetIsEnabled(_grid))
             {
                 if (_grid.ColumnDefinitions.All(def => def.Width.IsStar && def.Width.Value == 1d))
                     return;
+
+                _isAutoArrangeTried = false;
 
                 Clear();
 
@@ -50,13 +54,14 @@ namespace Markdown.Avalonia.Controls
                 ReSetGridChildren();
             }
 
+            // If column width adjustement is already done, skip the following process.
             if (_isAutoArrangeTried)
                 return;
 
             _isAutoArrangeTried = true;
 
 
-            // retrieve width at every columns
+            /// Determines the maximum requred width for each column.
 
             var width = new double[_columnCount];
 

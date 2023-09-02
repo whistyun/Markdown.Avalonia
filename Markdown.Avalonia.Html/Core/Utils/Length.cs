@@ -47,7 +47,7 @@ namespace Markdown.Avalonia.Html.Core.Utils
             if (String.IsNullOrEmpty(text))
                 goto failParse;
 
-            var mch = Regex.Match(text, @"^([0-9\.\+\-eE]+)(%|em|ex|mm|Q|cm|in|pt|pc|px)$");
+            var mch = Regex.Match(text, @"^([0-9\.\+\-eE]+)(%|em|ex|mm|Q|cm|in|pt|pc|px|)$");
 
             if (!mch.Success)
                 goto failParse;
@@ -70,6 +70,7 @@ namespace Markdown.Avalonia.Html.Core.Utils
                 "pt" => Unit.Points,
                 "pc" => Unit.Picas,
                 "px" => Unit.Pixels,
+                "" => Unit.Pixels,
                 _ => Unit.Pixels,
             };
 

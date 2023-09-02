@@ -97,7 +97,7 @@ namespace Markdown.Avalonia.Html.Core.Utils
 
             if (children.Count == 1)
             {
-                child = children[1];
+                child = children[0];
                 return true;
             }
             else

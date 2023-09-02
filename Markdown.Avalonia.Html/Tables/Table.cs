@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Avalonia.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,19 +7,21 @@ namespace Markdown.Avalonia.Html.Tables
 {
     class Table
     {
+        public List<LengthInfo> ColumnLengths { get; }
         public List<List<TableCell>> RowGroups { get; }
         public int ColCount { get; private set; }
         public int RowCount { get; private set; }
 
         public Table()
         {
+            ColumnLengths = new();
             RowGroups = new();
         }
 
         public void Structure()
         {
             var colCntAtDetail = new List<int>();
-            var maxColCntInDetails = 1;
+            var maxColCntInDetails = Math.Max(1, ColumnLengths.Count);
 
             // The list of multi-row cells.
             // Key: Column index where the target cell is located.
@@ -106,6 +109,13 @@ namespace Markdown.Avalonia.Html.Tables
 
             ColCount = maxColCntInDetails;
             RowCount = RowGroups.Count;
+
+            // insert coldef for the shortfall
+
+            while (ColumnLengths.Count < ColCount)
+            {
+                ColumnLengths.Add(new LengthInfo(1, LengthUnit.Auto));
+            }
 
             // insert cell for the shortfall
 
