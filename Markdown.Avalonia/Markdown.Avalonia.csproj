@@ -18,13 +18,6 @@
     <PackageReadmeFile>Markdown.Avalonia.md</PackageReadmeFile>
     <PackageTags>Markdown Avalonia Avaloniaui</PackageTags>
   </PropertyGroup>
-  <PropertyGroup>
-    <IsPackable>true</IsPackable>
-    <NoBuild>true</NoBuild>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <IncludeSymbols>false</IncludeSymbols>
-  </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\pack_readme\Markdown.Avalonia.md" Pack="true" PackagePath="\" />

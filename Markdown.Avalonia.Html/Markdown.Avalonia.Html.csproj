@@ -17,13 +17,6 @@
     <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-  <PropertyGroup>
-    <IsPackable>true</IsPackable>
-    <NoBuild>true</NoBuild>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <IncludeSymbols>false</IncludeSymbols>
-  </PropertyGroup>
   <ItemGroup>
     <None Remove="Core\Parsers\TypicalBlockParser.tsv" />
     <None Remove="Core\Parsers\TypicalInlineParser.tsv" />
