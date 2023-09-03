@@ -112,9 +112,14 @@ namespace Markdown.Avalonia.Html.Tables
 
             // insert coldef for the shortfall
 
+            var hasScaleWidCol = ColumnLengths.Any(c => c.Unit == LengthUnit.Percent);
+
             while (ColumnLengths.Count < ColCount)
             {
-                ColumnLengths.Add(new LengthInfo(1, LengthUnit.Auto));
+                if (hasScaleWidCol)
+                    ColumnLengths.Add(new LengthInfo(1, LengthUnit.Auto));
+                else
+                    ColumnLengths.Add(new LengthInfo(1, LengthUnit.Percent));
             }
 
             // insert cell for the shortfall

@@ -107,6 +107,11 @@ namespace Markdown.Avalonia.Html.Core.Parsers.MarkdigExtensions
             border.Child = grid;
             border.Classes.Add(global::Markdown.Avalonia.Markdown.TableClass);
 
+            if (table.ColumnLengths.All(l => l.Unit != LengthUnit.Percent))
+            {
+                border.Classes.Add("TightTable");
+            }
+
             var captions = node.SelectNodes("./caption");
             if (captions is not null)
             {

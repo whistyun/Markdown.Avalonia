@@ -70,6 +70,12 @@
     </Style.Setters>
   </Style>
 
+  <Style Selector="Border.TightTable">
+    <Style.Setters>
+      <Setter Property="HorizontalAlignment" Value="Left"/>
+    </Style.Setters>
+  </Style>
+
   <Style Selector="Grid.Table > Border">
     <Style.Setters>
       <Setter Property="Margin" Value="0"/>
