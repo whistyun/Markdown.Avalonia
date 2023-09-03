@@ -127,6 +127,12 @@
     </Style.Setters>
   </Style>
 
+  <Style Selector="Border.TightTable">
+    <Style.Setters>
+      <Setter Property="HorizontalAlignment" Value="Left"/>
+    </Style.Setters>
+  </Style>
+
   <Style Selector="Border.TableHeader">
     <Style.Setters>
       <Setter Property="Background" Value="LightGray"/>
