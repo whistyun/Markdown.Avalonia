@@ -7,7 +7,6 @@ using Markdown.Avalonia.Html.Core.Utils;
 using Avalonia;
 using Avalonia.Controls;
 using Markdown.Avalonia.Html.Tables;
-using Markdown.Avalonia.Controls;
 using Avalonia.Layout;
 
 namespace Markdown.Avalonia.Html.Core.Parsers.MarkdigExtensions
@@ -75,13 +74,15 @@ namespace Markdown.Avalonia.Html.Core.Parsers.MarkdigExtensions
                 table.RowGroups.AddRange(group);
             }
 
+            ParseColumnStyle(node, table);
+
             table.Structure();
 
             // table
             var grid = new Grid();
 
             // table columns
-            grid.ColumnDefinitions = new AutoScaleColumnDefinitions(table.ColCount, grid);
+            grid.ColumnDefinitions = new AutoScaleColumnDefinitions(table.ColumnLengths, grid);
 
             // table rows
             int rowIdx = 0;
@@ -92,11 +93,12 @@ namespace Markdown.Avalonia.Html.Core.Parsers.MarkdigExtensions
                 foreach (var cell in row)
                 {
                     grid.Children.Add(cell.Content);
-                    Grid.SetRow(cell.Content, rowIdx++);
+                    Grid.SetRow(cell.Content, rowIdx);
                     Grid.SetColumn(cell.Content, cell.ColumnIndex);
                     Grid.SetRowSpan(cell.Content, cell.RowSpan);
                     Grid.SetColumnSpan(cell.Content, cell.ColSpan);
                 }
+                ++rowIdx;
             }
 
             grid.Classes.Add(global::Markdown.Avalonia.Markdown.TableClass);
@@ -104,10 +106,6 @@ namespace Markdown.Avalonia.Html.Core.Parsers.MarkdigExtensions
             var border = new Border();
             border.Child = grid;
             border.Classes.Add(global::Markdown.Avalonia.Markdown.TableClass);
-
-            ParseColumnStyle(node, grid);
-
-
 
             var captions = node.SelectNodes("./caption");
             if (captions is not null)
@@ -144,41 +142,28 @@ namespace Markdown.Avalonia.Html.Core.Parsers.MarkdigExtensions
         }
 
 
-        private static void ParseColumnStyle(HtmlNode tableTag, Grid table)
+        private static void ParseColumnStyle(HtmlNode tableTag, Table table)
         {
             var colHolder = tableTag.ChildNodes.HasOneTag("colgroup", out var colgroup) ? colgroup! : tableTag;
 
-            // TODO Implements LATER 
-            // foreach (var col in colHolder.ChildNodes.CollectTag("col"))
-            // {
-            //     var coldef = new ColumnDefinition();
-            //     table.ColumnDefinitions.Add(coldef);
-            // 
-            //     var spanAttr = col.Attributes["span"];
-            //     if (spanAttr is not null)
-            //     {
-            //         if (int.TryParse(spanAttr.Value, out var spanCnt))
-            //         {
-            //             foreach (var _ in Enumerable.Range(0, spanCnt - 1))
-            //                 table.ColumnDefinitions.Add(coldef);
-            //         }
-            //     }
-            // 
-            //     var styleAttr = col.Attributes["style"];
-            //     if (styleAttr is null) continue;
-            // 
-            //     var mch = Regex.Match(styleAttr.Value, "width:([^;\"]+)(%|em|ex|mm|cm|in|pt|pc|)");
-            //     if (!mch.Success) continue;
-            // 
-            //     if (!Length.TryParse(mch.Groups[1].Value + mch.Groups[2].Value, out var length))
-            //         continue;
-            // 
-            //     coldef.Width = length.Unit switch
-            //     {
-            //         Unit.Percentage => new GridLength(length.Value, GridUnitType.Star),
-            //         _ => new GridLength(length.ToPoint())
-            //     };
-            // }
+            foreach (var col in colHolder.ChildNodes.CollectTag("col"))
+            {
+
+                var styleAttr = col.Attributes["style"];
+                if (styleAttr is null) continue;
+
+                var mch = Regex.Match(styleAttr.Value, "width[ \t]*:[ \t]*([^;\"]+)(%|em|ex|mm|cm|in|pt|pc|)");
+                if (!mch.Success) continue;
+
+                if (!Length.TryParse(mch.Groups[1].Value + mch.Groups[2].Value, out var length))
+                    continue;
+
+                table.ColumnLengths.Add(length.Unit switch
+                {
+                    Unit.Percentage => new LengthInfo(length.Value, LengthUnit.Percent),
+                    _ => new LengthInfo(length.ToPoint(), LengthUnit.Pixel)
+                });
+            }
         }
 
 

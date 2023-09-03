@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
+using System;
 using System.Linq;
 
 namespace ColorTextBlock.Avalonia.Geometries
@@ -111,19 +112,20 @@ namespace ColorTextBlock.Avalonia.Geometries
 
             Line.Draw(ctx, new Point(Left, Top));
 
-            var pen = new Pen(foreground);
             if (IsUnderline)
             {
-                ctx.DrawLine(pen,
-                    new Point(Left, Top + Height),
-                    new Point(Left + Width, Top + Height));
+                var ypos = Math.Round(Top + Height);
+                ctx.DrawLine(new Pen(foreground, 2),
+                    new Point(Left, ypos),
+                    new Point(Left + Width, ypos));
             }
 
             if (IsStrikethrough)
             {
-                ctx.DrawLine(pen,
-                    new Point(Left, +Top + Height / 2),
-                    new Point(Left + Width, Top + Height / 2));
+                var ypos = Math.Round(Top + Height / 2);
+                ctx.DrawLine(new Pen(foreground, 2),
+                    new Point(Left, ypos),
+                    new Point(Left + Width, ypos));
             }
         }
     }
