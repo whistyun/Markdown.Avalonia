@@ -46,6 +46,7 @@ namespace ColorTextBlock.Avalonia.Geometries
 
         public double WidthIncludingTrailingWhitespace => _result.WidthIncludingTrailingWhitespace;
         public double Height => _result.Height;
+        public double BaseHeight => _result.Baseline;
 
         private TextLine _result;
 
@@ -76,7 +77,7 @@ namespace ColorTextBlock.Avalonia.Geometries
             CTextLine tline,
             TextVerticalAlignment align,
             bool linebreak) :
-            base(owner, tline.WidthIncludingTrailingWhitespace, tline.Height, tline.Height, align, linebreak)
+            base(owner, tline.WidthIncludingTrailingWhitespace, tline.Height, tline.BaseHeight, align, linebreak)
         {
             Line = tline;
             LayoutForeground = owner.Foreground;
@@ -86,7 +87,7 @@ namespace ColorTextBlock.Avalonia.Geometries
                 TextLineGeometry baseGeometry,
                 bool linebreak) :
             base(baseGeometry.Owner,
-                 baseGeometry.Width, baseGeometry.Height, baseGeometry.Height,
+                 baseGeometry.Width, baseGeometry.Height, baseGeometry.BaseHeight,
                  baseGeometry.TextVerticalAlignment,
                  linebreak)
         {
