@@ -6,6 +6,9 @@ using System.Globalization;
 
 namespace ColorTextBlock.Avalonia
 {
+    /// <summary>
+    /// Expression of the linebreak.
+    /// </summary>
     public class CLineBreak : CRun
     {
         public CLineBreak()

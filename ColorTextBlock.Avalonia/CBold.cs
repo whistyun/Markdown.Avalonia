@@ -3,6 +3,9 @@ using Weight = Avalonia.Media.FontWeight;
 
 namespace ColorTextBlock.Avalonia
 {
+    /// <summary>
+    /// Bold decoration
+    /// </summary>
     public class CBold : CSpan
     {
         public CBold() { }

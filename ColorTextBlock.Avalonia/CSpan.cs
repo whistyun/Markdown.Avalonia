@@ -11,26 +11,57 @@ using System.Linq;
 
 namespace ColorTextBlock.Avalonia
 {
+    /// <summary>
+    /// Text decoration
+    /// </summary>
     public class CSpan : CInline
     {
+        /// <summary>
+        /// The thickness of the border
+        /// </summary>
+        /// <seealso cref="BorderThickness"/>
         public static readonly StyledProperty<Thickness> BorderThicknessProperty =
             AvaloniaProperty.Register<CSpan, Thickness>(nameof(BorderThickness));
 
+        /// <summary>
+        /// The brush of the border.
+        /// </summary>
+        /// <seealso cref="BorderBrush"/>
         public static readonly StyledProperty<IBrush> BorderBrushProperty =
             AvaloniaProperty.Register<CSpan, IBrush>(nameof(BorderBrush));
 
+        /// <summary>
+        /// The radius of the border rounded corners
+        /// </summary>
+        /// <seealso cref="CornerRadius"/>
         public static readonly StyledProperty<CornerRadius> CornerRadiusProperty =
             AvaloniaProperty.Register<CSpan, CornerRadius>(nameof(CornerRadius));
 
+        /// <summary>
+        /// The box shadow effect parameters
+        /// </summary>
+        /// <seealso cref="BoxShadow"/>
         public static readonly StyledProperty<BoxShadows> BoxShadowProperty =
             AvaloniaProperty.Register<CSpan, BoxShadows>(nameof(BoxShadow));
 
+        /// <summary>
+        /// The padding to place around the Child control.
+        /// </summary>
+        /// <seealso cref="Padding"/>
         public static readonly StyledProperty<Thickness> PaddingProperty =
             AvaloniaProperty.Register<CSpan, Thickness>(nameof(Padding));
 
+        /// <summary>
+        /// The margin around the element.
+        /// </summary>
+        /// <seealso cref="Margin"/>
         public static readonly StyledProperty<Thickness> MarginProperty =
             InputElement.MarginProperty.AddOwner<CSpan>();
 
+        /// <summary>
+        /// THe content of the eleemnt
+        /// </summary>
+        /// <seealso cref="Content"/>
         public static readonly StyledProperty<IEnumerable<CInline>> ContentProperty =
             AvaloniaProperty.Register<CSpan, IEnumerable<CInline>>(nameof(Content));
 
@@ -54,37 +85,63 @@ namespace ColorTextBlock.Avalonia
 
         private Border? _border;
 
+        /// <summary>
+        /// The thickness of the border
+        /// </summary>
         public Thickness BorderThickness
         {
             get => GetValue(BorderThicknessProperty);
             set => SetValue(BorderThicknessProperty, value);
         }
+
+        /// <summary>
+        /// The brush of the border.
+        /// </summary>
         public IBrush BorderBrush
         {
             get => GetValue(BorderBrushProperty);
             set => SetValue(BorderBrushProperty, value);
         }
+
+        /// <summary>
+        /// The radius of the border rounded corners
+        /// </summary>
         public CornerRadius CornerRadius
         {
             get => GetValue(CornerRadiusProperty);
             set => SetValue(CornerRadiusProperty, value);
         }
+
+        /// <summary>
+        /// The box shadow effect parameters
+        /// </summary>
         public BoxShadows BoxShadow
         {
             get => GetValue(BoxShadowProperty);
             set => SetValue(BoxShadowProperty, value);
         }
+
+        /// <summary>
+        /// The padding to place around the Child control.
+        /// </summary>
         public Thickness Padding
         {
             get => GetValue(PaddingProperty);
             set => SetValue(PaddingProperty, value);
         }
+
+        /// <summary>
+        /// The margin around the element.
+        /// </summary>
         public Thickness Margin
         {
             get => GetValue(MarginProperty);
             set => SetValue(MarginProperty, value);
         }
 
+        /// <summary>
+        /// THe content of the eleemnt
+        /// </summary>
         [Content]
         public IEnumerable<CInline> Content
         {

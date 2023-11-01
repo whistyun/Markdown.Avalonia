@@ -8,8 +8,14 @@ using System.Text;
 
 namespace ColorTextBlock.Avalonia
 {
+    /// <summary>
+    /// Places a control as an inline element.
+    /// </summary>
     public class CInlineUIContainer : CInline
     {
+        /// <summary>
+        /// A displayed control
+        /// </summary>
         public Control? Content { get; set; }
         internal DummyGeometryForControl? Indicator { get; private set; }
 
@@ -41,6 +47,7 @@ namespace ColorTextBlock.Avalonia
             }
         }
 
+        /// <inheritdoc/>
         public override string AsString() => String.Empty;
     }
 }

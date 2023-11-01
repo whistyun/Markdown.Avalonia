@@ -8,27 +8,50 @@ using System.Linq;
 
 namespace ColorTextBlock.Avalonia
 {
+    /// <summary>
+    /// Hyperlink decoration
+    /// </summary>
     public class CHyperlink : CSpan
     {
+        /// <summary>
+        /// Background brush during mouse hover
+        /// </summary>
+        /// <seealso cref="HoverBackground"/>
         public static readonly StyledProperty<IBrush?> HoverBackgroundProperty =
             AvaloniaProperty.Register<CHyperlink, IBrush?>(nameof(Foreground));
 
+        /// <summary>
+        /// Foreground brush during mouse hover
+        /// </summary>
+        /// <seealso cref="HoverForeground"/>
         public static readonly StyledProperty<IBrush?> HoverForegroundProperty =
             AvaloniaProperty.Register<CHyperlink, IBrush?>(nameof(Foreground));
 
+        /// <summary>
+        /// Background brush during mouse hover
+        /// </summary>
         public IBrush? HoverBackground
         {
             get { return GetValue(HoverBackgroundProperty); }
             set { SetValue(HoverBackgroundProperty, value); }
         }
 
+        /// <summary>
+        /// Foreground brush during mouse hover
+        /// </summary>
         public IBrush? HoverForeground
         {
             get { return GetValue(HoverForegroundProperty); }
             set { SetValue(HoverForegroundProperty, value); }
         }
 
+        /// <summary>
+        /// Link click action
+        /// </summary>
         public Action<string>? Command { get; set; }
+        /// <summary>
+        /// Link click action parameter
+        /// </summary>
         public string? CommandParameter { get; set; }
 
         public CHyperlink() { }
@@ -65,7 +88,8 @@ namespace ColorTextBlock.Avalonia
                     PseudoClasses.Add(":pointerover");
                     PseudoClasses.Add(":hover");
 
-                    try {
+                    try
+                    {
                         ctrl.Cursor = new Cursor(StandardCursorType.Hand);
                     }
                     catch { /*I cannot assume Cursor.ctor doesn't throw an exception.*/ }

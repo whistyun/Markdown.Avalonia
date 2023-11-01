@@ -7,7 +7,6 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Metadata;
-using Avalonia.Platform;
 using Avalonia.Utilities;
 using Avalonia.VisualTree;
 using ColorTextBlock.Avalonia.Geometries;
@@ -19,50 +18,110 @@ using System.Linq;
 
 namespace ColorTextBlock.Avalonia
 {
+    /// <summary>
+    /// TextBlock to enables character-by-character decoration.
+    /// </summary>
+    // 文字ごとの装飾を可能とするTextBlock
     public class CTextBlock : Control
     {
+        /// <summary>
+        /// Use for adjusting vertical position between CTextBlocks. e.g. between a list marker and a list item.
+        /// </summary>
+        // リストマーカーと項目の縦位置の調整といった、CTextBlock間で文字の位置調整に使用します。
         private static readonly StyledProperty<double> BaseHeightProperty =
             AvaloniaProperty.Register<CTextBlock, double>("BaseHeight");
 
+        /// <summary>
+        /// Use to indicate the height of each lines. If this value is NaN, the height is calculated by content.
+        /// </summary>
+        /// <seealso cref="LineHeight"/>
+        // 一行の高さ指定の為に使用します。指定がない(NaN)の場合、コンテンツによって行の高さが決まります。
         public static readonly StyledProperty<double> LineHeightProperty =
             AvaloniaProperty.Register<CTextBlock, double>(nameof(LineHeight), defaultValue: Double.NaN);
 
+        /// <summary>
+        /// Line to line spacing.
+        /// </summary>
+        /// <seealso cref="LineSpacing"/>
+        // 行間の幅
         public static readonly StyledProperty<double> LineSpacingProperty =
             AvaloniaProperty.Register<CTextBlock, double>(nameof(LineSpacing), defaultValue: 0);
 
+        /// <summary>
+        /// The brush of background.
+        /// </summary>
+        /// <seealso cref="Background"/>
         public static readonly StyledProperty<IBrush?> BackgroundProperty =
             Border.BackgroundProperty.AddOwner<CTextBlock>();
 
+        /// <summary>
+        /// The brush of characters.
+        /// </summary>
+        /// <seealso cref="Foreground"/>
         public static readonly StyledProperty<IBrush?> ForegroundProperty =
             TextBlock.ForegroundProperty.AddOwner<CTextBlock>();
 
+        /// <summary>
+        /// The font family of characters
+        /// </summary>
+        /// <seealso cref="FontFamily"/>
         public static readonly StyledProperty<FontFamily> FontFamilyProperty =
             TextBlock.FontFamilyProperty.AddOwner<CTextBlock>();
 
+        /// <summary>
+        /// The font weight of characters
+        /// </summary>
+        /// <seealso cref="FontWeight"/>
         public static readonly StyledProperty<FontWeight> FontWeightProperty =
             TextBlock.FontWeightProperty.AddOwner<CTextBlock>();
 
+        /// <summary>
+        /// The font size of characters
+        /// </summary>
+        /// <seealso cref="FontSize"/>
         public static readonly StyledProperty<double> FontSizeProperty =
             TextBlock.FontSizeProperty.AddOwner<CTextBlock>();
 
+        /// <summary>
+        /// The font style of characters
+        /// </summary>
+        /// <seealso cref="FontStyle"/>
         public static readonly StyledProperty<FontStyle> FontStyleProperty =
             TextBlock.FontStyleProperty.AddOwner<CTextBlock>();
 
+        /// <summary>
+        /// Use to indicate the vertical position of text within line.
+        /// For example, it is used to align text to the top or to the bottom.
+        /// </summary>
+        /// <seealso cref="TextVerticalAlignment"/>
+        // テキストを上揃えで描画するか下揃えで描画するか指定します。
         public static readonly StyledProperty<TextVerticalAlignment> TextVerticalAlignmentProperty =
             AvaloniaProperty.Register<CTextBlock, TextVerticalAlignment>(
                 nameof(TextVerticalAlignment),
                 defaultValue: TextVerticalAlignment.Base,
                 inherits: true);
 
+        /// <summary>
+        /// Use to indicate the mode of text wrapping.
+        /// </summary>
+        /// <seealso cref="TextWrapping"/>
         public static readonly StyledProperty<TextWrapping> TextWrappingProperty =
             AvaloniaProperty.Register<CTextBlock, TextWrapping>(nameof(TextWrapping), defaultValue: TextWrapping.Wrap);
 
+        /// <summary>
+        /// Contents to be displayed.
+        /// </summary>
+        /// <seealso cref="Content"/>
         public static readonly DirectProperty<CTextBlock, AvaloniaList<CInline>> ContentProperty =
             AvaloniaProperty.RegisterDirect<CTextBlock, AvaloniaList<CInline>>(
                 nameof(Content),
                     o => o.Content,
                     (o, v) => o.Content = v);
 
+        /// <summary>
+        /// Horizontal text alignment.
+        /// </summary>
+        /// <seealso cref="TextAlignment"/>
         public static readonly StyledProperty<TextAlignment> TextAlignmentProperty =
             AvaloniaProperty.Register<CTextBlock, TextAlignment>(
                 nameof(TextAlignment), defaultValue: TextAlignment.Left);
@@ -91,72 +150,109 @@ namespace ColorTextBlock.Avalonia
         private string? _text;
         private bool _measureRequested;
 
+        /// <summary>
+        /// The brush of background.
+        /// </summary>
         public IBrush? Background
         {
             get { return GetValue(BackgroundProperty); }
             set { SetValue(BackgroundProperty, value); }
         }
 
+        /// <summary>
+        /// The brush of characters.
+        /// </summary>
         public IBrush? Foreground
         {
             get { return GetValue(ForegroundProperty); }
             set { SetValue(ForegroundProperty, value); }
         }
 
+        /// <summary>
+        /// The font family of characters
+        /// </summary>
         public FontFamily FontFamily
         {
             get { return GetValue(FontFamilyProperty); }
             set { SetValue(FontFamilyProperty, value); }
         }
 
+        /// <summary>
+        /// The font size of characters
+        /// </summary>
         public double FontSize
         {
             get { return GetValue(FontSizeProperty); }
             set { SetValue(FontSizeProperty, value); }
         }
 
+        /// <summary>
+        /// The font style of characters
+        /// </summary>
         public FontStyle FontStyle
         {
             get { return GetValue(FontStyleProperty); }
             set { SetValue(FontStyleProperty, value); }
         }
 
+        /// <summary>
+        /// The font weight of characters
+        /// </summary>
         public FontWeight FontWeight
         {
             get { return GetValue(FontWeightProperty); }
             set { SetValue(FontWeightProperty, value); }
         }
 
+        /// <summary>
+        /// Use to indicate the mode of text wrapping.
+        /// </summary>
         public TextWrapping TextWrapping
         {
             get { return GetValue(TextWrappingProperty); }
             set { SetValue(TextWrappingProperty, value); }
         }
 
+        /// <summary>
+        /// Horizontal text alignment.
+        /// </summary>
         public TextAlignment TextAlignment
         {
             get { return GetValue(TextAlignmentProperty); }
             set { SetValue(TextAlignmentProperty, value); }
         }
 
+        /// <summary>
+        /// Use to indicate the vertical position of text within line.
+        /// For example, it is used to align text to the top or to the bottom.
+        /// </summary>
         public TextVerticalAlignment TextVerticalAlignment
         {
             get { return GetValue(TextVerticalAlignmentProperty); }
             set { SetValue(TextVerticalAlignmentProperty, value); }
         }
 
+        /// <summary>
+        /// Use to indicate the height of each lines. If this value is NaN, the height is calculated by content.
+        /// </summary>
         public double LineHeight
         {
             get { return GetValue(LineHeightProperty); }
             set { SetValue(LineHeightProperty, value); }
         }
 
+        /// <summary>
+        /// Line to line spacing.
+        /// </summary>
         public double LineSpacing
         {
             get { return GetValue(LineSpacingProperty); }
             set { SetValue(LineSpacingProperty, value); }
         }
 
+        /// <summary>
+        /// Contents to be displayed.
+        /// </summary>
         [Content]
         public AvaloniaList<CInline> Content
         {
@@ -178,6 +274,9 @@ namespace ColorTextBlock.Avalonia
             }
         }
 
+        /// <summary>
+        /// Textual presentation of content.
+        /// </summary>
         public string Text
         {
             get => _text ??= String.Join("", Content.Select(c => c.AsString()));
@@ -345,7 +444,12 @@ namespace ColorTextBlock.Avalonia
                     break;
 
                 case nameof(BaseHeightProperty):
-                    CheckHaveToMeasure();
+                    if (_computedBaseHeight != GetValue(BaseHeightProperty))
+                    {
+                        _measureRequested = true;
+                        InvalidateMeasure();
+                        InvalidateArrange();
+                    }
                     break;
             }
         }
@@ -381,6 +485,10 @@ namespace ColorTextBlock.Avalonia
             }
         }
 
+        /// <summary>
+        /// Add CInline to LogicalChildren to inherit the value of AvaloniaProperty.
+        /// And add Control, which is haved by CInlineUIContainer, to VisualChildren.
+        /// </summary>
         private void AttachChildren(IEnumerable<CInline> newItems)
         {
             foreach (CInline item in newItems)
@@ -418,6 +526,10 @@ namespace ColorTextBlock.Avalonia
             }
         }
 
+        /// <summary>
+        /// Remove CInline to LogicalChildren to inherit the value of AvaloniaProperty.
+        /// And remove Control, which is haved by CInlineUIContainer, to VisualChildren.
+        /// </summary>
         private void DetachChildren(IEnumerable<CInline> removeItems)
         {
             foreach (CInline item in removeItems)
@@ -441,16 +553,6 @@ namespace ColorTextBlock.Avalonia
             }
         }
 
-        private void CheckHaveToMeasure()
-        {
-            if (_computedBaseHeight != GetValue(BaseHeightProperty))
-            {
-                _measureRequested = true;
-                InvalidateMeasure();
-                InvalidateArrange();
-            }
-        }
-
         internal void OnMeasureSourceChanged()
         {
             SetValue(BaseHeightProperty, default);
@@ -464,6 +566,11 @@ namespace ColorTextBlock.Avalonia
             InvalidateVisual();
         }
 
+
+        /// <summary>
+        /// Check to see if the arrangement size is different from the size of measuring.
+        /// </summary>
+        // 配置領域が寸法計算時に与えられた領域より広すぎるもしくは狭すぎないか確認します。
         protected override Size ArrangeOverride(Size finalSize)
         {
             if (_measured.Width > finalSize.Width)
@@ -645,23 +752,7 @@ namespace ColorTextBlock.Avalonia
         }
     }
 
-    public class CTextBlockAutomationPeer : ControlAutomationPeer
-    {
-        public CTextBlockAutomationPeer(CTextBlock owner) : base(owner)
-        { }
-
-        public new CTextBlock Owner
-            => (CTextBlock)base.Owner;
-
-        protected override AutomationControlType GetAutomationControlTypeCore()
-            => AutomationControlType.Text;
-
-        protected override string? GetNameCore()
-            => Owner.Text;
-
-        protected override bool IsControlElementCore()
-            => Owner.TemplatedParent is null && base.IsControlElementCore();
-    }
+ 
 
 
     class LineInfo
