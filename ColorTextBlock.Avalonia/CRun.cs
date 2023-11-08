@@ -10,13 +10,23 @@ using System.Text.RegularExpressions;
 
 namespace ColorTextBlock.Avalonia
 {
+    /// <summary>
+    /// Expression of a text
+    /// </summary>
     public class CRun : CInline
     {
         private static readonly Regex Sep = new("\r\n|\r|\n", RegexOptions.Compiled);
 
+        /// <summary>
+        /// THe content of the eleemnt
+        /// </summary>
+        /// <seealso cref="Content"/>
         public static readonly StyledProperty<string> TextProperty =
             AvaloniaProperty.Register<CRun, string>(nameof(Text));
 
+        /// <summary>
+        /// THe content of the eleemnt
+        /// </summary>
         [Content]
         public string Text
         {

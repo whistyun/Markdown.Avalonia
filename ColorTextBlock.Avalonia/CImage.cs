@@ -11,6 +11,9 @@ using Avalonia.Media;
 
 namespace ColorTextBlock.Avalonia
 {
+    /// <summary>
+    /// Displays an image
+    /// </summary>
     public class CImage : CInline
     {
         public static readonly StyledProperty<double?> LayoutWidthProperty =

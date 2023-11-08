@@ -2,6 +2,9 @@
 
 namespace ColorTextBlock.Avalonia
 {
+    /// <summary>
+    /// Underline decoration
+    /// </summary>
     public class CUnderline : CSpan
     {
         public CUnderline() { }
