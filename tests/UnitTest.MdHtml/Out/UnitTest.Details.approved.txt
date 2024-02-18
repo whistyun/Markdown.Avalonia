@@ -38,7 +38,7 @@
       <StackPanel>
         <c:CTextBlock>
           <c:CRun Text="Spoiler warning " />
-          <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="https://www.google.com" Classes="Hyperlink">
+          <c:CHyperlink CommandParameter="https://www.google.com" Classes="Hyperlink">
             <c:CRun Text="link" />
           </c:CHyperlink>
         </c:CTextBlock>

@@ -6,7 +6,6 @@ using Avalonia.Metadata;
 using ColorTextBlock.Avalonia.Geometries;
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace ColorTextBlock.Avalonia
 {
@@ -15,8 +14,6 @@ namespace ColorTextBlock.Avalonia
     /// </summary>
     public class CRun : CInline
     {
-        private static readonly Regex Sep = new("\r\n|\r|\n", RegexOptions.Compiled);
-
         /// <summary>
         /// THe content of the eleemnt
         /// </summary>
@@ -88,7 +85,7 @@ namespace ColorTextBlock.Avalonia
 
                     var list = Create(secondalyText, entireWidth);
 
-                    list.Insert(0, Create(firstLineText, firstLineLayout.TextLines[0], true));
+                    list.Insert(0, new TextLineGeometry(this, firstLineText, firstLineLayout.TextLines[0], true));
 
                     return list;
                 }
@@ -103,13 +100,6 @@ namespace ColorTextBlock.Avalonia
                     return list;
                 }
             }
-        }
-
-        private CGeometry Create(string chip, TextLine line, bool linebreak)
-        {
-            var cline = new CTextLine(chip, Typeface, FontSize, line);
-
-            return new TextLineGeometry(this, cline, TextVerticalAlignment, linebreak);
         }
 
         private List<CGeometry> Create(string text, double maxWidth)
@@ -132,11 +122,9 @@ namespace ColorTextBlock.Avalonia
                 var line = textlines[j];
                 var chip = text.Substring(line.FirstTextSourceIndex, line.Length);
 
-                var cline = new CTextLine(chip, Typeface, FontSize, line);
-
                 var linebreak = j != textlines.Count - 1;
 
-                rslt.Add(new TextLineGeometry(this, cline, TextVerticalAlignment, linebreak));
+                rslt.Add(new TextLineGeometry(this, chip, line, linebreak));
             }
 
             return rslt;

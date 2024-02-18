@@ -7,7 +7,7 @@
     <c:CRun Text="Html style" />
   </c:CTextBlock>
   <c:CTextBlock>
-    <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="http://example.com" Classes="Hyperlink">
+    <c:CHyperlink CommandParameter="http://example.com" Classes="Hyperlink">
       <c:CImage />
       <c:CRun Text=" asdf " />
       <c:CItalic>
@@ -21,7 +21,7 @@
     <c:CRun Text="Html style" />
   </c:CTextBlock>
   <c:CTextBlock>
-    <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="http://example.com" Classes="Hyperlink">
+    <c:CHyperlink CommandParameter="http://example.com" Classes="Hyperlink">
       <c:CRun Text="![](https://img.shields.io/nuget/v/AssemblyInfoHelper.svg) asdf *asdf* asdf" />
     </c:CHyperlink>
   </c:CTextBlock>

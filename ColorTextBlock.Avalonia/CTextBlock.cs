@@ -4,9 +4,11 @@ using Avalonia.Automation.Peers;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Metadata;
+using Avalonia.Rendering.Composition;
 using Avalonia.Utilities;
 using Avalonia.VisualTree;
 using ColorTextBlock.Avalonia.Geometries;
@@ -14,7 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace ColorTextBlock.Avalonia
 {
@@ -22,7 +26,7 @@ namespace ColorTextBlock.Avalonia
     /// TextBlock to enables character-by-character decoration.
     /// </summary>
     // 文字ごとの装飾を可能とするTextBlock
-    public class CTextBlock : Control
+    public class CTextBlock : Control, ITextPointerHandleable
     {
         /// <summary>
         /// Use for adjusting vertical position between CTextBlocks. e.g. between a list marker and a list item.
@@ -126,6 +130,8 @@ namespace ColorTextBlock.Avalonia
             AvaloniaProperty.Register<CTextBlock, TextAlignment>(
                 nameof(TextAlignment), defaultValue: TextAlignment.Left);
 
+        public Selection? Selection { get; set; }
+
         static CTextBlock()
         {
             ClipToBoundsProperty.OverrideDefaultValue<CTextBlock>(true);
@@ -143,6 +149,7 @@ namespace ColorTextBlock.Avalonia
         private Size _constraint;
         private Size _measured;
         private readonly List<CGeometry> _metries;
+        private readonly List<LineInfo> _lines;
         private readonly List<CInlineUIContainer> _containers;
         private bool _isPressed;
         private CGeometry? _entered;
@@ -282,12 +289,16 @@ namespace ColorTextBlock.Avalonia
             get => _text ??= String.Join("", Content.Select(c => c.AsString()));
         }
 
+
+
+
         public CTextBlock()
         {
             _content = new AvaloniaList<CInline>();
             _content.CollectionChanged += ContentCollectionChangedd;
 
             _metries = new List<CGeometry>();
+            _lines = new List<LineInfo>();
             _containers = new List<CInlineUIContainer>();
 
             RenderOptions.SetBitmapInterpolationMode(this, BitmapInterpolationMode.HighQuality);
@@ -566,7 +577,6 @@ namespace ColorTextBlock.Avalonia
             InvalidateVisual();
         }
 
-
         /// <summary>
         /// Check to see if the arrangement size is different from the size of measuring.
         /// </summary>
@@ -612,6 +622,7 @@ namespace ColorTextBlock.Avalonia
         private Size UpdateGeometry()
         {
             _metries.Clear();
+            _lines.Clear();
 
             double entireWidth = _constraint.Width;
             if (Double.IsInfinity(_constraint.Width) && Bounds.Width != 0)
@@ -624,7 +635,6 @@ namespace ColorTextBlock.Avalonia
             // measure & split by linebreak
             var reqHeight = GetValue(BaseHeightProperty);
             var entireLineHeight = LineHeight;
-            var lines = new List<LineInfo>();
             {
                 LineInfo? now = null;
 
@@ -641,8 +651,8 @@ namespace ColorTextBlock.Avalonia
                     {
                         if (now is null)
                         {
-                            lines.Add(now = new LineInfo());
-                            if (lines.Count == 1)
+                            _lines.Add(now = new LineInfo());
+                            if (_lines.Count == 1)
                                 now.RequestBaseHeight = reqHeight;
                         }
 
@@ -671,21 +681,21 @@ namespace ColorTextBlock.Avalonia
                 }
             }
 
-            if (lines.Count > 0)
+            if (_lines.Count > 0)
             {
-                _computedBaseHeight = lines[0].BaseHeight;
-                SetValue(BaseHeightProperty, lines[0].BaseHeight);
+                _computedBaseHeight = _lines[0].BaseHeight;
+                SetValue(BaseHeightProperty, _lines[0].BaseHeight);
             }
 
             var lineSpc = LineSpacing;
-            height += lineSpc * (lines.Count - 1);
+            height += lineSpc * (_lines.Count - 1);
 
             // set position
             {
                 var topOffset = 0d;
                 var leftOffset = 0d;
 
-                foreach (LineInfo lineInf in lines)
+                foreach (LineInfo lineInf in _lines)
                 {
                     switch (TextAlignment)
                     {
@@ -735,7 +745,7 @@ namespace ColorTextBlock.Avalonia
 
         public override void Render(DrawingContext context)
         {
-            if (Background != null)
+            if (Background is not null)
             {
                 context.FillRectangle(Background, new Rect(0, 0, Bounds.Width, Bounds.Height));
             }
@@ -750,9 +760,185 @@ namespace ColorTextBlock.Avalonia
         {
             return new CTextBlockAutomationPeer(this);
         }
+
+
+        public bool TryMoveNext(
+            TextPointer current,
+#if NETCOREAPP3_0_OR_GREATER
+            [MaybeNullWhen(false)]
+            out TextPointer? next
+#else
+            out TextPointer next
+#endif
+            )
+        {
+            if (_metries.Count == 0)
+            {
+                next = null;
+                return false;
+            }
+
+            Debug.Assert(ReferenceEquals(current[0], this));
+
+            var inlineIdx = Enumerable.Range(0, _metries.Count)
+                                      .First(idx => ReferenceEquals(_metries[idx], current[1]));
+
+            while (inlineIdx < _metries.Count)
+            {
+                var curTgt = _metries[inlineIdx];
+
+                if (!curTgt.TryMoveNext(current, out var nxtPointer))
+                {
+                    ++inlineIdx;
+                }
+                else if (curTgt.GetEnd() == nxtPointer)
+                {
+                    if (++inlineIdx < _metries.Count)
+                    {
+                        next = Wrap(_metries[inlineIdx].GetBegin());
+                        return true;
+                    }
+                    else
+                    {
+                        next = Wrap(nxtPointer);
+                        return true;
+                    }
+                }
+                else
+                {
+                    next = Wrap(nxtPointer);
+                    return true;
+                }
+            }
+
+            next = null;
+            return false;
+        }
+
+        public bool TryMovePrev(
+            TextPointer current,
+#if NETCOREAPP3_0_OR_GREATER
+            [MaybeNullWhen(false)]
+            out TextPointer? prev
+#else
+            out TextPointer prev
+#endif
+        )
+        {
+            if (_metries.Count == 0)
+            {
+                prev = null;
+                return false;
+            }
+
+            Debug.Assert(ReferenceEquals(current[0], this));
+
+            var inlineIdx = Enumerable.Range(0, _metries.Count)
+                                      .First(idx => ReferenceEquals(_metries[idx], current[1]));
+
+            while (inlineIdx >= 0)
+            {
+                var curTgt = _metries[inlineIdx];
+
+                if (!curTgt.TryMovePrev(current, out var prvPointer))
+                {
+                    --inlineIdx;
+                }
+                else
+                {
+                    prev = Wrap(prvPointer);
+                    return true;
+                }
+            }
+
+            prev = null;
+            return false;
+        }
+
+        public TextPointer CalcuatePointerFrom(double x, double y)
+        {
+            if (x < 0)
+            {
+                return GetBegin();
+            }
+
+            foreach (var target in _metries)
+            {
+                if (x <= target.Left + target.Width)
+                {
+                    return Wrap(target.CalcuatePointerFrom(x, y));
+                }
+            }
+
+            return GetEnd();
+
+        }
+
+        public TextPointer GetBegin()
+        {
+            if (_metries.Count != 0)
+            {
+                return Wrap(_metries[0].GetBegin());
+            }
+            else
+            {
+                return new TextPointer(this, 0, 0d, 0d, _measured.Height);
+            }
+        }
+
+        public TextPointer GetEnd()
+        {
+            if (_metries.Count != 0)
+            {
+                return Wrap(_metries[_metries.Count - 1].GetEnd());
+            }
+            else
+            {
+                return new TextPointer(this, 0, 0d, 0d, _measured.Height);
+            }
+        }
+
+        public int CompareTo(TextPointer left, TextPointer right)
+        {
+            if (left is null || right is null)
+                throw new ArgumentNullException();
+
+            if (!ReferenceEquals(this, left.Host))
+                throw new ArgumentException("TextPointer has a different host.", nameof(left));
+
+            if (!ReferenceEquals(this, right.Host))
+                throw new ArgumentException("TextPointer has a different host.", nameof(right));
+
+            return left.Index.CompareTo(right.Index);
+        }
+
+
+        private TextPointer Wrap(TextPointer tgt)
+        {
+            var idx = 0;
+            for (var i = 0; !ReferenceEquals(_metries[idx], tgt.Host); ++i)
+            {
+                idx += _metries[i].CaretLength;
+            }
+
+            return tgt.Wrap(this, tgt.HostPosY, tgt.Height, idx);
+        }
     }
 
- 
+
+
+
+    public class Selection
+    {
+        public TextPointer From { get; }
+        public TextPointer To { get; }
+        public Selection(TextPointer f, TextPointer t)
+        {
+            From = f;
+            To = t;
+        }
+    }
+
 
 
     class LineInfo

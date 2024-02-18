@@ -2,83 +2,30 @@
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ColorTextBlock.Avalonia.Geometries
 {
-    internal class CTextLayout
-    {
-        public string Text { get; }
-        public Typeface Typeface { get; }
-        public double FontSize { get; }
-
-        private TextLayout _layout;
-
-        public CTextLayout(string text, Typeface typeface, double fontSize, IBrush? foreground, TextLayout result)
-        {
-            Text = text;
-            Typeface = typeface;
-            FontSize = fontSize;
-
-            _layout = result;
-        }
-
-        public CTextLayout(string text, Typeface typeface, double fontSize, IBrush? foreground, double maxWidth)
-        {
-            Text = text;
-            Typeface = typeface;
-            FontSize = fontSize;
-
-            _layout = new TextLayout(
-                            Text,
-                            Typeface, FontSize,
-                            foreground,
-                            textWrapping: TextWrapping.Wrap,
-                            maxWidth: maxWidth);
-        }
-    }
-
-    internal class CTextLine
-    {
-        public string Text { get; }
-        public Typeface Typeface { get; }
-        public double FontSize { get; }
-
-        public double WidthIncludingTrailingWhitespace => _result.WidthIncludingTrailingWhitespace;
-        public double Height => _result.Height;
-        public double BaseHeight => _result.Baseline;
-
-        private TextLine _result;
-
-        public CTextLine(string text, Typeface typeface, double fontSize, TextLine result)
-        {
-            Text = text;
-            Typeface = typeface;
-            FontSize = fontSize;
-            _result = result;
-        }
-
-        public void SetForegroundBrush(IBrush? foreground)
-        {
-            var layout = new TextLayout(Text, Typeface, FontSize, foreground);
-            _result = layout.TextLines.First();
-        }
-
-        public void Draw(DrawingContext ctx, Point point) => _result.Draw(ctx, point);
-    }
-
     internal class TextLineGeometry : TextGeometry
     {
-        private CTextLine Line { set; get; }
-        private IBrush? LayoutForeground { set; get; }
+        public string Text { get; }
+        public Typeface Typeface { get; }
+        public double FontSize { get; }
+        public TextLine Line { get; private set; }
+        public IBrush? LayoutForeground { get; private set; }
 
         internal TextLineGeometry(
             CInline owner,
-            CTextLine tline,
-            TextVerticalAlignment align,
+            string text,
+            TextLine tline,
             bool linebreak) :
-            base(owner, tline.WidthIncludingTrailingWhitespace, tline.Height, tline.BaseHeight, align, linebreak)
+            base(owner, tline.WidthIncludingTrailingWhitespace, tline.Height, tline.Baseline, owner.TextVerticalAlignment, linebreak)
         {
+            Text = text;
+            Typeface = owner.Typeface;
+            FontSize = owner.FontSize;
             Line = tline;
             LayoutForeground = owner.Foreground;
         }
@@ -91,6 +38,9 @@ namespace ColorTextBlock.Avalonia.Geometries
                  baseGeometry.TextVerticalAlignment,
                  linebreak)
         {
+            Text = baseGeometry.Text;
+            Typeface = baseGeometry.Typeface;
+            FontSize = baseGeometry.FontSize;
             Line = baseGeometry.Line;
             LayoutForeground = baseGeometry.LayoutForeground;
         }
@@ -103,7 +53,8 @@ namespace ColorTextBlock.Avalonia.Geometries
             if (LayoutForeground != foreground)
             {
                 LayoutForeground = foreground;
-                Line.SetForegroundBrush(LayoutForeground);
+                var layout = new TextLayout(Text, Typeface, FontSize, foreground);
+                Line = layout.TextLines.First();
             }
 
             if (background != null)
@@ -128,6 +79,81 @@ namespace ColorTextBlock.Avalonia.Geometries
                     new Point(Left, ypos),
                     new Point(Left + Width, ypos));
             }
+        }
+
+        public override bool TryMoveNext(
+            TextPointer current,
+#if NETCOREAPP3_0_OR_GREATER
+            [MaybeNullWhen(false)]
+            out TextPointer? next
+#else
+            out TextPointer next
+#endif
+            )
+        {
+            if (!Object.ReferenceEquals(current.Last, this))
+                throw new ArgumentException();
+
+            var hit = new CharacterHit(current.InternalIndex);
+            var nxt = Line.GetNextCaretCharacterHit(hit);
+
+            if (hit == nxt)
+            {
+                next = null;
+                return false;
+            }
+
+            var dst = Line.GetDistanceFromCharacterHit(nxt);
+            next = new TextPointer(this, Line, nxt, dst + Left, Top, Height);
+            return true;
+        }
+
+        public override bool TryMovePrev(
+            TextPointer current,
+#if NETCOREAPP3_0_OR_GREATER
+            [MaybeNullWhen(false)]
+            out TextPointer? prev
+#else
+            out TextPointer prev
+#endif
+            )
+        {
+            var hit = new CharacterHit(current.InternalIndex);
+            var prv = Line.GetPreviousCaretCharacterHit(hit);
+
+            if (hit == prv)
+            {
+                prev = null;
+                return false;
+            }
+
+            var dst = Line.GetDistanceFromCharacterHit(prv);
+            prev = new TextPointer(this, Line, prv, dst + Left, Top, Height);
+            return true;
+        }
+
+        public override TextPointer CalcuatePointerFrom(double x, double y)
+        {
+            var hit = Line.GetCharacterHitFromDistance(x - Left);
+            var dst = Line.GetDistanceFromCharacterHit(hit);
+
+            return new TextPointer(this, Line, hit, dst + Left, Top, Height);
+        }
+
+        public override TextPointer GetBegin()
+        {
+            var hit = Line.GetCharacterHitFromDistance(0);
+            var dst = Line.GetDistanceFromCharacterHit(hit);
+
+            return new TextPointer(this, Line, hit, dst + Left, Top, Height);
+        }
+
+        public override TextPointer GetEnd()
+        {
+            var hit = Line.GetCharacterHitFromDistance(Double.MaxValue);
+            var dst = Line.GetDistanceFromCharacterHit(hit);
+
+            return new TextPointer(this, Line, hit, dst + Left, Top, Height);
         }
     }
 }

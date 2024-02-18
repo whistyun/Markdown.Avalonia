@@ -9,6 +9,7 @@ using Markdown.Avalonia.Plugins;
 using Markdown.Avalonia.StyleCollections;
 using Markdown.Avalonia.Utils;
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -136,10 +137,11 @@ namespace Markdown.Avalonia
 
         private void UpdateMarkdown()
         {
-            if(_viewer.Content is null && String.IsNullOrEmpty(Markdown))
+            if (_viewer.Content is null && String.IsNullOrEmpty(Markdown))
                 return;
 
-            var doc = Engine.Transform(Markdown ?? "");
+            var docElm = _engine.TransformElement(Markdown ?? "");
+            var doc = docElm.Control;
 
             var ofst = _viewer.Offset;
             _viewer.Content = doc;
@@ -148,15 +150,20 @@ namespace Markdown.Avalonia
                 _viewer.Offset = ofst;
         }
 
-        private IMarkdownEngine _engine;
-        public IMarkdownEngine Engine
+        private IMarkdownEngine2 _engine;
+        public IMarkdownEngineBase Engine
         {
             set
             {
                 if (value is null)
                     throw new ArgumentNullException(nameof(Engine));
 
-                _engine = value;
+                if (value is IMarkdownEngine engine1)
+                    _engine = engine1.Upgrade();
+                else if (value is IMarkdownEngine2 engine)
+                    _engine = engine;
+                else
+                    throw new ArgumentException();
 
                 _engine.CascadeResources.SetParent(this);
                 _engine.UseResource = _useResource;
@@ -175,7 +182,7 @@ namespace Markdown.Avalonia
             {
                 if (value is not null)
                 {
-                    Engine.AssetPathRoot = _AssetPathRoot = value;
+                    _engine.AssetPathRoot = _AssetPathRoot = value;
                     UpdateMarkdown();
                 }
             }
@@ -384,7 +391,7 @@ namespace Markdown.Avalonia
             get => _plugins;
             set
             {
-                _plugins = Engine.Plugins = value;
+                _plugins = _engine.Plugins = value;
                 _setup = Plugins.Info;
 
                 EditStyle(MarkdownStyle);

@@ -2,6 +2,7 @@
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using ColorDocument.Avalonia;
 using ColorTextBlock.Avalonia;
 using Markdown.Avalonia.Parsers;
 using Markdown.Avalonia.Utils;
@@ -272,7 +273,11 @@ namespace Markdown.Avalonia.Plugins
             if (overrider is null)
                 return parser;
 
-            return new BlockParserOverride(parser.Pattern, parser.Name, overrider);
+
+            if (overrider is BlockOverride2 override2)
+                return new BlockParserOverride2(parser.Pattern, parser.Name, override2);
+            else
+                return new BlockParserOverride(parser.Pattern, parser.Name, overrider);
         }
 
         internal void Overwrite(ICommand? hyperlink)
@@ -323,6 +328,18 @@ namespace Markdown.Avalonia.Plugins
                 IMarkdownEngine engine,
                 out int parseTextBegin, out int parseTextEnd)
             => _overrider.Convert(text, firstMatch, status, engine, out parseTextBegin, out parseTextEnd);
+        }
+
+        class BlockParserOverride2 : BlockParser2
+        {
+            private BlockOverride2 _overrider;
+            public BlockParserOverride2(Regex pattern, string name, BlockOverride2 overrider) : base(pattern, name)
+            {
+                _overrider = overrider;
+            }
+
+            public override IEnumerable<DocumentElement>? Convert2(string text, Match firstMatch, ParseStatus status, IMarkdownEngine2 engine, out int parseTextBegin, out int parseTextEnd)
+                => _overrider.Convert2(text, firstMatch, status, engine, out parseTextBegin, out parseTextEnd);
         }
 
         class ImageLoader

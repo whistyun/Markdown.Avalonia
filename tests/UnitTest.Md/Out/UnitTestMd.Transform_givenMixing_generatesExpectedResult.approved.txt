@@ -67,7 +67,7 @@
     <StackPanel Grid.Column="1" Grid.Row="0">
       <c:CTextBlock Classes="Paragraph">
         <c:CRun Text="Links " />
-        <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="https://www.google.com">
+        <c:CHyperlink CommandParameter="https://www.google.com">
           <c:CRun Text="Go to Google!" />
         </c:CHyperlink>
       </c:CTextBlock>
@@ -78,7 +78,7 @@
     <StackPanel Grid.Column="1" Grid.Row="1">
       <c:CTextBlock Classes="Paragraph">
         <c:CRun Text="Links with title " />
-        <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="https://www.google.com">
+        <c:CHyperlink CommandParameter="https://www.google.com">
           <c:CRun Text="Go to Google!" />
         </c:CHyperlink>
       </c:CTextBlock>

@@ -247,6 +247,16 @@ namespace UnitTest.Base.Utils
                     }
                 }
 
+                if (pinf.PropertyType.IsValueType)
+                {
+                    if (value == Activator.CreateInstance(pinf.PropertyType))
+                        continue;
+                }
+                else if (value is null)
+                {
+                    continue;
+                }
+
                 node.Attributes.Add(new ObjectProperty()
                 {
                     Owner = obj,

@@ -3,7 +3,10 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ColorTextBlock.Avalonia.Geometries
 {
@@ -166,29 +169,171 @@ namespace ColorTextBlock.Avalonia.Geometries
             {
                 target.Left = left;
 
-                switch (target.TextVerticalAlignment)
+                target.Top = target.TextVerticalAlignment switch
                 {
-                    case TextVerticalAlignment.Top:
-                        target.Top = top;
-                        break;
+                    TextVerticalAlignment.Top
+                        => top,
 
-                    case TextVerticalAlignment.Center:
-                        target.Top = (top + btm - target.Height) / 2;
-                        break;
+                    TextVerticalAlignment.Center
+                        => (top + btm - target.Height) / 2,
 
-                    case TextVerticalAlignment.Bottom:
-                        target.Top = btm - target.Height;
-                        break;
+                    TextVerticalAlignment.Bottom
+                        => btm - target.Height,
 
-                    case TextVerticalAlignment.Base:
-                        target.Top = Top + BaseHeight - target.BaseHeight;
-                        break;
-                }
+                    TextVerticalAlignment.Base
+                        => Top + BaseHeight - target.BaseHeight,
+
+                    _ => throw new InvalidOperationException("sorry library manager forget to modify.")
+                };
 
                 target.Render(ctx);
 
                 left += target.Width;
             }
+        }
+
+        public override bool TryMoveNext(
+            TextPointer current,
+#if NETCOREAPP3_0_OR_GREATER
+            [MaybeNullWhen(false)]
+            out TextPointer? next
+#else
+            out TextPointer next
+#endif
+            )
+        {
+            if (Targets.Length == 0)
+            {
+                next = null;
+                return false;
+            }
+
+            int depgthIdx = Enumerable.Range(0, current.PathDepth)
+                                   .First(idx => ReferenceEquals(current[idx], this));
+
+            Debug.Assert(depgthIdx < current.PathDepth - 1);
+
+            var inlineIdx = Enumerable.Range(0, Targets.Length)
+                                      .First(idx => ReferenceEquals(Targets[idx], current[depgthIdx + 1]));
+
+            while (inlineIdx < Targets.Length)
+            {
+                var curTgt = Targets[inlineIdx];
+
+                if (curTgt.TryMoveNext(current, out var nxtPointer))
+                {
+                    if (curTgt.GetEnd() != nxtPointer)
+                    {
+                        next = Wrap(nxtPointer);
+                        return true;
+                    }
+
+                    if (++inlineIdx < Targets.Length)
+                    {
+                        next = Wrap(Targets[inlineIdx].GetBegin());
+                        return true;
+                    }
+                    else
+                    {
+                        next = Wrap(nxtPointer);
+                        return true;
+                    }
+                }
+
+                ++inlineIdx;
+            }
+
+            next = null;
+            return false;
+        }
+
+        public override bool TryMovePrev(
+            TextPointer current,
+#if NETCOREAPP3_0_OR_GREATER
+            [MaybeNullWhen(false)]
+            out TextPointer? prev
+#else
+            out TextPointer prev
+#endif
+            )
+        {
+            if (Targets.Length == 0)
+            {
+                prev = null;
+                return false;
+            }
+
+            int depgthIdx = Enumerable.Range(0, current.PathDepth)
+                                   .First(idx => ReferenceEquals(current[idx], this));
+
+            Debug.Assert(depgthIdx < current.PathDepth - 1);
+
+            var inlineIdx = Enumerable.Range(0, Targets.Length)
+                                      .First(idx => ReferenceEquals(Targets[idx], current[depgthIdx + 1]));
+
+            while (inlineIdx >= 0)
+            {
+                var curTgt = Targets[inlineIdx];
+
+                if (curTgt.TryMovePrev(current, out var prvPointer))
+                {
+                    prev = Wrap(prvPointer);
+                    return true;
+                }
+
+                --inlineIdx;
+            }
+
+            prev = null;
+            return false;
+        }
+
+        public override TextPointer CalcuatePointerFrom(double x, double y)
+            => Wrap(PrivateCalcuatePointerFrom(x, y));
+
+        public override TextPointer GetBegin()
+            => Wrap(PrivateGetBegin());
+
+        public override TextPointer GetEnd()
+            => Wrap(PrivateGetEnd());
+
+        private TextPointer PrivateCalcuatePointerFrom(double x, double y)
+        {
+            if (x < Left)
+            {
+                return PrivateGetBegin();
+            }
+
+            foreach (var target in Targets)
+            {
+                if (x <= target.Left + target.Width)
+                {
+                    return target.CalcuatePointerFrom(x, y);
+                }
+            }
+
+            return PrivateGetEnd();
+        }
+
+        private TextPointer PrivateGetBegin()
+        {
+            return Targets[0].GetBegin();
+        }
+
+        private TextPointer PrivateGetEnd()
+        {
+            return Targets[Targets.Length - 1].GetEnd();
+        }
+
+        private TextPointer Wrap(TextPointer tgt)
+        {
+            var idx = 0;
+            for (var i = 0; !ReferenceEquals(Targets[idx], tgt.Host); ++i)
+            {
+                idx += Targets[i].CaretLength;
+            }
+
+            return tgt.Wrap(this, Top, Height, idx);
         }
     }
 }
