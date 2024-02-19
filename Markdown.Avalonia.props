@@ -1,7 +1,7 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
-    <PackageTargetFrameworks>net461;netcoreapp2.0;netstandard2.0;net6</PackageTargetFrameworks>
+    <PackageTargetFrameworks>net461;netstandard2.0;net6</PackageTargetFrameworks>
     <DemoAppTargetFrameworks>net461;netcoreapp3.1;net6;net7</DemoAppTargetFrameworks>
     <TestTargetFrameworks>net6</TestTargetFrameworks>
   </PropertyGroup>
