@@ -1,20 +1,21 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using Avalonia.Markup.Xaml;
 using Avalonia.Metadata;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using ColorDocument.Avalonia;
+using ColorDocument.Avalonia.DocumentElements;
 using Markdown.Avalonia.Plugins;
 using Markdown.Avalonia.StyleCollections;
 using Markdown.Avalonia.Utils;
 using System;
-using System.ComponentModel;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
-using System.Threading;
 using MdStyle = Markdown.Avalonia.MarkdownStyle;
 
 namespace Markdown.Avalonia
@@ -67,10 +68,10 @@ namespace Markdown.Avalonia
                 (owner, v) => owner.ScrollValue = v);
 
 
-        private static readonly HttpClient _httpclient = new();
-
+        private static readonly HttpClient s_httpclient = new();
         private readonly ScrollViewer _viewer;
         private SetupInfo _setup;
+        private DocumentElement? _document;
 
         public MarkdownScrollViewer()
         {
@@ -121,7 +122,79 @@ namespace Markdown.Avalonia
             EditStyle(_markdownStyle);
 
             static bool nvl(bool? vl) => vl.HasValue && vl.Value;
+
+            _viewer.ScrollChanged += (s, e) => OnScrollChanged();
         }
+
+        public event HeaderScrolled? HeaderScrolled;
+        private List<HeaderRect>? _headerRects;
+        private HeaderScrolledEventArgs? _eventArgs;
+
+        private void OnViewportSizeChanged(object? obj, EventArgs arg)
+        {
+            _headerRects = null;
+        }
+
+        private void OnScrollChanged()
+        {
+            if (HeaderScrolled is null) return;
+
+            double offsetY = _viewer.Offset.Y;
+            double viewHeight = _viewer.Viewport.Height;
+
+            if (_headerRects is null)
+            {
+                if (_document is null) return;
+
+                _headerRects = new List<HeaderRect>();
+                foreach (var doc in _document.Children.OfType<HeaderElement>())
+                {
+                    var t = doc.GetRect();
+                    var rect = new Rect(t.Left, t.Top + offsetY, t.Width, t.Height);
+                    _headerRects.Add(new HeaderRect(rect, doc));
+                }
+            }
+
+            var tree = new Header?[5];
+            var viewing = new List<Header>();
+
+            tree[0] = _headerRects.Where(rct => rct.Header.Level == 1)
+                                  .Select(rct => CreateHeader(rct))
+                                  .FirstOrDefault();
+
+            foreach (var headerRect in _headerRects)
+            {
+                var boundY = headerRect.BaseBound.Bottom - offsetY;
+
+                if (boundY < 0)
+                {
+                    var header = CreateHeader(headerRect);
+                    tree[header.Level - 1] = header;
+
+                    for (var i = header.Level; i < tree.Length; ++i)
+                        tree[i] = null;
+                }
+                else if (0 <= boundY && boundY < viewHeight)
+                {
+                    viewing.Add(CreateHeader(headerRect));
+                }
+                else break;
+            }
+
+            var newEvArg = new HeaderScrolledEventArgs(tree.OfType<Header>().ToList(), viewing);
+            if (_eventArgs != newEvArg)
+            {
+                _eventArgs = newEvArg;
+                HeaderScrolled(this, _eventArgs);
+            }
+
+            static Header CreateHeader(HeaderRect headerRect)
+            {
+                var header = headerRect.Header;
+                return new Header(header.Level, header.Text);
+            }
+        }
+
 
         private void EditStyle(IStyle mdstyle)
         {
@@ -140,11 +213,23 @@ namespace Markdown.Avalonia
             if (_viewer.Content is null && String.IsNullOrEmpty(Markdown))
                 return;
 
-            var docElm = _engine.TransformElement(Markdown ?? "");
-            var doc = docElm.Control;
+            _document = _engine.TransformElement(Markdown ?? "");
+            var doc = _document.Control;
 
             var ofst = _viewer.Offset;
+
+            if (_viewer.Content is Control contentControl)
+            {
+                contentControl.SizeChanged -= OnViewportSizeChanged;
+            }
+
             _viewer.Content = doc;
+            if (doc is not null)
+            {
+                doc.SizeChanged += OnViewportSizeChanged;
+            }
+
+            _headerRects = null;
 
             if (SaveScrollValueWhenContentUpdated)
                 _viewer.Offset = ofst;
@@ -300,7 +385,7 @@ namespace Markdown.Avalonia
                 {
                     case "http":
                     case "https":
-                        using (var res = _httpclient.GetAsync(_source).Result)
+                        using (var res = s_httpclient.GetAsync(_source).Result)
                         using (var strm = res.Content.ReadAsStreamAsync().Result)
                         using (var reader = new StreamReader(strm, true))
                             Markdown = reader.ReadToEnd();
@@ -418,5 +503,18 @@ namespace Markdown.Avalonia
         //    Thread.MemoryBarrier();
         //    _viewer.Content = ctrl;
         //}
+
+
+        class HeaderRect
+        {
+            public Rect BaseBound { get; }
+            public HeaderElement Header { get; }
+
+            public HeaderRect(Rect bound, HeaderElement header)
+            {
+                BaseBound = bound;
+                Header = header;
+            }
+        }
     }
 }

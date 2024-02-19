@@ -10,6 +10,8 @@ namespace ColorDocument.Avalonia.DocumentElements
     {
         private Lazy<CTextBlock> _text;
 
+        public string Text => _text.Value.Text;
+
         public override Control Control => _text.Value;
 
         public override IEnumerable<DocumentElement> Children => Array.Empty<DocumentElement>();

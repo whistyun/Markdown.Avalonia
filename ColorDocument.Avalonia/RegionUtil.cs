@@ -22,7 +22,8 @@ namespace Markdown.Avalonia.Utils
             double driftX = 0;
             double driftY = 0;
 
-            for (StyledElement? c = control.Parent;
+            StyledElement? c;
+            for (c = control.Parent;
                     c is not null
                     && c is Layoutable layoutable
                     && !(layoutable is ScrollViewer);

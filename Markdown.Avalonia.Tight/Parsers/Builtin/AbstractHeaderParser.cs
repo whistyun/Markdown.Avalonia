@@ -14,19 +14,8 @@ namespace Markdown.Avalonia.Parsers.Builtin
 
         protected IEnumerable<DocumentElement> Create(int level, string header, IMarkdownEngine2 engine)
         {
-            var clsNm = level switch
-            {
-                1 => Markdown.Heading1Class,
-                2 => Markdown.Heading2Class,
-                3 => Markdown.Heading3Class,
-                4 => Markdown.Heading4Class,
-                5 => Markdown.Heading5Class,
-                _ => Markdown.Heading6Class,
-            };
-
-
             var inlines = engine.ParseGamutInline(header.Trim());
-            var element = new CTextBlockElement(inlines, clsNm);
+            var element = new HeaderElement(inlines, level);
             return new[] { element };
         }
     }
