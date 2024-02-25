@@ -17,7 +17,7 @@ namespace ColorTextBlock.Avalonia.Geometries
         public IBrush? LayoutForeground { get; private set; }
 
         internal TextLineGeometry(
-            CInline owner,
+            CRun owner,
             string text,
             TextLine tline,
             bool linebreak) :
@@ -81,79 +81,38 @@ namespace ColorTextBlock.Avalonia.Geometries
             }
         }
 
-        public override bool TryMoveNext(
-            TextPointer current,
-#if NETCOREAPP3_0_OR_GREATER
-            [MaybeNullWhen(false)]
-            out TextPointer? next
-#else
-            out TextPointer next
-#endif
-            )
-        {
-            if (!Object.ReferenceEquals(current.Last, this))
-                throw new ArgumentException();
-
-            var hit = new CharacterHit(current.InternalIndex);
-            var nxt = Line.GetNextCaretCharacterHit(hit);
-
-            if (hit == nxt)
-            {
-                next = null;
-                return false;
-            }
-
-            var dst = Line.GetDistanceFromCharacterHit(nxt);
-            next = new TextPointer(this, Line, nxt, dst + Left, Top, Height);
-            return true;
-        }
-
-        public override bool TryMovePrev(
-            TextPointer current,
-#if NETCOREAPP3_0_OR_GREATER
-            [MaybeNullWhen(false)]
-            out TextPointer? prev
-#else
-            out TextPointer prev
-#endif
-            )
-        {
-            var hit = new CharacterHit(current.InternalIndex);
-            var prv = Line.GetPreviousCaretCharacterHit(hit);
-
-            if (hit == prv)
-            {
-                prev = null;
-                return false;
-            }
-
-            var dst = Line.GetDistanceFromCharacterHit(prv);
-            prev = new TextPointer(this, Line, prv, dst + Left, Top, Height);
-            return true;
-        }
-
         public override TextPointer CalcuatePointerFrom(double x, double y)
         {
-            var hit = Line.GetCharacterHitFromDistance(x - Left);
+            var relX = x - Left;
+
+            if (relX < 0) return GetBegin();
+            if (relX >= Width) return GetEnd();
+
+            var hit = Line.GetCharacterHitFromDistance(relX);
             var dst = Line.GetDistanceFromCharacterHit(hit);
 
-            return new TextPointer(this, Line, hit, dst + Left, Top, Height);
+            return new TextPointer((CRun)Owner, this, hit, dst, false);
+        }
+        public override TextPointer CalcuatePointerFrom(int index)
+        {
+            var hit = new CharacterHit(Line.FirstTextSourceIndex + index);
+            var dst = Line.GetDistanceFromCharacterHit(hit);
+
+            return new TextPointer((CRun)Owner, this, hit, dst, false);
         }
 
         public override TextPointer GetBegin()
         {
             var hit = Line.GetCharacterHitFromDistance(0);
-            var dst = Line.GetDistanceFromCharacterHit(hit);
 
-            return new TextPointer(this, Line, hit, dst + Left, Top, Height);
+            return new TextPointer((CRun)Owner, this, hit, false);
         }
 
         public override TextPointer GetEnd()
         {
             var hit = Line.GetCharacterHitFromDistance(Double.MaxValue);
-            var dst = Line.GetDistanceFromCharacterHit(hit);
 
-            return new TextPointer(this, Line, hit, dst + Left, Top, Height);
+            return new TextPointer((CRun)Owner, this, hit, Width, true);
         }
     }
 }

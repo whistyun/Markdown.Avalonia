@@ -12,7 +12,6 @@ namespace ColorTextBlock.Avalonia.Geometries
 {
     public class DecoratorGeometry : CGeometry
     {
-        public CSpan Owner { get; }
         public CGeometry[] Targets { get; }
         public Border Decorate { get; }
 
@@ -141,27 +140,18 @@ namespace ColorTextBlock.Avalonia.Geometries
             CSpan owner,
             CGeometry[] targets,
             Border decorate) : base(
+                owner,
                 w, h, lh,
                 owner.TextVerticalAlignment,
                 targets[targets.Length - 1].LineBreak)
         {
-            this.Owner = owner;
             this.Targets = targets;
             this.Decorate = decorate;
         }
 
-        public override void Render(DrawingContext ctx)
+        public override void Arranged()
         {
-            using (ctx.PushTransform(Matrix.CreateTranslation(Left + Decorate.Margin.Left, Top + Decorate.Margin.Top)))
-            {
-                Decorate.Background = Owner.Background;
-                Decorate.Arrange(new Rect(0, 0, Width, Height));
-                Decorate.Render(ctx);
-
-            }
-
             var left = Left + Decorate.BorderThickness.Left + Decorate.Padding.Left + Decorate.Margin.Left;
-
             var top = Top + Decorate.BorderThickness.Top + Decorate.Padding.Top + Decorate.Margin.Top;
             var btm = Top + Height - Decorate.BorderThickness.Bottom - Decorate.Padding.Bottom - Decorate.Margin.Bottom;
 
@@ -186,154 +176,83 @@ namespace ColorTextBlock.Avalonia.Geometries
                     _ => throw new InvalidOperationException("sorry library manager forget to modify.")
                 };
 
-                target.Render(ctx);
-
                 left += target.Width;
+
+                target.Arranged();
             }
         }
 
-        public override bool TryMoveNext(
-            TextPointer current,
-#if NETCOREAPP3_0_OR_GREATER
-            [MaybeNullWhen(false)]
-            out TextPointer? next
-#else
-            out TextPointer next
-#endif
-            )
+        public override void Render(DrawingContext ctx)
         {
-            if (Targets.Length == 0)
+            using (ctx.PushTransform(Matrix.CreateTranslation(Left + Decorate.Margin.Left, Top + Decorate.Margin.Top)))
             {
-                next = null;
-                return false;
-            }
+                Decorate.Background = Owner.Background;
+                Decorate.Arrange(new Rect(0, 0, Width, Height));
+                Decorate.Render(ctx);
 
-            int depgthIdx = Enumerable.Range(0, current.PathDepth)
-                                   .First(idx => ReferenceEquals(current[idx], this));
-
-            Debug.Assert(depgthIdx < current.PathDepth - 1);
-
-            var inlineIdx = Enumerable.Range(0, Targets.Length)
-                                      .First(idx => ReferenceEquals(Targets[idx], current[depgthIdx + 1]));
-
-            while (inlineIdx < Targets.Length)
-            {
-                var curTgt = Targets[inlineIdx];
-
-                if (curTgt.TryMoveNext(current, out var nxtPointer))
-                {
-                    if (curTgt.GetEnd() != nxtPointer)
-                    {
-                        next = Wrap(nxtPointer);
-                        return true;
-                    }
-
-                    if (++inlineIdx < Targets.Length)
-                    {
-                        next = Wrap(Targets[inlineIdx].GetBegin());
-                        return true;
-                    }
-                    else
-                    {
-                        next = Wrap(nxtPointer);
-                        return true;
-                    }
-                }
-
-                ++inlineIdx;
-            }
-
-            next = null;
-            return false;
-        }
-
-        public override bool TryMovePrev(
-            TextPointer current,
-#if NETCOREAPP3_0_OR_GREATER
-            [MaybeNullWhen(false)]
-            out TextPointer? prev
-#else
-            out TextPointer prev
-#endif
-            )
-        {
-            if (Targets.Length == 0)
-            {
-                prev = null;
-                return false;
-            }
-
-            int depgthIdx = Enumerable.Range(0, current.PathDepth)
-                                   .First(idx => ReferenceEquals(current[idx], this));
-
-            Debug.Assert(depgthIdx < current.PathDepth - 1);
-
-            var inlineIdx = Enumerable.Range(0, Targets.Length)
-                                      .First(idx => ReferenceEquals(Targets[idx], current[depgthIdx + 1]));
-
-            while (inlineIdx >= 0)
-            {
-                var curTgt = Targets[inlineIdx];
-
-                if (curTgt.TryMovePrev(current, out var prvPointer))
-                {
-                    prev = Wrap(prvPointer);
-                    return true;
-                }
-
-                --inlineIdx;
-            }
-
-            prev = null;
-            return false;
-        }
-
-        public override TextPointer CalcuatePointerFrom(double x, double y)
-            => Wrap(PrivateCalcuatePointerFrom(x, y));
-
-        public override TextPointer GetBegin()
-            => Wrap(PrivateGetBegin());
-
-        public override TextPointer GetEnd()
-            => Wrap(PrivateGetEnd());
-
-        private TextPointer PrivateCalcuatePointerFrom(double x, double y)
-        {
-            if (x < Left)
-            {
-                return PrivateGetBegin();
             }
 
             foreach (var target in Targets)
+                target.Render(ctx);
+        }
+
+        public override TextPointer CalcuatePointerFrom(double x, double y)
+        {
+            if (x < Left)
+            {
+                return GetBegin();
+            }
+
+            int indexAdd = 0;
+            foreach (var target in Targets.Take(Targets.Length - 1))
             {
                 if (x <= target.Left + target.Width)
                 {
-                    return target.CalcuatePointerFrom(x, y);
+                    return target.CalcuatePointerFrom(x, y)
+                                 .Wrap(Owner, indexAdd);
+                }
+                else
+                {
+                    indexAdd += target.CaretLength;
                 }
             }
 
-            return PrivateGetEnd();
+            return Targets[Targets.Length - 1].GetEnd().Wrap(Owner, indexAdd);
         }
 
-        private TextPointer PrivateGetBegin()
+        public override TextPointer CalcuatePointerFrom(int index)
         {
-            return Targets[0].GetBegin();
-        }
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index));
 
-        private TextPointer PrivateGetEnd()
-        {
-            return Targets[Targets.Length - 1].GetEnd();
-        }
-
-        private TextPointer Wrap(TextPointer tgt)
-        {
-            var idx = 0;
-            for (var i = 0; !ReferenceEquals(Targets[idx], tgt.Host); ++i)
+            int relindex = index;
+            foreach (var target in Targets)
             {
-                idx += Targets[i].CaretLength;
+                if (relindex < target.CaretLength)
+                {
+                    return target.CalcuatePointerFrom(relindex)
+                                 .Wrap(Owner, index - relindex);
+                }
+
+                relindex -= target.CaretLength;
             }
 
-            return tgt.Wrap(this, Top, Height, idx);
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+
+
+        public override TextPointer GetBegin()
+        {
+            var pointer = Targets[0].GetBegin();
+            return pointer.Wrap(Owner, 0);
+        }
+
+        public override TextPointer GetEnd()
+        {
+            var pointer = Targets[Targets.Length - 1].GetEnd();
+
+            int indexAdd = Targets.Take(Targets.Length - 1).Sum(t => t.CaretLength);
+            return pointer.Wrap(Owner, indexAdd);
         }
     }
 }

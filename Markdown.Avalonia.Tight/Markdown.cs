@@ -532,13 +532,12 @@ namespace Markdown.Avalonia
                     }
                 }
 
-                var ctbox = new CTextBlock(PrivateRunSpanGamut(chip));
+                var inlines = PrivateRunSpanGamut(chip);
+                var ctbox = indiAlignment.HasValue ?
+                    new CTextBlockElement(inlines, ParagraphClass, indiAlignment.Value) :
+                    new CTextBlockElement(inlines, ParagraphClass);
 
-                if (indiAlignment.HasValue)
-                    ctbox.TextAlignment = indiAlignment.Value;
-
-                ctbox.Classes.Add(ParagraphClass);
-                yield return new CTextBlockElement(ctbox);
+                yield return ctbox;
             }
         }
 

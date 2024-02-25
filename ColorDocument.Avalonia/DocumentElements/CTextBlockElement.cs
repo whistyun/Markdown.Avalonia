@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Media;
 using ColorTextBlock.Avalonia;
 using System;
 using System.Collections.Generic;
@@ -15,11 +16,6 @@ namespace ColorDocument.Avalonia.DocumentElements
         public override Control Control => _text.Value;
 
         public override IEnumerable<DocumentElement> Children => Array.Empty<DocumentElement>();
-
-        public CTextBlockElement(CTextBlock block)
-        {
-            _text = new Lazy<CTextBlock>(() => block);
-        }
 
         public CTextBlockElement(IEnumerable<CInline> inlines)
         {
@@ -44,22 +40,33 @@ namespace ColorDocument.Avalonia.DocumentElements
             });
         }
 
+        public CTextBlockElement(IEnumerable<CInline> inlines, string appendClass, TextAlignment alignment)
+        {
+            _text = new Lazy<CTextBlock>(() =>
+            {
+                var text = new CTextBlock();
+                foreach (var inline in inlines)
+                    text.Content.Add(inline);
 
-        public override SelectDirection Select(Point from, Point to)
+                text.TextAlignment = alignment;
+                text.Classes.Add(appendClass);
+                return text;
+            });
+        }
+
+
+        public override void Select(Point from, Point to)
         {
             var text = _text.Value;
 
             var fromPoint = text.CalcuatePointerFrom(from.X, from.Y);
             var toPoint = text.CalcuatePointerFrom(to.X, to.Y);
-
-            text.Selection = new Selection(fromPoint, toPoint);
-
-            return fromPoint <= toPoint ? SelectDirection.Forward : SelectDirection.Backward;
+            text.Select(fromPoint, toPoint);
         }
 
         public override void UnSelect()
         {
-            _text.Value.Selection = null;
+            _text.Value.ClearSelection();
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using ColorDocument.Avalonia.DocumentElements;
-using Markdown.Avalonia.Utils;
+using Avalonia.Layout;
 using System.Collections.Generic;
 
 namespace ColorDocument.Avalonia
@@ -12,8 +11,8 @@ namespace ColorDocument.Avalonia
 
         public abstract IEnumerable<DocumentElement> Children { get; }
 
-        public Rect GetRect() => Control.GetRectInDoc().GetValueOrDefault();
-        public abstract SelectDirection Select(Point from, Point to);
+        public Rect GetRect(Layoutable anchor) => Control.GetRectInDoc(anchor).GetValueOrDefault();
+        public abstract void Select(Point from, Point to);
         public abstract void UnSelect();
     }
 }

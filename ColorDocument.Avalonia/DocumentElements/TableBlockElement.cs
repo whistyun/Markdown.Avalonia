@@ -1,11 +1,8 @@
 ﻿using Avalonia;
-using Avalonia.Collections;
 using Avalonia.Controls;
-using Avalonia.VisualTree;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 
 namespace ColorDocument.Avalonia.DocumentElements
 {
@@ -17,9 +14,9 @@ namespace ColorDocument.Avalonia.DocumentElements
         private TableCellElement[][] _foot;
         private bool _autoAdjust;
         private EnumerableEx<TableCellElement> _all;
+        private List<DocumentElement>? _prevSelection;
 
         public override Control Control => _table.Value;
-
         public override IEnumerable<DocumentElement> Children => _all;
 
         public TableBlockElement(
@@ -54,8 +51,23 @@ namespace ColorDocument.Avalonia.DocumentElements
             _table = new Lazy<Border>(CreateTable);
         }
 
-        public override SelectDirection Select(Point from, Point to)
-            => SelectionUtil.SelectGrid(_all, from, to);
+        public override void Select(Point from, Point to)
+        {
+            var selection = SelectionUtil.SelectGrid(Control, _all, from, to);
+
+            if (_prevSelection is not null)
+            {
+                foreach (var ps in _prevSelection)
+                {
+                    if (!selection.Any(cs => ReferenceEquals(cs, ps)))
+                    {
+                        ps.UnSelect();
+                    }
+                }
+            }
+
+            _prevSelection = selection;
+        }
 
         public override void UnSelect()
         {

@@ -12,6 +12,7 @@ namespace ColorDocument.Avalonia.DocumentElements
     {
         private readonly Lazy<Border> _control;
         private readonly EnumerableEx<DocumentElement> _items;
+        private List<DocumentElement>? _prevSelection;
 
         public int RowSpan { set; get; }
         public int ColSpan { set; get; }
@@ -33,8 +34,23 @@ namespace ColorDocument.Avalonia.DocumentElements
             _control = new Lazy<Border>(CreateCell);
         }
 
-        public override SelectDirection Select(Point from, Point to)
-            => SelectionUtil.SelectVertical(_items, from, to);
+        public override void Select(Point from, Point to)
+        {
+            var selection = SelectionUtil.SelectVertical(Control, _items, from, to);
+
+            if (_prevSelection is not null)
+            {
+                foreach (var ps in _prevSelection)
+                {
+                    if (!selection.Any(cs => ReferenceEquals(cs, ps)))
+                    {
+                        ps.UnSelect();
+                    }
+                }
+            }
+
+            _prevSelection = selection;
+        }
 
         public override void UnSelect()
         {

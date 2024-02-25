@@ -31,15 +31,27 @@ namespace ColorTextBlock.Avalonia
             set { SetValue(TextProperty, value); }
         }
 
+        internal List<CGeometry>? Geometries { private set; get; }
+
+
         protected override IEnumerable<CGeometry> MeasureOverride(
             double entireWidth,
             double remainWidth)
         {
             if (String.IsNullOrEmpty(Text))
             {
+                Geometries = null;
                 return Array.Empty<CGeometry>();
             }
 
+            Geometries = PrivateMeasureOverride(entireWidth, remainWidth);
+            return Geometries;
+        }
+
+        protected List<CGeometry> PrivateMeasureOverride(
+            double entireWidth,
+            double remainWidth)
+        {
             if (remainWidth == entireWidth)
             {
                 return Create(Text, entireWidth);

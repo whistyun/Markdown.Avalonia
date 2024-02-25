@@ -18,21 +18,9 @@ namespace ColorDocument.Avalonia.DocumentElements
             _control = control;
         }
 
-        public override SelectDirection Select(Point from, Point to)
-        {
-            if (Math.Abs(from.X - to.X) > Math.Abs(from.Y - to.Y))
-            {
-                return from.X < to.X ? SelectDirection.Forward : SelectDirection.Backward;
-            }
-            else
-            {
-                return from.Y < to.Y ? SelectDirection.Forward : SelectDirection.Backward;
-            }
-        }
+        public override void Select(Point from, Point to) { }
 
-        public override void UnSelect()
-        {
-        }
+        public override void UnSelect() { }
     }
 }
 

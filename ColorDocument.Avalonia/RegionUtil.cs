@@ -1,22 +1,14 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
-using ColorDocument.Avalonia;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Markdown.Avalonia.Utils
+namespace ColorDocument.Avalonia
 {
     internal static class RegionUtil
     {
-        public static Rect? GetRectInDoc(this Control control)
+        public static Rect? GetRectInDoc(this Control control, Layoutable anchor)
         {
-            var baseRect = LayoutInformation.GetPreviousArrangeBounds(control);
-            if (!baseRect.HasValue)
+            if (!LayoutInformation.GetPreviousArrangeBounds(control).HasValue)
                 return null;
 
             double driftX = 0;
@@ -26,35 +18,30 @@ namespace Markdown.Avalonia.Utils
             for (c = control.Parent;
                     c is not null
                     && c is Layoutable layoutable
-                    && !(layoutable is ScrollViewer);
+                    && !ReferenceEquals(anchor, layoutable);
                     c = c.Parent)
             {
-                var ar = LayoutInformation.GetPreviousArrangeBounds(layoutable);
-                if (ar.HasValue)
-                {
-                    driftX += ar.Value.Left;
-                    driftY += ar.Value.Top;
-                }
-                else return null;
+                driftX += layoutable.Bounds.X;
+                driftY += layoutable.Bounds.Y;
             }
 
             return new Rect(
-                        baseRect.Value.X + driftX,
-                        baseRect.Value.Y + driftY,
-                        baseRect.Value.Width,
-                        baseRect.Value.Height);
+                        control.Bounds.X + driftX,
+                        control.Bounds.Y + driftY,
+                        control.Bounds.Width,
+                        control.Bounds.Height);
         }
 
 
 
-        public static EnumerableEx<DocumentElementWithBound> GetRectInDoc<T>(this EnumerableEx<T> controls)
+        public static EnumerableEx<DocumentElementWithBound> GetRectInDoc<T>(this EnumerableEx<T> controls, Layoutable anchor)
             where T : DocumentElement
         {
             var rs = new DocumentElementWithBound[controls.Count];
             for (var i = 0; i < rs.Length; ++i)
             {
                 var doc = controls[i];
-                var rect = doc.Control.GetRectInDoc();
+                var rect = doc.Control.GetRectInDoc(anchor);
                 if (rect.HasValue)
                 {
                     rs[i] = new DocumentElementWithBound(doc, rect.Value);

@@ -35,6 +35,11 @@ namespace Markdown.Avalonia.Svg
         {
             try
             {
+                int firstChr = fileStream.ReadByte();
+                if (firstChr != ('<' & 0xFF))
+                    return false;
+
+                fileStream.Seek(0, SeekOrigin.Begin);
                 using (var xmlReader = XmlReader.Create(fileStream))
                 {
                     return xmlReader.MoveToContent() == XmlNodeType.Element &&

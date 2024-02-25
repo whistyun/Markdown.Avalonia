@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Media;
 using ColorTextBlock.Avalonia.Geometries;
 using System;
@@ -11,8 +12,9 @@ namespace ColorTextBlock.Avalonia.Geometies
     {
         public Control Control { get; }
 
-        public DummyGeometryForControl(Control control, TextVerticalAlignment alignment) :
+        public DummyGeometryForControl(CInlineUIContainer owner, Control control, TextVerticalAlignment alignment) :
             base(
+                owner,
                 control.DesiredSize.Width,
                 control.DesiredSize.Height,
                 control.DesiredSize.Height,
@@ -24,34 +26,6 @@ namespace ColorTextBlock.Avalonia.Geometies
 
         public override void Render(DrawingContext ctx)
         {
-        }
-
-        public override bool TryMoveNext(TextPointer current, out TextPointer next)
-        {
-            if (current == GetBegin())
-            {
-                next = GetEnd();
-                return true;
-            }
-            else
-            {
-                next = null;
-                return false;
-            }
-        }
-
-        public override bool TryMovePrev(TextPointer current, out TextPointer prev)
-        {
-            if (current == GetEnd())
-            {
-                prev = GetBegin();
-                return true;
-            }
-            else
-            {
-                prev = null;
-                return false;
-            }
         }
 
         public override TextPointer CalcuatePointerFrom(double x, double y)
@@ -66,14 +40,24 @@ namespace ColorTextBlock.Avalonia.Geometies
             }
         }
 
+        public override TextPointer CalcuatePointerFrom(int index)
+        {
+            return index switch
+            {
+                0 => GetBegin(),
+                1 => GetEnd(),
+                _ => throw new ArgumentOutOfRangeException(nameof(index))
+            };
+        }
+
         public override TextPointer GetBegin()
         {
-            return new TextPointer(this, 0, Left, Top, Height);
+            return new TextPointer(this, 0);
         }
 
         public override TextPointer GetEnd()
         {
-            return new TextPointer(this, 1, Left, Top, Height);
+            return new TextPointer(this, 1);
         }
     }
 }

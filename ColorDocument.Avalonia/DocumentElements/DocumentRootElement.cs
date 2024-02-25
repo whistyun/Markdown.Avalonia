@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ColorDocument.Avalonia.DocumentElements
 {
@@ -13,6 +14,7 @@ namespace ColorDocument.Avalonia.DocumentElements
     {
         private Lazy<StackPanel> _block;
         private EnumerableEx<DocumentElement> _children;
+        private List<DocumentElement>? _prevSelection;
 
         public override Control Control => _block.Value;
         public override IEnumerable<DocumentElement> Children => _children;
@@ -33,8 +35,23 @@ namespace ColorDocument.Avalonia.DocumentElements
             return panel;
         }
 
-        public override SelectDirection Select(Point from, Point to)
-            => SelectionUtil.SelectVertical(_children, from, to);
+        public override void Select(Point from, Point to)
+        {
+            var selection = SelectionUtil.SelectVertical(Control, _children, from, to);
+
+            if (_prevSelection is not null)
+            {
+                foreach (var ps in _prevSelection)
+                {
+                    if (!selection.Any(cs => ReferenceEquals(cs, ps)))
+                    {
+                        ps.UnSelect();
+                    }
+                }
+            }
+
+            _prevSelection = selection;
+        }
 
         public override void UnSelect()
         {

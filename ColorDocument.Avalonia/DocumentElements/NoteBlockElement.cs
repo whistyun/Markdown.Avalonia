@@ -1,14 +1,9 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Documents;
-using Avalonia.Data;
 using Avalonia.Media;
 using ColorTextBlock.Avalonia;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ColorDocument.Avalonia.DocumentElements
 {
@@ -47,7 +42,7 @@ namespace ColorDocument.Avalonia.DocumentElements
             return result;
         }
 
-        public override SelectDirection Select(Point from, Point to)
+        public override void Select(Point from, Point to)
             => _child.Select(from, to);
 
         public override void UnSelect()

@@ -5,9 +5,6 @@ using ColorTextBlock.Avalonia;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace ColorDocument.Avalonia.DocumentElements
 {
@@ -15,12 +12,34 @@ namespace ColorDocument.Avalonia.DocumentElements
     {
         private Lazy<Grid> _control;
         private EnumerableEx<ListItemElement> _items;
+        private List<DocumentElement>? _prevSelection;
 
         public override Control Control => _control.Value;
         public override IEnumerable<DocumentElement> Children => _items;
 
-        public override SelectDirection Select(Point from, Point to)
-            => SelectionUtil.SelectVertical(_items, from, to);
+        public ListBlockElement(TextMarkerStyle marker, IEnumerable<ListItemElement> items)
+        {
+            _control = new Lazy<Grid>(() => CreateList(marker));
+            _items = items.ToEnumerable();
+        }
+
+        public override void Select(Point from, Point to)
+        {
+            var selection = SelectionUtil.SelectVertical(Control, _items, from, to);
+
+            if (_prevSelection is not null)
+            {
+                foreach (var ps in _prevSelection)
+                {
+                    if (!selection.Any(cs => ReferenceEquals(cs, ps)))
+                    {
+                        ps.UnSelect();
+                    }
+                }
+            }
+
+            _prevSelection = selection;
+        }
 
         public override void UnSelect()
         {
@@ -28,13 +47,7 @@ namespace ColorDocument.Avalonia.DocumentElements
                 c.UnSelect();
         }
 
-        public ListBlockElement(TextMarkerStyle marker, IEnumerable<ListItemElement> items)
-        {
-            _control = new Lazy<Grid>(() => CreateList(marker, items));
-            _items = items.ToEnumerable();
-        }
-
-        private Grid CreateList(TextMarkerStyle marker, IEnumerable<ListItemElement> items)
+        private Grid CreateList(TextMarkerStyle marker)
         {
             var grid = new Grid();
             grid.Classes.Add(ClassNames.ListClass);
@@ -42,7 +55,7 @@ namespace ColorDocument.Avalonia.DocumentElements
             grid.ColumnDefinitions.Add(new ColumnDefinition());
 
             int index = 0;
-            foreach (var item in items)
+            foreach (var item in _items)
             {
                 var markerTxt = new CTextBlock(marker.CreateMakerText(index));
                 var itemCtrl = item.Control;
@@ -52,17 +65,18 @@ namespace ColorDocument.Avalonia.DocumentElements
                     markerTxt.ObserveBaseHeightOf(controlTxt);
 
                 grid.RowDefinitions.Add(new RowDefinition());
-                grid.Children.Add(markerTxt);
-                grid.Children.Add(itemCtrl);
 
                 markerTxt.TextAlignment = TextAlignment.Right;
                 markerTxt.TextWrapping = TextWrapping.NoWrap;
                 markerTxt.Classes.Add(ClassNames.ListMarkerClass);
                 Grid.SetRow(markerTxt, index);
                 Grid.SetColumn(markerTxt, 0);
+                grid.Children.Add(markerTxt);
 
                 Grid.SetRow(itemCtrl, index);
                 Grid.SetColumn(itemCtrl, 1);
+                grid.Children.Add(itemCtrl);
+
                 ++index;
             }
 

@@ -5,9 +5,6 @@ using Avalonia.Media;
 using ColorTextBlock.Avalonia;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ColorDocument.Avalonia.DocumentElements
 {
@@ -28,21 +25,18 @@ namespace ColorDocument.Avalonia.DocumentElements
             _text = new Lazy<CTextBlock>(() => (CTextBlock)(_border.Value.Child!));
         }
 
-        public override SelectDirection Select(Point from, Point to)
+        public override void Select(Point from, Point to)
         {
             var text = _text.Value;
 
             var fromPoint = text.CalcuatePointerFrom(from.X, from.Y);
             var toPoint = text.CalcuatePointerFrom(to.X, to.Y);
-
-            text.Selection = new Selection(fromPoint, toPoint);
-
-            return fromPoint <= toPoint ? SelectDirection.Forward : SelectDirection.Backward;
+            text.Select(fromPoint, toPoint);
         }
 
         public override void UnSelect()
         {
-            _text.Value.Selection = null;
+            _text.Value.ClearSelection();
         }
 
         public Border CreateBlock()

@@ -1,6 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
+using Avalonia.Media;
 using Avalonia.Metadata;
 using Avalonia.Platform;
 using Avalonia.Styling;
@@ -12,6 +14,7 @@ using Markdown.Avalonia.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -66,6 +69,9 @@ namespace Markdown.Avalonia
                 nameof(ScrollValue),
                 owner => owner.ScrollValue,
                 (owner, v) => owner.ScrollValue = v);
+
+        public static readonly StyledProperty<IBrush?> SelectionBrushProperty =
+            TextBox.SelectionBrushProperty.AddOwner<SelectableTextBlock>();
 
 
         private static readonly HttpClient s_httpclient = new();
@@ -124,7 +130,56 @@ namespace Markdown.Avalonia
             static bool nvl(bool? vl) => vl.HasValue && vl.Value;
 
             _viewer.ScrollChanged += (s, e) => OnScrollChanged();
+
+
+            _viewer.PointerPressed += _viewer_PointerPressed;
+            _viewer.PointerMoved += _viewer_PointerMoved;
+            _viewer.PointerReleased += _viewer_PointerReleased;
         }
+
+
+        #region text selection
+
+        private bool _isLeftButtonPressed;
+        private Point _startPoint;
+
+        private void _viewer_PointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            var point = e.GetCurrentPoint(_document.Control);
+
+            if (point.Properties.IsLeftButtonPressed && _document is not null)
+            {
+                _isLeftButtonPressed = true;
+                _startPoint = point.Position;
+                _document.Select(_startPoint, point.Position);
+            }
+        }
+
+        private void _viewer_PointerMoved(object? sender, PointerEventArgs e)
+        {
+            var point = e.GetCurrentPoint(_document.Control);
+
+            if (_isLeftButtonPressed && point.Properties.IsLeftButtonPressed)
+            {
+                if (_document is not null)
+                    _document.Select(_startPoint, point.Position);
+            }
+        }
+
+        private void _viewer_PointerReleased(object? sender, PointerReleasedEventArgs e)
+        {
+            var point = e.GetCurrentPoint(_document.Control);
+
+            if (_isLeftButtonPressed && !point.Properties.IsLeftButtonPressed)
+            {
+                _isLeftButtonPressed = false;
+
+                if (_document is not null)
+                    _document.Select(_startPoint, point.Position);
+            }
+        }
+
+        #endregion
 
         public event HeaderScrolled? HeaderScrolled;
         private List<HeaderRect>? _headerRects;
@@ -149,7 +204,7 @@ namespace Markdown.Avalonia
                 _headerRects = new List<HeaderRect>();
                 foreach (var doc in _document.Children.OfType<HeaderElement>())
                 {
-                    var t = doc.GetRect();
+                    var t = doc.GetRect(this);
                     var rect = new Rect(t.Left, t.Top + offsetY, t.Width, t.Height);
                     _headerRects.Add(new HeaderRect(rect, doc));
                 }

@@ -130,8 +130,6 @@ namespace ColorTextBlock.Avalonia
             AvaloniaProperty.Register<CTextBlock, TextAlignment>(
                 nameof(TextAlignment), defaultValue: TextAlignment.Left);
 
-        public Selection? Selection { get; set; }
-
         static CTextBlock()
         {
             ClipToBoundsProperty.OverrideDefaultValue<CTextBlock>(true);
@@ -151,11 +149,20 @@ namespace ColorTextBlock.Avalonia
         private readonly List<CGeometry> _metries;
         private readonly List<LineInfo> _lines;
         private readonly List<CInlineUIContainer> _containers;
-        private bool _isPressed;
         private CGeometry? _entered;
         private CGeometry? _pressed;
         private string? _text;
         private bool _measureRequested;
+
+        private TextPointer? _beginSelect;
+        private List<CGeometry> _intermediates = new();
+        private TextPointer? _endSelect;
+
+
+        public Selection? Selection =>
+            _beginSelect is not null && _endSelect is not null ?
+                new Selection(_beginSelect.Index, _endSelect.Index) :
+                null;
 
         /// <summary>
         /// The brush of background.
@@ -337,15 +344,6 @@ namespace ColorTextBlock.Avalonia
 
             Point point = e.GetPosition(this);
 
-            bool isEntered(CGeometry metry)
-            {
-                var relX = point.X - metry.Left;
-                var relY = point.Y - metry.Top;
-
-                return 0 <= relX && relX <= metry.Width
-                    && 0 <= relY && relY <= metry.Height;
-            }
-
             if (_entered is not null)
             {
                 var relX = point.X - _entered.Left;
@@ -368,6 +366,15 @@ namespace ColorTextBlock.Avalonia
                     break;
                 }
             }
+
+            bool isEntered(CGeometry metry)
+            {
+                var relX = point.X - metry.Left;
+                var relY = point.Y - metry.Top;
+
+                return 0 <= relX && relX <= metry.Width
+                    && 0 <= relY && relY <= metry.Height;
+            }
         }
 
         protected override void OnPointerPressed(PointerPressedEventArgs e)
@@ -375,10 +382,18 @@ namespace ColorTextBlock.Avalonia
             base.OnPointerPressed(e);
             if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             {
-                _isPressed = true;
-                e.Handled = true;
-
                 Point point = e.GetPosition(this);
+
+                foreach (CGeometry metry in _metries)
+                {
+                    if ((metry.OnMousePressed is not null || metry.OnMouseReleased is not null) && isEntered(metry))
+                    {
+                        metry.OnMousePressed?.Invoke(this);
+                        _pressed = metry;
+                        e.Handled = true;
+                        return;
+                    }
+                }
 
                 bool isEntered(CGeometry metry)
                 {
@@ -388,16 +403,6 @@ namespace ColorTextBlock.Avalonia
                     return 0 <= relX && relX <= metry.Width
                         && 0 <= relY && relY <= metry.Height;
                 }
-
-                foreach (CGeometry metry in _metries)
-                {
-                    if (isEntered(metry))
-                    {
-                        metry.OnMousePressed?.Invoke(this);
-                        _pressed = metry;
-                        break;
-                    }
-                }
             }
         }
 
@@ -405,32 +410,22 @@ namespace ColorTextBlock.Avalonia
         {
             base.OnPointerReleased(e);
 
-            if (_isPressed && e.InitialPressMouseButton == MouseButton.Left)
+            if (_pressed is not null && e.InitialPressMouseButton == MouseButton.Left)
             {
-                _isPressed = false;
                 e.Handled = true;
-
-                if (_pressed is not null)
-                {
-                    _pressed.OnMouseReleased?.Invoke(this);
-                    _pressed = null;
-                }
-
+                _pressed.OnMouseReleased?.Invoke(this);
 
                 Point point = e.GetPosition(this);
+                var relX = point.X - _pressed.Left;
+                var relY = point.Y - _pressed.Top;
 
-                foreach (CGeometry metry in _metries)
+                if (0 <= relX && relX <= _pressed.Width
+                    && 0 <= relY && relY <= _pressed.Height)
                 {
-                    var relX = point.X - metry.Left;
-                    var relY = point.Y - metry.Top;
-
-                    if (0 <= relX && relX <= metry.Width
-                        && 0 <= relY && relY <= metry.Height)
-                    {
-                        metry.OnClick?.Invoke(this);
-                        break;
-                    }
+                    _pressed.OnClick?.Invoke(this);
                 }
+
+                _pressed = null;
             }
         }
 
@@ -697,6 +692,8 @@ namespace ColorTextBlock.Avalonia
 
                 foreach (LineInfo lineInf in _lines)
                 {
+                    lineInf.Top = topOffset;
+
                     switch (TextAlignment)
                     {
                         case TextAlignment.Left:
@@ -732,6 +729,7 @@ namespace ColorTextBlock.Avalonia
                         leftOffset += metry.Width;
 
                         _metries.Add(metry);
+                        metry.Arranged();
                     }
 
                     topOffset += lineInf.Height + lineSpc;
@@ -739,6 +737,11 @@ namespace ColorTextBlock.Avalonia
             }
 
             foreach (CGeometry metry in _metries) metry.RepaintRequested += RepaintRequested;
+
+            if (_beginSelect is not null && _endSelect is not null)
+            {
+                Select(_beginSelect.Index, _endSelect.Index);
+            }
 
             return new Size(width, height);
         }
@@ -748,6 +751,44 @@ namespace ColorTextBlock.Avalonia
             if (Background is not null)
             {
                 context.FillRectangle(Background, new Rect(0, 0, Bounds.Width, Bounds.Height));
+            }
+
+            if (_beginSelect is not null && _endSelect is not null)
+            {
+                TextPointer bgn, end;
+                if (_beginSelect < _endSelect)
+                {
+                    bgn = _beginSelect;
+                    end = _endSelect;
+                }
+                else
+                {
+                    bgn = _endSelect;
+                    end = _beginSelect;
+                }
+
+                IBrush select = Brushes.Cyan;
+
+                if (ReferenceEquals(bgn.Geometry, end.Geometry))
+                {
+                    var rct = new Rect(
+                        bgn.Geometry.Left + bgn.Distance,
+                        bgn.Geometry.Top,
+                        end.Distance - bgn.Distance,
+                        bgn.Geometry.Height);
+                    context.FillRectangle(select, rct);
+                }
+                else
+                {
+                    context.FillRectangle(select, new Rect(bgn.Geometry.Left + bgn.Distance, bgn.Geometry.Top, bgn.Geometry.Width - bgn.Distance, bgn.Geometry.Height));
+
+                    foreach (var inter in _intermediates)
+                    {
+                        context.FillRectangle(select, new Rect(inter.Left, inter.Top, inter.Width, inter.Height));
+                    }
+
+                    context.FillRectangle(select, new Rect(end.Geometry.Left, end.Geometry.Top, end.Distance, end.Geometry.Height));
+                }
             }
 
             foreach (var metry in _metries)
@@ -761,128 +802,138 @@ namespace ColorTextBlock.Avalonia
             return new CTextBlockAutomationPeer(this);
         }
 
-
-        public bool TryMoveNext(
-            TextPointer current,
-#if NETCOREAPP3_0_OR_GREATER
-            [MaybeNullWhen(false)]
-            out TextPointer? next
-#else
-            out TextPointer next
-#endif
-            )
+        public void Select(int begin, int end)
         {
-            if (_metries.Count == 0)
+            int beginBack = begin;
+            int endBack = end;
+            for (var i = 0; i < _metries.Count; ++i)
             {
-                next = null;
-                return false;
+                var metry = _metries[i];
+                var caretLength = metry.CaretLength;
+
+                if (begin < caretLength || (i == _metries.Count - 1 && begin == caretLength))
+                {
+                    _beginSelect = metry.CalcuatePointerFrom(begin).Wrap(this, beginBack - begin);
+                    begin = Int32.MaxValue;
+                }
+                else begin -= caretLength;
+
+                if (end < caretLength || (i == _metries.Count - 1 && end == caretLength))
+                {
+                    _endSelect = metry.CalcuatePointerFrom(end).Wrap(this, endBack - end);
+                    if (endBack != _endSelect.Index)
+                        throw new Exception();
+                    end = Int32.MaxValue;
+                }
+                else end -= caretLength;
             }
-
-            Debug.Assert(ReferenceEquals(current[0], this));
-
-            var inlineIdx = Enumerable.Range(0, _metries.Count)
-                                      .First(idx => ReferenceEquals(_metries[idx], current[1]));
-
-            while (inlineIdx < _metries.Count)
-            {
-                var curTgt = _metries[inlineIdx];
-
-                if (!curTgt.TryMoveNext(current, out var nxtPointer))
-                {
-                    ++inlineIdx;
-                }
-                else if (curTgt.GetEnd() == nxtPointer)
-                {
-                    if (++inlineIdx < _metries.Count)
-                    {
-                        next = Wrap(_metries[inlineIdx].GetBegin());
-                        return true;
-                    }
-                    else
-                    {
-                        next = Wrap(nxtPointer);
-                        return true;
-                    }
-                }
-                else
-                {
-                    next = Wrap(nxtPointer);
-                    return true;
-                }
-            }
-
-            next = null;
-            return false;
+            ComplementIntermediate();
+            InvalidateVisual();
         }
 
-        public bool TryMovePrev(
-            TextPointer current,
-#if NETCOREAPP3_0_OR_GREATER
-            [MaybeNullWhen(false)]
-            out TextPointer? prev
-#else
-            out TextPointer prev
-#endif
-        )
+        public void Select(TextPointer begin, TextPointer end)
         {
-            if (_metries.Count == 0)
+            _beginSelect = begin;
+            _endSelect = end;
+            ComplementIntermediate();
+            InvalidateVisual();
+        }
+
+        private void ComplementIntermediate()
+        {
+            bool bgn = false;
+            bool end = false;
+
+            _intermediates.Clear();
+            foreach (var metry in _metries)
             {
-                prev = null;
-                return false;
-            }
+                bool hitB = false;
+                bool hitE = false;
+                bgn |= (hitB = ReferenceEquals(metry, _beginSelect.Geometry));
+                end |= (hitE = ReferenceEquals(metry, _endSelect.Geometry));
 
-            Debug.Assert(ReferenceEquals(current[0], this));
+                if (bgn && end) break;
 
-            var inlineIdx = Enumerable.Range(0, _metries.Count)
-                                      .First(idx => ReferenceEquals(_metries[idx], current[1]));
+                if (hitB | hitE) continue;
 
-            while (inlineIdx >= 0)
-            {
-                var curTgt = _metries[inlineIdx];
-
-                if (!curTgt.TryMovePrev(current, out var prvPointer))
+                if (bgn | end)
                 {
-                    --inlineIdx;
-                }
-                else
-                {
-                    prev = Wrap(prvPointer);
-                    return true;
+                    _intermediates.Add(metry);
                 }
             }
+        }
 
-            prev = null;
-            return false;
+
+        public void ClearSelection()
+        {
+            _beginSelect = null;
+            _endSelect = null;
+            _intermediates.Clear();
+            InvalidateVisual();
         }
 
         public TextPointer CalcuatePointerFrom(double x, double y)
         {
-            if (x < 0)
+            if (y < 0)
             {
                 return GetBegin();
             }
 
-            foreach (var target in _metries)
+            int indexAdd = 0;
+            foreach (var line in _lines)
             {
-                if (x <= target.Left + target.Width)
+                if (y <= line.Top + line.Height)
                 {
-                    return Wrap(target.CalcuatePointerFrom(x, y));
+                    foreach (var target in line.Metries)
+                    {
+                        if (x <= target.Left + target.Width)
+                        {
+                            return target.CalcuatePointerFrom(x, y)
+                                         .Wrap(this, indexAdd);
+                        }
+                        else
+                        {
+                            indexAdd += target.CaretLength;
+                        }
+                    }
+                }
+                else
+                {
+                    indexAdd += line.Metries.Sum(t => t.CaretLength);
                 }
             }
 
             return GetEnd();
+        }
 
+        public TextPointer CalcuatePointerFrom(int index)
+        {
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            foreach (var metry in _metries)
+            {
+                var caretLength = metry.CaretLength;
+
+                if (index < caretLength)
+                {
+                    return metry.CalcuatePointerFrom(index);
+                }
+                else index -= caretLength;
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(index));
         }
 
         public TextPointer GetBegin()
         {
             if (_metries.Count != 0)
             {
-                return Wrap(_metries[0].GetBegin());
+                return _metries[0].GetBegin().Wrap(this, 0);
             }
             else
             {
-                return new TextPointer(this, 0, 0d, 0d, _measured.Height);
+                return new TextPointer(this, 0);
             }
         }
 
@@ -890,38 +941,15 @@ namespace ColorTextBlock.Avalonia
         {
             if (_metries.Count != 0)
             {
-                return Wrap(_metries[_metries.Count - 1].GetEnd());
+                var pointer = _metries[_metries.Count - 1].GetEnd();
+
+                int indexAdd = _metries.Take(_metries.Count - 1).Sum(t => t.CaretLength);
+                return pointer.Wrap(this, indexAdd);
             }
             else
             {
-                return new TextPointer(this, 0, 0d, 0d, _measured.Height);
+                return new TextPointer(this, 0);
             }
-        }
-
-        public int CompareTo(TextPointer left, TextPointer right)
-        {
-            if (left is null || right is null)
-                throw new ArgumentNullException();
-
-            if (!ReferenceEquals(this, left.Host))
-                throw new ArgumentException("TextPointer has a different host.", nameof(left));
-
-            if (!ReferenceEquals(this, right.Host))
-                throw new ArgumentException("TextPointer has a different host.", nameof(right));
-
-            return left.Index.CompareTo(right.Index);
-        }
-
-
-        private TextPointer Wrap(TextPointer tgt)
-        {
-            var idx = 0;
-            for (var i = 0; !ReferenceEquals(_metries[idx], tgt.Host); ++i)
-            {
-                idx += _metries[i].CaretLength;
-            }
-
-            return tgt.Wrap(this, tgt.HostPosY, tgt.Height, idx);
         }
     }
 
@@ -930,16 +958,14 @@ namespace ColorTextBlock.Avalonia
 
     public class Selection
     {
-        public TextPointer From { get; }
-        public TextPointer To { get; }
-        public Selection(TextPointer f, TextPointer t)
+        public int From { get; }
+        public int To { get; }
+        public Selection(int f, int t)
         {
             From = f;
             To = t;
         }
     }
-
-
 
     class LineInfo
     {
@@ -953,6 +979,7 @@ namespace ColorTextBlock.Avalonia
         private double _dheightTop;
         private double _dheightBtm;
 
+        public double Top { get; internal set; }
         public double Width { private set; get; }
         public double Height => Math.Max(_height, _dheightTop + _dheightBtm);
         public double BaseHeight => Math.Max(RequestBaseHeight, BaseHeight1 != 0 ? BaseHeight1 : BaseHeight2);

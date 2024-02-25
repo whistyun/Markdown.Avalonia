@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace ColorTextBlock.Avalonia.Geometries
@@ -11,8 +12,11 @@ namespace ColorTextBlock.Avalonia.Geometries
         public new double Height { get; }
         public IImage Image { get; }
 
-        internal ImageGeometry(IImage image, double width, double height,
-            TextVerticalAlignment alignment) : base(width, height, height, alignment, false)
+        internal ImageGeometry(
+            CImage owner,
+            IImage image, double width, double height,
+            TextVerticalAlignment alignment) :
+            base(owner, width, height, height, alignment, false)
         {
             this.Image = image;
             this.Width = width;
@@ -27,50 +31,6 @@ namespace ColorTextBlock.Avalonia.Geometries
                 new Rect(Left, Top, Width, Height));
         }
 
-        public override bool TryMoveNext(
-            TextPointer current,
-#if NETCOREAPP3_0_OR_GREATER
-            [MaybeNullWhen(false)]
-            out TextPointer? next
-#else
-            out TextPointer next
-#endif
-            )
-        {
-            if (current == GetBegin())
-            {
-                next = GetEnd();
-                return true;
-            }
-            else
-            {
-                next = null;
-                return false;
-            }
-        }
-
-        public override bool TryMovePrev(
-            TextPointer current,
-#if NETCOREAPP3_0_OR_GREATER
-            [MaybeNullWhen(false)]
-            out TextPointer? prev
-#else
-            out TextPointer prev
-#endif
-            )
-        {
-            if (current == GetEnd())
-            {
-                prev = GetBegin();
-                return true;
-            }
-            else
-            {
-                prev = null;
-                return false;
-            }
-        }
-
         public override TextPointer CalcuatePointerFrom(double x, double y)
         {
             if (x < Left + Width / 2)
@@ -82,15 +42,23 @@ namespace ColorTextBlock.Avalonia.Geometries
                 return GetEnd();
             }
         }
-
+        public override TextPointer CalcuatePointerFrom(int index)
+        {
+            return index switch
+            {
+                0 => GetBegin(),
+                1 => GetEnd(),
+                _ => throw new ArgumentOutOfRangeException(nameof(index))
+            };
+        }
         public override TextPointer GetBegin()
         {
-            return new TextPointer(this, 0, Left, Top, Height);
+            return new TextPointer(this, 0);
         }
 
         public override TextPointer GetEnd()
         {
-            return new TextPointer(this, 1, Left, Top, Height);
+            return new TextPointer(this, 1);
         }
     }
 }

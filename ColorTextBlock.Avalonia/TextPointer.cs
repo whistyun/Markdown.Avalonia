@@ -1,5 +1,6 @@
 ﻿using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
+using ColorTextBlock.Avalonia.Geometries;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,101 +16,110 @@ namespace ColorTextBlock.Avalonia
 {
     public class TextPointer : IEquatable<TextPointer>, IComparable<TextPointer>
     {
-        private WeakReference<ITextPointerHandleable>[] _path;
-
         public int Index { get; }
-        /// <summary>The x coordinate of caret position on Control like as CTextBlock</summary>
-        public double HostPosX { get; }
-        /// <summary>The y coordinate of caret position on Control like as CTextBlock</summary>
-        public double HostPosY { get; }
-
-        public double Height { get; }
-
         internal int InternalIndex { get; }
         internal int TrailingLength { get; }
+        internal double Distance { get; }
+        internal CGeometry Geometry { get; }
 
-        internal int PathDepth
-            => _path.Length;
+        internal int PathDepth => _path.Length;
+        internal CInline this[int idx] => _path[idx];
 
-        public ITextPointerHandleable Host
-        {
-            get
-            {
-                if (!_path[0].TryGetTarget(out var host))
-                    throw new InvalidOperationException();
+        private CInline[] _path;
 
-                return host;
-            }
-        }
-
-        public ITextPointerHandleable Last
-        {
-            get
-            {
-                if (!_path[_path.Length - 1].TryGetTarget(out var host))
-                    throw new InvalidOperationException();
-
-                return host;
-            }
-        }
-
-        internal ITextPointerHandleable this[int idx]
-            => _path[idx].TryGetTarget(out var element) ?
-                    element :
-                    throw new InvalidOperationException();
-
-        private TextPointer(
-            WeakReference<ITextPointerHandleable>[] path, int index,
-            int internalIndex, int trallingLength,
-            double hostPosX, double hostPosY, double caretHeight)
+        private TextPointer(CInline[] path, CGeometry geometry, int index, int internalIndex, int trallingLength, double distance)
         {
             _path = path;
+            Geometry = geometry;
             Index = index;
             InternalIndex = internalIndex;
             TrailingLength = trallingLength;
-            HostPosX = hostPosX;
-            HostPosY = hostPosY;
-            Height = caretHeight;
+            Distance = distance;
         }
 
-        internal TextPointer(ITextPointerHandleable owner, int idx, double hostPosX, double hostPosY, double caretHeight)
+        internal TextPointer(CRun inline, TextLineGeometry target, CharacterHit charHit, bool isLast)
         {
-            _path = new[] { new WeakReference<ITextPointerHandleable>(owner) };
-            Index = InternalIndex = idx;
+            _path = new[] { inline };
+
+            var index = 0;
+            foreach (var metry in inline.Geometries!)
+            {
+                if (ReferenceEquals(metry, target))
+                {
+                    break;
+                }
+                else index += metry.CaretLength;
+            }
+            Geometry = target;
+
+            if (isLast)
+            {
+                var lastIdx = charHit.FirstCharacterIndex + charHit.TrailingLength;
+                Index = lastIdx - target.Line.FirstTextSourceIndex;
+                InternalIndex = lastIdx;
+                TrailingLength = 0;
+            }
+            else
+            {
+                Index = charHit.FirstCharacterIndex - target.Line.FirstTextSourceIndex;
+                InternalIndex = charHit.FirstCharacterIndex;
+                TrailingLength = charHit.TrailingLength;
+            }
+        }
+
+        internal TextPointer(CRun inline, TextLineGeometry target, CharacterHit charHit, double distance, bool isLast) :
+            this(inline, target, charHit, isLast)
+        {
+            Distance = distance;
+        }
+
+        internal TextPointer(CGeometry inline, int idx)
+        {
+            _path = new[] { inline.Owner };
+            Geometry = inline;
+            Index = idx;
+            InternalIndex = 0;
             TrailingLength = 0;
-            HostPosX = hostPosX;
-            HostPosY = hostPosY;
-            Height = caretHeight;
         }
 
-        internal TextPointer(
-            ITextPointerHandleable owner, TextLine baseLine, CharacterHit charaHit,
-            double hostPosX, double hostPosY, double caretHeight)
+        internal TextPointer(CTextBlock host, int idx)
         {
-            _path = new[] { new WeakReference<ITextPointerHandleable>(owner) };
-            Index = charaHit.FirstCharacterIndex - baseLine.FirstTextSourceIndex;
-            InternalIndex = charaHit.FirstCharacterIndex;
-            TrailingLength = charaHit.TrailingLength;
-            HostPosX = hostPosX;
-            HostPosY = hostPosY;
-            Height = caretHeight;
+            _path = Array.Empty<CInline>();
+            Index = idx;
+            InternalIndex = 0;
+            TrailingLength = 0;
         }
 
-        internal TextPointer Wrap(ITextPointerHandleable owner, double hostPosY, double caretHeight, int appendIndex)
+        internal TextPointer Wrap(CInline owner, int indexAdding)
         {
-            var path = new WeakReference<ITextPointerHandleable>[_path.Length + 1];
-            path[0] = new WeakReference<ITextPointerHandleable>(owner);
-            Array.Copy(_path, 0, path, 1, _path.Length);
+            var path = new List<CInline>(_path.Length + 1);
+            path.Add(owner);
+            path.AddRange(_path);
 
-            return new TextPointer(path, Index + appendIndex, InternalIndex, TrailingLength, HostPosX, hostPosY, caretHeight);
+            return new TextPointer(
+                path.ToArray(),
+                Geometry,
+                Index + indexAdding,
+                InternalIndex,
+                TrailingLength,
+                Distance);
+        }
+
+        internal TextPointer Wrap(CTextBlock host, int indexAdding)
+        {
+            return new TextPointer(
+                _path,
+                Geometry,
+                Index + indexAdding,
+                InternalIndex,
+                TrailingLength,
+                Distance);
         }
 
         public override int GetHashCode()
         {
             return _path.Sum(e => e.GetHashCode())
-                + HostPosX.GetHashCode()
-                + HostPosY.GetHashCode()
-                + Height.GetHashCode()
+                + Index.GetHashCode()
                 + InternalIndex.GetHashCode()
                 + TrailingLength.GetHashCode();
         }
@@ -117,16 +127,14 @@ namespace ColorTextBlock.Avalonia
         public bool Equals(TextPointer? other)
         {
             return PathDepth == other.PathDepth
-                && HostPosX == other.HostPosX
-                && HostPosY == other.HostPosY
-                && Height == other.Height
-                && Enumerable.Range(0, PathDepth)
-                             .All(i => Object.ReferenceEquals(_path[i], other[i]))
+                && Enumerable.Range(0, PathDepth).All(i => Object.ReferenceEquals(_path[i], other[i]))
+                && Index == other.Index
                 && InternalIndex == other.InternalIndex
                 && TrailingLength == other.TrailingLength;
         }
 
-        public int CompareTo(TextPointer other) => Index.CompareTo(other.Index);
+        public int CompareTo(TextPointer? other)
+            => other is not null ? Index.CompareTo(other.Index) : throw new ArgumentNullException(nameof(other));
 
         public static bool operator <(TextPointer left, TextPointer right) => left.CompareTo(right) < 0;
         public static bool operator >(TextPointer left, TextPointer right) => left.CompareTo(right) > 0;
@@ -138,38 +146,6 @@ namespace ColorTextBlock.Avalonia
     public interface ITextPointerHandleable
     {
         /// <summary>
-        /// Calcuates next position from the indicated position.
-        /// </summary>
-        /// <param name="current">The indicated position</param>
-        /// <param name="next">The next position. If the indicated position is the end then this is equals to the indicated position.</param>
-        /// <returns>Returns true if the indicated position is not equals to the end.</returns>
-        // 指定されたテキスト位置から次の位置を計算します。
-        public bool TryMoveNext(
-            TextPointer current,
-#if NETCOREAPP3_0_OR_GREATER
-            [MaybeNullWhen(false)]
-            out TextPointer? next
-#else
-            out TextPointer next
-#endif
-        );
-        /// <summary>
-        /// Calcuates previous position from the indicated position.
-        /// </summary>
-        /// <param name="current">The indicated position</param>
-        /// <param name="next">The previous position. If the indicated position is the begin then this is equals to the indicated position.</param>
-        /// <returns>Returns true if the indicated position is not equals to the end.</returns>
-        public bool TryMovePrev(
-            TextPointer current,
-#if NETCOREAPP3_0_OR_GREATER
-            [MaybeNullWhen(false)]
-            out TextPointer? prev
-#else
-            out TextPointer prev
-#endif
-        );
-
-        /// <summary>
         /// Calcuates position from relative coordinates. 
         /// The origin of the relative coordinates is based on CTextBlock.
         /// </summary>
@@ -177,6 +153,8 @@ namespace ColorTextBlock.Avalonia
         /// <param name="y">The y coordinate of caret position on CTextBlock</param>
         /// <returns></returns>
         public TextPointer CalcuatePointerFrom(double x, double y);
+
+        public TextPointer CalcuatePointerFrom(int index);
 
         public TextPointer GetBegin();
 

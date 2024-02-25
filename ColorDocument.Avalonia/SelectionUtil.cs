@@ -1,33 +1,33 @@
 ﻿using Avalonia;
-using ColorDocument.Avalonia.DocumentElements;
-using Markdown.Avalonia.Utils;
+using Avalonia.Layout;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ColorDocument.Avalonia
 {
     internal static class SelectionUtil
     {
-        public static SelectDirection SelectVertical<T>(EnumerableEx<T> elements, Point from, Point to)
+        public static List<DocumentElement> SelectVertical<T>(Layoutable anchor, EnumerableEx<T> elements, Point from, Point to)
             where T : DocumentElement
         {
-            var c = elements.GetRectInDoc();
+            var c = elements.GetRectInDoc(anchor);
 
             int fp = ComputeIdxVertical(c, from);
             int tp = ComputeIdxVertical(c, to);
 
-            return Select(elements, from, to, fp, tp);
+            return Select(c, from, to, fp, tp);
         }
 
-        public static SelectDirection SelectGrid<T>(EnumerableEx<T> elements, Point from, Point to)
+        public static List<DocumentElement> SelectGrid<T>(Layoutable anchor, EnumerableEx<T> elements, Point from, Point to)
             where T : DocumentElement
         {
-            var c = elements.GetRectInDoc();
+            var c = elements.GetRectInDoc(anchor);
 
             int fp = ComputeIdxGrid(c, from);
             int tp = ComputeIdxGrid(c, to);
 
-            return Select(elements, from, to, fp, tp);
+            return Select(c, from, to, fp, tp);
         }
 
         static int ComputeIdxVertical(EnumerableEx<DocumentElementWithBound> elements, Point pnt)
@@ -81,43 +81,69 @@ namespace ColorDocument.Avalonia
             return elements.Count - 1;
         }
 
-        private static SelectDirection Select<T>(EnumerableEx<T> elements, Point from, Point to, int fp, int tp)
-            where T : DocumentElement
+        private static List<DocumentElement> Select(EnumerableEx<DocumentElementWithBound> elements, Point from, Point to, int fp, int tp)
         {
+            var list = new List<DocumentElement>();
+
             if (fp < tp)
             {
                 var workF = from;
                 var workT = new Point(Double.PositiveInfinity, Double.PositiveInfinity);
 
-                for (var i = fp; i < tp - 1; ++i)
+                for (var i = fp; i <= tp; ++i)
                 {
-                    elements[i].Select(workF, workT);
+                    if (i == tp)
+                    {
+                        workT = to;
+                    }
+
+                    var element = elements[i].Element;
+                    var rect = elements[i].Rect;
+
+                    element.Select(
+                        new Point(workF.X - rect.X, workF.Y - rect.Y),
+                        new Point(workT.X - rect.X, workT.Y - rect.Y));
+
+                    list.Add(element);
                     workF = new Point(0, 0);
                 }
-
-                elements[tp - 1].Select(workF, to);
-
-                return SelectDirection.Backward;
             }
             else if (tp < fp)
             {
-                var workF = new Point(0, 0);
-                var workT = to;
+                var workF = from;
+                var workT = new Point(0, 0);
 
-                for (var i = tp - 1; i >= fp - 1; --i)
+                for (var i = fp; i >= tp; --i)
                 {
-                    elements[i].Select(workF, workT);
-                    workT = new Point(Double.PositiveInfinity, Double.PositiveInfinity);
+                    if (i == tp)
+                    {
+                        workT = to;
+                    }
+
+                    var element = elements[i].Element;
+                    var rect = elements[i].Rect;
+
+                    element.Select(
+                        new Point(workF.X - rect.X, workF.Y - rect.Y),
+                        new Point(workT.X - rect.X, workT.Y - rect.Y));
+
+                    list.Add(element);
+                    workF = new Point(Double.PositiveInfinity, Double.PositiveInfinity);
                 }
-
-                elements[fp].Select(from, workT);
-
-                return SelectDirection.Backward;
             }
             else
             {
-                return elements[tp].Select(from, to);
+                var element = elements[tp].Element;
+                var rect = elements[tp].Rect;
+
+                element.Select(
+                       new Point(from.X - rect.X, from.Y - rect.Y),
+                       new Point(to.X - rect.X, to.Y - rect.Y));
+
+                list.Add(element);
             }
+
+            return list;
         }
     }
 }
