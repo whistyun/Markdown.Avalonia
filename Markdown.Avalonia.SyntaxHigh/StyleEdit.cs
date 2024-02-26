@@ -11,11 +11,11 @@ namespace Markdown.Avalonia.SyntaxHigh
             switch (styleName)
             {
                 case nameof(MarkdownStyle.SimpleTheme):
-                    styles.Add(new AppendixOfDefaultTheme()[0]);
+                    styles.AddRange(new AppendixOfDefaultTheme());
                     break;
 
                 case nameof(MarkdownStyle.FluentTheme):
-                    styles.Add(new AppendixOfFluentTheme()[0]);
+                    styles.AddRange(new AppendixOfFluentTheme());
                     break;
             }
         }

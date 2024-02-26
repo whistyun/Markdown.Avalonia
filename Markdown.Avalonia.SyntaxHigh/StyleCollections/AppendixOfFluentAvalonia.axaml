@@ -1,13 +1,26 @@
 <Styles
       xmlns="https://github.com/avaloniaui"
       xmlns:mde="clr-namespace:Markdown.Avalonia.SyntaxHigh.Extensions;assembly=Markdown.Avalonia.SyntaxHigh"
+      xmlns:mdte="clr-namespace:Markdown.Avalonia.Extensions;assembly=Markdown.Avalonia"
       xmlns:avedit="https://github.com/avaloniaui/avaloniaedit"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       x:Class="Markdown.Avalonia.SyntaxHigh.StyleCollections.AppendixOfFluentAvalonia"
       >
-  <Style Selector="avedit|TextEditor">
+  <Style Selector=".CodeBlock avedit|TextEditor">
     <Setter Property="SyntaxHighlighting" Value="{mde:SyntaxHighlightWrapper TextFillColorPrimaryBrush}"/>
     <Setter Property="FontFamily" Value="menlo,monaco,consolas,droid sans mono,inconsolata,courier new,monospace,dejavu sans mono"/>
     <Setter Property="VerticalScrollBarVisibility" Value="Disabled"/>
+  </Style>
+
+  <Style Selector=".CodeBlock Label.LangInfo">
+    <Setter Property="Padding" Value="8, 0"/>
+    <Setter Property="Background" Value="{mdte:Alpha TextFillColorPrimaryBrush, 0.2}"/>
+    <Setter Property="BorderBrush" Value="{mdte:Alpha TextFillColorPrimaryBrush, 0.4}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="2"/>
+  </Style>
+
+  <Style Selector=".CodeBlock Button.CopyButton TextBlock">
+    <Setter Property="Text" Value="Copy"/>
   </Style>
 </Styles>

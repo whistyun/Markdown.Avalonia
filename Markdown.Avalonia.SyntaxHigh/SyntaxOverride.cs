@@ -97,17 +97,34 @@ namespace Markdown.Avalonia.SyntaxHigh
                     SetupStyle();
                 }
 
+                var langLabel = new Label() { Content = lang };
+                langLabel.Classes.Add("LangInfo");
+
+                var copyButton = new Button() { Content = new TextBlock() };
+                copyButton.Classes.Add("CopyButton");
+
                 var txtEdit = new TextEditor();
                 txtEdit.Tag = lang;
                 txtEdit.SetValue(SyntaxHighlightWrapperExtension.ProviderProperty, _provider);
-
                 txtEdit.Text = code;
                 txtEdit.HorizontalAlignment = HorizontalAlignment.Stretch;
                 txtEdit.IsReadOnly = true;
 
+                copyButton.Click += (s, e) =>
+                {
+                    var clipboard = TopLevel.GetTopLevel(txtEdit)?.Clipboard;
+                    clipboard?.SetTextAsync(txtEdit.Text);
+                };
+
+
+                var cdPd = new CodePad();
+                cdPd.Content = txtEdit;
+                cdPd.ExandableMenu = copyButton;
+                cdPd.AlwaysShowMenu = langLabel;
+
                 var result = new Border();
                 result.Classes.Add(Markdown.CodeBlockClass);
-                result.Child = txtEdit;
+                result.Child = cdPd;
 
                 yield return result;
             }
