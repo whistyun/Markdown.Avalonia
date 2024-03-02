@@ -14,5 +14,7 @@ namespace ColorDocument.Avalonia
         public Rect GetRect(Layoutable anchor) => Control.GetRectInDoc(anchor).GetValueOrDefault();
         public abstract void Select(Point from, Point to);
         public abstract void UnSelect();
+
+        //public abstract string GetSelectedText();
     }
 }

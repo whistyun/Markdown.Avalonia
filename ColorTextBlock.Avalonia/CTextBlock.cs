@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace ColorTextBlock.Avalonia
 {
@@ -949,6 +950,53 @@ namespace ColorTextBlock.Avalonia
             else
             {
                 return new TextPointer(this, 0);
+            }
+        }
+
+        public string GetSelectedText()
+        {
+            if (_beginSelect is null || _endSelect is null)
+            {
+                return string.Empty;
+            }
+
+            TextPointer bgn, end;
+            if (_beginSelect < _endSelect)
+            {
+                bgn = _beginSelect;
+                end = _endSelect;
+            }
+            else
+            {
+                bgn = _endSelect;
+                end = _beginSelect;
+            }
+
+            if (ReferenceEquals(bgn.Geometry, end.Geometry))
+            {
+                if (bgn.Geometry is TextLineGeometry tlg)
+                {
+                    return tlg.Text.Substring(bgn.InternalIndex, end.InternalIndex - bgn.InternalIndex);
+                }
+                else return "";
+            }
+            else
+            {
+                var buffer = new StringBuilder();
+
+                if (bgn.Geometry is TextLineGeometry btlg)
+                    buffer.Append(btlg.Text.Substring(bgn.InternalIndex));
+
+                foreach (var inter in _intermediates)
+                {
+                    if (inter is TextLineGeometry itlg)
+                        buffer.Append(itlg.ToString());
+                }
+
+                if (end.Geometry is TextLineGeometry etlg)
+                    buffer.Append(etlg.Text.Substring(etlg.Line.FirstTextSourceIndex, end.InternalIndex - etlg.Line.FirstTextSourceIndex));
+
+                return buffer.ToString();
             }
         }
     }

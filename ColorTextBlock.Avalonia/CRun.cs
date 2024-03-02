@@ -31,117 +31,167 @@ namespace ColorTextBlock.Avalonia
             set { SetValue(TextProperty, value); }
         }
 
-        internal List<CGeometry>? Geometries { private set; get; }
-
-
         protected override IEnumerable<CGeometry> MeasureOverride(
             double entireWidth,
             double remainWidth)
         {
             if (String.IsNullOrEmpty(Text))
             {
-                Geometries = null;
                 return Array.Empty<CGeometry>();
             }
 
-            Geometries = PrivateMeasureOverride(entireWidth, remainWidth);
-            return Geometries;
+            return PrivateMeasureOverride(entireWidth, remainWidth);
         }
 
         protected List<CGeometry> PrivateMeasureOverride(
             double entireWidth,
             double remainWidth)
         {
+            var runProps = CreateTextRunProperties(Foreground);
+            var paraProps = CreateTextParagraphProperties(runProps);
+            var source = new SimpleTextSource(Text.AsMemory(), runProps);
+
             if (remainWidth == entireWidth)
             {
-                return Create(Text, entireWidth);
+                return Create(entireWidth);
             }
 
-            var layout = new TextLayout(
-                                Text,
-                                Typeface, FontSize,
-                                Foreground,
-                                textWrapping: TextWrapping.Wrap);
-
-            TextLine firstLine = layout.TextLines[0];
+            var firstLine = TextFormatter.Current.FormatLine(source, 0, double.PositiveInfinity, paraProps);
+            if (firstLine is null)
+            {
+                return new List<CGeometry>();
+            }
 
             if (firstLine.Width < remainWidth)
             {
-                return layout.TextLines.Count == 1 ?
-                    Create(Text, layout) :
-                    Create(Text, entireWidth);
+                if (firstLine.Length == Text.Length)
+                {
+                    return new List<CGeometry>() { new TextLineGeometry(this, source, firstLine, false) };
+                }
+
+                return CreateLines(firstLine);
             }
             else
             {
-                string firstLineText = Text.Substring(firstLine.FirstTextSourceIndex, firstLine.Length);
+                var firstLineSource = source.Subsource(firstLine.FirstTextSourceIndex, firstLine.Length);
+                var firstLineRemain = TextFormatter.Current.FormatLine(firstLineSource, 0, remainWidth, paraProps)!;
 
-                var firstLineLayout = new TextLayout(
-                                              firstLineText,
-                                              Typeface, FontSize,
-                                              Foreground,
-                                              textWrapping: TextWrapping.Wrap,
-                                              maxWidth: remainWidth);
+                var breakPosEnum = new LineBreakEnumerator(Text.AsMemory().Slice(firstLine.FirstTextSourceIndex, firstLine.Length).Span);
+                int breakPos = breakPosEnum.MoveNext(out var lnbrk) ? lnbrk.PositionWrap : int.MaxValue;
 
 
-                var breakPosEnum = new LineBreakEnumerator(firstLineText.AsMemory().Span);
-                int breakPos = breakPosEnum.MoveNext(out var lnbrk) ?
-                                    lnbrk.PositionWrap :
-                                    int.MaxValue;
-
-
-                if (breakPos < firstLineLayout.TextLines[0].Length)
+                if (breakPos < firstLineRemain.Length)
                 {
                     // correct wrap
 
-                    var secondalyText = Text.Substring(firstLineLayout.TextLines[0].Length);
-
-                    var list = Create(secondalyText, entireWidth);
-
-                    list.Insert(0, new TextLineGeometry(this, firstLineText, firstLineLayout.TextLines[0], true));
-
-                    return list;
+                    return CreateLines(firstLineRemain);
                 }
                 else
                 {
                     // wrong wrap; first line word is too long
 
-                    var list = Create(Text, entireWidth);
-
+                    var list = Create(entireWidth);
                     list.Insert(0, new LineBreakMarkGeometry(this));
-
                     return list;
                 }
             }
-        }
 
-        private List<CGeometry> Create(string text, double maxWidth)
-        => Create(
-            text,
-            new TextLayout(
-                    text,
-                    Typeface, FontSize,
-                    Foreground,
-                    textWrapping: TextWrapping.Wrap,
-                    maxWidth: maxWidth));
-
-        private List<CGeometry> Create(string text, TextLayout layout)
-        {
-            var rslt = new List<CGeometry>();
-
-            var textlines = layout.TextLines;
-            for (int j = 0; j < textlines.Count; ++j)
+            List<CGeometry> CreateLines(TextLine firstLine)
             {
-                var line = textlines[j];
-                var chip = text.Substring(line.FirstTextSourceIndex, line.Length);
+                var lines = new List<CGeometry>();
 
-                var linebreak = j != textlines.Count - 1;
+                TextLine prev = firstLine;
 
-                rslt.Add(new TextLineGeometry(this, chip, line, linebreak));
+                var length = firstLine.Length;
+                while (length < Text.Length)
+                {
+                    var line = TextFormatter.Current.FormatLine(source, length, entireWidth, paraProps, prev.TextLineBreak);
+                    if (line is null)
+                        break;
+
+                    lines.Add(new TextLineGeometry(this, source, prev, true));
+                    prev = line;
+
+                    length += line.Length;
+                }
+
+                lines.Add(new TextLineGeometry(this, source, prev, false));
+
+                return lines;
             }
 
-            return rslt;
+            List<CGeometry> Create(double maxWidth)
+            {
+                var layout = new TextLayout(
+                        source,
+                        paraProps,
+                        maxWidth: maxWidth);
+
+                var rslt = new List<CGeometry>();
+
+                for (int j = 0; j < layout.TextLines.Count; ++j)
+                {
+                    var line = layout.TextLines[j];
+                    var linebreak = j != layout.TextLines.Count - 1;
+
+                    rslt.Add(new TextLineGeometry(this, source, line, linebreak));
+                }
+
+                return rslt;
+            }
         }
 
+
+        internal TextParagraphProperties CreateTextParagraphProperties(TextRunProperties runProps)
+            => new GenericTextParagraphProperties(
+                        FlowDirection.LeftToRight,
+                        TextAlignment.Left, true, false,
+                        runProps,
+                        TextWrapping.Wrap,
+                        double.NaN,
+                        0,
+                        0);
+
+        internal TextRunProperties CreateTextRunProperties(IBrush? foreground)
+            => new GenericTextRunProperties(Typeface, FontSize, foregroundBrush: foreground);
+
         public override string AsString() => Text;
+    }
+
+
+    readonly struct SimpleTextSource : ITextSource
+    {
+        private readonly ReadOnlyMemory<char> _text;
+        private readonly TextRunProperties _props;
+
+        public TextRunProperties RunProperties => _props;
+
+        public SimpleTextSource(ReadOnlyMemory<char> text, TextRunProperties props)
+        {
+            _text = text;
+            _props = props;
+        }
+
+        public TextRun? GetTextRun(int textSourceIndex)
+        {
+            return new TextCharacters(_text.Slice(textSourceIndex), _props);
+        }
+
+        public SimpleTextSource Subsource(int start, int length)
+            => new SimpleTextSource(_text.Slice(start, length), _props);
+
+        public string Substring(int start, int length)
+            => _text.Slice(start, length).ToString();
+
+        public string Substring(int start)
+            => _text.Slice(start).ToString();
+
+        public SimpleTextSource ChangeForeground(IBrush? foreground)
+        {
+            var runProps = new GenericTextRunProperties(_props.Typeface, _props.FontRenderingEmSize, foregroundBrush: foreground);
+            return new SimpleTextSource(_text, runProps);
+        }
+
+        public override string ToString() => _text.ToString();
     }
 }

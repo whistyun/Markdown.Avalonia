@@ -1,16 +1,8 @@
 ﻿using Avalonia.Media;
-using Avalonia.Media.TextFormatting;
 using ColorTextBlock.Avalonia.Geometries;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace ColorTextBlock.Avalonia
 {
@@ -40,16 +32,6 @@ namespace ColorTextBlock.Avalonia
         internal TextPointer(CRun inline, TextLineGeometry target, CharacterHit charHit, bool isLast)
         {
             _path = new[] { inline };
-
-            var index = 0;
-            foreach (var metry in inline.Geometries!)
-            {
-                if (ReferenceEquals(metry, target))
-                {
-                    break;
-                }
-                else index += metry.CaretLength;
-            }
             Geometry = target;
 
             if (isLast)

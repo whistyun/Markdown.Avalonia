@@ -68,5 +68,10 @@ namespace ColorDocument.Avalonia.DocumentElements
         {
             _text.Value.ClearSelection();
         }
+
+        public string GetSelectedText()
+        {
+            return _text.Value.GetSelectedText();
+        }
     }
 }

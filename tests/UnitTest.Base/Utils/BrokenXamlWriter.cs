@@ -341,7 +341,7 @@ namespace UnitTest.Base.Utils
                     var objValue = obj.GetValue(aprop);
                     yield return (aprop, objValue);
                 }
-                else if (aprop.Name == "Text" && !String.IsNullOrEmpty(obj.GetValue(aprop).ToString()))
+                else if (aprop.Name == "Text" && obj.GetValue(aprop) is not null && !String.IsNullOrEmpty(obj.GetValue(aprop).ToString()))
                 {
                     var objValue = obj.GetValue(aprop);
                     yield return (aprop, objValue);

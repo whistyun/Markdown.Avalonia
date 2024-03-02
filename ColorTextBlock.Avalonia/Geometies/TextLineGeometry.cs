@@ -10,39 +10,20 @@ namespace ColorTextBlock.Avalonia.Geometries
 {
     internal class TextLineGeometry : TextGeometry
     {
-        public string Text { get; }
-        public Typeface Typeface { get; }
-        public double FontSize { get; }
+        public SimpleTextSource Text { get; private set; }
         public TextLine Line { get; private set; }
         public IBrush? LayoutForeground { get; private set; }
 
         internal TextLineGeometry(
             CRun owner,
-            string text,
+            SimpleTextSource text,
             TextLine tline,
             bool linebreak) :
             base(owner, tline.WidthIncludingTrailingWhitespace, tline.Height, tline.Baseline, owner.TextVerticalAlignment, linebreak)
         {
             Text = text;
-            Typeface = owner.Typeface;
-            FontSize = owner.FontSize;
             Line = tline;
             LayoutForeground = owner.Foreground;
-        }
-
-        internal TextLineGeometry(
-                TextLineGeometry baseGeometry,
-                bool linebreak) :
-            base(baseGeometry.Owner,
-                 baseGeometry.Width, baseGeometry.Height, baseGeometry.BaseHeight,
-                 baseGeometry.TextVerticalAlignment,
-                 linebreak)
-        {
-            Text = baseGeometry.Text;
-            Typeface = baseGeometry.Typeface;
-            FontSize = baseGeometry.FontSize;
-            Line = baseGeometry.Line;
-            LayoutForeground = baseGeometry.LayoutForeground;
         }
 
         public override void Render(DrawingContext ctx)
@@ -53,8 +34,16 @@ namespace ColorTextBlock.Avalonia.Geometries
             if (LayoutForeground != foreground)
             {
                 LayoutForeground = foreground;
-                var layout = new TextLayout(Text, Typeface, FontSize, foreground);
-                Line = layout.TextLines.First();
+                Text = Text.ChangeForeground(foreground);
+
+                var owner = (CRun)Owner;
+                var parPrps = owner.CreateTextParagraphProperties(Text.RunProperties);
+
+                Line = TextFormatter.Current.FormatLine(
+                            Text,
+                            Line.FirstTextSourceIndex,
+                            Width,
+                            parPrps)!;
             }
 
             if (background != null)
@@ -114,5 +103,8 @@ namespace ColorTextBlock.Avalonia.Geometries
 
             return new TextPointer((CRun)Owner, this, hit, Width, true);
         }
+
+        public override string ToString()
+            => Text.Substring(Line.FirstTextSourceIndex, Line.Length);
     }
 }
