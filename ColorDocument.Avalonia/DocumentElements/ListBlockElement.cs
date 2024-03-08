@@ -5,6 +5,7 @@ using ColorTextBlock.Avalonia;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace ColorDocument.Avalonia.DocumentElements
 {
@@ -12,7 +13,7 @@ namespace ColorDocument.Avalonia.DocumentElements
     {
         private Lazy<Grid> _control;
         private EnumerableEx<ListItemElement> _items;
-        private List<DocumentElement>? _prevSelection;
+        private SelectionList? _prevSelection;
 
         public override Control Control => _control.Value;
         public override IEnumerable<DocumentElement> Children => _items;
@@ -60,6 +61,8 @@ namespace ColorDocument.Avalonia.DocumentElements
                 var markerTxt = new CTextBlock(marker.CreateMakerText(index));
                 var itemCtrl = item.Control;
 
+                item.MarkerText = markerTxt.Text;
+
                 // adjust baseline
                 if (FindFirstFrom(itemCtrl) is { } controlTxt)
                     markerTxt.ObserveBaseHeightOf(controlTxt);
@@ -97,6 +100,23 @@ namespace ColorDocument.Avalonia.DocumentElements
                     return ctxt;
                 }
                 return null;
+            }
+        }
+
+        public override void ConstructSelectedText(StringBuilder builder)
+        {
+            if (_prevSelection is null)
+                return;
+
+            foreach (var para in _prevSelection.Cast<ListItemElement>())
+            {
+                builder.Append(para.MarkerText).Append(' ');
+
+                var listElmTxt = para.GetSelectedText().Replace("\r\n", "\n").Replace('\r', '\n');
+                builder.Append(listElmTxt);
+
+                if (!listElmTxt.EndsWith("\n"))
+                    builder.Append('\n');
             }
         }
     }

@@ -5,6 +5,7 @@ using Avalonia.Media;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace ColorDocument.Avalonia.DocumentElements
 {
@@ -12,8 +13,10 @@ namespace ColorDocument.Avalonia.DocumentElements
     {
         private readonly Lazy<Border> _control;
         private readonly EnumerableEx<DocumentElement> _items;
-        private List<DocumentElement>? _prevSelection;
+        private SelectionList? _prevSelection;
 
+        internal int Row { get; set; }
+        internal int Column { get; set; }
         public int RowSpan { set; get; }
         public int ColSpan { set; get; }
         public TextAlignment? Horizontal { set; get; }
@@ -94,8 +97,26 @@ namespace ColorDocument.Avalonia.DocumentElements
                         break;
                 }
             }
-
             return control;
+        }
+
+        public override void ConstructSelectedText(StringBuilder builder)
+        {
+            if (_prevSelection is null)
+                return;
+
+            var preLen = builder.Length;
+
+            foreach (var para in _prevSelection)
+            {
+                para.ConstructSelectedText(builder);
+
+                if (preLen == builder.Length)
+                    continue;
+
+                if (builder[builder.Length - 1] != '\n')
+                    builder.Append('\n');
+            }
         }
     }
 }

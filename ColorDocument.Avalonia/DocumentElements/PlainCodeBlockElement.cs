@@ -5,6 +5,7 @@ using Avalonia.Media;
 using ColorTextBlock.Avalonia;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace ColorDocument.Avalonia.DocumentElements
 {
@@ -58,6 +59,11 @@ namespace ColorDocument.Avalonia.DocumentElements
             result.Child = scrl;
 
             return result;
+        }
+
+        public override void ConstructSelectedText(StringBuilder stringBuilder)
+        {
+            stringBuilder.Append(_text.Value.GetSelectedText());
         }
     }
 }

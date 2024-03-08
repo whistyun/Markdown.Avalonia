@@ -4,6 +4,7 @@ using Avalonia.Media;
 using ColorTextBlock.Avalonia;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace ColorDocument.Avalonia.DocumentElements
 {
@@ -48,6 +49,11 @@ namespace ColorDocument.Avalonia.DocumentElements
         public override void UnSelect()
         {
             _child.UnSelect();
+        }
+
+        public override void ConstructSelectedText(StringBuilder builder)
+        {
+            _child.ConstructSelectedText(builder);
         }
     }
 }

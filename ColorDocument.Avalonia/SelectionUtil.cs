@@ -8,7 +8,7 @@ namespace ColorDocument.Avalonia
 {
     internal static class SelectionUtil
     {
-        public static List<DocumentElement> SelectVertical<T>(Layoutable anchor, EnumerableEx<T> elements, Point from, Point to)
+        public static SelectionList SelectVertical<T>(Layoutable anchor, EnumerableEx<T> elements, Point from, Point to)
             where T : DocumentElement
         {
             var c = elements.GetRectInDoc(anchor);
@@ -16,10 +16,24 @@ namespace ColorDocument.Avalonia
             int fp = ComputeIdxVertical(c, from);
             int tp = ComputeIdxVertical(c, to);
 
-            return Select(c, from, to, fp, tp);
+            var list = Select(c, from, to, fp, tp);
+
+            SelectRange rng =
+                 (Math.Min(fp, tp) == 0 ? SelectRange.Begin : SelectRange.Part)
+               | (Math.Max(fp, tp) == elements.Count - 1 ? SelectRange.End : SelectRange.Part);
+
+            if (fp < tp)
+            {
+                return new SelectionList(SelectDirection.Forward, rng, list);
+            }
+            else
+            {
+                list.Reverse();
+                return new SelectionList(SelectDirection.Backward, rng, list);
+            }
         }
 
-        public static List<DocumentElement> SelectGrid<T>(Layoutable anchor, EnumerableEx<T> elements, Point from, Point to)
+        public static SelectionList SelectGrid<T>(Layoutable anchor, EnumerableEx<T> elements, Point from, Point to)
             where T : DocumentElement
         {
             var c = elements.GetRectInDoc(anchor);
@@ -27,7 +41,21 @@ namespace ColorDocument.Avalonia
             int fp = ComputeIdxGrid(c, from);
             int tp = ComputeIdxGrid(c, to);
 
-            return Select(c, from, to, fp, tp);
+            var list = Select(c, from, to, fp, tp);
+
+            SelectRange rng =
+                 (Math.Min(fp, tp) == 0 ? SelectRange.Begin : SelectRange.Part)
+               | (Math.Max(fp, tp) == elements.Count - 1 ? SelectRange.End : SelectRange.Part);
+
+            if (fp < tp)
+            {
+                return new SelectionList(SelectDirection.Forward, rng, list);
+            }
+            else
+            {
+                list.Reverse();
+                return new SelectionList(SelectDirection.Backward, rng, list);
+            }
         }
 
         static int ComputeIdxVertical(EnumerableEx<DocumentElementWithBound> elements, Point pnt)

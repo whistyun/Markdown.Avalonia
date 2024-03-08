@@ -2,6 +2,8 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Metadata;
 using Avalonia.Platform;
@@ -25,6 +27,12 @@ namespace Markdown.Avalonia
 {
     public class MarkdownScrollViewer : Control
     {
+        static MarkdownScrollViewer()
+        {
+            FocusableProperty.OverrideDefaultValue(typeof(MarkdownScrollViewer), true);
+        }
+
+
         public static readonly DirectProperty<MarkdownScrollViewer, Uri?> SourceDirectProperty =
             AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, Uri?>(
                 nameof(Source),
@@ -131,12 +139,10 @@ namespace Markdown.Avalonia
 
             _viewer.ScrollChanged += (s, e) => OnScrollChanged();
 
-
             _viewer.PointerPressed += _viewer_PointerPressed;
             _viewer.PointerMoved += _viewer_PointerMoved;
             _viewer.PointerReleased += _viewer_PointerReleased;
         }
-
 
         #region text selection
 
@@ -145,20 +151,24 @@ namespace Markdown.Avalonia
 
         private void _viewer_PointerPressed(object? sender, PointerPressedEventArgs e)
         {
-            var point = e.GetCurrentPoint(_document.Control);
+            if (_document is null) return;
 
+            var point = e.GetCurrentPoint(_document.Control);
             if (point.Properties.IsLeftButtonPressed && _document is not null)
             {
                 _isLeftButtonPressed = true;
                 _startPoint = point.Position;
                 _document.Select(_startPoint, point.Position);
+
+                this.Focus();
             }
         }
 
         private void _viewer_PointerMoved(object? sender, PointerEventArgs e)
         {
-            var point = e.GetCurrentPoint(_document.Control);
+            if (_document is null) return;
 
+            var point = e.GetCurrentPoint(_document.Control);
             if (_isLeftButtonPressed && point.Properties.IsLeftButtonPressed)
             {
                 if (_document is not null)
@@ -168,14 +178,29 @@ namespace Markdown.Avalonia
 
         private void _viewer_PointerReleased(object? sender, PointerReleasedEventArgs e)
         {
-            var point = e.GetCurrentPoint(_document.Control);
+            if (_document is null) return;
 
+            var point = e.GetCurrentPoint(_document.Control);
             if (_isLeftButtonPressed && !point.Properties.IsLeftButtonPressed)
             {
                 _isLeftButtonPressed = false;
 
                 if (_document is not null)
                     _document.Select(_startPoint, point.Position);
+            }
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            // Ctrl+C
+            if (e.Key == Key.C && e.KeyModifiers == KeyModifiers.Control)
+            {
+                if (_document is not null
+                    && TopLevel.GetTopLevel(this) is TopLevel top
+                    && top.Clipboard is IClipboard clipboard)
+                {
+                    clipboard.SetTextAsync(_document.GetSelectedText());
+                }
             }
         }
 

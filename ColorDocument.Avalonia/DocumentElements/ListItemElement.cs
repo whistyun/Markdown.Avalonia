@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace ColorDocument.Avalonia.DocumentElements
 {
@@ -10,7 +11,9 @@ namespace ColorDocument.Avalonia.DocumentElements
     {
         private Lazy<StackPanel> _panel;
         private EnumerableEx<DocumentElement> _elements;
-        private List<DocumentElement>? _prevSelection;
+        private SelectionList? _prevSelection;
+
+        internal string MarkerText { get; set; }
 
         public override Control Control => _panel.Value;
         public override IEnumerable<DocumentElement> Children => _elements;
@@ -51,6 +54,25 @@ namespace ColorDocument.Avalonia.DocumentElements
         {
             foreach (var c in _elements)
                 c.UnSelect();
+        }
+
+        public override void ConstructSelectedText(StringBuilder builder)
+        {
+            if (_prevSelection is null)
+                return;
+
+            var preLen = builder.Length;
+
+            foreach (var para in _prevSelection)
+            {
+                para.ConstructSelectedText(builder);
+
+                if (preLen == builder.Length)
+                    continue;
+
+                if (builder[builder.Length - 1] != '\n')
+                    builder.Append('\n');
+            }
         }
     }
 }

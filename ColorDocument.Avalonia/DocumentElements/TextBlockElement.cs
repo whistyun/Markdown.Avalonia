@@ -4,6 +4,7 @@ using Avalonia.Controls.Documents;
 using Avalonia.Media;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace ColorDocument.Avalonia.DocumentElements
 {
@@ -69,5 +70,9 @@ namespace ColorDocument.Avalonia.DocumentElements
         public override void Select(Point from, Point to) { }
 
         public override void UnSelect() { }
+
+        public override void ConstructSelectedText(StringBuilder stringBuilder)
+        {
+        }
     }
 }

@@ -4,6 +4,7 @@ using Avalonia.Layout;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace ColorDocument.Avalonia.DocumentElements
 {
@@ -15,7 +16,7 @@ namespace ColorDocument.Avalonia.DocumentElements
     {
         private Lazy<Border> _block;
         private EnumerableEx<DocumentElement> _children;
-        private List<DocumentElement>? _prevSelection;
+        private SelectionList? _prevSelection;
 
         public override Control Control => _block.Value;
         public override IEnumerable<DocumentElement> Children => _children;
@@ -63,6 +64,25 @@ namespace ColorDocument.Avalonia.DocumentElements
         {
             foreach (var child in _children)
                 child.UnSelect();
+        }
+
+        public override void ConstructSelectedText(StringBuilder builder)
+        {
+            if (_prevSelection is null)
+                return;
+
+            var preLen = builder.Length;
+
+            foreach (var para in _prevSelection)
+            {
+                para.ConstructSelectedText(builder);
+
+                if (preLen == builder.Length)
+                    continue;
+
+                if (builder[builder.Length - 1] != '\n')
+                    builder.Append('\n');
+            }
         }
     }
 }

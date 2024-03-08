@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace ColorDocument.Avalonia.DocumentElements
 {
@@ -14,7 +15,7 @@ namespace ColorDocument.Avalonia.DocumentElements
         private TableCellElement[][] _foot;
         private bool _autoAdjust;
         private EnumerableEx<TableCellElement> _all;
-        private List<DocumentElement>? _prevSelection;
+        private SelectionList? _prevSelection;
 
         public override Control Control => _table.Value;
         public override IEnumerable<DocumentElement> Children => _all;
@@ -224,6 +225,8 @@ namespace ColorDocument.Avalonia.DocumentElements
                         }
 
                         var cellCtrl = cell.Control;
+                        cell.Row = gridRowIdx;
+                        cell.Column = colIdx;
                         Grid.SetRow(cellCtrl, gridRowIdx);
                         Grid.SetColumn(cellCtrl, colIdx);
                         if (cell.RowSpan > 1) Grid.SetRowSpan(cellCtrl, cell.RowSpan);
@@ -397,6 +400,8 @@ namespace ColorDocument.Avalonia.DocumentElements
                         }
 
                         var cellCtrl = cell.Control;
+                        cell.Row = rowInfs.Count;
+                        cell.Column = colIdx;
                         Grid.SetRow(cellCtrl, rowInfs.Count);
                         Grid.SetColumn(cellCtrl, colIdx);
                         if (cell.RowSpan > 1) Grid.SetRowSpan(cellCtrl, cell.RowSpan);
@@ -503,6 +508,38 @@ namespace ColorDocument.Avalonia.DocumentElements
             }
         }
 
+        public override void ConstructSelectedText(StringBuilder builder)
+        {
+            if (_prevSelection is null)
+                return;
+
+            string[,] cellTxt = new string[
+                _all.Max(c => c.Row + c.RowSpan),
+                _all.Max(c => c.Column + c.ColSpan)
+            ];
+
+            foreach (var para in _prevSelection.Cast<TableCellElement>())
+            {
+                cellTxt[para.Row, para.Column] = para.GetSelectedText().TrimEnd().Replace("\r\n", "\r").Replace('\n', '\r');
+            }
+
+            for (int i = 0; i < cellTxt.GetLength(0); i++)
+            {
+                var preLen = builder.Length;
+
+                for (int j = 0; j < cellTxt.GetLength(1); j++)
+                {
+                    builder.Append(cellTxt[i, j] ?? "");
+                    builder.Append("\t");
+                }
+
+                if (builder.Length - preLen == 0)
+                    continue;
+
+                if (builder[builder.Length - 1] != '\n')
+                    builder.Append('\n');
+            }
+        }
 
         class MdSpan
         {
