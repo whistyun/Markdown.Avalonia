@@ -40,26 +40,19 @@ namespace ColorTextBlock.Avalonia
                 return Array.Empty<CGeometry>();
             }
 
-            return PrivateMeasureOverride(entireWidth, remainWidth);
-        }
-
-        protected List<CGeometry> PrivateMeasureOverride(
-            double entireWidth,
-            double remainWidth)
-        {
             var runProps = CreateTextRunProperties(Foreground);
             var paraProps = CreateTextParagraphProperties(runProps);
             var source = new SimpleTextSource(Text.AsMemory(), runProps);
 
             if (remainWidth == entireWidth)
             {
-                return Create(entireWidth);
+                return CreateLines(source, entireWidth, paraProps);
             }
 
             var firstLine = TextFormatter.Current.FormatLine(source, 0, double.PositiveInfinity, paraProps);
             if (firstLine is null)
             {
-                return new List<CGeometry>();
+                return Array.Empty<CGeometry>();
             }
 
             if (firstLine.Width < remainWidth)
@@ -69,7 +62,7 @@ namespace ColorTextBlock.Avalonia
                     return new List<CGeometry>() { new TextLineGeometry(this, source, firstLine, false) };
                 }
 
-                return CreateLines(firstLine);
+                return CreateLines(source, entireWidth, paraProps, firstLine);
             }
             else
             {
@@ -84,62 +77,71 @@ namespace ColorTextBlock.Avalonia
                 {
                     // correct wrap
 
-                    return CreateLines(firstLineRemain);
+                    return CreateLines(source, entireWidth, paraProps, firstLineRemain);
                 }
                 else
                 {
                     // wrong wrap; first line word is too long
 
-                    var list = Create(entireWidth);
-                    list.Insert(0, new LineBreakMarkGeometry(this));
-                    return list;
+                    return CreateLines(source, entireWidth, paraProps, new LineBreakMarkGeometry(this));
                 }
-            }
-
-            List<CGeometry> CreateLines(TextLine firstLine)
-            {
-                var lines = new List<CGeometry>();
-
-                TextLine prev = firstLine;
-
-                var length = firstLine.Length;
-                while (length < Text.Length)
-                {
-                    var line = TextFormatter.Current.FormatLine(source, length, entireWidth, paraProps, prev.TextLineBreak);
-                    if (line is null)
-                        break;
-
-                    lines.Add(new TextLineGeometry(this, source, prev, true));
-                    prev = line;
-
-                    length += line.Length;
-                }
-
-                lines.Add(new TextLineGeometry(this, source, prev, false));
-
-                return lines;
-            }
-
-            List<CGeometry> Create(double maxWidth)
-            {
-                var layout = new TextLayout(
-                        source,
-                        paraProps,
-                        maxWidth: maxWidth);
-
-                var rslt = new List<CGeometry>();
-
-                for (int j = 0; j < layout.TextLines.Count; ++j)
-                {
-                    var line = layout.TextLines[j];
-                    var linebreak = j != layout.TextLines.Count - 1;
-
-                    rslt.Add(new TextLineGeometry(this, source, line, linebreak));
-                }
-
-                return rslt;
             }
         }
+
+        private IEnumerable<CGeometry> CreateLines(
+            SimpleTextSource source,
+            double entireWidth,
+            TextParagraphProperties paraProps,
+            TextLine firstLine)
+        {
+            TextLine prev = firstLine;
+
+            var length = firstLine.Length;
+            while (length < Text.Length)
+            {
+                var line = TextFormatter.Current.FormatLine(source, length, entireWidth, paraProps, prev.TextLineBreak);
+                if (line is null)
+                    break;
+
+                yield return new TextLineGeometry(this, source, prev, true);
+
+                prev = line;
+                length += line.Length;
+            }
+
+            yield return new TextLineGeometry(this, source, prev, false);
+        }
+
+        private IEnumerable<CGeometry> CreateLines(
+            SimpleTextSource source,
+            double entireWidth,
+            TextParagraphProperties paraProps,
+            CGeometry? prevGeo = null)
+        {
+            if (prevGeo is not null)
+                yield return prevGeo;
+
+            TextLine? prev = TextFormatter.Current.FormatLine(source, 0, entireWidth, paraProps);
+            if (prev is null)
+                yield break;
+
+            var length = prev.Length;
+            while (length < Text.Length)
+            {
+                var line = TextFormatter.Current.FormatLine(source, length, entireWidth, paraProps, prev.TextLineBreak);
+                if (line is null)
+                    break;
+
+                yield return new TextLineGeometry(this, source, prev, true);
+
+                prev = line;
+                length += line.Length;
+            }
+
+            yield return new TextLineGeometry(this, source, prev, false);
+        }
+
+
 
 
         internal TextParagraphProperties CreateTextParagraphProperties(TextRunProperties runProps)
