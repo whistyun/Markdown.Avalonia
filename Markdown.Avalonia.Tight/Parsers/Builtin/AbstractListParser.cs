@@ -207,39 +207,39 @@ namespace Markdown.Avalonia.Parsers.Builtin
         {
             if (Regex.IsMatch(markerText, _markerUL_Disc))
             {
-                return (TextMarkerStyle.Disc, _markerUL_Disc, 2);
+                return (TextMarkerStyle.Disc, _markerUL_Disc, 1);
             }
             else if (Regex.IsMatch(markerText, _markerUL_Box))
             {
-                return (TextMarkerStyle.Box, _markerUL_Box, 2);
+                return (TextMarkerStyle.Box, _markerUL_Box, 1);
             }
             else if (Regex.IsMatch(markerText, _markerUL_Circle))
             {
-                return (TextMarkerStyle.Circle, _markerUL_Circle, 2);
+                return (TextMarkerStyle.Circle, _markerUL_Circle, 1);
             }
             else if (Regex.IsMatch(markerText, _markerUL_Square))
             {
-                return (TextMarkerStyle.Square, _markerUL_Square, 2);
+                return (TextMarkerStyle.Square, _markerUL_Square, 1);
             }
             else if (Regex.IsMatch(markerText, _markerOL_Number))
             {
-                return (TextMarkerStyle.Decimal, _markerOL_Number, 3);
+                return (TextMarkerStyle.Decimal, _markerOL_Number, 2);
             }
             else if (Regex.IsMatch(markerText, _markerOL_LetterLower))
             {
-                return (TextMarkerStyle.LowerLatin, _markerOL_LetterLower, 3);
+                return (TextMarkerStyle.LowerLatin, _markerOL_LetterLower, 2);
             }
             else if (Regex.IsMatch(markerText, _markerOL_LetterUpper))
             {
-                return (TextMarkerStyle.UpperLatin, _markerOL_LetterUpper, 3);
+                return (TextMarkerStyle.UpperLatin, _markerOL_LetterUpper, 2);
             }
             else if (Regex.IsMatch(markerText, _markerOL_RomanLower))
             {
-                return (TextMarkerStyle.LowerRoman, _markerOL_RomanLower, 3);
+                return (TextMarkerStyle.LowerRoman, _markerOL_RomanLower, 2);
             }
             else if (Regex.IsMatch(markerText, _markerOL_RomanUpper))
             {
-                return (TextMarkerStyle.UpperRoman, _markerOL_RomanUpper, 3);
+                return (TextMarkerStyle.UpperRoman, _markerOL_RomanUpper, 2);
             }
 
             Helper.ThrowInvalidOperation("sorry library manager forget to modify about listmerker.");
