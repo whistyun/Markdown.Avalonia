@@ -27,12 +27,6 @@ namespace Markdown.Avalonia
 {
     public class MarkdownScrollViewer : Control
     {
-        static MarkdownScrollViewer()
-        {
-            FocusableProperty.OverrideDefaultValue(typeof(MarkdownScrollViewer), true);
-        }
-
-
         public static readonly DirectProperty<MarkdownScrollViewer, Uri?> SourceDirectProperty =
             AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, Uri?>(
                 nameof(Source),
@@ -80,6 +74,12 @@ namespace Markdown.Avalonia
 
         public static readonly StyledProperty<IBrush?> SelectionBrushProperty =
             SelectableTextBlock.SelectionBrushProperty.AddOwner<MarkdownScrollViewer>();
+
+        public static readonly AvaloniaProperty<bool> SelectionEnabledProperty =
+            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, bool>(
+                nameof(SelectionEnabled),
+                owner => owner.SelectionEnabled,
+                (owner, v) => owner.SelectionEnabled = v);
 
         private static readonly HttpClient s_httpclient = new();
         private readonly ScrollViewer _viewer;
@@ -156,6 +156,7 @@ namespace Markdown.Avalonia
         private void _viewer_PointerPressed(object? sender, PointerPressedEventArgs e)
         {
             if (_document is null) return;
+            if (!SelectionEnabled) return;
 
             var point = e.GetCurrentPoint(_document.Control);
             if (point.Properties.IsLeftButtonPressed && _document is not null)
@@ -196,6 +197,8 @@ namespace Markdown.Avalonia
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
+            if (!SelectionEnabled) return;
+
             // Ctrl+C
             if (e.Key == Key.C && e.KeyModifiers == KeyModifiers.Control)
             {
@@ -381,6 +384,16 @@ namespace Markdown.Avalonia
         {
             set { _viewer.Offset = value; }
             get { return _viewer.Offset; }
+        }
+
+        private bool _selectionEnabled;
+        public bool SelectionEnabled
+        {
+            set
+            {
+                Focusable = _selectionEnabled = value;
+            }
+            get => _selectionEnabled;
         }
 
         [Content]
