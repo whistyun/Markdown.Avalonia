@@ -53,12 +53,12 @@ namespace ColorTextBlock.Avalonia.Geometries
         }
         public override TextPointer GetBegin()
         {
-            return new TextPointer(this, 0);
+            return new TextPointer(this);
         }
 
         public override TextPointer GetEnd()
         {
-            return new TextPointer(this, 1);
+            return new TextPointer(this, 1, Width);
         }
     }
 }

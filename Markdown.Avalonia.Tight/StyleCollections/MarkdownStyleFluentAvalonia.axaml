@@ -8,8 +8,13 @@
         
       x:Class="Markdown.Avalonia.StyleCollections.MarkdownStyleFluentAvalonia"
       >
+  <Styles.Resources>
+    <SolidColorBrush x:Key="MarkdownScrollViewer.SelectionBrush"  Color="{DynamicResource SystemAccentColor}"/>
+  </Styles.Resources>
+
   <Style Selector="ctxt|CTextBlock">
     <Style.Setters>
+      <Setter Property="SelectionBrush" Value="{DynamicResource TextControlSelectionHighlightColor}"/>
       <Setter Property="FontSize"   Value="{mde:Multiply ControlContentThemeFontSize, 1}" />
       <Setter Property="Margin"     Value="0,5" />
     </Style.Setters>

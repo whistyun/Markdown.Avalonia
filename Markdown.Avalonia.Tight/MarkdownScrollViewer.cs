@@ -1,22 +1,22 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
-using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Metadata;
 using Avalonia.Platform;
 using Avalonia.Styling;
 using ColorDocument.Avalonia;
 using ColorDocument.Avalonia.DocumentElements;
+using ColorTextBlock.Avalonia;
 using Markdown.Avalonia.Plugins;
 using Markdown.Avalonia.StyleCollections;
 using Markdown.Avalonia.Utils;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -79,13 +79,14 @@ namespace Markdown.Avalonia
                 (owner, v) => owner.ScrollValue = v);
 
         public static readonly StyledProperty<IBrush?> SelectionBrushProperty =
-            TextBox.SelectionBrushProperty.AddOwner<SelectableTextBlock>();
-
+            CTextBlock.SelectionBrushProperty.AddOwner<MarkdownScrollViewer>();
 
         private static readonly HttpClient s_httpclient = new();
         private readonly ScrollViewer _viewer;
         private SetupInfo _setup;
         private DocumentElement? _document;
+        private IBrush? _selectionBrush;
+        private Wrapper _wrapper;
 
         public MarkdownScrollViewer()
         {
@@ -120,6 +121,7 @@ namespace Markdown.Avalonia
                 _markdownStyle = MdStyle.Standard;
             }
             Styles.Insert(0, _markdownStyle);
+            TrySetupSelectionBrush(_markdownStyle);
 
             _viewer = new ScrollViewer()
             {
@@ -138,10 +140,12 @@ namespace Markdown.Avalonia
             static bool nvl(bool? vl) => vl.HasValue && vl.Value;
 
             _viewer.ScrollChanged += (s, e) => OnScrollChanged();
-
             _viewer.PointerPressed += _viewer_PointerPressed;
             _viewer.PointerMoved += _viewer_PointerMoved;
             _viewer.PointerReleased += _viewer_PointerReleased;
+
+            _wrapper = new Wrapper(this);
+            _viewer.Content = _wrapper;
         }
 
         #region text selection
@@ -213,6 +217,7 @@ namespace Markdown.Avalonia
         private void OnViewportSizeChanged(object? obj, EventArgs arg)
         {
             _headerRects = null;
+            _wrapper.Restructure();
         }
 
         private void OnScrollChanged()
@@ -275,7 +280,6 @@ namespace Markdown.Avalonia
             }
         }
 
-
         private void EditStyle(IStyle mdstyle)
         {
             if (mdstyle is INamedStyle nameStyle && !nameStyle.IsEditted
@@ -288,25 +292,37 @@ namespace Markdown.Avalonia
             }
         }
 
+        private void TrySetupSelectionBrush(IStyle style)
+        {
+            _selectionBrush = null;
+
+            var key = "MarkdownScrollViewer.SelectionBrush";
+            if (style.TryGetResource(key, null, out var brushObj)
+                && brushObj is IBrush brush)
+            {
+                _selectionBrush = brush;
+            }
+        }
+
         private void UpdateMarkdown()
         {
-            if (_viewer.Content is null && String.IsNullOrEmpty(Markdown))
+            if (_wrapper.Document is null && String.IsNullOrEmpty(Markdown))
                 return;
 
             _document = _engine.TransformElement(Markdown ?? "");
-            var doc = _document.Control;
 
             var ofst = _viewer.Offset;
 
-            if (_viewer.Content is Control contentControl)
+            if (_wrapper.Document?.Control is Control oldContentControl)
             {
-                contentControl.SizeChanged -= OnViewportSizeChanged;
+                oldContentControl.SizeChanged -= OnViewportSizeChanged;
             }
 
-            _viewer.Content = doc;
-            if (doc is not null)
+            _wrapper.Document = _document;
+
+            if (_wrapper.Document?.Control is Control newContentControl)
             {
-                doc.SizeChanged += OnViewportSizeChanged;
+                newContentControl.SizeChanged += OnViewportSizeChanged;
             }
 
             _headerRects = null;
@@ -512,6 +528,7 @@ namespace Markdown.Avalonia
 
                     Styles.Insert(0, value);
 
+                    TrySetupSelectionBrush(value);
                     //ResetContent();
                 }
 
@@ -576,14 +593,13 @@ namespace Markdown.Avalonia
             }
         }
 
-        //public void ResetContent()
-        //{
-        //    var ctrl = _viewer.Content;
-        //    _viewer.Content = null;
-        //    Thread.MemoryBarrier();
-        //    _viewer.Content = ctrl;
-        //}
+        public IBrush? SelectionBrush
+        {
+            get => GetValue(SelectionBrushProperty);
+            set => SetValue(SelectionBrushProperty, value);
+        }
 
+        internal IBrush ComputedSelectionBrush => SelectionBrush ?? _selectionBrush ?? Brushes.Cyan;
 
         class HeaderRect
         {
@@ -594,6 +610,128 @@ namespace Markdown.Avalonia
             {
                 BaseBound = bound;
                 Header = header;
+            }
+        }
+
+        class Wrapper : Control, ISelectionRenderHelper
+        {
+            private MarkdownScrollViewer _viewer;
+            private readonly Canvas _canvas;
+            private readonly Dictionary<Control, Rectangle> _rects;
+            private DocumentElement? _document;
+
+            public DocumentElement? Document
+            {
+                get => _document;
+                set
+                {
+                    if (_document is not null)
+                    {
+                        VisualChildren.Remove(_document.Control);
+                        LogicalChildren.Remove(_document.Control);
+                        _document.Helper = null;
+                        Clear();
+                    }
+
+                    _document = value;
+
+                    if (_document is not null)
+                    {
+                        VisualChildren.Insert(0, _document.Control);
+                        LogicalChildren.Insert(0, _document.Control);
+                        _document.Helper = this;
+                        InvalidateMeasure();
+                    }
+                }
+            }
+
+            public Wrapper(MarkdownScrollViewer v)
+            {
+                _viewer = v;
+                _canvas = new Canvas();
+                _canvas.PointerPressed += (s, e) => _document?.UnSelect();
+
+                _rects = new Dictionary<Control, Rectangle>();
+
+                VisualChildren.Add(_canvas);
+            }
+
+            public void Register(Control control)
+            {
+                if (!_rects.ContainsKey(control))
+                {
+                    var brush = _viewer.ComputedSelectionBrush;
+                    var bounds = GetRectInDoc(control);
+                    var rect = new Rectangle()
+                    {
+                        Width = bounds.Value.Width,
+                        Height = bounds.Value.Height,
+                        Fill = brush,
+                        Opacity = .5
+                    };
+
+                    Canvas.SetLeft(rect, bounds.Value.Left);
+                    Canvas.SetTop(rect, bounds.Value.Top);
+
+                    _rects[control] = rect;
+                    _canvas.Children.Add(rect);
+                }
+            }
+
+            public void Unregister(Control control)
+            {
+                if (_rects.TryGetValue(control, out var rct))
+                {
+                    _canvas.Children.Remove(rct);
+                    _rects.Remove(control);
+                }
+            }
+            public void Clear()
+            {
+                _canvas.Children.Clear();
+                _rects.Clear();
+            }
+
+            public void Restructure()
+            {
+                foreach (var rct in _rects)
+                {
+                    var boundN = GetRectInDoc(rct.Key);
+                    if (boundN.HasValue)
+                    {
+                        var bound = boundN.Value;
+                        rct.Value.Width = bound.Width;
+                        rct.Value.Height = bound.Height;
+                        Canvas.SetLeft(rct.Value, bound.Left);
+                        Canvas.SetTop(rct.Value, bound.Top);
+                    }
+                }
+            }
+
+            public Rect? GetRectInDoc(Control control)
+            {
+                if (!LayoutInformation.GetPreviousArrangeBounds(control).HasValue)
+                    return null;
+
+                double driftX = 0;
+                double driftY = 0;
+
+                StyledElement? c;
+                for (c = control.Parent;
+                        c is not null
+                        && c is Layoutable layoutable
+                        && !ReferenceEquals(_document.Control, layoutable);
+                        c = c.Parent)
+                {
+                    driftX += layoutable.Bounds.X;
+                    driftY += layoutable.Bounds.Y;
+                }
+
+                return new Rect(
+                            control.Bounds.X + driftX,
+                            control.Bounds.Y + driftY,
+                            control.Bounds.Width,
+                            control.Bounds.Height);
             }
         }
     }

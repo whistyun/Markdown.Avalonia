@@ -12,7 +12,6 @@ namespace ColorDocument.Avalonia.DocumentElements
     public class PlainCodeBlockElement : DocumentElement
     {
         private string _code;
-        private Lazy<CTextBlock> _text;
         private Lazy<Border> _border;
 
         public override Control Control => _border.Value;
@@ -23,21 +22,14 @@ namespace ColorDocument.Avalonia.DocumentElements
         {
             _code = code;
             _border = new Lazy<Border>(CreateBlock);
-            _text = new Lazy<CTextBlock>(() => (CTextBlock)(_border.Value.Child!));
         }
 
         public override void Select(Point from, Point to)
         {
-            var text = _text.Value;
-
-            var fromPoint = text.CalcuatePointerFrom(from.X, from.Y);
-            var toPoint = text.CalcuatePointerFrom(to.X, to.Y);
-            text.Select(fromPoint, toPoint);
         }
 
         public override void UnSelect()
         {
-            _text.Value.ClearSelection();
         }
 
         public Border CreateBlock()
@@ -63,7 +55,7 @@ namespace ColorDocument.Avalonia.DocumentElements
 
         public override void ConstructSelectedText(StringBuilder stringBuilder)
         {
-            stringBuilder.Append(_text.Value.GetSelectedText());
+            stringBuilder.Append(_code);
         }
     }
 }

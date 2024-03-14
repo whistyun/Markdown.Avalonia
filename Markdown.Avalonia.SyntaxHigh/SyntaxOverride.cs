@@ -13,30 +13,27 @@ using System.Collections.ObjectModel;
 using Markdown.Avalonia.SyntaxHigh.Extensions;
 using Markdown.Avalonia.Parsers;
 using System.Diagnostics;
-using System.Security.Cryptography.X509Certificates;
-using Avalonia.Metadata;
+using ColorDocument.Avalonia;
+using ColorDocument.Avalonia.DocumentElements;
 
 namespace Markdown.Avalonia.SyntaxHigh
 {
-    internal class SyntaxOverride : IBlockOverride
+    internal class SyntaxOverride : BlockOverride2
     {
         private SyntaxHighlightProvider _provider;
         private SetupInfo _info;
 
-        public string ParserName => "CodeBlocksWithLangEvaluator";
-
-
-        public SyntaxOverride(ObservableCollection<Alias> aliases, SetupInfo info)
+        public SyntaxOverride(ObservableCollection<Alias> aliases, SetupInfo info) : base("CodeBlocksWithLangEvaluator")
         {
             _provider = new SyntaxHighlightProvider(aliases);
             _info = info;
         }
 
-        public IEnumerable<Control>? Convert(
+        public override IEnumerable<DocumentElement>? Convert2(
             string text,
             Match match,
             ParseStatus status,
-            IMarkdownEngine engine,
+            IMarkdownEngine2 engine,
             out int parseTextBegin, out int parseTextEnd)
         {
             var closeTagPattern = new Regex($"\n[ ]*{match.Groups[1].Value}[ ]*\n");
@@ -67,27 +64,11 @@ namespace Markdown.Avalonia.SyntaxHigh
             return Convert(lang, code);
         }
 
-        private IEnumerable<Control> Convert(string lang, string code)
+        private IEnumerable<DocumentElement> Convert(string lang, string code)
         {
             if (String.IsNullOrEmpty(lang))
             {
-                var ctxt = new TextBlock()
-                {
-                    Text = code,
-                    TextWrapping = TextWrapping.NoWrap
-                };
-                ctxt.Classes.Add(Markdown.CodeBlockClass);
-
-                var scrl = new ScrollViewer();
-                scrl.Classes.Add(Markdown.CodeBlockClass);
-                scrl.Content = ctxt;
-                scrl.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
-
-                var result = new Border();
-                result.Classes.Add(Markdown.CodeBlockClass);
-                result.Child = scrl;
-
-                yield return result;
+                yield return new PlainCodeBlockElement(code);
             }
             else
             {
@@ -97,36 +78,7 @@ namespace Markdown.Avalonia.SyntaxHigh
                     SetupStyle();
                 }
 
-                var langLabel = new Label() { Content = lang };
-                langLabel.Classes.Add("LangInfo");
-
-                var copyButton = new Button() { Content = new TextBlock() };
-                copyButton.Classes.Add("CopyButton");
-
-                var txtEdit = new TextEditor();
-                txtEdit.Tag = lang;
-                txtEdit.SetValue(SyntaxHighlightWrapperExtension.ProviderProperty, _provider);
-                txtEdit.Text = code;
-                txtEdit.HorizontalAlignment = HorizontalAlignment.Stretch;
-                txtEdit.IsReadOnly = true;
-
-                copyButton.Click += (s, e) =>
-                {
-                    var clipboard = TopLevel.GetTopLevel(txtEdit)?.Clipboard;
-                    clipboard?.SetTextAsync(txtEdit.Text);
-                };
-
-
-                var cdPd = new CodePad();
-                cdPd.Content = txtEdit;
-                cdPd.ExandableMenu = copyButton;
-                cdPd.AlwaysShowMenu = langLabel;
-
-                var result = new Border();
-                result.Classes.Add(Markdown.CodeBlockClass);
-                result.Child = cdPd;
-
-                yield return result;
+                yield return new CodeBlockElement(_provider, lang, code);
             }
         }
 

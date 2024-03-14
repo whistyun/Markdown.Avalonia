@@ -123,6 +123,9 @@ namespace ColorTextBlock.Avalonia
                     o => o.Content,
                     (o, v) => o.Content = v);
 
+        public static readonly StyledProperty<IBrush?> SelectionBrushProperty =
+            AvaloniaProperty.Register<CTextBlock, IBrush?>(nameof(SelectionBrush), inherits: true);
+
         /// <summary>
         /// Horizontal text alignment.
         /// </summary>
@@ -297,7 +300,11 @@ namespace ColorTextBlock.Avalonia
             get => _text ??= String.Join("", Content.Select(c => c.AsString()));
         }
 
-
+        public IBrush SelectionBrush
+        {
+            get => GetValue(SelectionBrushProperty);
+            set => SetValue(SelectionBrushProperty, value);
+        }
 
 
         public CTextBlock()
@@ -754,8 +761,13 @@ namespace ColorTextBlock.Avalonia
                 context.FillRectangle(Background, new Rect(0, 0, Bounds.Width, Bounds.Height));
             }
 
+            IBrush select = SelectionBrush ?? Brushes.Cyan;
+            List<Rect>? fillAfter = null;
+
             if (_beginSelect is not null && _endSelect is not null)
             {
+                fillAfter = new List<Rect>();
+
                 TextPointer bgn, end;
                 if (_beginSelect < _endSelect)
                 {
@@ -768,7 +780,6 @@ namespace ColorTextBlock.Avalonia
                     end = _beginSelect;
                 }
 
-                IBrush select = Brushes.Cyan;
 
                 if (ReferenceEquals(bgn.Geometry, end.Geometry))
                 {
@@ -777,24 +788,58 @@ namespace ColorTextBlock.Avalonia
                         bgn.Geometry.Top,
                         end.Distance - bgn.Distance,
                         bgn.Geometry.Height);
-                    context.FillRectangle(select, rct);
+
+                    TryRender(bgn.Geometry, rct);
                 }
                 else
                 {
-                    context.FillRectangle(select, new Rect(bgn.Geometry.Left + bgn.Distance, bgn.Geometry.Top, bgn.Geometry.Width - bgn.Distance, bgn.Geometry.Height));
+                    TryRender(bgn.Geometry, new Rect(bgn.Geometry.Left + bgn.Distance, bgn.Geometry.Top, bgn.Geometry.Width - bgn.Distance, bgn.Geometry.Height));
 
                     foreach (var inter in _intermediates)
                     {
-                        context.FillRectangle(select, new Rect(inter.Left, inter.Top, inter.Width, inter.Height));
+                        TryRender(inter, new Rect(inter.Left, inter.Top, inter.Width, inter.Height));
                     }
 
-                    context.FillRectangle(select, new Rect(end.Geometry.Left, end.Geometry.Top, end.Distance, end.Geometry.Height));
+                    TryRender(end.Geometry, new Rect(end.Geometry.Left, end.Geometry.Top, end.Distance, end.Geometry.Height));
+                }
+
+                void TryRender(CGeometry metry, Rect rct)
+                {
+                    if (metry is TextGeometry)
+                    {
+                        context.FillRectangle(select, rct);
+                    }
+                    else
+                    {
+                        fillAfter.Add(rct);
+                    }
                 }
             }
 
             foreach (var metry in _metries)
             {
                 metry.Render(context);
+            }
+
+            if (fillAfter is not null)
+            {
+                if (select is ISolidColorBrush colorBrush)
+                {
+                    var selectFill = new SolidColorBrush(colorBrush.Color, .5);
+                    foreach (var fillRct in fillAfter)
+                    {
+                        context.FillRectangle(selectFill, fillRct);
+                    }
+                }
+                else
+                {
+                    foreach (var fillRct in fillAfter)
+                    {
+                        var pen = new Pen(select, 2);
+                        var rct = new Rect(fillRct.Left - 1, fillRct.Top - 1, fillRct.Width + 2, fillRct.Height + 2);
+                        context.DrawRectangle(pen, rct);
+                    }
+                }
             }
         }
 

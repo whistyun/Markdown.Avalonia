@@ -55,13 +55,23 @@ namespace ColorTextBlock.Avalonia
             Distance = distance;
         }
 
-        internal TextPointer(CGeometry inline, int idx)
+        internal TextPointer(CGeometry inline)
+        {
+            _path = new[] { inline.Owner };
+            Geometry = inline;
+            Index = 0;
+            InternalIndex = 0;
+            TrailingLength = 0;
+        }
+
+        internal TextPointer(CGeometry inline, int idx, double distance)
         {
             _path = new[] { inline.Owner };
             Geometry = inline;
             Index = idx;
             InternalIndex = 0;
             TrailingLength = 0;
+            Distance = distance;
         }
 
         internal TextPointer(CTextBlock host, int idx)

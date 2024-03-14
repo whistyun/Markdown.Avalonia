@@ -8,9 +8,21 @@ namespace ColorDocument.Avalonia
 {
     public abstract class DocumentElement
     {
-        public abstract Control Control { get; }
+        private ISelectionRenderHelper? _helper;
 
+        public abstract Control Control { get; }
         public abstract IEnumerable<DocumentElement> Children { get; }
+
+        public ISelectionRenderHelper? Helper
+        {
+            get => _helper;
+            set
+            {
+                _helper = value;
+                foreach (var child in Children)
+                    child.Helper = value;
+            }
+        }
 
         public Rect GetRect(Layoutable anchor) => Control.GetRectInDoc(anchor).GetValueOrDefault();
         public abstract void Select(Point from, Point to);
@@ -25,5 +37,11 @@ namespace ColorDocument.Avalonia
 
         public abstract void ConstructSelectedText(StringBuilder stringBuilder);
 
+    }
+
+    public interface ISelectionRenderHelper
+    {
+        void Register(Control control);
+        void Unregister(Control control);
     }
 }

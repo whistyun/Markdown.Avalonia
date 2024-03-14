@@ -2,14 +2,20 @@
       xmlns="https://github.com/avaloniaui"
         
       xmlns:mdc="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia"
+      xmlns:md="clr-namespace:Markdown.Avalonia;assembly=Markdown.Avalonia"
       xmlns:mde="clr-namespace:Markdown.Avalonia.Extensions;assembly=Markdown.Avalonia"
       xmlns:ctxt="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         
       x:Class="Markdown.Avalonia.StyleCollections.MarkdownStyleDefaultTheme"
         >
+  <Styles.Resources>
+    <SolidColorBrush x:Key="MarkdownScrollViewer.SelectionBrush"  Color="{StaticResource HighlightColor}"/>
+  </Styles.Resources>
+
   <Style Selector="ctxt|CTextBlock">
     <Style.Setters>
+      <Setter Property="SelectionBrush" Value="{StaticResource HighlightBrush}"/>
       <Setter Property="FontSize"   Value="{mde:Multiply FontSizeNormal, 1.1}" />
       <Setter Property="Margin"     Value="0,5" />
     </Style.Setters>
