@@ -124,7 +124,7 @@ namespace ColorTextBlock.Avalonia
                     (o, v) => o.Content = v);
 
         public static readonly StyledProperty<IBrush?> SelectionBrushProperty =
-            AvaloniaProperty.Register<CTextBlock, IBrush?>(nameof(SelectionBrush), inherits: true);
+            SelectableTextBlock.SelectionBrushProperty.AddOwner<CTextBlock>();
 
         /// <summary>
         /// Horizontal text alignment.
@@ -300,7 +300,7 @@ namespace ColorTextBlock.Avalonia
             get => _text ??= String.Join("", Content.Select(c => c.AsString()));
         }
 
-        public IBrush SelectionBrush
+        public IBrush? SelectionBrush
         {
             get => GetValue(SelectionBrushProperty);
             set => SetValue(SelectionBrushProperty, value);

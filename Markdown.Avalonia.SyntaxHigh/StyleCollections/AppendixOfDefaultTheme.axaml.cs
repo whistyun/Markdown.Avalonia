@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Markdown.Avalonia.SyntaxHigh.StyleCollections
 {
-    class AppendixOfDefaultTheme : Styles
+    public class AppendixOfDefaultTheme : Styles
     {
         public AppendixOfDefaultTheme()
         {

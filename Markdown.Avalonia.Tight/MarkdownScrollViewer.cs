@@ -79,7 +79,7 @@ namespace Markdown.Avalonia
                 (owner, v) => owner.ScrollValue = v);
 
         public static readonly StyledProperty<IBrush?> SelectionBrushProperty =
-            CTextBlock.SelectionBrushProperty.AddOwner<MarkdownScrollViewer>();
+            SelectableTextBlock.SelectionBrushProperty.AddOwner<MarkdownScrollViewer>();
 
         private static readonly HttpClient s_httpclient = new();
         private readonly ScrollViewer _viewer;
@@ -310,6 +310,7 @@ namespace Markdown.Avalonia
                 return;
 
             _document = _engine.TransformElement(Markdown ?? "");
+            _document.Control.Classes.Add("Markdown_Avalonia_MarkdownViewer");
 
             var ofst = _viewer.Offset;
 
@@ -551,6 +552,10 @@ namespace Markdown.Avalonia
                         nvl(ThemeDetector.IsFluentUsed) ? MdStyle.FluentTheme :
                         nvl(ThemeDetector.IsSimpleUsed) ? MdStyle.SimpleTheme :
                         MdStyle.Standard;
+                }
+                else if (_markdownStyleName == "Empty")
+                {
+                    MarkdownStyle = new Styles();
                 }
                 else
                 {

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Markdown.Avalonia.StyleCollections
 {
-    class MarkdownStyleFluentAvalonia : Styles, INamedStyle
+    public class MarkdownStyleFluentAvalonia : Styles, INamedStyle
     {
         public string Name => nameof(MarkdownStyle.FluentAvalonia);
         public bool IsEditted { get; set; }

@@ -1,6 +1,7 @@
 <Styles
       xmlns="https://github.com/avaloniaui"
         
+      xmlns:md="clr-namespace:Markdown.Avalonia;assembly=Markdown.Avalonia"
       xmlns:mdc="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia"
       xmlns:mde="clr-namespace:Markdown.Avalonia.Extensions;assembly=Markdown.Avalonia"
       xmlns:ctxt="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia"
@@ -12,20 +13,26 @@
     <SolidColorBrush x:Key="MarkdownScrollViewer.SelectionBrush"  Color="{DynamicResource SystemAccentColor}"/>
   </Styles.Resources>
 
-  <Style Selector="ctxt|CTextBlock">
+  <Style Selector=":is(md|MarkdownScrollViewer)">
+    <Style.Setters>
+      <Setter Property="SelectionBrush" Value="{DynamicResource TextControlSelectionHighlightColor}"/>
+    </Style.Setters>
+  </Style>
+
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CTextBlock">
     <Style.Setters>
       <Setter Property="SelectionBrush" Value="{DynamicResource TextControlSelectionHighlightColor}"/>
       <Setter Property="FontSize"   Value="{mde:Multiply ControlContentThemeFontSize, 1}" />
       <Setter Property="Margin"     Value="0,5" />
     </Style.Setters>
   </Style>
-  <Style Selector="TextBlock">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer TextBlock">
     <Style.Setters>
       <Setter Property="FontSize"   Value="{mde:Multiply ControlContentThemeFontSize, 1}" />
     </Style.Setters>
   </Style>
 
-  <Style Selector="ctxt|CTextBlock.Heading1">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CTextBlock.Heading1">
     <Style.Setters>
       <Setter Property="FontSize"   Value="{mde:Multiply ControlContentThemeFontSize, 3.2}" />
       <Setter Property="Foreground" Value="{mde:Alpha TextFillColorPrimaryBrush}" />
@@ -33,7 +40,7 @@
     </Style.Setters>
   </Style>
 
-  <Style Selector="ctxt|CTextBlock.Heading2">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CTextBlock.Heading2">
     <Style.Setters>
       <Setter Property="FontSize"   Value="{mde:Multiply ControlContentThemeFontSize, 1.6}" />
       <Setter Property="Foreground" Value="{mde:Alpha TextFillColorPrimaryBrush}" />
@@ -41,7 +48,7 @@
     </Style.Setters>
   </Style>
 
-  <Style Selector="ctxt|CTextBlock.Heading3">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CTextBlock.Heading3">
     <Style.Setters>
       <Setter Property="FontSize"   Value="{mde:Multiply ControlContentThemeFontSize, 1.6}" />
       <Setter Property="Foreground" Value="{mde:Alpha TextFillColorPrimaryBrush, 0.7}" />
@@ -49,7 +56,7 @@
     </Style.Setters>
   </Style>
 
-  <Style Selector="ctxt|CTextBlock.Heading4">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CTextBlock.Heading4">
     <Style.Setters>
       <Setter Property="FontSize"   Value="{mde:Multiply ControlContentThemeFontSize, 1.2}" />
       <Setter Property="Foreground" Value="{mde:Alpha TextFillColorPrimaryBrush, 0.7}" />
@@ -57,17 +64,17 @@
     </Style.Setters>
   </Style>
 
-  <Style Selector="ctxt|CHyperlink">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CHyperlink">
     <Style.Setters>
       <Setter Property="IsUnderline" Value="true"/>
       <Setter Property="Foreground" Value="{StaticResource SystemAccentColor}"/>
     </Style.Setters>
   </Style>
-  <Style Selector="ctxt|CHyperlink:pointerover">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CHyperlink:pointerover">
     <Setter Property="Foreground" Value="{mde:Complementary SystemAccentColor}"/>
   </Style>
 
-  <Style Selector="Border.Table">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.Table">
     <Style.Setters>
       <Setter Property="Margin" Value="5"/>
       <Setter Property="BorderThickness" Value="0,0,1,1"/>
@@ -75,13 +82,13 @@
     </Style.Setters>
   </Style>
 
-  <Style Selector="Border.TightTable">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.TightTable">
     <Style.Setters>
       <Setter Property="HorizontalAlignment" Value="Left"/>
     </Style.Setters>
   </Style>
 
-  <Style Selector="Grid.Table > Border">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Grid.Table > Border">
     <Style.Setters>
       <Setter Property="Margin" Value="0"/>
       <Setter Property="BorderThickness" Value="1,1,0,0"/>
@@ -90,24 +97,24 @@
     </Style.Setters>
   </Style>
 
-  <Style Selector="Border.TableHeader">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.TableHeader">
     <Style.Setters>
       <Setter Property="Background" Value="{mde:Alpha TextFillColorPrimaryBrush, 0.3}"/>
     </Style.Setters>
   </Style>
-  <Style Selector="Border.TableHeader ctxt|CTextBlock">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.TableHeader ctxt|CTextBlock">
     <Style.Setters>
       <Setter Property="FontWeight" Value="DemiBold"/>
     </Style.Setters>
   </Style>
 
-  <Style Selector="Border.EvenTableRow">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.EvenTableRow">
     <Style.Setters>
       <Setter Property="Background" Value="{mde:Alpha ControlFillColorDefaultBrush, 0.9}"/>
     </Style.Setters>
   </Style>
 
-  <Style Selector="Border.CodeBlock">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.CodeBlock">
     <Style.Setters>
       <Setter Property="BorderBrush"     Value="{mde:Alpha TextFillColorPrimaryBrush, 0.2}"/>
       <Setter Property="BorderThickness" Value="0,5,0,5"/>
@@ -115,26 +122,26 @@
       <Setter Property="Background"      Value="{mde:Alpha ControlFillColorDefaultBrush, 0.9}"/>
     </Style.Setters>
   </Style>
-  <Style Selector="TextBlock.CodeBlock">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer TextBlock.CodeBlock">
     <Style.Setters>
       <Setter Property="FontFamily"      Value="menlo,monaco,consolas,droid sans mono,inconsolata,courier new,monospace,dejavu sans mono"/>
       <Setter Property="Foreground"      Value="{mde:DivideColor Blue, TextFillColorPrimary, 0.4}"/>
     </Style.Setters>
   </Style>
-  <Style Selector="Border.NoContainer">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.NoContainer">
     <Style.Setters>
       <Setter Property="BorderBrush"     Value="Red"/>
     </Style.Setters>
   </Style>
 
-  <Style Selector="ctxt|CCode">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CCode">
     <Style.Setters>
       <Setter Property="Foreground" Value="{mde:DivideColor Blue, TextFillColorPrimary, 0.4}" />
       <Setter Property="Background" Value="{mde:Alpha ControlFillColorDefaultBrush, 0.9}" />
     </Style.Setters>
   </Style>
 
-  <Style Selector="Border.Note">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.Note">
     <Style.Setters>
       <Setter Property="Margin"          Value="5,0,5,0"/>
       <Setter Property="BorderBrush"     Value="{mde:Alpha TextFillColorPrimaryBrush, 0.2}"/>
@@ -142,37 +149,37 @@
       <Setter Property="Background"      Value="{mde:Alpha ControlFillColorDefaultBrush, 0.9}"/>
     </Style.Setters>
   </Style>
-  <Style Selector="ctxt|CTextBlock.Note">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CTextBlock.Note">
     <Style.Setters>
       <Setter Property="Margin"         Value="10, 5"/>
     </Style.Setters>
   </Style>
 
-  <Style Selector="Grid.List">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Grid.List">
     <Style.Setters>
       <Setter Property="Margin" Value="40,0,0,0"/>
     </Style.Setters>
   </Style>
-  <Style Selector="ctxt|CTextBlock.ListMarker">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CTextBlock.ListMarker">
     <Style.Setters>
       <Setter Property="Margin"         Value="0,5,5,5"/>
     </Style.Setters>
   </Style>
 
-  <Style Selector="Border.Blockquote">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.Blockquote">
     <Style.Setters>
       <Setter Property="BorderBrush"     Value="{mde:Alpha TextFillColorPrimaryBrush, 0.2}"/>
       <Setter Property="BorderThickness" Value="5,0,0,0"/>
     </Style.Setters>
   </Style>
 
-  <Style Selector="StackPanel.Blockquote">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer StackPanel.Blockquote">
     <Style.Setters>
       <Setter Property="Margin" Value="10, 5"/>
     </Style.Setters>
   </Style>
 
-  <Style Selector="mdc|Rule">
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer mdc|Rule">
     <Style.Setters>
       <Setter Property="Margin" Value="0,3"/>
     </Style.Setters>
