@@ -12,10 +12,6 @@ namespace Markdown.Avalonia.Parsers.Builtin
         private const string _extSubseqListMaker = @"(?:[*+=-]|\d+[.]|[a-c][.]|[cdilmvx]+[,]|[A-C][.]|[CDILMVX]+[,])";
 
 
-        private static readonly Regex _startNoIndentSublistMarker = new(@"\A" + _extSubseqListMaker, RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private static readonly Regex _startNoIndentExtSublistMarker = new(@"\A" + _extSubseqListMaker, RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
         private static readonly Regex _extListNested = CreateWholeListPattern(_extFirstListMaker, _extSubseqListMaker);
 
         public ExtListParser() : base(_extListNested)
@@ -28,7 +24,9 @@ namespace Markdown.Avalonia.Parsers.Builtin
             IMarkdownEngine2 engine,
             out int parseTextBegin, out int parseTextEnd)
         {
-            return new DocumentElement[] { ListEvalutor(firstMatch, _startNoIndentExtSublistMarker, engine, out parseTextBegin, out parseTextEnd) };
+            return new DocumentElement[] {
+                ListEvalutor(text, firstMatch, _extSubseqListMaker, engine, out parseTextBegin, out parseTextEnd)
+            };
         }
     }
 }

@@ -1,8 +1,12 @@
-﻿using ColorDocument.Avalonia.DocumentElements;
+﻿using ColorDocument.Avalonia;
+using ColorDocument.Avalonia.DocumentElements;
 using Markdown.Avalonia.Utils;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Markdown.Avalonia.Parsers.Builtin
 {
@@ -27,32 +31,32 @@ namespace Markdown.Avalonia.Parsers.Builtin
         /// </summary>
         private const int _listDepth = 4;
 
-        private static readonly string _wholeListFormat = @"
-            ^
-            (?<whltxt>                      # whole list
-              (?<mkr_i>                     # list marker with indent
-                (?![ ]{{0,3}}(?<hrm>[-=*_])([ ]{{0,2}}\k<hrm>){{2,}}[ ]*\n)
-                (?<idt>[ ]{{0,{2}}})
-                (?<mkr>{0})                 # first list item marker
-                [ ]+
-              )
-              (?s:.+?)
-              (                             # $4
-                  \z
-                |
-                  \n{{2,}}
-                  (?=\S)
-                  (?!                       # Negative lookahead for another list item marker
-                    [ ]*
-                    {1}[ ]+
-                  )
-              )
-            )";
 
-        private static readonly Regex _startNoIndentRule = new(@"\A[ ]{0,2}(?<hrm>[-=*_])([ ]{0,2}\k<hrm>){2,}[ ]*$",
+        private static readonly string _firstListLine = @"
+              ^
+              (?![ ]{{0,3}}(?<hrm>[-=*_])([ ]{{0,2}}\k<hrm>){{2,}}[ ]*\n) # ignore horizontal syntax
+              (?<indent>[ ]{{0,{2}}})                                     # indent
+              (?<marker>{0})                                              # first list item marker
+              [ ]+
+              (?:[^ \n]|\n)
+            ";
+
+        private static readonly string _ruleLine = @"
+            \G
+            [ ]{{0,{0}}}
+            (?<hrm>[-=*_])([ ]{{0,2}}\k<hrm>){{2,}}[ ]*\n";
+
+        private static readonly string _listLine = @"
+            \G
+            (?<indent>[ ]{{0,{0}}})
+            {1}                                                            # list marker
+            [ ]+
+            (?<content>[^\n]*)                                         # content
+            ";
+
+        private static readonly Regex _startQuoteOrHeader = new(@"
+            \G(\#{1,6}[ ]|>|```)",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private static readonly Regex _startQuoteOrHeader = new(@"\A(\#{1,6}[ ]|>|```)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         protected AbstractListParser(Regex pattern) : base(pattern, "ListEvaluator")
         {
@@ -62,136 +66,179 @@ namespace Markdown.Avalonia.Parsers.Builtin
                 string firstListMarkerPattern,
                 string subseqListMarkerPattern)
         {
-            var format = string.Format(_wholeListFormat, firstListMarkerPattern, subseqListMarkerPattern, _listDepth - 1);
+            var format = string.Format(_firstListLine, firstListMarkerPattern, subseqListMarkerPattern, _listDepth - 1);
             return new Regex(format, RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
         }
 
-
         protected ListBlockElement ListEvalutor(
+            string text,
             Match match,
-            Regex sublistMarker,
+            string alllistMarkersPattern,
             IMarkdownEngine2 engine,
-            out int parseTextBegin, out int parseTextEnd)
+            out int parseTextBegin, out int parseTextEnd
+            )
         {
             parseTextBegin = match.Index;
 
             // Check text marker style.
             (TextMarkerStyle textMarker, string markerPattern, int indentAppending)
-                = GetTextMarkerStyle(match.Groups["mkr"].Value);
-
-            Regex markerRegex = new(@"\A" + markerPattern, RegexOptions.Compiled);
+                = GetTextMarkerStyle(match.Groups["marker"].Value);
 
             // count indent from first marker with indent
-            int countIndent = TextUtil.CountIndent(match.Groups["mkr_i"].Value);
+            int countIndent = match.Groups["indent"].Value.Length;
 
-            // whole list
-            string[] listLines = match.Groups["whltxt"].Value.Split('\n');
-            parseTextEnd = match.Groups["whltxt"].Index;
+            var ruleLinePtn = new Regex(
+                String.Format(_ruleLine, countIndent + indentAppending - 1),
+                RegexOptions.IgnorePatternWhitespace);
 
-            // collect detendentable line
-            var listBulder = new StringBuilder();
-            var outerListBuildre = new StringBuilder();
-            for (var i = 0; i < listLines.Length; ++i)
+            var listLinePtn = new Regex(
+                String.Format(_listLine, countIndent + indentAppending - 1, markerPattern),
+                RegexOptions.IgnorePatternWhitespace);
+
+            var allListLinePtn = new Regex(
+                String.Format(_listLine, countIndent + indentAppending - 1, alllistMarkersPattern),
+                RegexOptions.IgnorePatternWhitespace);
+
+            int caret = parseTextBegin;
+
+            var listItems = new List<ListItemElement>();
+
+            var hasEmptyLine = false;
+            var listBuilder = new StringBuilder();
+            while (caret < text.Length)
             {
-                var line = listLines[i];
-
-                if (string.IsNullOrEmpty(line))
+                // is it blank line?
+                if (text[caret] == '\n')
                 {
-                    listBulder.Append("").Append("\n");
+                    listBuilder.Append('\n');
+                    hasEmptyLine = true;
+                    ++caret;
                 }
-                else if (TextUtil.TryDetendLine(line, countIndent, out var stripedLine))
+                // is it horizontal line?
+                else if (ruleLinePtn.IsMatch(text, caret))
                 {
-                    // is it horizontal line?
-                    if (_startNoIndentRule.IsMatch(stripedLine))
+                    break;
+                }
+                // is it header or blockquote?
+                else if (_startQuoteOrHeader.IsMatch(text, caret))
+                {
+                    break;
+                }
+                else
+                {
+                    // Dose it have list marker?
+                    var listLineMch = listLinePtn.Match(text, caret);
+                    if (listLineMch.Success)
                     {
-                        break;
-                    }
-                    // is it header or blockquote?
-                    else if (_startQuoteOrHeader.IsMatch(stripedLine))
-                    {
-                        break;
-                    }
-                    // is it had list marker?
-                    else if (sublistMarker.IsMatch(stripedLine))
-                    {
-                        // is it same marker as now processed?
-                        var targetMarkerMch = markerRegex.Match(stripedLine);
-                        if (targetMarkerMch.Success)
+                        // next list item?
+                        if (listBuilder.Length > 0)
                         {
-                            listBulder.Append(stripedLine).Append("\n");
+                            TrimEnd(listBuilder);
+                            var elements = engine.ParseGamutElement(listBuilder.ToString(), new ParseStatus(false));
+                            listItems.Add(new ListItemElement(elements));
+                            listBuilder.Length = 0;
                         }
-                        else break;
+
+                        listBuilder.Append(listLineMch.Groups["content"].Value);
+                        caret += listLineMch.Length;
+
+                        if (caret < text.Length && text[caret] == '\n')
+                        {
+                            ++caret;
+                            listBuilder.Append('\n');
+                        }
+
+                        hasEmptyLine = false;
+                    }
+                    // Dose it have other list marker?
+                    else if (allListLinePtn.IsMatch(text, caret))
+                    {
+                        break;
                     }
                     else
                     {
-                        var detentedline = TextUtil.DetentLineBestEffort(stripedLine, indentAppending);
-                        listBulder.Append(detentedline).Append("\n");
+                        var st = caret;
+                        if (!MoveIndent(text, countIndent + indentAppending, ref st))
+                        {
+                            if (hasEmptyLine) break;
+                        }
+
+                        caret = st;
+                        if (caret < text.Length)
+                        {
+                            MoveLineEnd(text, ref caret);
+                            listBuilder.Append(text, st, caret - st);
+
+                            if (caret < text.Length && text[caret] == '\n')
+                            {
+                                ++caret;
+                                listBuilder.Append('\n');
+                            }
+                        }
                     }
                 }
-                else break;
-
-                parseTextEnd += i == listLines.Length - 1 ? line.Length : line.Length + 1;
             }
 
-            string list = listBulder.ToString();
-
-            IEnumerable<ListItemElement> listItems = ProcessListItems(list, markerPattern, engine);
-
-            return new ListBlockElement(textMarker.Change(), listItems);
-
-        }
-        /// <summary>
-        /// Process the contents of a single ordered or unordered list, splitting it
-        /// into individual list items.
-        /// </summary>
-        private IEnumerable<ListItemElement> ProcessListItems(string list, string marker, IMarkdownEngine2 engine)
-        {
-            // The listLevel global keeps track of when we're inside a list.
-            // Each time we enter a list, we increment it; when we leave a list,
-            // we decrement. If it's zero, we're not in a list anymore.
-
-            // We do this because when we're not inside a list, we want to treat
-            // something like this:
-
-            //    I recommend upgrading to version
-            //    8. Oops, now this line is treated
-            //    as a sub-list.
-
-            // As a single paragraph, despite the fact that the second line starts
-            // with a digit-period-space sequence.
-
-            // Whereas when we're inside a list (or sub-list), that line will be
-            // treated as the start of a sub-list. What a kludge, huh? This is
-            // an aspect of Markdown's syntax that's hard to parse perfectly
-            // without resorting to mind-reading. Perhaps the solution is to
-            // change the syntax rules such that sub-lists must start with a
-            // starting cardinal number; e.g. "1." or "a.".
-
-            // Trim trailing blank lines:
-            list = Regex.Replace(list, @"\n{2,}\z", "\n");
-
-            string pattern = string.Format(
-              @"(\n)?                  # leading line = $1
-                (^[ ]*)                    # leading whitespace = $2
-                ({0}) [ ]+                 # list marker = $3
-                ((?s:.+?)                  # list item text = $4
-                (\n{{1,2}}))      
-                (?= \n* (\z | \2 ({0}) [ ]+))", marker);
-
-            var regex = new Regex(pattern, RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline);
-            var matches = regex.Matches(list);
-            foreach (Match m in matches)
+            if (listBuilder.Length > 0)
             {
-                string item = m.Groups[4].Value;
-
-                var status = new ParseStatus(false);
-
-                // we could correct any bad indentation here..
-                // recursion for sub-lists
-
-                yield return new ListItemElement(engine.ParseGamutElement(item, status));
+                TrimEnd(listBuilder);
+                var elements = engine.ParseGamutElement(listBuilder.ToString(), new ParseStatus(false));
+                listItems.Add(new ListItemElement(elements)); ;
             }
+
+            parseTextEnd = caret;
+            return new ListBlockElement(textMarker.Change(), listItems);
         }
+
+        private static void TrimEnd(StringBuilder text)
+        {
+            if (text.Length < 2)
+                return;
+
+            if (text[text.Length - 1] != '\n')
+                return;
+
+            int len = text.Length;
+            while (len >= 2)
+            {
+                if (text[len - 2] == '\n')
+                    len--;
+                else
+                    break;
+            }
+
+            text.Length = len;
+        }
+
+        private static bool MoveIndent(string text, int count, ref int caret)
+        {
+            for (var i = 0; i < count; ++i)
+            {
+                if (caret == text.Length)
+                    return false;
+
+                if (text[caret] != ' ')
+                    return false;
+
+                ++caret;
+            }
+
+            return true;
+        }
+
+        private static bool MoveLineEnd(string text, ref int caret)
+        {
+            for (; caret < text.Length; ++caret)
+            {
+                if (text[caret] == '\n')
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
 
 
         /// <summary>
@@ -207,39 +254,39 @@ namespace Markdown.Avalonia.Parsers.Builtin
         {
             if (Regex.IsMatch(markerText, _markerUL_Disc))
             {
-                return (TextMarkerStyle.Disc, _markerUL_Disc, 1);
+                return (TextMarkerStyle.Disc, _markerUL_Disc, 2);
             }
             else if (Regex.IsMatch(markerText, _markerUL_Box))
             {
-                return (TextMarkerStyle.Box, _markerUL_Box, 1);
+                return (TextMarkerStyle.Box, _markerUL_Box, 2);
             }
             else if (Regex.IsMatch(markerText, _markerUL_Circle))
             {
-                return (TextMarkerStyle.Circle, _markerUL_Circle, 1);
+                return (TextMarkerStyle.Circle, _markerUL_Circle, 2);
             }
             else if (Regex.IsMatch(markerText, _markerUL_Square))
             {
-                return (TextMarkerStyle.Square, _markerUL_Square, 1);
+                return (TextMarkerStyle.Square, _markerUL_Square, 2);
             }
             else if (Regex.IsMatch(markerText, _markerOL_Number))
             {
-                return (TextMarkerStyle.Decimal, _markerOL_Number, 2);
+                return (TextMarkerStyle.Decimal, _markerOL_Number, 3);
             }
             else if (Regex.IsMatch(markerText, _markerOL_LetterLower))
             {
-                return (TextMarkerStyle.LowerLatin, _markerOL_LetterLower, 2);
+                return (TextMarkerStyle.LowerLatin, _markerOL_LetterLower, 3);
             }
             else if (Regex.IsMatch(markerText, _markerOL_LetterUpper))
             {
-                return (TextMarkerStyle.UpperLatin, _markerOL_LetterUpper, 2);
+                return (TextMarkerStyle.UpperLatin, _markerOL_LetterUpper, 3);
             }
             else if (Regex.IsMatch(markerText, _markerOL_RomanLower))
             {
-                return (TextMarkerStyle.LowerRoman, _markerOL_RomanLower, 2);
+                return (TextMarkerStyle.LowerRoman, _markerOL_RomanLower, 3);
             }
             else if (Regex.IsMatch(markerText, _markerOL_RomanUpper))
             {
-                return (TextMarkerStyle.UpperRoman, _markerOL_RomanUpper, 2);
+                return (TextMarkerStyle.UpperRoman, _markerOL_RomanUpper, 3);
             }
 
             Helper.ThrowInvalidOperation("sorry library manager forget to modify about listmerker.");

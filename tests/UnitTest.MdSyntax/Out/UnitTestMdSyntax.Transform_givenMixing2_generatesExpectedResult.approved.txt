@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="https://github.com/whistyun/Markdown.Avalonia.SyntaxHigh" xmlns:a="https://github.com/avaloniaui/avaloniaedit" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="https://github.com/whistyun/Markdown.Avalonia.SyntaxHigh" xmlns:ma="https://github.com/whistyun/Markdown.Avalonia.SyntaxHigh/Styles" xmlns:a="https://github.com/avaloniaui/avaloniaedit" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
   <c:CTextBlock Classes="Paragraph">
     <c:CRun Text="abcd" />
   </c:CTextBlock>

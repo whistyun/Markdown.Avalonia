@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-16"?>
-<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="https://github.com/whistyun/Markdown.Avalonia.Tight" xmlns:ma="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="https://github.com/whistyun/Markdown.Avalonia.Tight" xmlns:ma="https://github.com/whistyun/Markdown.Avalonia.Tight/Styles" xmlns:ma2="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
   <c:CTextBlock Classes="Paragraph">
     <c:CRun Text="First we have a simple numeric list" />
   </c:CTextBlock>
@@ -173,7 +173,7 @@
       <RowDefinition />
     </Grid.RowDefinitions>
   </Grid>
-  <ma:Rule BoldLineWidth="2" Classes="Bold" />
+  <ma2:Rule BoldLineWidth="2" Classes="Bold" />
   <c:CTextBlock Classes="Paragraph">
     <c:CRun Text="Pluses tight:" />
   </c:CTextBlock>
@@ -250,7 +250,7 @@
       <RowDefinition />
     </Grid.RowDefinitions>
   </Grid>
-  <ma:Rule BoldLineWidth="2" Classes="Bold" />
+  <ma2:Rule BoldLineWidth="2" Classes="Bold" />
   <c:CTextBlock Classes="Paragraph">
     <c:CRun Text="Minuses tight:" />
   </c:CTextBlock>
@@ -742,9 +742,94 @@
           <c:CTextBlock Classes="Paragraph">
             <c:CRun Text="sub" />
           </c:CTextBlock>
+        </StackPanel>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition />
+          <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+          <RowDefinition />
+        </Grid.RowDefinitions>
+      </Grid>
+      <c:CTextBlock Classes="Paragraph">
+        <c:CRun Text=" that" />
+      </c:CTextBlock>
+    </StackPanel>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition />
+    </Grid.RowDefinitions>
+  </Grid>
+  <ma2:Rule BoldLineWidth="2" Classes="Bold" />
+  <Grid Classes="List" xmlns="">
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+      <c:CRun Text="•" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="0">
+      <c:CTextBlock Classes="Paragraph">
+        <c:CRun Text="one" />
+      </c:CTextBlock>
+    </StackPanel>
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="1">
+      <c:CRun Text="•" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="1">
+      <c:CTextBlock Classes="Paragraph">
+        <c:CRun Text="one-two" />
+      </c:CTextBlock>
+    </StackPanel>
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="2">
+      <c:CRun Text="•" />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="2">
+      <c:CTextBlock Classes="Paragraph">
+        <c:CRun Text="one-three" />
+      </c:CTextBlock>
+      <Grid Classes="List">
+        <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+          <c:CRun Text="•" />
+        </c:CTextBlock>
+        <StackPanel Grid.Column="1" Grid.Row="0">
           <c:CTextBlock Classes="Paragraph">
-            <c:CRun Text="that" />
+            <c:CRun Text="two" />
           </c:CTextBlock>
+          <Grid Classes="List">
+            <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+              <c:CRun Text="•" />
+            </c:CTextBlock>
+            <StackPanel Grid.Column="1" Grid.Row="0">
+              <c:CTextBlock Classes="Paragraph">
+                <c:CRun Text="three" />
+              </c:CTextBlock>
+              <Grid Classes="List">
+                <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+                  <c:CRun Text="•" />
+                </c:CTextBlock>
+                <StackPanel Grid.Column="1" Grid.Row="0">
+                  <c:CTextBlock Classes="Paragraph">
+                    <c:CRun Text="four" />
+                  </c:CTextBlock>
+                </StackPanel>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition />
+                  <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition />
+                </Grid.RowDefinitions>
+              </Grid>
+            </StackPanel>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition />
+              <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+              <RowDefinition />
+            </Grid.RowDefinitions>
+          </Grid>
         </StackPanel>
         <Grid.ColumnDefinitions>
           <ColumnDefinition />
@@ -760,6 +845,94 @@
       <ColumnDefinition />
     </Grid.ColumnDefinitions>
     <Grid.RowDefinitions>
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+    </Grid.RowDefinitions>
+  </Grid>
+  <Grid Classes="List" xmlns="">
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+      <c:CRun Text="1." />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="0">
+      <c:CTextBlock Classes="Paragraph">
+        <c:CRun Text="eine" />
+      </c:CTextBlock>
+    </StackPanel>
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="1">
+      <c:CRun Text="2." />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="1">
+      <c:CTextBlock Classes="Paragraph">
+        <c:CRun Text="eine-twei" />
+      </c:CTextBlock>
+    </StackPanel>
+    <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="2">
+      <c:CRun Text="3." />
+    </c:CTextBlock>
+    <StackPanel Grid.Column="1" Grid.Row="2">
+      <c:CTextBlock Classes="Paragraph">
+        <c:CRun Text="eine-drei" />
+      </c:CTextBlock>
+      <Grid Classes="List">
+        <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+          <c:CRun Text="1." />
+        </c:CTextBlock>
+        <StackPanel Grid.Column="1" Grid.Row="0">
+          <c:CTextBlock Classes="Paragraph">
+            <c:CRun Text="twei" />
+          </c:CTextBlock>
+          <Grid Classes="List">
+            <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+              <c:CRun Text="1." />
+            </c:CTextBlock>
+            <StackPanel Grid.Column="1" Grid.Row="0">
+              <c:CTextBlock Classes="Paragraph">
+                <c:CRun Text="drei" />
+              </c:CTextBlock>
+              <Grid Classes="List">
+                <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
+                  <c:CRun Text="1." />
+                </c:CTextBlock>
+                <StackPanel Grid.Column="1" Grid.Row="0">
+                  <c:CTextBlock Classes="Paragraph">
+                    <c:CRun Text="vier" />
+                  </c:CTextBlock>
+                </StackPanel>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition />
+                  <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition />
+                </Grid.RowDefinitions>
+              </Grid>
+            </StackPanel>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition />
+              <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+              <RowDefinition />
+            </Grid.RowDefinitions>
+          </Grid>
+        </StackPanel>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition />
+          <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+          <RowDefinition />
+        </Grid.RowDefinitions>
+      </Grid>
+    </StackPanel>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition />
+      <RowDefinition />
       <RowDefinition />
     </Grid.RowDefinitions>
   </Grid>

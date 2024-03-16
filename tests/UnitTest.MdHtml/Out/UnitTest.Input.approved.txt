@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-16"?>
-<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="https://github.com/whistyun/Markdown.Avalonia.Tight" xmlns:ma="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+<StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="https://github.com/whistyun/Markdown.Avalonia.Tight" xmlns:ma="https://github.com/whistyun/Markdown.Avalonia.Tight/Styles" xmlns:ma2="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
   <c:CTextBlock>
     <c:CInlineUIContainer>
       <c:CInlineUIContainer.Content>
@@ -25,7 +25,7 @@
       </c:CInlineUIContainer.Content>
     </c:CInlineUIContainer>
   </c:CTextBlock>
-  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <ma2:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
   <c:CTextBlock>
     <c:CInlineUIContainer>
       <c:CInlineUIContainer.Content>
@@ -51,7 +51,7 @@
       </c:CInlineUIContainer.Content>
     </c:CInlineUIContainer>
   </c:CTextBlock>
-  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <ma2:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
   <c:CTextBlock>
     <c:CInlineUIContainer>
       <c:CInlineUIContainer.Content>
@@ -77,7 +77,7 @@
       </c:CInlineUIContainer.Content>
     </c:CInlineUIContainer>
   </c:CTextBlock>
-  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <ma2:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
   <c:CTextBlock>
     <c:CInlineUIContainer>
       <c:CInlineUIContainer.Content>
@@ -103,7 +103,7 @@
       </c:CInlineUIContainer.Content>
     </c:CInlineUIContainer>
   </c:CTextBlock>
-  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <ma2:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
   <c:CTextBlock>
     <c:CInlineUIContainer>
       <c:CInlineUIContainer.Content>
@@ -123,7 +123,7 @@
       </c:CInlineUIContainer.Content>
     </c:CInlineUIContainer>
   </c:CTextBlock>
-  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <ma2:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
   <c:CTextBlock>
     <c:CInlineUIContainer>
       <c:CInlineUIContainer.Content>
@@ -143,7 +143,7 @@
       </c:CInlineUIContainer.Content>
     </c:CInlineUIContainer>
   </c:CTextBlock>
-  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <ma2:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
   <c:CTextBlock>
     <c:CInlineUIContainer>
       <c:CInlineUIContainer.Content>
@@ -163,7 +163,7 @@
       </c:CInlineUIContainer.Content>
     </c:CInlineUIContainer>
   </c:CTextBlock>
-  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <ma2:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
   <c:CTextBlock>
     <c:CInlineUIContainer>
       <c:CInlineUIContainer.Content>
@@ -171,7 +171,7 @@
       </c:CInlineUIContainer.Content>
     </c:CInlineUIContainer>
   </c:CTextBlock>
-  <ma:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
+  <ma2:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
   <c:CTextBlock>
     <c:CInlineUIContainer>
       <c:CInlineUIContainer.Content>
