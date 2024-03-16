@@ -18,6 +18,9 @@
     <Compile Update="Xamls\Test5.axaml.cs">
       <DependentUpon>Test5.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Xamls\Test7 - コピー.axaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
     <Compile Update="Xamls\Test7.axaml.cs">
       <DependentUpon>Test7.axaml</DependentUpon>
     </Compile>

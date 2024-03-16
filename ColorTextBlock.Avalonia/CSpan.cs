@@ -237,52 +237,59 @@ namespace ColorTextBlock.Avalonia
 
                 entireWidth -= _border.DesiredSize.Width;
                 remainWidth -= _border.DesiredSize.Width;
-            }
 
-            var metries = new List<CGeometry>();
+                return PrivateMeasure(_border, entireWidth, remainWidth);
+            }
+            else
+            {
+                return PrivateMeasure(entireWidth, remainWidth);
+            }
+        }
+
+        private IEnumerable<CGeometry> PrivateMeasure(
+            Border border,
+            double entireWidth,
+            double remainWidth)
+        {
+            var buffer = new List<CGeometry>();
+            foreach (var adding in PrivateMeasure(entireWidth, remainWidth))
+            {
+                // save linebreak before span
+                if (adding is LineBreakMarkGeometry && buffer.Count == 0)
+                {
+                    yield return adding;
+                    continue;
+                }
+
+                buffer.Add(adding);
+
+                if (adding.LineBreak)
+                {
+                    yield return DecoratorGeometry.New(this, buffer, border);
+                    buffer.Clear();
+                }
+            }
+            if (buffer.Count != 0)
+            {
+                yield return DecoratorGeometry.New(this, buffer, border);
+            }
+        }
+
+        private IEnumerable<CGeometry> PrivateMeasure(
+            double entireWidth,
+            double remainWidth)
+        {
             foreach (CInline inline in Content)
             {
                 IEnumerable<CGeometry> addings = inline.Measure(entireWidth, remainWidth);
                 foreach (var add in addings)
                 {
-                    metries.Add(add);
+                    yield return add;
+
                     if (add.LineBreak) remainWidth = entireWidth;
                     else remainWidth -= add.Width;
                 }
             }
-
-            if (_border is not null)
-            {
-                var renew = new List<CGeometry>();
-
-                var buffer = new List<CGeometry>();
-                foreach (var adding in metries)
-                {
-                    // save linebreak before span
-                    if (adding is LineBreakMarkGeometry && buffer.Count == 0)
-                    {
-                        renew.Add(adding);
-                        continue;
-                    }
-
-                    buffer.Add(adding);
-
-                    if (adding.LineBreak)
-                    {
-                        renew.Add(DecoratorGeometry.New(this, buffer, _border));
-                        buffer.Clear();
-                    }
-                }
-
-                if (buffer.Count != 0)
-                {
-                    renew.Add(DecoratorGeometry.New(this, buffer, _border));
-                }
-
-                metries = renew;
-            }
-
-            return metries;
         }
 
         public override string AsString() => String.Join("", Content.Select(c => c.AsString()));

@@ -239,6 +239,72 @@ namespace UnitTest.CTxt
                 Approvals.GetDefaultNamer(),
                 new DiffToolReporter(DiffEngine.DiffTool.WinMerge));
         }
+
+        [Test]
+        [TestCase(500)]
+        [TestCase(510)]
+        [TestCase(520)]
+        [TestCase(530)]
+        [TestCase(540)]
+        [TestCase(550)]
+        [TestCase(560)]
+        [TestCase(570)]
+        [TestCase(580)]
+        [TestCase(590)]
+        [TestCase(600)]
+        [TestCase(610)]
+        [TestCase(620)]
+        [TestCase(630)]
+        [TestCase(640)]
+        [TestCase(650)]
+        [TestCase(660)]
+        [TestCase(670)]
+        [TestCase(680)]
+        [TestCase(690)]
+        [TestCase(700)]
+        [TestCase(710)]
+        [TestCase(720)]
+        [TestCase(730)]
+        [TestCase(740)]
+        [TestCase(750)]
+        [TestCase(760)]
+        [TestCase(770)]
+        [TestCase(780)]
+        [TestCase(790)]
+        [TestCase(800)]
+        [TestCase(810)]
+        [TestCase(820)]
+        [TestCase(830)]
+        [TestCase(840)]
+        [TestCase(850)]
+        [TestCase(860)]
+        [TestCase(870)]
+        [TestCase(880)]
+        [TestCase(890)]
+        [TestCase(900)]
+        [TestCase(910)]
+        [TestCase(920)]
+        [TestCase(930)]
+        [TestCase(940)]
+        [TestCase(950)]
+        [TestCase(960)]
+        [TestCase(970)]
+        [TestCase(980)]
+        [TestCase(990)]
+        [TestCase(1000)]
+        [RunOnUI]
+        public void GivenTest99_generatesExpectedResult(int width)
+        {
+            var tst99 = new Test99();
+            var ctxt = (CTextBlock)tst99.Content;
+
+            var info = new MetryHolder(ctxt, width, 1000);
+
+            Approvals.Verify(
+                new ApprovalImageWriter("99", info.Image, width.ToString()),
+                Approvals.GetDefaultNamer(),
+                new DiffToolReporter(DiffEngine.DiffTool.WinMerge));
+        }
     }
 
     class MetryHolder : AvaloniaObject

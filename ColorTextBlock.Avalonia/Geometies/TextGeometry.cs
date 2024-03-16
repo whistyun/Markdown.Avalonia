@@ -7,8 +7,6 @@ namespace ColorTextBlock.Avalonia.Geometries
 {
     internal abstract class TextGeometry : CGeometry
     {
-        internal CInline Owner { get; }
-
         private IBrush? _TemporaryForeground;
         public IBrush? TemporaryForeground
         {
@@ -45,9 +43,8 @@ namespace ColorTextBlock.Avalonia.Geometries
             double width, double height, double lineHeight,
             TextVerticalAlignment alignment,
             bool linebreak) :
-            base(width, height, lineHeight, alignment, linebreak)
+            base(owner, width, height, lineHeight, alignment, linebreak)
         {
-            Owner = owner;
         }
     }
 }

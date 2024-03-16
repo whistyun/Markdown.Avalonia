@@ -29,7 +29,7 @@
       <StackPanel Classes="Address">
         <c:CTextBlock>
           <c:CRun Text="Written by " />
-          <c:CHyperlink HoverBackground="{x:Null}" HoverForeground="{x:Null}" CommandParameter="mailto:webmaster@example.com" Classes="Hyperlink">
+          <c:CHyperlink CommandParameter="mailto:webmaster@example.com" Classes="Hyperlink">
             <c:CRun Text="Jon Doe " />
           </c:CHyperlink>
           <c:CRun Text="." />

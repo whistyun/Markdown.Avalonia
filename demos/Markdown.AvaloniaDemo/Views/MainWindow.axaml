@@ -29,12 +29,14 @@
       <ColumnDefinition Width="10*"/>
     </Grid.ColumnDefinitions>
     <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
       <RowDefinition Height="10*"/>
     </Grid.RowDefinitions>
 
     <TabControl
       Grid.Row="0"
       Grid.Column="0"
+      Grid.RowSpan="2"
       VerticalAlignment="Stretch">
 
       <TabItem
@@ -112,13 +114,22 @@
 
     </TabControl>
 
-    <md:MarkdownScrollViewer
+    <Label
+      x:Name="Breadcrumb"
       Grid.Row="0"
+      Grid.Column="1"
+      Content=" "
+      BorderThickness="0,0,0,1"
+      />
+    
+    <md:MarkdownScrollViewer
+      Grid.Row="1"
       Grid.Column="1"
       VerticalAlignment="Stretch"
       MarkdownStyleName="{Binding SelectedStyle.Name}"
       SaveScrollValueWhenContentUpdated="True"
       Markdown="{Binding Text}"
+      HeaderScrolled="HeaderScrolled"
       
       local:DynamicStyleBehavior.XamlText="{Binding AppendStyleXamlText}"
       local:DynamicStyleBehavior.ValidationResult="{Binding XamlParseResult}"

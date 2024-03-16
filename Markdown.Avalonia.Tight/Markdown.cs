@@ -1,39 +1,31 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Documents;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
-using Avalonia.Markup.Xaml;
-using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.Platform;
 using Avalonia.Styling;
+using ColorDocument.Avalonia;
+using ColorDocument.Avalonia.DocumentElements;
 using ColorTextBlock.Avalonia;
 using Markdown.Avalonia.Controls;
 using Markdown.Avalonia.Parsers;
+using Markdown.Avalonia.Parsers.Builtin;
 using Markdown.Avalonia.Plugins;
 using Markdown.Avalonia.Tables;
 using Markdown.Avalonia.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net.Cache;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace Markdown.Avalonia
 {
-    public class Markdown : AvaloniaObject, IMarkdownEngine
+    public class Markdown : AvaloniaObject, IMarkdownEngine, IMarkdownEngine2
     {
         #region const
         /// <summary>
@@ -47,30 +39,31 @@ namespace Markdown.Avalonia
         /// </summary>
         private const int _tabWidth = 4;
 
-        public const string Heading1Class = "Heading1";
-        public const string Heading2Class = "Heading2";
-        public const string Heading3Class = "Heading3";
-        public const string Heading4Class = "Heading4";
-        public const string Heading5Class = "Heading5";
-        public const string Heading6Class = "Heading6";
+        public const string Heading1Class = ClassNames.Heading1Class;
+        public const string Heading2Class = ClassNames.Heading2Class;
+        public const string Heading3Class = ClassNames.Heading3Class;
+        public const string Heading4Class = ClassNames.Heading4Class;
+        public const string Heading5Class = ClassNames.Heading5Class;
+        public const string Heading6Class = ClassNames.Heading6Class;
 
-        public const string CodeBlockClass = "CodeBlock";
-        public const string ContainerBlockClass = "ContainerBlock";
-        public const string NoContainerClass = "NoContainer";
-        public const string BlockquoteClass = "Blockquote";
-        public const string NoteClass = "Note";
+        public const string CodeBlockClass = ClassNames.CodeBlockClass;
+        public const string ContainerBlockClass = ClassNames.ContainerBlockClass;
+        public const string NoContainerClass = ClassNames.NoContainerClass;
+        public const string BlockquoteClass = ClassNames.BlockquoteClass;
+        public const string NoteClass = ClassNames.NoteClass;
 
-        public const string ParagraphClass = "Paragraph";
+        public const string ParagraphClass = ClassNames.ParagraphClass;
 
-        public const string TableClass = "Table";
-        public const string TableHeaderClass = "TableHeader";
-        public const string TableFirstRowClass = "FirstTableRow";
-        public const string TableRowOddClass = "OddTableRow";
-        public const string TableRowEvenClass = "EvenTableRow";
-        public const string TableLastRowClass = "LastTableRow";
+        public const string TableClass = ClassNames.TableClass;
+        public const string TableHeaderClass = ClassNames.TableHeaderClass;
+        public const string TableFirstRowClass = ClassNames.TableFirstRowClass;
+        public const string TableRowOddClass = ClassNames.TableRowOddClass;
+        public const string TableRowEvenClass = ClassNames.TableRowEvenClass;
+        public const string TableLastRowClass = ClassNames.TableLastRowClass;
+        public const string TableFooterClass = ClassNames.TableFooterClass;
 
-        public const string ListClass = "List";
-        public const string ListMarkerClass = "ListMarker";
+        public const string ListClass = ClassNames.ListClass;
+        public const string ListMarkerClass = ClassNames.ListMarkerClass;
 
         #endregion
 
@@ -168,8 +161,8 @@ namespace Markdown.Avalonia
         #region ParseInfo
 
         private SetupInfo _setupInfo;
-        private BlockParser[] _topBlockParsers;
-        private BlockParser[] _blockParsers;
+        private BlockParser2[] _topBlockParsers;
+        private BlockParser2[] _blockParsers;
         private InlineParser[] _inlines;
         private bool _supportTextAlignment;
         private bool _supportStrikethrough;
@@ -204,60 +197,49 @@ namespace Markdown.Avalonia
             if (ReferenceEquals(info, _setupInfo))
                 return;
 
-            var topBlocks = new List<BlockParser>();
-            var subBlocks = new List<BlockParser>();
+            var topBlocks = new List<BlockParser2>();
+            var subBlocks = new List<BlockParser2>();
             var inlines = new List<InlineParser>();
 
 
             // top-level block parser
+            topBlocks.Add(
+                info.EnableListMarkerExt ?
+                    new ExtListParser() :
+                    new CommonListParser());
 
-            if (info.EnableListMarkerExt)
-            {
-                topBlocks.Add(BlockParser.New(_extListNested, nameof(ListEvaluator), ExtListEvaluator));
-            }
-            else
-            {
-                topBlocks.Add(BlockParser.New(_commonListNested, nameof(ListEvaluator), CommonListEvaluator));
-            }
-
-            topBlocks.Add(BlockParser.New(_codeBlockBegin, nameof(CodeBlocksWithLangEvaluator), CodeBlocksWithLangEvaluator));
+            topBlocks.Add(new FencedCodeBlockParser(info.EnablePreRenderingCodeBlock));
 
             if (info.EnableContainerBlockExt)
             {
-                topBlocks.Add(BlockParser.New(_containerBlockFirst, nameof(ContainerBlockEvaluator), ContainerBlockEvaluator));
+                topBlocks.Add(new ContainerBlockParser());
             }
 
 
             // sub-level block parser
+            subBlocks.Add(new BlockquotesParser(info.EnableTextAlignment));
+            subBlocks.Add(new SetextHeaderParser());
+            subBlocks.Add(new AtxHeaderParser());
 
-            subBlocks.Add(BlockParser.New(_blockquoteFirst, nameof(BlockquotesEvaluator), BlockquotesEvaluator));
-            subBlocks.Add(BlockParser.New(_headerSetext, nameof(SetextHeaderEvaluator), SetextHeaderEvaluator));
-            subBlocks.Add(BlockParser.New(_headerAtx, nameof(AtxHeaderEvaluator), AtxHeaderEvaluator));
-
-            if (info.EnableRuleExt)
-            {
-                subBlocks.Add(BlockParser.New(_horizontalRules, nameof(RuleEvaluator), RuleEvaluator));
-            }
-            else
-            {
-                subBlocks.Add(BlockParser.New(_horizontalCommonRules, nameof(RuleEvaluator), RuleCommonEvaluator));
-            }
+            subBlocks.Add(
+                info.EnableRuleExt ?
+                    new ExtHorizontalParser() :
+                    new CommonHorizontalParser());
 
             if (info.EnableTableBlock)
             {
-                subBlocks.Add(BlockParser.New(_table, nameof(TableEvalutor), TableEvalutor));
+                subBlocks.Add(new TableParser());
             }
 
             if (info.EnableNoteBlock)
             {
-                subBlocks.Add(BlockParser.New(_note, nameof(NoteEvaluator), NoteEvaluator));
+                subBlocks.Add(new NoteParser());
             }
 
-            subBlocks.Add(BlockParser.New(_indentCodeBlock, nameof(CodeBlocksWithoutLangEvaluator), CodeBlocksWithoutLangEvaluator));
+            subBlocks.Add(new IndentCodeBlockParser());
 
 
             // inline parser
-
             inlines.Add(InlineParser.New(_codeSpan, nameof(CodeSpanEvaluator), CodeSpanEvaluator));
             inlines.Add(InlineParser.New(_imageOrHrefInline, nameof(ImageOrHrefInlineEvaluator), ImageOrHrefInlineEvaluator));
 
@@ -273,8 +255,8 @@ namespace Markdown.Avalonia
 
             // parser registered by plugin
 
-            topBlocks.AddRange(info.TopBlock);
-            subBlocks.AddRange(info.Block);
+            topBlocks.AddRange(info.TopBlock.Select(bp => bp.Upgrade()));
+            subBlocks.AddRange(info.Block.Select(bp => bp.Upgrade()));
             inlines.AddRange(info.Inline);
 
 
@@ -287,8 +269,8 @@ namespace Markdown.Avalonia
             info.Overwrite(_loader);
 
 
-            _topBlockParsers = topBlocks.Select(p => info.Override(p)).ToArray();
-            _blockParsers = subBlocks.Select(p => info.Override(p)).ToArray();
+            _topBlockParsers = topBlocks.Select(p => info.Override(p).Upgrade()).ToArray();
+            _blockParsers = subBlocks.Select(p => info.Override(p).Upgrade()).ToArray();
             _inlines = inlines.ToArray();
             _supportTextAlignment = info.EnableTextAlignment;
             _supportStrikethrough = info.EnableStrikethrough;
@@ -296,9 +278,12 @@ namespace Markdown.Avalonia
             _setupInfo = info;
         }
 
-
-        /// <inheritdoc/>
         public Control Transform(string? text)
+        {
+            return TransformElement(text).Control;
+        }
+
+        public DocumentElement TransformElement(string? text)
         {
             if (text is null)
             {
@@ -310,15 +295,30 @@ namespace Markdown.Avalonia
             text = TextUtil.Normalize(text, _tabWidth);
 
             var status = new ParseStatus(true & _supportTextAlignment);
-            var document = Create<StackPanel, Control>(PrivateRunBlockGamut(text, status));
-            document.Orientation = Orientation.Vertical;
-
-            return document;
+            var elements = ParseGamutElement(text, status);
+            return new DocumentRootElement(elements);
         }
 
-        /// <summary>
-        /// Perform transformations that form block-level tags like paragraphs, headers, and list items.
-        /// </summary>
+        public IEnumerable<DocumentElement> ParseGamutElement(string? text, ParseStatus status)
+        {
+            if (text is null)
+            {
+                throw new ArgumentNullException(nameof(text));
+            }
+            SetupParser();
+            return PrivateRunBlockGamut(text, status);
+        }
+
+        public IEnumerable<CInline> ParseGamutInline(string? text)
+        {
+            if (text is null)
+            {
+                throw new ArgumentNullException(nameof(text));
+            }
+            SetupParser();
+            return PrivateRunSpanGamut(text);
+        }
+
         public IEnumerable<Control> RunBlockGamut(string? text, ParseStatus status)
         {
             if (text is null)
@@ -330,12 +330,10 @@ namespace Markdown.Avalonia
 
             text = TextUtil.Normalize(text, _tabWidth);
 
-            return PrivateRunBlockGamut(text, status);
+            var elements = PrivateRunBlockGamut(text, status);
+            return elements.Select(e => e.Control);
         }
 
-        /// <summary>
-        /// Perform transformations that occur *within* block-level tags like paragraphs, headers, and list items.
-        /// </summary>
         public IEnumerable<CInline> RunSpanGamut(string? text)
         {
             if (text is null)
@@ -350,13 +348,13 @@ namespace Markdown.Avalonia
             return PrivateRunSpanGamut(text);
         }
 
-        private IEnumerable<Control> PrivateRunBlockGamut(string text, ParseStatus status)
+        private IEnumerable<DocumentElement> PrivateRunBlockGamut(string text, ParseStatus status)
         {
             var index = 0;
             var length = text.Length;
-            var rtn = new List<Control>();
+            var rtn = new List<DocumentElement>();
 
-            var candidates = new List<Candidate<BlockParser>>();
+            var candidates = new List<Candidate<BlockParser2>>();
 
             for (; ; )
             {
@@ -365,7 +363,7 @@ namespace Markdown.Avalonia
                 foreach (var parser in _topBlockParsers)
                 {
                     var match = parser.Pattern.Match(text, index, length);
-                    if (match.Success) candidates.Add(new Candidate<BlockParser>(match, parser));
+                    if (match.Success) candidates.Add(new Candidate<BlockParser2>(match, parser));
                 }
 
                 if (candidates.Count == 0) break;
@@ -374,11 +372,11 @@ namespace Markdown.Avalonia
 
                 int bestBegin = 0;
                 int bestEnd = 0;
-                IEnumerable<Control>? result = null;
+                IEnumerable<DocumentElement>? result = null;
 
                 foreach (var c in candidates)
                 {
-                    result = c.Parser.Convert(text, c.Match, status, this, out bestBegin, out bestEnd);
+                    result = c.Parser.Convert2(text, c.Match, status, this, out bestBegin, out bestEnd);
                     if (result is not null) break;
                 }
 
@@ -407,7 +405,7 @@ namespace Markdown.Avalonia
                string text, int index, int length,
                ParseStatus status,
                 int parserStart,
-               List<Control> outto)
+               List<DocumentElement> outto)
             {
                 for (; parserStart < _blockParsers.Length; ++parserStart)
                 {
@@ -418,7 +416,7 @@ namespace Markdown.Avalonia
                         var match = parser.Pattern.Match(text, index, length);
                         if (!match.Success) break;
 
-                        var rslt = parser.Convert(text, match, status, this, out int parseBegin, out int parserEnd);
+                        var rslt = parser.Convert2(text, match, status, this, out int parseBegin, out int parserEnd);
                         if (rslt is null) break;
 
                         if (parseBegin > index)
@@ -499,7 +497,7 @@ namespace Markdown.Avalonia
         /// <summary>
         /// splits on two or more newlines, to form "paragraphs";    
         /// </summary>
-        private IEnumerable<Control> FormParagraphs(string text, ParseStatus status)
+        private IEnumerable<DocumentElement> FormParagraphs(string text, ParseStatus status)
         {
             var trimemdText = _newlinesLeadingTrailing.Replace(text, "");
 
@@ -534,12 +532,10 @@ namespace Markdown.Avalonia
                     }
                 }
 
-                var ctbox = new CTextBlock(PrivateRunSpanGamut(chip));
-
-                if (indiAlignment.HasValue)
-                    ctbox.TextAlignment = indiAlignment.Value;
-
-                ctbox.Classes.Add(ParagraphClass);
+                var inlines = PrivateRunSpanGamut(chip);
+                var ctbox = indiAlignment.HasValue ?
+                    new CTextBlockElement(inlines, ParagraphClass, indiAlignment.Value) :
+                    new CTextBlockElement(inlines, ParagraphClass);
 
                 yield return ctbox;
             }
@@ -669,757 +665,6 @@ namespace Markdown.Avalonia
             return image;
         }
 
-
-        #endregion
-
-        #region grammer - header
-
-        /// <summary>
-        /// Turn Markdown headers into HTML header tags
-        /// </summary>
-        /// <remarks>
-        /// Header 1  
-        /// ========  
-        /// 
-        /// Header 2  
-        /// --------  
-        /// </remarks>
-        private static readonly Regex _headerSetext = new(@"
-                ^(.+?)
-                [ ]*
-                \n
-                (=+|-+)     # $1 = string of ='s or -'s
-                [ ]*
-                \n+",
-                RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        /// <summary>
-        /// # Header 1  
-        /// ## Header 2  
-        /// ## Header 2 with closing hashes ##  
-        /// ...  
-        /// ###### Header 6  
-        /// </remarks>
-        private static readonly Regex _headerAtx = new(@"
-                ^(\#{1,6})  # $1 = string of #'s
-                [ ]*
-                (.+?)       # $2 = Header text
-                [ ]*
-                \#*         # optional closing #'s (not counted)
-                \n+",
-                RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private CTextBlock SetextHeaderEvaluator(Match match)
-        {
-            string header = match.Groups[1].Value;
-            int level = match.Groups[2].Value.StartsWith("=") ? 1 : 2;
-
-            //TODO: Style the paragraph based on the header level
-            return CreateHeader(level, PrivateRunSpanGamut(header.Trim()));
-        }
-
-        private CTextBlock AtxHeaderEvaluator(Match match)
-        {
-            string header = match.Groups[2].Value;
-            int level = match.Groups[1].Value.Length;
-            return CreateHeader(level, PrivateRunSpanGamut(header));
-        }
-
-        private CTextBlock CreateHeader(int level, IEnumerable<CInline> content)
-        {
-            var heading = new CTextBlock(content);
-
-            switch (level)
-            {
-                case 1:
-                    heading.Classes.Add(Heading1Class);
-                    break;
-
-                case 2:
-                    heading.Classes.Add(Heading2Class);
-                    break;
-
-                case 3:
-                    heading.Classes.Add(Heading3Class);
-                    break;
-
-                case 4:
-                    heading.Classes.Add(Heading4Class);
-                    break;
-
-                case 5:
-                    heading.Classes.Add(Heading5Class);
-                    break;
-
-                case 6:
-                    heading.Classes.Add(Heading6Class);
-                    break;
-            }
-
-            return heading;
-        }
-        #endregion
-
-        #region grammer - Note
-
-        /// <summary>
-        /// Turn Markdown into HTML paragraphs.
-        /// </summary>
-        /// <remarks>
-        /// < Note
-        /// </remarks>
-        private static readonly Regex _note = new(@"
-                ^(\<)       # $1 = starting marker <
-                [ ]*
-                (.+?)       # $2 = Header text
-                [ ]*
-                \>*         # optional closing >'s (not counted)
-                \n+
-            ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private Border NoteEvaluator(Match match, ParseStatus status)
-        {
-            string text = match.Groups[2].Value;
-
-            TextAlignment? indiAlignment = null;
-
-            if (status.SupportTextAlignment)
-            {
-                var alignMatch = _align.Match(text);
-                if (alignMatch.Success)
-                {
-                    text = text.Substring(alignMatch.Length);
-                    switch (alignMatch.Groups[1].Value)
-                    {
-                        case "<":
-                            indiAlignment = TextAlignment.Left;
-                            break;
-                        case ">":
-                            indiAlignment = TextAlignment.Right;
-                            break;
-                        case "=":
-                            indiAlignment = TextAlignment.Center;
-                            break;
-                    }
-                }
-            }
-
-            return NoteComment(PrivateRunSpanGamut(text), indiAlignment);
-        }
-
-        private Border NoteComment(IEnumerable<CInline> content, TextAlignment? indiAlignment)
-        {
-            var note = new CTextBlock(content);
-            note.Classes.Add(NoteClass);
-            if (indiAlignment.HasValue)
-            {
-                note.TextAlignment = indiAlignment.Value;
-            }
-
-            var result = new Border();
-            result.Classes.Add(NoteClass);
-            result.Child = note;
-
-            return result;
-        }
-        #endregion
-
-        #region grammer - horizontal rules
-
-        /// <summary>
-        /// Turn Markdown horizontal rules into HTML hr tags
-        /// </summary>
-        /// <remarks>
-        /// ***  
-        /// * * *  
-        /// ---
-        /// - - -
-        /// </remarks>
-        private static readonly Regex _horizontalRules = new(@"
-                ^[ ]{0,3}                   # Leading space
-                    ([-=*_])                # $1: First marker ([markers])
-                    (?>                     # Repeated marker group
-                        [ ]{0,2}            # Zero, one, or two spaces.
-                        \1                  # Marker character
-                    ){2,}                   # Group repeated at least twice
-                    [ ]*                    # Trailing spaces
-                    \n                      # End of line.
-                ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private static readonly Regex _horizontalCommonRules = new(@"
-                ^[ ]{0,3}                   # Leading space
-                    ([-*_])                 # $1: First marker ([markers])
-                    (?>                     # Repeated marker group
-                        [ ]{0,2}            # Zero, one, or two spaces.
-                        \1                  # Marker character
-                    ){2,}                   # Group repeated at least twice
-                    [ ]*                    # Trailing spaces
-                    \n                      # End of line.
-                ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        /// <summary>
-        /// Single line separator.
-        /// </summary>
-        private Rule RuleEvaluator(Match match)
-        {
-            return match.Groups[1].Value switch
-            {
-                "=" => new Rule(RuleType.TwoLines),
-                "*" => new Rule(RuleType.Bold),
-                "_" => new Rule(RuleType.BoldWithSingle),
-                "-" => new Rule(RuleType.Single),
-                _ => new Rule(RuleType.Single),
-            };
-        }
-
-        private Rule RuleCommonEvaluator(Match match)
-        {
-            return new Rule(RuleType.Single);
-        }
-        #endregion
-
-
-        #region grammer - list
-
-        // `alphabet order` and `roman number` must start 'a.'～'c.' and 'i,'～'iii,'.
-        // This restrict is avoid to treat "Yes," as list marker.
-        private const string _extFirstListMaker = @"(?:[*+=-]|\d+[.]|[a-c][.]|[i]{1,3}[,]|[A-C][.]|[I]{1,3}[,])";
-        private const string _extSubseqListMaker = @"(?:[*+=-]|\d+[.]|[a-c][.]|[cdilmvx]+[,]|[A-C][.]|[CDILMVX]+[,])";
-
-        private const string _commonListMaker = @"(?:[*+-]|\d+[.])";
-
-        //private const string _markerUL = @"[*+=-]";
-        //private const string _markerOL = @"\d+[.]|\p{L}+[.,]";
-
-        // Unordered List
-        private const string _markerUL_Disc = @"[*]";
-        private const string _markerUL_Box = @"[+]";
-        private const string _markerUL_Circle = @"[-]";
-        private const string _markerUL_Square = @"[=]";
-
-        // Ordered List
-        private const string _markerOL_Number = @"\d+[.]";
-        private const string _markerOL_LetterLower = @"[a-c][.]";
-        private const string _markerOL_LetterUpper = @"[A-C][.]";
-        private const string _markerOL_RomanLower = @"[cdilmvx]+[,]";
-        private const string _markerOL_RomanUpper = @"[CDILMVX]+[,]";
-
-        /// <summary>
-        /// Maximum number of levels a single list can have.
-        /// In other words, _listDepth - 1 is the maximum number of nested lists.
-        /// </summary>
-        private const int _listDepth = 4;
-
-        private static readonly string _wholeListFormat = @"
-            ^
-            (?<whltxt>                      # whole list
-              (?<mkr_i>                     # list marker with indent
-                (?![ ]{{0,3}}(?<hrm>[-=*_])([ ]{{0,2}}\k<hrm>){{2,}}[ ]*\n)
-                (?<idt>[ ]{{0,{2}}})
-                (?<mkr>{0})                 # first list item marker
-                [ ]+
-              )
-              (?s:.+?)
-              (                             # $4
-                  \z
-                |
-                  \n{{2,}}
-                  (?=\S)
-                  (?!                       # Negative lookahead for another list item marker
-                    [ ]*
-                    {1}[ ]+
-                  )
-              )
-            )";
-
-        private static readonly Regex _startNoIndentRule = new(@"\A[ ]{0,2}(?<hrm>[-=*_])([ ]{0,2}\k<hrm>){2,}[ ]*$",
-            RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private static readonly Regex _startNoIndentSublistMarker = new(@"\A" + _extSubseqListMaker, RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private static readonly Regex _startQuoteOrHeader = new(@"\A(\#{1,6}[ ]|>|```)", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private static readonly Regex _startNoIndentCommonSublistMarker = new(@"\A" + _commonListMaker, RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private static readonly Regex _commonListNested = new(
-            String.Format(_wholeListFormat, _commonListMaker, _commonListMaker, _listDepth - 1),
-            RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private static readonly Regex _startNoIndentExtSublistMarker = new(@"\A" + _extSubseqListMaker, RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private static readonly Regex _extListNested = new(
-            String.Format(_wholeListFormat, _extFirstListMaker, _extSubseqListMaker, _listDepth - 1),
-            RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-
-        private IEnumerable<Control> ExtListEvaluator(Match match)
-            => ListEvaluator(match, _startNoIndentExtSublistMarker);
-
-        private IEnumerable<Control> CommonListEvaluator(Match match)
-            => ListEvaluator(match, _startNoIndentCommonSublistMarker);
-
-        private IEnumerable<Control> ListEvaluator(Match match, Regex sublistMarker)
-        {
-            // Check text marker style.
-            (TextMarkerStyle textMarker, string markerPattern, int indentAppending)
-                = GetTextMarkerStyle(match.Groups["mkr"].Value);
-
-            Regex markerRegex = new(@"\A" + markerPattern, RegexOptions.Compiled);
-
-            // count indent from first marker with indent
-            int countIndent = TextUtil.CountIndent(match.Groups["mkr_i"].Value);
-
-            // whole list
-            string[] whileListLins = match.Groups["whltxt"].Value.Split('\n');
-
-            // collect detendentable line
-            var listBulder = new StringBuilder();
-            var outerListBuildre = new StringBuilder();
-            var isInOuterList = false;
-            foreach (var line in whileListLins)
-            {
-                if (!isInOuterList)
-                {
-                    if (String.IsNullOrEmpty(line))
-                    {
-                        listBulder.Append("").Append("\n");
-                    }
-                    else if (TextUtil.TryDetendLine(line, countIndent, out var stripedLine))
-                    {
-                        // is it horizontal line?
-                        if (_startNoIndentRule.IsMatch(stripedLine))
-                        {
-                            isInOuterList = true;
-                        }
-                        // is it header or blockquote?
-                        else if (_startQuoteOrHeader.IsMatch(stripedLine))
-                        {
-                            isInOuterList = true;
-                        }
-                        // is it had list marker?
-                        else if (sublistMarker.IsMatch(stripedLine))
-                        {
-                            // is it same marker as now processed?
-                            var targetMarkerMch = markerRegex.Match(stripedLine);
-                            if (targetMarkerMch.Success)
-                            {
-                                listBulder.Append(stripedLine).Append("\n");
-                            }
-                            else isInOuterList = true;
-                        }
-                        else
-                        {
-                            var detentedline = TextUtil.DetentLineBestEffort(stripedLine, indentAppending);
-                            listBulder.Append(detentedline).Append("\n");
-                        }
-                    }
-                    else isInOuterList = true;
-                }
-
-                if (isInOuterList)
-                {
-                    outerListBuildre.Append(line).Append("\n");
-                }
-            }
-
-            string list = listBulder.ToString();
-
-            IEnumerable<Control> listItems = ProcessListItems(list, markerPattern);
-
-            var grid = new Grid();
-            grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
-            grid.ColumnDefinitions.Add(new ColumnDefinition());
-
-            static CTextBlock? FindFirstFrom(Control ctrl)
-            {
-                if (ctrl is Panel pnl)
-                {
-                    foreach (var chld in pnl.Children)
-                    {
-                        var res = FindFirstFrom(chld);
-                        if (res != null) return res;
-                    }
-                }
-                if (ctrl is CTextBlock ctxt)
-                {
-                    return ctxt;
-                }
-                return null;
-            }
-
-            foreach (Tuple<Control, int> listItemTpl in listItems.Select((elm, idx) => Tuple.Create(elm, idx)))
-            {
-                var index = listItemTpl.Item2;
-                var markerTxt = new CTextBlock(textMarker.CreateMakerText(index));
-
-                var control = listItemTpl.Item1;
-                CTextBlock? controlTxt = FindFirstFrom(control);
-
-                // adjust baseline
-                if (controlTxt is not null)
-                    markerTxt.ObserveBaseHeightOf(controlTxt);
-
-                grid.RowDefinitions.Add(new RowDefinition());
-                grid.Children.Add(markerTxt);
-                grid.Children.Add(control);
-
-                markerTxt.TextAlignment = TextAlignment.Right;
-                markerTxt.TextWrapping = TextWrapping.NoWrap;
-                markerTxt.Classes.Add(ListMarkerClass);
-                Grid.SetRow(markerTxt, index);
-                Grid.SetColumn(markerTxt, 0);
-
-                Grid.SetRow(control, index);
-                Grid.SetColumn(control, 1);
-            }
-
-            grid.Classes.Add(ListClass);
-
-            yield return grid;
-
-
-            if (outerListBuildre.Length != 0)
-            {
-                foreach (var ctrl in PrivateRunBlockGamut(outerListBuildre.ToString(), ParseStatus.Init))
-                    yield return ctrl;
-            }
-        }
-
-        /// <summary>
-        /// Process the contents of a single ordered or unordered list, splitting it
-        /// into individual list items.
-        /// </summary>
-        private IEnumerable<Control> ProcessListItems(string list, string marker)
-        {
-            // The listLevel global keeps track of when we're inside a list.
-            // Each time we enter a list, we increment it; when we leave a list,
-            // we decrement. If it's zero, we're not in a list anymore.
-
-            // We do this because when we're not inside a list, we want to treat
-            // something like this:
-
-            //    I recommend upgrading to version
-            //    8. Oops, now this line is treated
-            //    as a sub-list.
-
-            // As a single paragraph, despite the fact that the second line starts
-            // with a digit-period-space sequence.
-
-            // Whereas when we're inside a list (or sub-list), that line will be
-            // treated as the start of a sub-list. What a kludge, huh? This is
-            // an aspect of Markdown's syntax that's hard to parse perfectly
-            // without resorting to mind-reading. Perhaps the solution is to
-            // change the syntax rules such that sub-lists must start with a
-            // starting cardinal number; e.g. "1." or "a.".
-
-            // Trim trailing blank lines:
-            list = Regex.Replace(list, @"\n{2,}\z", "\n");
-
-            string pattern = string.Format(
-              @"(\n)?                  # leading line = $1
-                (^[ ]*)                    # leading whitespace = $2
-                ({0}) [ ]+                 # list marker = $3
-                ((?s:.+?)                  # list item text = $4
-                (\n{{1,2}}))      
-                (?= \n* (\z | \2 ({0}) [ ]+))", marker);
-
-            var regex = new Regex(pattern, RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline);
-            var matches = regex.Matches(list);
-            foreach (Match m in matches)
-            {
-                yield return ListItemEvaluator(m);
-            }
-        }
-
-        private Control ListItemEvaluator(Match match)
-        {
-            string item = match.Groups[4].Value;
-
-            var status = new ParseStatus(false);
-
-            // we could correct any bad indentation here..
-            // recursion for sub-lists
-            return Create<StackPanel, Control>(PrivateRunBlockGamut(item, status));
-        }
-
-        /// <summary>
-        /// Get the text marker style based on a specific regex.
-        /// </summary>
-        /// <param name="markerText">list maker (eg. * + 1. a. </param>
-        /// <returns>
-        ///     1; return Type. 
-        ///     2: match regex pattern
-        ///     3: char length of listmaker
-        /// </returns>
-        private static (TextMarkerStyle, string, int) GetTextMarkerStyle(string markerText)
-        {
-            if (Regex.IsMatch(markerText, _markerUL_Disc))
-            {
-                return (TextMarkerStyle.Disc, _markerUL_Disc, 2);
-            }
-            else if (Regex.IsMatch(markerText, _markerUL_Box))
-            {
-                return (TextMarkerStyle.Box, _markerUL_Box, 2);
-            }
-            else if (Regex.IsMatch(markerText, _markerUL_Circle))
-            {
-                return (TextMarkerStyle.Circle, _markerUL_Circle, 2);
-            }
-            else if (Regex.IsMatch(markerText, _markerUL_Square))
-            {
-                return (TextMarkerStyle.Square, _markerUL_Square, 2);
-            }
-            else if (Regex.IsMatch(markerText, _markerOL_Number))
-            {
-                return (TextMarkerStyle.Decimal, _markerOL_Number, 3);
-            }
-            else if (Regex.IsMatch(markerText, _markerOL_LetterLower))
-            {
-                return (TextMarkerStyle.LowerLatin, _markerOL_LetterLower, 3);
-            }
-            else if (Regex.IsMatch(markerText, _markerOL_LetterUpper))
-            {
-                return (TextMarkerStyle.UpperLatin, _markerOL_LetterUpper, 3);
-            }
-            else if (Regex.IsMatch(markerText, _markerOL_RomanLower))
-            {
-                return (TextMarkerStyle.LowerRoman, _markerOL_RomanLower, 3);
-            }
-            else if (Regex.IsMatch(markerText, _markerOL_RomanUpper))
-            {
-                return (TextMarkerStyle.UpperRoman, _markerOL_RomanUpper, 3);
-            }
-
-            Helper.ThrowInvalidOperation("sorry library manager forget to modify about listmerker.");
-            // dummy
-            return (TextMarkerStyle.Disc, _markerUL_Disc, 2);
-        }
-
-        #endregion
-
-        #region grammer - table
-
-        private static readonly Regex _table = new(@"
-            (                               # whole table
-                [ \n]*
-                (?<hdr>                     # table header
-                    ([^\n\|]*\|[^\n]+)
-                )
-                [ ]*\n[ ]*
-                (?<col>                     # column style
-                    \|?([ ]*:?-+:?[ ]*(\||$))+
-                )
-                (?<row>                     # table row
-                    (
-                        [ ]*\n[ ]*
-                        ([^\n\|]*\|[^\n]+)
-                    )+
-                )
-            )",
-            RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-
-        private Border TableEvalutor(Match match)
-        {
-            var headerTxt = match.Groups["hdr"].Value.Trim();
-            var styleTxt = match.Groups["col"].Value.Trim();
-            var rowTxt = match.Groups["row"].Value.Trim();
-
-            static string ExtractCoverBar(string txt)
-            {
-                if (txt[0] == '|')
-                    txt = txt.Substring(1);
-
-                if (String.IsNullOrEmpty(txt))
-                    return txt;
-
-                if (txt[txt.Length - 1] == '|')
-                    txt = txt.Substring(0, txt.Length - 1);
-
-                return txt;
-            }
-
-            var mdtable = new TextileTable(
-                ExtractCoverBar(headerTxt).Split('|'),
-                ExtractCoverBar(styleTxt).Split('|').Select(txt => txt.Trim()).ToArray(),
-                rowTxt.Split('\n').Select(ritm =>
-                {
-                    var trimRitm = ritm.Trim();
-                    return ExtractCoverBar(trimRitm).Split('|');
-                }).ToList());
-
-            // table
-            var table = new Grid();
-
-            // table columns
-            table.ColumnDefinitions = new AutoScaleColumnDefinitions(mdtable.ColCount, table);
-
-            // table header
-            table.RowDefinitions.Add(new RowDefinition());
-            foreach (Border tableHeaderCell in CreateTableRow(mdtable.Header, 0))
-            {
-                tableHeaderCell.Classes.Add(TableHeaderClass);
-
-                table.Children.Add(tableHeaderCell);
-            }
-
-            // table cell
-            foreach (int rowIdx in Enumerable.Range(0, mdtable.Details.Count))
-            {
-                table.RowDefinitions.Add(new RowDefinition());
-                foreach (Border cell in CreateTableRow(mdtable.Details[rowIdx], rowIdx + 1))
-                {
-                    cell.Classes.Add((rowIdx & 1) == 0 ? TableRowOddClass : TableRowEvenClass);
-
-                    if (rowIdx == 0)
-                        cell.Classes.Add(TableFirstRowClass);
-                    if (rowIdx == mdtable.Details.Count - 1)
-                        cell.Classes.Add(TableLastRowClass);
-
-                    table.Children.Add(cell);
-                }
-            }
-
-            table.Classes.Add(TableClass);
-
-            var result = new Border { Child = table };
-            result.Classes.Add(TableClass);
-
-            return result;
-        }
-
-        private IEnumerable<Border> CreateTableRow(IList<ITableCell> mdcells, int rowIdx)
-        {
-            foreach (var mdcell in mdcells)
-            {
-                var cell = new Border();
-
-                if (!(mdcell.Text is null))
-                {
-                    var txtbx = new CTextBlock(PrivateRunSpanGamut(mdcell.Text));
-                    cell.Child = txtbx;
-
-                    if (mdcell.Horizontal.HasValue)
-                        txtbx.TextAlignment = mdcell.Horizontal.Value;
-                }
-
-                Grid.SetRow(cell, rowIdx);
-                Grid.SetColumn(cell, mdcell.ColumnIndex);
-
-                if (mdcell.RowSpan != 1)
-                    Grid.SetRowSpan(cell, mdcell.RowSpan);
-
-                if (mdcell.ColSpan != 1)
-                    Grid.SetColumnSpan(cell, mdcell.ColSpan);
-
-                yield return cell;
-            }
-        }
-
-        #endregion
-
-        #region grammer - container block
-
-        private static readonly Regex _containerBlockFirst = new(@"
-                    ^          # Character before opening
-                    [ ]{0,3}
-                    (:{3,})          # $1 = Opening run of `
-                    ([^\n`]*)        # $2 = The container type
-                    \n
-                    ((.|\n)+?)       # $3 = The code block
-                    \n[ ]*
-                    \1
-                    (?!:)[\n]+", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
-
-        private Border ContainerBlockEvaluator(Match match)
-        {
-            var result = ContainerBlockHandler?.ProvideControl(AssetPathRoot, match.Groups[2].Value, match.Groups[3].Value);
-
-            if (result is null)
-            {
-                Border _retVal = CodeBlocksEvaluator(match.Value);
-                _retVal.Classes.Add(NoContainerClass);
-                return _retVal;
-            }
-
-            result.Classes.Add(ContainerBlockClass);
-            return result;
-        }
-
-        #endregion
-
-        #region grammer - code block
-
-        private static readonly Regex _codeBlockBegin = new(@"
-                    ^          # Character before opening
-                    [ ]{0,3}
-                    (`{3,})          # $1 = Opening run of `
-                    ([^\n`]*)        # $2 = The code lang
-                    \n", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
-
-
-        private static readonly Regex _indentCodeBlock = new(@"
-                    (?:\A|^[ ]*\n)
-                    (
-                    [ ]{4}.+
-                    (\n([ ]{4}.+|[ ]*))*
-                    \n?
-                    )
-                    ", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline | RegexOptions.Compiled);
-
-        private Border? CodeBlocksWithLangEvaluator(string text, Match match, out int parseTextBegin, out int parseTextEnd)
-        {
-            var closeTagPattern = new Regex($"\n[ ]*{match.Groups[1].Value}[ ]*\n");
-            var closeTagMatch = closeTagPattern.Match(text, match.Index + match.Length);
-
-            int codeEndIndex;
-            if (closeTagMatch.Success)
-            {
-                codeEndIndex = closeTagMatch.Index;
-                parseTextEnd = closeTagMatch.Index + closeTagMatch.Length;
-            }
-            else if (_setupInfo.EnablePreRenderingCodeBlock)
-            {
-                codeEndIndex = text.Length;
-                parseTextEnd = text.Length;
-            }
-            else
-            {
-                parseTextBegin = parseTextEnd = -1;
-                return null;
-            }
-
-            parseTextBegin = match.Index;
-
-            string code = text.Substring(match.Index + match.Length, codeEndIndex - (match.Index + match.Length));
-            return CodeBlocksEvaluator(code);
-        }
-
-        private Border CodeBlocksWithoutLangEvaluator(Match match)
-        {
-            var detentTxt = String.Join("\n", match.Groups[1].Value.Split('\n').Select(line => TextUtil.DetentLineBestEffort(line, 4)));
-            return CodeBlocksEvaluator(_newlinesLeadingTrailing.Replace(detentTxt, ""));
-        }
-
-        private Border CodeBlocksEvaluator(string code)
-        {
-            var ctxt = new TextBlock()
-            {
-                Text = code,
-                TextWrapping = TextWrapping.NoWrap
-            };
-            ctxt.Classes.Add(CodeBlockClass);
-
-            var scrl = new ScrollViewer();
-            scrl.Classes.Add(CodeBlockClass);
-            scrl.Content = ctxt;
-            scrl.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
-
-            var result = new Border();
-            result.Classes.Add(CodeBlockClass);
-            result.Child = scrl;
-
-            return result;
-        }
 
         #endregion
 
@@ -1861,48 +1106,6 @@ namespace Markdown.Avalonia
                 yield return new CRun() { Text = t };
             }
         }
-
-        #endregion
-
-        #region grammer - blockquote
-
-        private static readonly Regex _blockquoteFirst = new(@"
-            ^
-            ([>].*)
-            (\n[>].*)*
-            [\n]*
-            ", RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-
-        private Border BlockquotesEvaluator(Match match)
-        {
-            // trim '>'
-            var trimmedTxt = string.Join(
-                    "\n",
-                    match.Value.Trim().Split('\n')
-                        .Select(txt =>
-                        {
-                            if (txt.Length <= 1) return string.Empty;
-                            var trimmed = txt.Substring(1);
-                            if (trimmed.FirstOrDefault() == ' ') trimmed = trimmed.Substring(1);
-                            return trimmed;
-                        })
-                        .ToArray()
-            );
-
-            var status = new ParseStatus(true & _supportTextAlignment);
-            var blocks = PrivateRunBlockGamut(trimmedTxt + "\n", status);
-
-            var panel = Create<StackPanel, Control>(blocks);
-            panel.Orientation = Orientation.Vertical;
-            panel.Classes.Add(BlockquoteClass);
-
-            var result = new Border();
-            result.Classes.Add(BlockquoteClass);
-            result.Child = panel;
-
-            return result;
-        }
-
 
         #endregion
 

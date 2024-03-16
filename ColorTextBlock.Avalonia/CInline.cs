@@ -146,7 +146,7 @@ namespace ColorTextBlock.Avalonia
         /// <summary>
         /// The font stretch of the text element
         /// </summary>
-            public FontStretch FontStretch
+        public FontStretch FontStretch
         {
             get { return GetValue(FontStretchProperty); }
             set { SetValue(FontStretchProperty, value); }

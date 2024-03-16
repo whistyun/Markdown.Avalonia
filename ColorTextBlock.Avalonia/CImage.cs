@@ -171,8 +171,7 @@ namespace ColorTextBlock.Avalonia
                 }
             }
 
-            yield return new ImageGeometry(Image, imageWidth, imageHeight,
-                TextVerticalAlignment);
+            yield return new ImageGeometry(this, Image, imageWidth, imageHeight, TextVerticalAlignment);
         }
 
         public override string AsString() => " $$Image$$ ";

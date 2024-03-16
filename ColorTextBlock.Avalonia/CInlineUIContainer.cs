@@ -37,12 +37,12 @@ namespace ColorTextBlock.Avalonia
             if (Content.DesiredSize.Width > remainWidth)
             {
                 Content.Measure(new Size(entireWidth, Double.PositiveInfinity));
-                Indicator = new DummyGeometryForControl(Content, TextVerticalAlignment);
+                Indicator = new DummyGeometryForControl(this, Content, TextVerticalAlignment);
                 return new CGeometry[] { new LineBreakMarkGeometry(this), Indicator };
             }
             else
             {
-                Indicator = new DummyGeometryForControl(Content, TextVerticalAlignment);
+                Indicator = new DummyGeometryForControl(this, Content, TextVerticalAlignment);
                 return new[] { Indicator };
             }
         }

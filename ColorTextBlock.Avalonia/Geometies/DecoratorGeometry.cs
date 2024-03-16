@@ -3,13 +3,15 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ColorTextBlock.Avalonia.Geometries
 {
     public class DecoratorGeometry : CGeometry
     {
-        public CSpan Owner { get; }
         public CGeometry[] Targets { get; }
         public Border Decorate { get; }
 
@@ -138,13 +140,46 @@ namespace ColorTextBlock.Avalonia.Geometries
             CSpan owner,
             CGeometry[] targets,
             Border decorate) : base(
+                owner,
                 w, h, lh,
                 owner.TextVerticalAlignment,
                 targets[targets.Length - 1].LineBreak)
         {
-            this.Owner = owner;
             this.Targets = targets;
             this.Decorate = decorate;
+        }
+
+        public override void Arranged()
+        {
+            var left = Left + Decorate.BorderThickness.Left + Decorate.Padding.Left + Decorate.Margin.Left;
+            var top = Top + Decorate.BorderThickness.Top + Decorate.Padding.Top + Decorate.Margin.Top;
+            var btm = Top + Height - Decorate.BorderThickness.Bottom - Decorate.Padding.Bottom - Decorate.Margin.Bottom;
+
+            foreach (var target in Targets)
+            {
+                target.Left = left;
+
+                target.Top = target.TextVerticalAlignment switch
+                {
+                    TextVerticalAlignment.Top
+                        => top,
+
+                    TextVerticalAlignment.Center
+                        => (top + btm - target.Height) / 2,
+
+                    TextVerticalAlignment.Bottom
+                        => btm - target.Height,
+
+                    TextVerticalAlignment.Base
+                        => Top + BaseHeight - target.BaseHeight,
+
+                    _ => throw new InvalidOperationException("sorry library manager forget to modify.")
+                };
+
+                left += target.Width;
+
+                target.Arranged();
+            }
         }
 
         public override void Render(DrawingContext ctx)
@@ -157,38 +192,67 @@ namespace ColorTextBlock.Avalonia.Geometries
 
             }
 
-            var left = Left + Decorate.BorderThickness.Left + Decorate.Padding.Left + Decorate.Margin.Left;
+            foreach (var target in Targets)
+                target.Render(ctx);
+        }
 
-            var top = Top + Decorate.BorderThickness.Top + Decorate.Padding.Top + Decorate.Margin.Top;
-            var btm = Top + Height - Decorate.BorderThickness.Bottom - Decorate.Padding.Bottom - Decorate.Margin.Bottom;
+        public override TextPointer CalcuatePointerFrom(double x, double y)
+        {
+            if (x < Left)
+            {
+                return GetBegin();
+            }
 
+            int indexAdd = 0;
+            foreach (var target in Targets.Take(Targets.Length - 1))
+            {
+                if (x <= target.Left + target.Width)
+                {
+                    return target.CalcuatePointerFrom(x, y)
+                                 .Wrap(Owner, indexAdd);
+                }
+                else
+                {
+                    indexAdd += target.CaretLength;
+                }
+            }
+
+            return Targets[Targets.Length - 1].GetEnd().Wrap(Owner, indexAdd);
+        }
+
+        public override TextPointer CalcuatePointerFrom(int index)
+        {
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            int relindex = index;
             foreach (var target in Targets)
             {
-                target.Left = left;
-
-                switch (target.TextVerticalAlignment)
+                if (relindex < target.CaretLength)
                 {
-                    case TextVerticalAlignment.Top:
-                        target.Top = top;
-                        break;
-
-                    case TextVerticalAlignment.Center:
-                        target.Top = (top + btm - target.Height) / 2;
-                        break;
-
-                    case TextVerticalAlignment.Bottom:
-                        target.Top = btm - target.Height;
-                        break;
-
-                    case TextVerticalAlignment.Base:
-                        target.Top = Top + BaseHeight - target.BaseHeight;
-                        break;
+                    return target.CalcuatePointerFrom(relindex)
+                                 .Wrap(Owner, index - relindex);
                 }
 
-                target.Render(ctx);
-
-                left += target.Width;
+                relindex -= target.CaretLength;
             }
+
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+
+
+        public override TextPointer GetBegin()
+        {
+            var pointer = Targets[0].GetBegin();
+            return pointer.Wrap(Owner, 0);
+        }
+
+        public override TextPointer GetEnd()
+        {
+            var pointer = Targets[Targets.Length - 1].GetEnd();
+
+            int indexAdd = Targets.Take(Targets.Length - 1).Sum(t => t.CaretLength);
+            return pointer.Wrap(Owner, indexAdd);
         }
     }
 }

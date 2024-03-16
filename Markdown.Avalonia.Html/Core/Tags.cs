@@ -64,6 +64,7 @@ namespace Markdown.Avalonia.Html.Core
                 Tags.TagTableHeader => Engine.TableHeaderClass,
                 Tags.TagEvenTableRow => Engine.TableRowEvenClass,
                 Tags.TagOddTableRow => Engine.TableRowOddClass,
+                Tags.TagTableFooter => Engine.TableFooterClass,
 
                 Tags.TagBlockquote => Engine.BlockquoteClass,
 
