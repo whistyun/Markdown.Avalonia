@@ -28,7 +28,7 @@ namespace Markdown.Avalonia
 
         public static Styles SimpleTheme
         {
-            get => new MarkdownStyleDefaultTheme();
+            get => new MarkdownStyleSimpleTheme();
         }
 
         public static Styles FluentTheme

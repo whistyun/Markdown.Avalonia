@@ -7,7 +7,7 @@
       xmlns:ctxt="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         
-      x:Class="Markdown.Avalonia.StyleCollections.MarkdownStyleDefaultTheme"
+      x:Class="Markdown.Avalonia.StyleCollections.MarkdownStyleSimpleTheme"
         >
   <Styles.Resources>
     <SolidColorBrush x:Key="MarkdownScrollViewer.SelectionBrush"  Color="{StaticResource HighlightColor}"/>

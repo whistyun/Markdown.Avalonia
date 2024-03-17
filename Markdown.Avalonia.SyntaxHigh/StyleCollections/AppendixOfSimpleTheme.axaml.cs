@@ -6,9 +6,9 @@ using System.Text;
 
 namespace Markdown.Avalonia.SyntaxHigh.StyleCollections
 {
-    public class AppendixOfDefaultTheme : Styles
+    public class AppendixOfSimpleTheme : Styles
     {
-        public AppendixOfDefaultTheme()
+        public AppendixOfSimpleTheme()
         {
             AvaloniaXamlLoader.Load(this);
         }

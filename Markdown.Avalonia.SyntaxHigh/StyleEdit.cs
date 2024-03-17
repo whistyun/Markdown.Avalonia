@@ -11,7 +11,7 @@ namespace Markdown.Avalonia.SyntaxHigh
             switch (styleName)
             {
                 case nameof(MarkdownStyle.SimpleTheme):
-                    styles.AddRange(new AppendixOfDefaultTheme());
+                    styles.AddRange(new AppendixOfSimpleTheme());
                     break;
 
                 case nameof(MarkdownStyle.FluentTheme):

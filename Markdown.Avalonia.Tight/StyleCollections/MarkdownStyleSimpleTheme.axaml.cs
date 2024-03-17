@@ -6,12 +6,12 @@ using System.Text;
 
 namespace Markdown.Avalonia.StyleCollections
 {
-    public class MarkdownStyleDefaultTheme : Styles, INamedStyle
+    public class MarkdownStyleSimpleTheme : Styles, INamedStyle
     {
         public string Name => nameof(MarkdownStyle.SimpleTheme);
         public bool IsEditted { get; set; }
 
-        public MarkdownStyleDefaultTheme()
+        public MarkdownStyleSimpleTheme()
         {
             AvaloniaXamlLoader.Load(this);
         }

@@ -31,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="StyleCollections\AppendixOfDefaultTheme.axaml.cs">
-      <DependentUpon>AppendixOfDefaultTheme.axaml</DependentUpon>
+    <Compile Update="StyleCollections\AppendixOfSimpleTheme.axaml.cs">
+      <DependentUpon>AppendixOfSimpleTheme.axaml</DependentUpon>
     </Compile>
     <Compile Update="StyleCollections\AppendixOfFluentAvalonia.axaml.cs">
       <DependentUpon>AppendixOfFluentAvalonia.axaml</DependentUpon>
