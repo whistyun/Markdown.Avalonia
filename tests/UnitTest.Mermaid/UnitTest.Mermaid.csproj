@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\UnitTest.props" />
+
+  <PropertyGroup>
+    <TargetFrameworks>$(TestTargetFrameworks)</TargetFrameworks>
+    <IsPackable>false</IsPackable>
+    <LangVersion>9</LangVersion>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(TestAvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Desktop" Version="$(TestAvaloniaVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Markdown.Avalonia.Mermaid\Markdown.Avalonia.Mermaid.csproj" />
+    <ProjectReference Include="..\..\Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj" />
+    <ProjectReference Include="..\UnitTest.Base\UnitTest.Base.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Texts\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

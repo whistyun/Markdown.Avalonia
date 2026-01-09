@@ -32,6 +32,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Markdown.Avalonia\Markdown.Avalonia.csproj" />
+    <ProjectReference Include="..\..\Markdown.Avalonia.Mermaid\Markdown.Avalonia.Mermaid.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="LocalPath.png">

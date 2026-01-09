@@ -27,6 +27,7 @@
     <ProjectReference Include="..\Markdown.Avalonia.Html\Markdown.Avalonia.Html.csproj" />
     <ProjectReference Include="..\Markdown.Avalonia.Svg\Markdown.Avalonia.Svg.csproj" />
     <ProjectReference Include="..\Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj" />
+    <ProjectReference Include="..\Markdown.Avalonia.Mermaid\Markdown.Avalonia.Mermaid.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(EnableAvaloniaEdit)' == 'enabled'">
     <ProjectReference Include="..\Markdown.Avalonia.SyntaxHigh\Markdown.Avalonia.SyntaxHigh.csproj" />    

@@ -3,7 +3,7 @@
   <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
     <PackageTargetFrameworks>net461;netstandard2.0;net6</PackageTargetFrameworks>
     <DemoAppTargetFrameworks>net461;netcoreapp3.1;net6;net7</DemoAppTargetFrameworks>
-    <TestTargetFrameworks>net6</TestTargetFrameworks>
+    <TestTargetFrameworks>net6.0</TestTargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(IS_WHISTYUN_PC)' == 'Y' ">

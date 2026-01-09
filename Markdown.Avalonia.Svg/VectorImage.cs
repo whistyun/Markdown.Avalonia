@@ -10,7 +10,7 @@ namespace Markdown.Avalonia.Svg
     /// <summary>
     /// An <see cref="IImage"/> that uses a <see cref="SvgSource"/> for content.
     /// </summary>
-    internal class VectorImage : IImage
+    public class VectorImage : IImage
     {
         /// <summary>
         /// Gets or sets the <see cref="SvgSource"/> content.

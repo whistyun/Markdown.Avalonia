@@ -9,6 +9,7 @@
 
         xmlns:md="https://github.com/whistyun/Markdown.Avalonia"
         xmlns:mde="https://github.com/whistyun/Markdown.Avalonia.SyntaxHigh"
+        xmlns:mermaid="clr-namespace:Markdown.Avalonia.Mermaid;assembly=Markdown.Avalonia.Mermaid"
 
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
         x:Class="Markdown.AvaloniaDemo.Views.MainWindow"
@@ -139,6 +140,7 @@
           <mde:SyntaxHighlight>
             <mde:Alias Name="peg" XSHD="avares://Markdown.AvaloniaDemo/Assets/Pegasus-Mode.xshd" />
           </mde:SyntaxHighlight>
+          <mermaid:MermaidBlockHandler />
         </md:MdAvPlugins>
       </md:MarkdownScrollViewer.Plugins>
 

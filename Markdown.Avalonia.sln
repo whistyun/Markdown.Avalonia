@@ -41,6 +41,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmark", "benchmark", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MdAvBench", "benchmark\MdAvBench\MdAvBench.csproj", "{57CC28E5-9915-4AFA-A5E5-B7977BBF8589}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Markdown.Avalonia.Mermaid", "Markdown.Avalonia.Mermaid\Markdown.Avalonia.Mermaid.csproj", "{8919DF8B-BFE8-49C0-8746-7BFFEF1E355A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -243,6 +245,18 @@ Global
 		{57CC28E5-9915-4AFA-A5E5-B7977BBF8589}.Release|x64.Build.0 = Release|Any CPU
 		{57CC28E5-9915-4AFA-A5E5-B7977BBF8589}.Release|x86.ActiveCfg = Release|Any CPU
 		{57CC28E5-9915-4AFA-A5E5-B7977BBF8589}.Release|x86.Build.0 = Release|Any CPU
+		{8919DF8B-BFE8-49C0-8746-7BFFEF1E355A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8919DF8B-BFE8-49C0-8746-7BFFEF1E355A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8919DF8B-BFE8-49C0-8746-7BFFEF1E355A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8919DF8B-BFE8-49C0-8746-7BFFEF1E355A}.Debug|x64.Build.0 = Debug|Any CPU
+		{8919DF8B-BFE8-49C0-8746-7BFFEF1E355A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8919DF8B-BFE8-49C0-8746-7BFFEF1E355A}.Debug|x86.Build.0 = Debug|Any CPU
+		{8919DF8B-BFE8-49C0-8746-7BFFEF1E355A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8919DF8B-BFE8-49C0-8746-7BFFEF1E355A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8919DF8B-BFE8-49C0-8746-7BFFEF1E355A}.Release|x64.ActiveCfg = Release|Any CPU
+		{8919DF8B-BFE8-49C0-8746-7BFFEF1E355A}.Release|x64.Build.0 = Release|Any CPU
+		{8919DF8B-BFE8-49C0-8746-7BFFEF1E355A}.Release|x86.ActiveCfg = Release|Any CPU
+		{8919DF8B-BFE8-49C0-8746-7BFFEF1E355A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

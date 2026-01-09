@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\Markdown.Avalonia.props" />
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFrameworks>$(PackageTargetFrameworks)</TargetFrameworks>
+    <PackageId>Markdown.Avalonia.Mermaid</PackageId>
+    <Version>$(PackageVersion)</Version>
+    <Authors>whistyun</Authors>
+    <Copyright>Copyright (c) 2026 whistyun</Copyright>
+    <PackageProjectUrl>https://github.com/whistyun/Markdown.Avalonia</PackageProjectUrl>
+    <PackageReadmeFile>Markdown.Avalonia.Mermaid.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Company />
+    <LangVersion>9</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj" />
+    <ProjectReference Include="..\Markdown.Avalonia.Svg\Markdown.Avalonia.Svg.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\mermaid.min.js" />
+    <None Include="..\pack_readme\Markdown.Avalonia.Mermaid.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PuppeteerSharp" Version="20.2.5" />
+  </ItemGroup>
+</Project>

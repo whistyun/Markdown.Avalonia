@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-16"?>
+<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
+  <Border xmlns="">
+    <Border.Child>
+      <Image />
+    </Border.Child>
+  </Border>
+</StackPanel>
