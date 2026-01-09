@@ -54,3 +54,4 @@ dependencies:
 - Markdown.Avalonia.Tight
 - Markdown.Avalonia.Svg
 - PuppeteerSharp
+- cdn for mermaid.min.js
