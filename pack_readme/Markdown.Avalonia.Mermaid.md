@@ -30,12 +30,6 @@ You can also set BackgroundColor property to make the background transparent.
 <mermaid:MermaidBlockHandler BackgroundColor="transparent" />
 ```
 
-## In C#
-```csharp
-var viewer = new MarkdownViewer();
-viewer.Extensions.Add(new MarkdownAvalonia.Mermaid.MermaidExtension());
-```
-
 ## ⚠️ First Run Requirement
 The first time a Mermaid diagram is rendered, the library will automatically download a standalone Chromium browser instance (managed by PuppeteerSharp). This one-time setup requires an active internet connection and may take a few moments depending on your network speed.
 
