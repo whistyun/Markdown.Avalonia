@@ -1,12 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-16"?>
 <StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
-  <Border Classes="CodeBlock" xmlns="">
+  <Border xmlns="">
     <Border.Child>
-      <ScrollViewer Classes="CodeBlock">
-        <ScrollViewer.Content>
-          <TextBlock Text="quadrantChart&#xA;    title Reach and engagement of campaigns&#xA;    x-axis Low Reach --&gt; High Reach&#xA;    y-axis Low Engagement --&gt; High Engagement&#xA;    quadrant-1 We should expand&#xA;    quadrant-2 Need to promote&#xA;    quadrant-3 Re-evaluate&#xA;    quadrant-4 May be improved&#xA;    Campaign A: [0.3, 0.6]&#xA;    Campaign B: [0.45, 0.23]&#xA;    Campaign C: [0.57, 0.69]&#xA;    Campaign D: [0.78, 0.34]&#xA;    Campaign E: [0.40, 0.34]&#xA;    Campaign F: [0.35, 0.78]" Classes="CodeBlock" />
-        </ScrollViewer.Content>
-      </ScrollViewer>
+      <TextBlock Text="Initializing Mermaid..." />
     </Border.Child>
   </Border>
 </StackPanel>

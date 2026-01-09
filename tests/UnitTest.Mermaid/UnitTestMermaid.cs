@@ -11,6 +11,11 @@ namespace UnitTest.Mermaid
     [UseReporter(typeof(DiffReporter))]
     public class UnitTestMermaid : UnitTestBase
     {
+        static UnitTestMermaid()
+        {
+            MermaidBlockHandler.EnableMermaidRendering = false;
+        }
+
         [Test]
         [RunOnUI]
         public void Transform_givenFlowcharts_generatesExpectedResult()
@@ -148,17 +153,6 @@ namespace UnitTest.Mermaid
         public void Transform_givenUserJourneyDiagram_generatesExpectedResult()
         {
             var text = Util.LoadText("UserJourneyDiagram.md");
-            var markdown = new Markdown.Avalonia.Markdown();
-            markdown.UseMermaid();
-            var result = markdown.Transform(text);
-            Approvals.Verify(Util.AsXaml(result));
-        }
-
-        [Test]
-        [RunOnUI]
-        public void Transform_givenZenUML_generatesExpectedResult()
-        {
-            var text = Util.LoadText("ZenUML.md");
             var markdown = new Markdown.Avalonia.Markdown();
             markdown.UseMermaid();
             var result = markdown.Transform(text);

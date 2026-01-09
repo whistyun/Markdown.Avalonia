@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using Avalonia.Threading;
 using PuppeteerSharp;
 using System.Threading;
+using Avalonia.Styling;
 
 namespace Markdown.Avalonia.Mermaid
 {
@@ -30,8 +31,7 @@ namespace Markdown.Avalonia.Mermaid
 		private static readonly AvaloniaAssetLoader _assetLoader = new();
 		private static IBrowser? _browser;
 		private static readonly SemaphoreSlim _browserLock = new(1, 1);
-		private static string? _mermaidJsContent;
-
+        public static bool EnableMermaidRendering { get; set; } = true;
 		public string Theme { get; set; } = "default";
 		public string BackgroundColor { get; set; } = "transparent";
 
@@ -49,8 +49,7 @@ namespace Markdown.Avalonia.Mermaid
 			var prop = typeof(SetupInfo).GetProperty("BlockOverrides", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 			if (prop != null)
 			{
-				var list = prop.GetValue(info) as IList;
-				if (list != null)
+				if (prop.GetValue(info) is IList list)
 				{
 					IBlockOverride? inner = null;
 					foreach (var item in list)
@@ -89,6 +88,19 @@ namespace Markdown.Avalonia.Mermaid
 			var theme = Theme;
 			var bgColor = BackgroundColor;
 
+			if (string.Equals(theme, "default", StringComparison.OrdinalIgnoreCase))
+			{
+				if (Application.Current?.ActualThemeVariant == ThemeVariant.Dark)
+				{
+					theme = "dark";
+				}
+			}
+
+            if (!EnableMermaidRendering)
+            {
+                return border;
+            }
+
 			Task.Run(async () =>
 			{
 				try
@@ -96,54 +108,53 @@ namespace Markdown.Avalonia.Mermaid
 					var browser = await EnsureBrowserAsync(border);
 					if (browser == null) return; // Error handled in EnsureBrowserAsync
 
-					Dispatcher.UIThread.Post(() => {
+					Dispatcher.UIThread.Post(() =>
+					{
 						if (border.Child is TextBlock tb) tb.Text = "Rendering Mermaid Diagram...";
 					});
 
 					string svgContent = await RenderMermaidAsync(browser, lines, theme, bgColor);
 					if (string.IsNullOrEmpty(svgContent))
 					{
-						Dispatcher.UIThread.Post(() => border.Child = CreateErrorBorder("Rendered SVG was empty.").Child);
+						Dispatcher.UIThread.Post(() => border.Child = CreateErrorControl("Rendered SVG was empty."));
 						return;
 					}
 
-
-					bool success = false;
-					try
+					if (svgContent.StartsWith("ERROR:"))
 					{
-						// We need to write to a stream or parse string directly
-						// SvgExtensions.Open expects a stream.
-						using (var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(svgContent)))
+						Dispatcher.UIThread.Post(() => border.Child = CreateErrorControl(svgContent));
+						return;
+					}
+
+					await Dispatcher.UIThread.InvokeAsync(() =>
+					{
+						try
 						{
+							using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(svgContent));
 							var document = SvgExtensions.Open(stream);
 							if (document != null)
 							{
 								var picture = SvgExtensions.ToModel(document, _assetLoader, out _, out _);
 								var svgsrc = new SvgSource() { Picture = picture };
-								Dispatcher.UIThread.Post(() =>
+								border.Child = new Image
 								{
-									border.Child = new Image
-									{
-										Source = new VectorImage { Source = svgsrc }
-									};
-								});
-								success = true;
+									Source = new VectorImage { Source = svgsrc }
+								};
+							}
+							else
+							{
+								border.Child = CreateErrorControl("Failed to process SVG.");
 							}
 						}
-					}
-					catch (Exception ex)
-					{
-						Dispatcher.UIThread.Post(() => border.Child = CreateErrorBorder($"Error parsing SVG: {ex.Message}").Child);
-					}
-
-					if (!success && !(border.Child is Image))
-					{
-						Dispatcher.UIThread.Post(() => border.Child = CreateErrorBorder("Failed to process SVG.").Child);
-					}
+						catch (Exception ex)
+						{
+							border.Child = CreateErrorControl($"Error parsing SVG: {ex.Message}");
+						}
+					});
 				}
 				catch (Exception ex)
 				{
-					Dispatcher.UIThread.Post(() => border.Child = CreateErrorBorder($"Error: {ex.Message}").Child);
+					Dispatcher.UIThread.Post(() => border.Child = CreateErrorControl($"Error: {ex.Message}"));
 				}
 			});
 
@@ -159,29 +170,40 @@ namespace Markdown.Avalonia.Mermaid
 			{
 				if (_browser != null && !_browser.IsClosed) return _browser;
 
-				Dispatcher.UIThread.Post(() => {
+				Dispatcher.UIThread.Post(() =>
+				{
 					if (borderContext.Child is TextBlock tb) tb.Text = "Downloading internal browser engine (one-time setup)...";
 				});
 
-				// Download browser if needed
-				var browserFetcher = new BrowserFetcher();
-				await browserFetcher.DownloadAsync();
+				// Download browser to a stable location in LocalAppData to avoid bin folder issues
+				var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+				var downloadPath = Path.Combine(appData, "MarkdownAvalonia", "Chromium");
 
-				Dispatcher.UIThread.Post(() => {
-					if (borderContext.Child is TextBlock tb) tb.Text = "Launching browser engine...";
+				var browserFetcher = new BrowserFetcher(new BrowserFetcherOptions { Path = downloadPath });
+				var revisionInfo = await browserFetcher.DownloadAsync();
+
+				Dispatcher.UIThread.Post(() =>
+				{
+					if (borderContext.Child is TextBlock tb) tb.Text = $"Launching browser engine... ({revisionInfo.GetExecutablePath()})";
 				});
 
 				_browser = await Puppeteer.LaunchAsync(new LaunchOptions
 				{
 					Headless = true,
-					Args = new[] { "--no-sandbox", "--disable-setuid-sandbox" } 
+					ExecutablePath = revisionInfo.GetExecutablePath(),
+					Args = new[] {
+						"--no-sandbox",
+						"--disable-setuid-sandbox",
+						"--disable-gpu",
+						"--disable-dev-shm-usage"
+					}
 				});
 
 				return _browser;
 			}
 			catch (Exception ex)
 			{
-				Dispatcher.UIThread.Post(() => borderContext.Child = CreateErrorBorder($"Failed to launch browser: {ex.Message}").Child);
+				Dispatcher.UIThread.Post(() => borderContext.Child = CreateErrorControl($"Failed to launch browser: {ex.Message}"));
 				return null;
 			}
 			finally
@@ -192,62 +214,43 @@ namespace Markdown.Avalonia.Mermaid
 
 		private async Task<string> RenderMermaidAsync(IBrowser browser, string code, string theme, string bgColor)
 		{
-			// Load mermaid js content if not loaded
-			if (_mermaidJsContent == null)
-			{
-				var assembly = Assembly.GetExecutingAssembly();
-				var resourceName = "Markdown.Avalonia.Mermaid.Assets.mermaid.min.js";
-				// Depending on how it's embedded, might need full name check
-				// But given namespace and folder, likely correct.
-				using var stream = assembly.GetManifestResourceStream(resourceName);
-				if (stream != null)
-				{
-					using var reader = new StreamReader(stream);
-					_mermaidJsContent = await reader.ReadToEndAsync();
-				}
-				else
-				{
-					// Fallback: check resource names
-					var names = assembly.GetManifestResourceNames();
-					throw new FileNotFoundException($"Embedded mermaid.min.js not found. Available: {string.Join(", ", names)}");
-				}
-			}
-
 			using var page = await browser.NewPageAsync();
 
 			string htmlCrumbs = $@"
-<!DOCTYPE html>
-<html>
-<head>
-</head>
-<body>
-    <div id='graphDiv'></div>
-    <script>
-        {_mermaidJsContent}
-    </script>
-</body>
-</html>";
-			
+				<!DOCTYPE html>
+				<html>
+					<head>
+						<meta charset='utf-8'>
+						<meta name='viewport' content='width=device-width, initial-scale=1'>
+						<title>Mermaid Renderer</title>
+						<script src='https://cdn.jsdelivr.net/npm/mermaid@10.9.5/dist/mermaid.min.js'></script>
+					</head>
+					<body>
+						<div id='graphDiv'></div>
+					</body>
+				</html>";
+
 			await page.SetContentAsync(htmlCrumbs);
 
+			// Wait for mermaid to load
+			await page.WaitForFunctionAsync("() => typeof mermaid !== 'undefined'");
+
 			// Now eval
-			return await page.EvaluateFunctionAsync<string>(@"async (code, theme) => {
+			return await page.EvaluateFunctionAsync<string>(@"
+			async (code, theme, bgColor) => {
                 try {
-                    mermaid.initialize({ startOnLoad: false, theme: theme });
+                    mermaid.initialize({ startOnLoad: true, theme: theme, securityLevel: 'loose', suppressErrors: true, flowchart: { useMaxWidth: false, htmlLabels: true }});
                     const { svg } = await mermaid.render('graphDiv', code);
                     return svg;
                 } catch (e) {
                     return 'ERROR: ' + e.message;
                 }
-            }", code, theme);
+            }", code, theme, bgColor);
 		}
 
-		private Border CreateErrorBorder(string message)
+		private Control CreateErrorControl(string message)
 		{
-			return new Border
-			{
-				Child = new TextBlock { Text = message, Foreground = Brushes.Red, TextWrapping = TextWrapping.Wrap }
-			};
+			return new TextBlock { Text = message, Foreground = Brushes.Red, TextWrapping = TextWrapping.Wrap };
 		}
 
 		public class MermaidFencedBlockOverride : BlockOverride2
