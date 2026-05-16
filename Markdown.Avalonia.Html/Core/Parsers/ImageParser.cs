@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Avalonia.Layout;
@@ -23,13 +23,6 @@ namespace Markdown.Avalonia.Html.Core.Parsers
         }
 
         public IEnumerable<string> SupportTag => new[] { "img", "image" };
-
-        bool ITagParser.TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<StyledElement> generated)
-        {
-            var rtn = TryReplace(node, manager, out var list);
-            generated = list;
-            return rtn;
-        }
 
         public bool TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<CInline> generated)
         {

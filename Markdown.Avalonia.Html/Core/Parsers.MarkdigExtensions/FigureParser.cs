@@ -1,6 +1,8 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
+using ColorDocument.Avalonia;
+using ColorDocument.Avalonia.DocumentElements;
 using HtmlAgilityPack;
 using Markdown.Avalonia.Html.Core.Utils;
 using System;
@@ -13,14 +15,7 @@ namespace Markdown.Avalonia.Html.Core.Parsers.MarkdigExtensions
     {
         public IEnumerable<string> SupportTag => new[] { "figure" };
 
-        bool ITagParser.TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<StyledElement> generated)
-        {
-            var rtn = TryReplace(node, manager, out var list);
-            generated = list;
-            return rtn;
-        }
-
-        public bool TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<Control> generated)
+        public bool TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<DocumentElement> generated)
         {
             var captionPair =
                 node.ChildNodes
@@ -31,8 +26,8 @@ namespace Markdown.Avalonia.Html.Core.Parsers.MarkdigExtensions
             var contentList = captionPair.Item2;
 
 
-            var captionBlock = captionList.SelectMany(c => manager.Grouping(manager.ParseBlockAndInline(c)));
-            var contentBlock = contentList.SelectMany(c => manager.Grouping(manager.ParseChildrenJagging(c)));
+            var captionBlock = captionList.SelectMany(c => manager.Parse(c).Select(e => e.Control));
+            var contentBlock = contentList.SelectMany(c => manager.ParseChildNodes(c).Select(e => e.Control));
 
             var section = new DockPanel() { LastChildFill = true };
             section.Tag = Tags.TagFigure.GetClass();
@@ -50,7 +45,7 @@ namespace Markdown.Avalonia.Html.Core.Parsers.MarkdigExtensions
             }
             section.Children.Add(contentPanel);
 
-            generated = new[] { section };
+            generated = new DocumentElement[] { new UnBlockElement(section) };
             return false;
         }
     }

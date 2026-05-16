@@ -56,7 +56,7 @@ namespace Markdown.Avalonia.SyntaxHigh
             txtEdit.Tag = lang;
             txtEdit.SetValue(SyntaxHighlightWrapperExtension.ProviderProperty, _provider);
             txtEdit.Text = code;
-            txtEdit.HorizontalAlignment = HorizontalAlignment.Stretch;
+            txtEdit.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Stretch;
             txtEdit.IsReadOnly = true;
 
             copyButton.Click += (s, e) =>

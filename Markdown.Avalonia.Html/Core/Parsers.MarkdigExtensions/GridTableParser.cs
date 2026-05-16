@@ -1,4 +1,4 @@
-﻿using HtmlAgilityPack;
+using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +6,8 @@ using System.Text.RegularExpressions;
 using Markdown.Avalonia.Html.Core.Utils;
 using Avalonia;
 using Avalonia.Controls;
+using ColorDocument.Avalonia;
+using ColorDocument.Avalonia.DocumentElements;
 using Markdown.Avalonia.Html.Tables;
 using Avalonia.Layout;
 
@@ -17,14 +19,7 @@ namespace Markdown.Avalonia.Html.Core.Parsers.MarkdigExtensions
 
         public IEnumerable<string> SupportTag => new[] { "table" };
 
-        bool ITagParser.TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<StyledElement> generated)
-        {
-            var rtn = TryReplace(node, manager, out var list);
-            generated = list;
-            return rtn;
-        }
-
-        public bool TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<Control> generated)
+        public bool TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<DocumentElement> generated)
         {
             var table = new Table();
 
@@ -119,7 +114,7 @@ namespace Markdown.Avalonia.Html.Core.Parsers.MarkdigExtensions
 
                 foreach (var captionNode in captions)
                 {
-                    foreach (var caption in manager.ParseChildrenAndGroup(captionNode))
+                    foreach (var caption in manager.ParseChildNodes(captionNode).Select(e => e.Control))
                     {
                         DockPanel.SetDock(caption, Dock.Top);
                         caption.Classes.Add(Tags.TagTableCaption.GetClass());
@@ -129,11 +124,11 @@ namespace Markdown.Avalonia.Html.Core.Parsers.MarkdigExtensions
 
                 section.Children.Add(border);
 
-                generated = new[] { section };
+                generated = new DocumentElement[] { new UnBlockElement(section) };
             }
             else
             {
-                generated = new[] { border };
+                generated = new DocumentElement[] { new UnBlockElement(border) };
             }
 
             return true;
@@ -184,7 +179,7 @@ namespace Markdown.Avalonia.Html.Core.Parsers.MarkdigExtensions
 
                 foreach (var cellTag in rowTag.ChildNodes.CollectTag("td", "th"))
                 {
-                    var cell = new TableCell(manager.ParseChildrenAndGroup(cellTag));
+                    var cell = new TableCell(manager.ParseChildNodes(cellTag).Select(e => e.Control));
 
                     int colspan = TryParse(cellTag.Attributes["colspan"]?.Value);
                     int rowspan = TryParse(cellTag.Attributes["rowspan"]?.Value);

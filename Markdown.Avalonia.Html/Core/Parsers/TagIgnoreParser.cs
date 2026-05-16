@@ -1,5 +1,6 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
+using ColorDocument.Avalonia;
 using ColorTextBlock.Avalonia;
 using HtmlAgilityPack;
 using Markdown.Avalonia.Html.Core.Utils;
@@ -11,15 +12,9 @@ namespace Markdown.Avalonia.Html.Core.Parsers
     {
         public IEnumerable<string> SupportTag => new[] { "title", "meta", "link", "script", "style", "datalist" };
 
-        bool ITagParser.TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<StyledElement> generated)
+        public bool TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<DocumentElement> generated)
         {
-            generated = EnumerableExt.Empty<StyledElement>();
-            return true;
-        }
-
-        public bool TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<Control> generated)
-        {
-            generated = EnumerableExt.Empty<Control>();
+            generated = EnumerableExt.Empty<DocumentElement>();
             return true;
         }
 
