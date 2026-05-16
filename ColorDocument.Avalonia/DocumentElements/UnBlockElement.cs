@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,14 @@ namespace ColorDocument.Avalonia.DocumentElements
     {
         private Control _control;
 
-        public override Control Control => _control;
+        public override Control Control
+        {
+            get
+            {
+                ApplyEffects(_control);
+                return _control;
+            }
+        }
 
         public override IEnumerable<DocumentElement> Children => Array.Empty<DocumentElement>();
 

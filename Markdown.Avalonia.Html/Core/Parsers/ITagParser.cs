@@ -1,26 +1,23 @@
-﻿using Avalonia;
-using Avalonia.Controls;
 using ColorTextBlock.Avalonia;
+using ColorDocument.Avalonia;
 using HtmlAgilityPack;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Markdown.Avalonia.Html.Core.Parsers
 {
-    public interface ITagParser
+    public interface ITagParserBase
     {
         IEnumerable<string> SupportTag { get; }
-        bool TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<StyledElement> generated);
     }
 
-    public interface IInlineTagParser : ITagParser
+    public interface IInlineTagParser : ITagParserBase
     {
         bool TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<CInline> generated);
     }
 
-    public interface IBlockTagParser : ITagParser
+    public interface IBlockTagParser : ITagParserBase
     {
-        bool TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<Control> generated);
+        bool TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<DocumentElement> generated);
     }
 
     public interface IHasPriority
@@ -32,7 +29,7 @@ namespace Markdown.Avalonia.Html.Core.Parsers
     {
         public const int DefaultPriority = 10000;
 
-        public static int GetPriority(this ITagParser parser)
+        public static int GetPriority(this ITagParserBase parser)
             => parser is IHasPriority prop ? prop.Priority : HasPriority.DefaultPriority;
     }
 }

@@ -21,6 +21,7 @@ namespace ColorDocument.Avalonia.DocumentElements
 
     public static class MarkdownStyleExt
     {
+        /// <param name="index">Zero-based item index within the list.</param>
         public static string CreateMakerText(this TextMarkerStyle textMarker, int index)
         {
             switch (textMarker)
@@ -41,19 +42,19 @@ namespace ColorDocument.Avalonia.DocumentElements
                     return "❏";
 
                 case TextMarkerStyle.Decimal:
-                    return (index + 1).ToString() + ".";
+                    return index.ToString() + ".";
 
                 case TextMarkerStyle.LowerLatin:
-                    return NumberToOrder.ToLatin(index + 1).ToLower() + ".";
+                    return NumberToOrder.ToLatin((int)index).ToLower() + ".";
 
                 case TextMarkerStyle.UpperLatin:
-                    return NumberToOrder.ToLatin(index + 1) + ".";
+                    return NumberToOrder.ToLatin((int)index) + ".";
 
                 case TextMarkerStyle.LowerRoman:
-                    return NumberToOrder.ToRoman(index + 1).ToLower() + ".";
+                    return NumberToOrder.ToRoman((int)index).ToLower() + ".";
 
                 case TextMarkerStyle.UpperRoman:
-                    return NumberToOrder.ToRoman(index + 1) + ".";
+                    return NumberToOrder.ToRoman((int)index) + ".";
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using ColorTextBlock.Avalonia;
@@ -12,13 +12,6 @@ namespace Markdown.Avalonia.Html.Core.Parsers
     public class TextAreaParser : IInlineTagParser
     {
         public IEnumerable<string> SupportTag => new[] { "textarea" };
-
-        bool ITagParser.TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<StyledElement> generated)
-        {
-            var rtn = TryReplace(node, manager, out var list);
-            generated = list;
-            return rtn;
-        }
 
         public bool TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<CInline> generated)
         {

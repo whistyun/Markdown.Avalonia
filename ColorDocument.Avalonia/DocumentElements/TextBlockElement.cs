@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Media;
@@ -30,6 +30,7 @@ namespace ColorDocument.Avalonia.DocumentElements
 
                 text.Inlines.AddRange(inlines);
 
+                ApplyEffects(text);
                 return text;
             });
         }
@@ -46,6 +47,7 @@ namespace ColorDocument.Avalonia.DocumentElements
                 text.Inlines.AddRange(inlines);
 
                 text.Classes.Add(appendClass);
+                ApplyEffects(text);
                 return text;
             });
         }
@@ -63,6 +65,7 @@ namespace ColorDocument.Avalonia.DocumentElements
 
                 text.TextAlignment = alignment;
                 text.Classes.Add(appendClass);
+                ApplyEffects(text);
                 return text;
             });
         }

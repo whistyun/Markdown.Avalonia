@@ -1,5 +1,7 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
+using ColorDocument.Avalonia;
+using ColorDocument.Avalonia.DocumentElements;
 using HtmlAgilityPack;
 using Markdown.Avalonia.Html.Core.Utils;
 using Markdown.Avalonia.SyntaxHigh;
@@ -22,21 +24,14 @@ namespace Markdown.Avalonia.Html.Core.Parsers
 
         public IEnumerable<string> SupportTag => new[] { "pre" };
 
-        bool ITagParser.TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<StyledElement> generated)
+        public bool TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<DocumentElement> generated)
         {
-            var rtn = TryReplace(node, manager, out var list);
-            generated = list;
-            return rtn;
-        }
-
-        public bool TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<Control> generated)
-        {
-            generated = EnumerableExt.Empty<Control>();
+            generated = EnumerableExt.Empty<DocumentElement>();
 
             var codeElements = node.ChildNodes.CollectTag("code");
             if (codeElements.Count != 0)
             {
-                var rslt = new List<Control>();
+                var rslt = new List<DocumentElement>();
 
                 foreach (var codeElement in codeElements)
                 {
@@ -44,7 +39,7 @@ namespace Markdown.Avalonia.Html.Core.Parsers
                     var classVal = codeElement.Attributes["class"]?.Value;
 
                     var langCode = ParseLangCode(classVal);
-                    rslt.Add(DocUtils.CreateCodeBlock(langCode, codeElement.InnerText, manager, _provider));
+                    rslt.Add(new UnBlockElement(DocUtils.CreateCodeBlock(langCode, codeElement.InnerText, manager, _provider)));
                 }
 
                 generated = rslt;
@@ -56,7 +51,7 @@ namespace Markdown.Avalonia.Html.Core.Parsers
                 foreach (var textNode in textNodes)
                     buff.Append(textNode.InnerText);
 
-                generated = new[] { DocUtils.CreateCodeBlock(null, buff.ToString(), manager, _provider) };
+                generated = new DocumentElement[] { new UnBlockElement(DocUtils.CreateCodeBlock(null, buff.ToString(), manager, _provider)) };
                 return true;
             }
             else return false;
