@@ -7,8 +7,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AvaloniaVersion>12.0.0</AvaloniaVersion>
-    <DemoAvaloniaVersion>12.0.0</DemoAvaloniaVersion>
+    <!-- 11.2.6+ has fix for CompileAvaloniaXamlTask original.pdb lock (Avalonia#12670) -->
+    <AvaloniaVersion>11.2.6</AvaloniaVersion>
+    <DemoAvaloniaVersion>11.0.5</DemoAvaloniaVersion>
     <EnableAvaloniaEdit>enabled</EnableAvaloniaEdit>
     <AvaloniaEditVersion>12.0.0</AvaloniaEditVersion>
     <AvaloniaSvgVersion>12.0.0.1</AvaloniaSvgVersion>
@@ -26,5 +27,3 @@
   </PropertyGroup>
 
 </Project>
-
-

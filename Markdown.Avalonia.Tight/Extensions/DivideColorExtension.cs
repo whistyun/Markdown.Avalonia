@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Avalonia.Data.Core;
@@ -7,10 +7,8 @@ using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using Avalonia.Media.Immutable;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 
 namespace Markdown.Avalonia.Extensions
 {
@@ -22,9 +20,9 @@ namespace Markdown.Avalonia.Extensions
 
         public DivideColorExtension(string frm, string to, double relate)
         {
-            this._frmKey = frm;
-            this._toKey = to;
-            this._relate = relate;
+            _frmKey = frm;
+            _toKey = to;
+            _relate = relate;
         }
 
         public override object ProvideValue(IServiceProvider serviceProvider)
@@ -37,8 +35,7 @@ namespace Markdown.Avalonia.Extensions
             }
             else
             {
-                var lftExt = new DynamicResourceExtension(_frmKey);
-                left = lftExt.ProvideValue(serviceProvider);
+                return Blend(leftColor, rightColor, _relate);
             }
 
             BindingBase right;
@@ -47,17 +44,72 @@ namespace Markdown.Avalonia.Extensions
                 var rightBrush = new ImmutableSolidColorBrush(rightColor);
                 right = CompiledBinding.Create<IBrush, IBrush>(v=>v, rightColor);
             }
-            else
+
+            if (!leftIsConst && rightIsConst)
             {
-                var rgtExt = new DynamicResourceExtension(_toKey);
-                right = rgtExt.ProvideValue(serviceProvider);
+                var leftExt = new DynamicResourceExtension(_frmKey);
+                return new MultiBinding()
+                {
+                    Bindings = new IBinding[]
+                    {
+                        (IBinding)leftExt.ProvideValue(serviceProvider)!,
+                        new Binding { Source = new SolidColorBrush(rightColor) },
+                    },
+                    Converter = new DivideConstantDynamicConverter(_relate, fromLeft: false),
+                };
             }
 
+            // Both dynamic: MultiBinding with only DynamicResource bindings.
+            var lftExt = new DynamicResourceExtension(_frmKey);
+            var rgtExt = new DynamicResourceExtension(_toKey);
             return new MultiBinding()
             {
-                Bindings = new BindingBase[] { left, right },
-                Converter = new DivideConverter(_relate)
+                Bindings = new IBinding[]
+                {
+                    (IBinding)lftExt.ProvideValue(serviceProvider)!,
+                    (IBinding)rgtExt.ProvideValue(serviceProvider)!,
+                },
+                Converter = new DivideConverter(_relate),
             };
+        }
+
+        internal static SolidColorBrush Blend(Color colL, Color colR, double relate)
+        {
+            static byte Calc(byte l, byte r, double d)
+                => (byte)(l * (1 - d) + r * d);
+            return new SolidColorBrush(Color.FromArgb(
+                Calc(colL.A, colR.A, relate),
+                Calc(colL.R, colR.R, relate),
+                Calc(colL.G, colR.G, relate),
+                Calc(colL.B, colR.B, relate)));
+        }
+    }
+
+    /// <summary>Blends constant (one binding) with dynamic (other binding) for MultiBinding; used when one side is constant.</summary>
+    internal sealed class DivideConstantDynamicConverter : IMultiValueConverter
+    {
+        private readonly double _relate;
+        private readonly bool _fromLeft;
+
+        public DivideConstantDynamicConverter(double relate, bool fromLeft)
+        {
+            _relate = relate;
+            _fromLeft = fromLeft;
+        }
+
+        public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (values.Count < 2) return null;
+            Color col0 = ToColor(values[0]);
+            Color col1 = ToColor(values[1]);
+            return _fromLeft ? DivideColorExtension.Blend(col0, col1, _relate) : DivideColorExtension.Blend(col0, col1, _relate);
+        }
+
+        private static Color ToColor(object? value)
+        {
+            if (value is ISolidColorBrush br) return br.Color;
+            if (value is Color c) return c;
+            return default;
         }
     }
 
