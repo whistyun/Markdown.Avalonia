@@ -1,9 +1,11 @@
 using Avalonia;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
+using Avalonia.Data.Core;
 using Avalonia.Markup.Xaml;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
+using Avalonia.Media.Immutable;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -25,28 +27,22 @@ namespace Markdown.Avalonia.Extensions
 
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-            bool leftIsConst = Color.TryParse(_frmKey, out var leftColor);
-            bool rightIsConst = Color.TryParse(_toKey, out var rightColor);
-
-            // Both constant: return computed brush (no binding). Avalonia accepts plain values in setters.
-            if (leftIsConst && rightIsConst)
+            BindingBase left;
+            if (Color.TryParse(_frmKey, out var leftColor))
+            {
+                var leftBrush = new ImmutableSolidColorBrush(leftColor);
+                left = CompiledBinding.Create<IBrush, IBrush>(v=>v, leftColor);
+            }
+            else
             {
                 return Blend(leftColor, rightColor, _relate);
             }
 
-            // One constant, one dynamic: MultiBinding with Binding(Source=constant) + DynamicResource (no custom IBinding; Avalonia 11.2+ rejects user IBinding).
-            if (leftIsConst && !rightIsConst)
+            BindingBase right;
+            if (Color.TryParse(_toKey, out var rightColor))
             {
-                var rightExt = new DynamicResourceExtension(_toKey);
-                return new MultiBinding()
-                {
-                    Bindings = new IBinding[]
-                    {
-                        new Binding { Source = new SolidColorBrush(leftColor) },
-                        (IBinding)rightExt.ProvideValue(serviceProvider)!,
-                    },
-                    Converter = new DivideConstantDynamicConverter(_relate, fromLeft: true),
-                };
+                var rightBrush = new ImmutableSolidColorBrush(rightColor);
+                right = CompiledBinding.Create<IBrush, IBrush>(v=>v, rightColor);
             }
 
             if (!leftIsConst && rightIsConst)
@@ -134,7 +130,7 @@ namespace Markdown.Avalonia.Extensions
             else if (values[0] is Color cl)
                 colL = cl;
             else
-                return values[0];
+                return AvaloniaProperty.UnsetValue;
 
             Color colR;
             if (values[1] is ISolidColorBrush br)
@@ -142,7 +138,7 @@ namespace Markdown.Avalonia.Extensions
             else if (values[1] is Color cr)
                 colR = cr;
             else
-                return values[0];
+                return new ImmutableSolidColorBrush(colL);
 
             static byte Calc(byte l, byte r, double d)
                 => (byte)(l * (1 - d) + r * d);

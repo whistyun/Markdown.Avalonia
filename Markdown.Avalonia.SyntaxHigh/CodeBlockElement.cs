@@ -1,12 +1,14 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Layout;
 using AvaloniaEdit;
+using ColorDocument.Avalonia;
+using Markdown.Avalonia.SyntaxHigh.Extensions;
 using System;
 using System.Collections.Generic;
-using Avalonia;
-using Markdown.Avalonia.SyntaxHigh.Extensions;
-using ColorDocument.Avalonia;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Markdown.Avalonia.SyntaxHigh
 {
@@ -59,8 +61,13 @@ namespace Markdown.Avalonia.SyntaxHigh
 
             copyButton.Click += (s, e) =>
             {
+                var item = new DataTransferItem();
+                item.Set(DataFormat.Text, txtEdit.Text);
+                var data = new DataTransfer();
+                data.Add(item);
+
                 var clipboard = TopLevel.GetTopLevel(txtEdit)?.Clipboard;
-                clipboard?.SetTextAsync(txtEdit.Text);
+                clipboard?.SetDataAsync(data);
             };
 
 

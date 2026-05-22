@@ -81,6 +81,12 @@ namespace Markdown.Avalonia
                 owner => owner.SelectionEnabled,
                 (owner, v) => owner.SelectionEnabled = v);
 
+        public static readonly AvaloniaProperty<Thickness> PaddingProperty =
+            AvaloniaProperty.RegisterDirect<MarkdownScrollViewer, Thickness>(
+                nameof(Padding),
+                owner => owner.Padding,
+                (owner, v) => owner.Padding = v);
+
         private static readonly HttpClient s_httpclient = new();
         private readonly ScrollViewer _viewer;
         private SetupInfo _setup;
@@ -615,6 +621,12 @@ namespace Markdown.Avalonia
         {
             get => GetValue(SelectionBrushProperty);
             set => SetValue(SelectionBrushProperty, value);
+        }
+
+        public Thickness Padding
+        {
+            get => _viewer.Padding;
+            set => _viewer.Padding = value;
         }
 
         internal IBrush ComputedSelectionBrush => SelectionBrush ?? _selectionBrush ?? Brushes.Cyan;

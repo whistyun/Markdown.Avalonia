@@ -36,7 +36,7 @@ namespace Markdown.Avalonia.Extensions
 
             return new MultiBinding()
             {
-                Bindings = new IBinding[] { brush },
+                Bindings = new BindingBase[] { brush },
                 Converter = new MultiplyConverter(_scale)
             };
         }

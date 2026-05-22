@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Svg" Version="$(AvaloniaSvgVersion)" />
+    <PackageReference Include="Svg.Controls.Avalonia" Version="$(AvaloniaSvgVersion)" />
   </ItemGroup>
   
   <ItemGroup>

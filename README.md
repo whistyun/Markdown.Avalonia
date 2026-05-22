@@ -20,6 +20,7 @@ The table of compability with Avalonia's version.
 
 | AvaloniaUI         | Markdown.Avalonia |
 |--------------------|-------------------|
+| 12.0.0             | 12.0.0-a1         |
 | 11.1.0-beta1       | 11.0.3-a1         |
 | 11.0.0             | 11.0.0～11.0.3-a1 |
 | 11.0.0-rc1.1       | 11.0.0-d1～d2     |

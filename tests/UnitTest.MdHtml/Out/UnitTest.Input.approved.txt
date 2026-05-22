@@ -3,25 +3,25 @@
   <c:CTextBlock>
     <c:CInlineUIContainer>
       <c:CInlineUIContainer.Content>
-        <TextBox Text="" IsReadOnly="True" Width="100" SelectedText="" Classes=":empty" xmlns="" />
+        <TextBox Text="" IsReadOnly="True" Width="100" SelectedText="" UseFloatingWatermark="False" Classes=":empty" xmlns="" />
       </c:CInlineUIContainer.Content>
     </c:CInlineUIContainer>
     <c:CRun Text=" " />
     <c:CInlineUIContainer>
       <c:CInlineUIContainer.Content>
-        <TextBox Text="" IsReadOnly="True" Width="98" SelectedText="" Classes=":empty" xmlns="" />
+        <TextBox Text="" IsReadOnly="True" Width="98" SelectedText="" UseFloatingWatermark="False" Classes=":empty" xmlns="" />
       </c:CInlineUIContainer.Content>
     </c:CInlineUIContainer>
     <c:CRun Text=" " />
     <c:CInlineUIContainer>
       <c:CInlineUIContainer.Content>
-        <TextBox Text="" IsReadOnly="True" Width="100" SelectedText="" Classes=":empty" xmlns="" />
+        <TextBox Text="" IsReadOnly="True" Width="100" SelectedText="" UseFloatingWatermark="False" Classes=":empty" xmlns="" />
       </c:CInlineUIContainer.Content>
     </c:CInlineUIContainer>
     <c:CRun Text=" " />
     <c:CInlineUIContainer>
       <c:CInlineUIContainer.Content>
-        <TextBox Text="textbox" IsReadOnly="True" SelectedText="" xmlns="" />
+        <TextBox Text="textbox" IsReadOnly="True" SelectedText="" UseFloatingWatermark="False" xmlns="" />
       </c:CInlineUIContainer.Content>
     </c:CInlineUIContainer>
   </c:CTextBlock>
@@ -167,7 +167,7 @@
   <c:CTextBlock>
     <c:CInlineUIContainer>
       <c:CInlineUIContainer.Content>
-        <TextBox Text="asasdfasdfsadfasdfasd&#xA;&#xA;sd&#xA;&#xA;df" AcceptsReturn="True" AcceptsTab="True" SelectedText="" xmlns="" />
+        <TextBox Text="asasdfasdfsadfasdfasd&#xA;&#xA;sd&#xA;&#xA;df" AcceptsReturn="True" AcceptsTab="True" SelectedText="" UseFloatingWatermark="False" xmlns="" />
       </c:CInlineUIContainer.Content>
     </c:CInlineUIContainer>
   </c:CTextBlock>
@@ -175,7 +175,7 @@
   <c:CTextBlock>
     <c:CInlineUIContainer>
       <c:CInlineUIContainer.Content>
-        <TextBox Text="afsadfasdfasd&#xA;&#xA;sd&#xA;&#xA;df" AcceptsReturn="True" AcceptsTab="True" Width="210" Height="42" SelectedText="" xmlns="" />
+        <TextBox Text="afsadfasdfasd&#xA;&#xA;sd&#xA;&#xA;df" AcceptsReturn="True" AcceptsTab="True" Width="210" Height="42" SelectedText="" UseFloatingWatermark="False" xmlns="" />
       </c:CInlineUIContainer.Content>
     </c:CInlineUIContainer>
   </c:CTextBlock>

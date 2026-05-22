@@ -21,9 +21,8 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="$(DemoAvaloniaVersion)" />
     <PackageReference Include="Avalonia.Desktop" Version="$(DemoAvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="$(DemoAvaloniaVersion)" />
     <PackageReference Include="Avalonia.Themes.Simple" Version="$(DemoAvaloniaVersion)" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="$(DemoAvaloniaVersion)" />
+    <PackageReference Include="ReactiveUI.Avalonia" Version="11.4.12" />
     <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="$(DemoAvaloniaVersion)" />
 
     <PackageReference Include="Serilog" Version="3.0.1" />

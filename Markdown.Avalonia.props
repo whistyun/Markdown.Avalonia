@@ -1,13 +1,9 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
-    <PackageTargetFrameworks>net461;netstandard2.0;net6</PackageTargetFrameworks>
-    <DemoAppTargetFrameworks>net461;netcoreapp3.1;net6;net7</DemoAppTargetFrameworks>
-    <TestTargetFrameworks>net6</TestTargetFrameworks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(IS_WHISTYUN_PC)' == 'Y' ">
-    <TestTargetFrameworks>netcoreapp3.1;net5;net6;net7</TestTargetFrameworks>
+  <PropertyGroup>
+    <PackageTargetFrameworks>net8.0;net10.0</PackageTargetFrameworks>
+    <DemoAppTargetFrameworks>net8.0;net10.0</DemoAppTargetFrameworks>
+    <TestTargetFrameworks>net8.0;net10.0</TestTargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -15,8 +11,8 @@
     <AvaloniaVersion>11.2.6</AvaloniaVersion>
     <DemoAvaloniaVersion>11.0.5</DemoAvaloniaVersion>
     <EnableAvaloniaEdit>enabled</EnableAvaloniaEdit>
-    <AvaloniaEditVersion>11.0.0</AvaloniaEditVersion>
-    <AvaloniaSvgVersion>11.0.0</AvaloniaSvgVersion>
+    <AvaloniaEditVersion>12.0.0</AvaloniaEditVersion>
+    <AvaloniaSvgVersion>12.0.0.1</AvaloniaSvgVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(AVA_VER)' != '' ">
@@ -27,7 +23,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>11.0.3-a1</PackageVersion>
+    <PackageVersion>12.0.0-a3</PackageVersion>
   </PropertyGroup>
 
 </Project>
