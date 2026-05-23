@@ -131,6 +131,7 @@
 
           AssetPathRoot="{Binding AssetPathRoot}"
           Source="{Binding Source}"
+          SelectionEnabled="True"
       
           local:DynamicStyleBehavior.XamlText="{Binding AppendStyleXamlText}"
           local:DynamicStyleBehavior.ValidationResult="{Binding XamlParseResult}">
