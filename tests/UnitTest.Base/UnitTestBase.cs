@@ -28,7 +28,8 @@ namespace UnitTest.Base
         public UnitTestBase()
         {
             var asm = Assembly.GetExecutingAssembly();
-            AssetPath = Path.GetDirectoryName(asm.Location);
+            AssetPath = Path.GetDirectoryName(asm.Location)
+                ?? throw new NullReferenceException("assembly location");
             disposable = App.Start();
         }
 

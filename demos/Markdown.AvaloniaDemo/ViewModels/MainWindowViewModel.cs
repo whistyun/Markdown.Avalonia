@@ -70,14 +70,15 @@ namespace Markdown.AvaloniaDemo.ViewModels
 
             Styles = new List<StyleViewModel>
             {
-                new StyleViewModel() { Name = nameof(MarkdownStyle.Standard) },
-                new StyleViewModel() { Name = nameof(MarkdownStyle.SimpleTheme) },
-                new StyleViewModel() { Name = nameof(MarkdownStyle.GithubLike) }
+                new(nameof(MarkdownStyle.Standard)),
+                new(nameof(MarkdownStyle.SimpleTheme)),
+                new(nameof(MarkdownStyle.GithubLike))
             };
 
             SelectedStyle = Styles[1];
 
-            using (var strm = AssetLoader.Open(new Uri("avares://Markdown.AvaloniaDemo/Assets/XamlTemplate.txt")))
+            var uri = new Uri("avares://Markdown.AvaloniaDemo/Assets/XamlTemplate.txt");
+            using (var strm = AssetLoader.Open(uri))
             using (var reader = new StreamReader(strm))
             {
                 EdittingStyleXamlText = reader.ReadToEnd();
@@ -87,6 +88,11 @@ namespace Markdown.AvaloniaDemo.ViewModels
 
     public class StyleViewModel
     {
-        public string Name { get; set; }
+        public string Name { get; }
+
+        public StyleViewModel(string name)
+        {
+            Name = name;
+        }
     }
 }

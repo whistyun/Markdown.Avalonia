@@ -1,9 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
-using ColorDocument.Avalonia;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 

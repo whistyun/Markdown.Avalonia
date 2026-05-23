@@ -6,7 +6,7 @@
     <OutputType>WinExe</OutputType>
     <IsPackable>false</IsPackable>
     <TargetFrameworks>$(DemoAppTargetFrameworks)</TargetFrameworks>
-    <LangVersion>9</LangVersion>
+    <LangVersion>$(LangVersion)</LangVersion>
     <Nullable>disable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net7' ">
@@ -23,7 +23,7 @@
     <PackageReference Include="Avalonia.Desktop" Version="$(DemoAvaloniaVersion)" />
     <PackageReference Include="Avalonia.Themes.Simple" Version="$(DemoAvaloniaVersion)" />
     <PackageReference Include="ReactiveUI.Avalonia" Version="11.4.12" />
-    <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="$(DemoAvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="$(DemoAvaloniaVersion)" />
 
     <PackageReference Include="Serilog" Version="3.0.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />

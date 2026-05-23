@@ -6,7 +6,7 @@
     <OutputType>WinExe</OutputType>
     <IsPackable>false</IsPackable>
     <TargetFrameworks>$(DemoAppTargetFrameworks)</TargetFrameworks>
-    <LangVersion>9</LangVersion>
+    <LangVersion>$(LangVersion)</LangVersion>
     <Nullable>disable</Nullable>
   </PropertyGroup>
   <ItemGroup>
@@ -19,15 +19,12 @@
     <PackageReference Include="Avalonia.Desktop" Version="$(DemoAvaloniaVersion)" />
     <PackageReference Include="FluentAvaloniaUI" Version="2.0.5" />
     <PackageReference Include="ReactiveUI.Avalonia" Version="11.4.12" />
-    <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="$(DemoAvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="$(DemoAvaloniaVersion)" />
     <None Remove="Assets\XamlTemplate.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\tests\UnitTest.Base\Utils\BrokenXamlWriter.cs" Link="BrokenXamlWriter.cs" />
-    <Compile Include="..\..\tests\UnitTest.Base\Utils\Util.cs" Link="Util.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Markdown.Avalonia\Markdown.Avalonia.csproj" />
+    <ProjectReference Include="..\..\tests\XamlUtils\XamlUtils.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="LocalPath.png">

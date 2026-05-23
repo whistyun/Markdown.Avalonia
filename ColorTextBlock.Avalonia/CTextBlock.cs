@@ -18,6 +18,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -516,8 +517,9 @@ namespace ColorTextBlock.Avalonia
                 if (item is CInlineUIContainer container)
                 {
                     var content = container.Content;
+                    if (content is null) return;
 
-                    var visparent = container.Content.GetVisualParent();
+                    var visparent = content.GetVisualParent();
                     if (visparent is CTextBlock cblock)
                     {
                         cblock.VisualChildren.Remove(content);
@@ -529,8 +531,8 @@ namespace ColorTextBlock.Avalonia
                         return;
                     }
 
-                    VisualChildren.Add(container.Content);
-                    LogicalChildren.Add(container.Content);
+                    VisualChildren.Add(content);
+                    LogicalChildren.Add(content);
 
                     _containers.Add(container);
                 }
@@ -556,8 +558,11 @@ namespace ColorTextBlock.Avalonia
             {
                 if (item is CInlineUIContainer container)
                 {
-                    VisualChildren.Remove(container.Content);
-                    LogicalChildren.Remove(container.Content);
+                    var content = container.Content;
+                    if (content is null) return;
+
+                    VisualChildren.Remove(content);
+                    LogicalChildren.Remove(content);
 
                     _containers.Remove(container);
                 }
@@ -860,6 +865,9 @@ namespace ColorTextBlock.Avalonia
         {
             int beginBack = begin;
             int endBack = end;
+
+            TextPointer? beginPointer = null;
+            TextPointer? endPointer = null;
             for (var i = 0; i < _metries.Count; ++i)
             {
                 var metry = _metries[i];
@@ -867,38 +875,44 @@ namespace ColorTextBlock.Avalonia
 
                 if (begin < caretLength || (i == _metries.Count - 1 && begin == caretLength))
                 {
-                    _beginSelect = metry.CalcuatePointerFrom(begin).Wrap(this, beginBack - begin);
+                    beginPointer = metry.CalcuatePointerFrom(begin).Wrap(this, beginBack - begin);
                     begin = Int32.MaxValue;
                 }
                 else begin -= caretLength;
 
                 if (end < caretLength || (i == _metries.Count - 1 && end == caretLength))
                 {
-                    _endSelect = metry.CalcuatePointerFrom(end).Wrap(this, endBack - end);
-                    if (endBack != _endSelect.Index)
+                    endPointer = metry.CalcuatePointerFrom(end).Wrap(this, endBack - end);
+                    if (endBack != endPointer.Index)
                         throw new Exception();
                     end = Int32.MaxValue;
                 }
                 else end -= caretLength;
             }
-            ComplementIntermediate();
+
+            beginPointer ??= GetBegin();
+            endPointer ??= GetEnd();
+            ComplementIntermediate(beginPointer, endPointer);
             InvalidateVisual();
         }
 
         public void Select(TextPointer begin, TextPointer end)
         {
-            _beginSelect = begin;
-            _endSelect = end;
-            ComplementIntermediate();
+            ComplementIntermediate(begin, end);
             InvalidateVisual();
         }
 
-        private void ComplementIntermediate()
+        private void ComplementIntermediate(TextPointer beginPointer, TextPointer endPointer)
         {
             bool bgn = false;
             bool end = false;
 
+            _beginSelect = beginPointer;
+            _endSelect = endPointer;
             _intermediates.Clear();
+            if (_beginSelect is null || _endSelect is null)
+                return;
+
             foreach (var metry in _metries)
             {
                 bool hitB = false;
