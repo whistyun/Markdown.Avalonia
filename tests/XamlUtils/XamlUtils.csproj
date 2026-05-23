@@ -1,19 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\UnitTest.props" />
-
+  <Import Project="..\..\Markdown.Avalonia.props" />
+ 
   <PropertyGroup>
-    <TargetFrameworks>$(TestTargetFrameworks)</TargetFrameworks>
     <IsPackable>false</IsPackable>
+    <TargetFrameworks>$(TestTargetFrameworks);$(DemoAppTargetFrameworks)</TargetFrameworks>
     <LangVersion>$(LangVersion)</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Update="Apps\App.axaml.cs">
-      <DependentUpon>%(Filename)</DependentUpon>
-    </Compile>
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="$(TestAvaloniaVersion)" />

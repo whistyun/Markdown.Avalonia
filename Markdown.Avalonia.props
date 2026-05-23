@@ -2,17 +2,15 @@
 
   <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
     <PackageTargetFrameworks>net461;netstandard2.0;net6</PackageTargetFrameworks>
-    <DemoAppTargetFrameworks>net461;;net10</DemoAppTargetFrameworks>
-    <TestTargetFrameworks>net6</TestTargetFrameworks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(IS_WHISTYUN_PC)' == 'Y' ">
-    <TestTargetFrameworks>netcoreapp3.1;net5;net6;net7</TestTargetFrameworks>
+    <DemoAppTargetFrameworks>net481;net10.0</DemoAppTargetFrameworks>
+    <TestTargetFrameworks>net481;net10.0</TestTargetFrameworks>
+    <LangVersion>14</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup>
     <AvaloniaVersion>11.0.0</AvaloniaVersion>
-    <DemoAvaloniaVersion>11.0.5</DemoAvaloniaVersion>
+    <LatestAvaloniaVersion>11.3.16</LatestAvaloniaVersion>
+    <DemoAvaloniaVersion>$(LatestAvaloniaVersion)</DemoAvaloniaVersion>
     <EnableAvaloniaEdit>enabled</EnableAvaloniaEdit>
     <AvaloniaEditVersion>11.0.0</AvaloniaEditVersion>
     <AvaloniaSvgVersion>11.0.0</AvaloniaSvgVersion>
@@ -22,7 +20,7 @@
     <TestAvaloniaVersion>$(AVA_VER)</TestAvaloniaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(AVA_VER)' == '' ">
-    <TestAvaloniaVersion>$(AvaloniaVersion)</TestAvaloniaVersion>
+    <TestAvaloniaVersion>$(LatestAvaloniaVersion)</TestAvaloniaVersion>
   </PropertyGroup>
 
   <PropertyGroup>

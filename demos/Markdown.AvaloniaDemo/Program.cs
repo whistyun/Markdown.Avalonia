@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using Avalonia;
 using Avalonia.Logging;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
 using Serilog;
 
 namespace Markdown.AvaloniaDemo

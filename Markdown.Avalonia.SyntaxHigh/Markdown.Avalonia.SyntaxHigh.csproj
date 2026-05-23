@@ -13,7 +13,7 @@
     <PackageReadmeFile>Markdown.Avalonia.SyntaxHigh.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Company />
-    <LangVersion>9</LangVersion>
+    <LangVersion>$(LangVersion)</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

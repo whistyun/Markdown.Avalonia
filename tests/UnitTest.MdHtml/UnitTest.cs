@@ -8,6 +8,7 @@ using System.Linq;
 using UnitTest.Base;
 using UnitTest.Base.Utils;
 using UnitTest.MdHtml.Test;
+using XamlUtils;
 
 using MarkdownEngine = Markdown.Avalonia.Markdown;
 
@@ -38,7 +39,7 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
 
             Approvals.Verify(xaml);
         }
@@ -51,7 +52,7 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
 
             Approvals.Verify(xaml);
         }
@@ -64,7 +65,7 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
 
             Approvals.Verify(xaml);
         }
@@ -77,7 +78,7 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
 
             Approvals.Verify(xaml);
         }
@@ -90,7 +91,7 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
 
             Approvals.Verify(xaml);
         }
@@ -103,7 +104,7 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
 
             Approvals.Verify(xaml);
         }
@@ -116,7 +117,7 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
 
             Approvals.Verify(xaml);
         }
@@ -129,7 +130,7 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
 
             Approvals.Verify(xaml);
         }
@@ -142,7 +143,7 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
 
             Approvals.Verify(xaml);
         }
@@ -155,7 +156,7 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
 
             Approvals.Verify(xaml);
         }
