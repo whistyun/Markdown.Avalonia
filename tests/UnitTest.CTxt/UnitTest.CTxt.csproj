@@ -15,22 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Xamls\Test5.axaml.cs">
-      <DependentUpon>Test5.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Xamls\Test7 - コピー.axaml.cs">
-      <DependentUpon>%(Filename)</DependentUpon>
-    </Compile>
-    <Compile Update="Xamls\Test7.axaml.cs">
-      <DependentUpon>Test7.axaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Avalonia" Version="$(TestAvaloniaVersion)" />
     <PackageReference Include="Avalonia.Desktop" Version="$(TestAvaloniaVersion)" />
   </ItemGroup>
-
 
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="3.119.0" />

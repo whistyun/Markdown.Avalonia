@@ -36,8 +36,8 @@ namespace UnitTest.CTxt.Utils
             using var approvedImg = SKBitmap.FromImage(SKImage.FromEncodedData(approvedPath));
             using var receivedImg = SKBitmap.FromImage(SKImage.FromEncodedData(receivedPath));
 
-            var approvedByte = BitmapToByte(approvedImg);
-            var receivedByte = BitmapToByte(receivedImg);
+            var approvedByte = approvedImg.Bytes;
+            var receivedByte = approvedImg.Bytes;
 
             if (Compare(receivedByte, approvedByte))
             {
@@ -45,24 +45,6 @@ namespace UnitTest.CTxt.Utils
             }
 
             return new ApprovalMismatchException(receivedPath, approvedPath);
-        }
-
-
-        private byte[] BitmapToByte(SKBitmap bmp)
-        {
-            var rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
-
-            var bary = new byte[bmp.Width * bmp.Height * 3];
-
-            var ptr = bmp.GetPixels();
-            var lineLen = bmp.Width * 3;
-            for (int i = 0; i < bmp.Height; ++i)
-            {
-                Marshal.Copy(ptr, bary, i * lineLen, lineLen);
-                ptr += bmp.RowBytes;
-            }
-
-            return bary;
         }
 
         private static bool Compare(ICollection<byte> bytes1, ICollection<byte> bytes2)

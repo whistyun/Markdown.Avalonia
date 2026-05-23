@@ -59,7 +59,7 @@ namespace ColorDocument.Avalonia.DocumentElements
 
             var fromPoint = text.CalcuatePointerFrom(from.X, from.Y);
             var toPoint = text.CalcuatePointerFrom(to.X, to.Y);
-            text.Select(fromPoint, toPoint);
+            text.Select(fromPoint.Index, toPoint.Index);
         }
 
         public override void UnSelect()

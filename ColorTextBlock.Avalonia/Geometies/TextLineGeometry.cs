@@ -10,9 +10,10 @@ namespace ColorTextBlock.Avalonia.Geometries
 {
     internal class TextLineGeometry : TextGeometry
     {
-        public SimpleTextSource Text { get; private set; }
+        public SimpleTextSource RootText { get; private set; }
         public TextLine Line { get; private set; }
         public IBrush? LayoutForeground { get; private set; }
+        public int Length => Line.Length;
 
         internal TextLineGeometry(
             CRun owner,
@@ -21,7 +22,7 @@ namespace ColorTextBlock.Avalonia.Geometries
             bool linebreak) :
             base(owner, tline.WidthIncludingTrailingWhitespace, tline.Height, tline.Baseline, owner.TextVerticalAlignment, linebreak)
         {
-            Text = text;
+            RootText = text;
             Line = tline;
             LayoutForeground = owner.Foreground;
         }
@@ -34,13 +35,13 @@ namespace ColorTextBlock.Avalonia.Geometries
             if (LayoutForeground != foreground)
             {
                 LayoutForeground = foreground;
-                Text = Text.ChangeForeground(foreground);
+                RootText = RootText.ChangeForeground(foreground);
 
                 var owner = (CRun)Owner;
-                var parPrps = owner.CreateTextParagraphProperties(Text.RunProperties);
+                var parPrps = owner.CreateTextParagraphProperties(RootText.RunProperties);
 
                 Line = TextFormatter.Current.FormatLine(
-                            Text,
+                            RootText,
                             Line.FirstTextSourceIndex,
                             Width,
                             parPrps)!;
@@ -104,7 +105,22 @@ namespace ColorTextBlock.Avalonia.Geometries
             return new TextPointer((CRun)Owner, this, hit, Width, true);
         }
 
+        public string Substring(int idx)
+        {
+            return Substring(idx, Line.Length - idx);
+        }
+
+        public string Substring(int idx, int len)
+        {
+            if (idx >= Line.Length)
+                throw new ArgumentOutOfRangeException(nameof(idx));
+            if (idx + len > Line.Length)
+                throw new ArgumentOutOfRangeException(nameof(len));
+
+            return RootText.Substring(Line.FirstTextSourceIndex + idx, len);
+        }
+
         public override string ToString()
-            => Text.Substring(Line.FirstTextSourceIndex, Line.Length);
+            => RootText.Substring(Line.FirstTextSourceIndex, Line.Length);
     }
 }
