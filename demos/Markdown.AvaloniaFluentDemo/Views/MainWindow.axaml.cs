@@ -2,7 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Markdown.Avalonia;
-using UnitTest.Base.Utils;
+using XamlUtils;
 
 namespace Markdown.AvaloniaFluentDemo.Views
 {
@@ -27,12 +27,11 @@ namespace Markdown.AvaloniaFluentDemo.Views
             var txtbox = this.FindControl<TextBox>("MarkdownSource");
 
             var engine = new global::Markdown.Avalonia.Markdown();
-            var reverter = new BrokenXamlWriter();
 
             void UpdateMarkdown(string mdtxt)
             {
                 var mdctl = engine.Transform(mdtxt);
-                txtbox.Text = Util.AsXaml(mdctl);
+                txtbox.Text = BrokenXamlWriter.AsXaml(mdctl);
             }
 
             TabItem.IsSelectedProperty.Changed.AddClassHandler<TabItem>(

@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\Markdown.Avalonia.props" />
+ 
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <TargetFrameworks>$(TestTargetFrameworks);$(DemoAppTargetFrameworks)</TargetFrameworks>
+    <LangVersion>$(LangVersion)</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(TestAvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Desktop" Version="$(TestAvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Themes.Simple" Version="$(TestAvaloniaVersion)" />
+  </ItemGroup>
+</Project>

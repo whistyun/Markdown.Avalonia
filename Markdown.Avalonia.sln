@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.4.33110.190
+# Visual Studio Version 18
+VisualStudioVersion = 18.6.11806.211 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown.Avalonia.Tight", "Markdown.Avalonia.Tight\Markdown.Avalonia.Tight.csproj", "{B5FBF669-6012-4A62-9EAC-9ECB7BD599FC}"
 EndProject
@@ -12,6 +12,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown.AvaloniaFluentDemo", "demos\Markdown.AvaloniaFluentDemo\Markdown.AvaloniaFluentDemo.csproj", "{BC6B016B-B353-4E73-A98E-556DC70E5850}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{AD84CF32-2208-43FD-95CE-31DF8DFEB2CD}"
+	ProjectSection(SolutionItems) = preProject
+		tests\UnitTest.props = tests\UnitTest.props
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTest.Base", "tests\UnitTest.Base\UnitTest.Base.csproj", "{B5F20CDD-025F-4BD8-A1AF-0F3EC9B6E8E4}"
 EndProject
@@ -37,9 +40,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTest.MdHtml", "tests\Un
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ColorDocument.Avalonia", "ColorDocument.Avalonia\ColorDocument.Avalonia.csproj", "{008A6F1F-A1D9-45ED-B3CF-3106A59A4417}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmark", "benchmark", "{F5ED37EA-8110-4262-9310-3990EE6D9BFE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "configs", "configs", "{DDB4EF12-CC4E-5E88-E6FC-71A802F4DE97}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Markdown.Avalonia.props = Markdown.Avalonia.props
+	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MdAvBench", "benchmark\MdAvBench\MdAvBench.csproj", "{57CC28E5-9915-4AFA-A5E5-B7977BBF8589}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XamlUtils", "tests\XamlUtils\XamlUtils.csproj", "{13BD603E-B8C8-D56D-C9C5-DFFB1D896FFB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -231,18 +239,18 @@ Global
 		{008A6F1F-A1D9-45ED-B3CF-3106A59A4417}.Release|x64.Build.0 = Release|Any CPU
 		{008A6F1F-A1D9-45ED-B3CF-3106A59A4417}.Release|x86.ActiveCfg = Release|Any CPU
 		{008A6F1F-A1D9-45ED-B3CF-3106A59A4417}.Release|x86.Build.0 = Release|Any CPU
-		{57CC28E5-9915-4AFA-A5E5-B7977BBF8589}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{57CC28E5-9915-4AFA-A5E5-B7977BBF8589}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{57CC28E5-9915-4AFA-A5E5-B7977BBF8589}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{57CC28E5-9915-4AFA-A5E5-B7977BBF8589}.Debug|x64.Build.0 = Debug|Any CPU
-		{57CC28E5-9915-4AFA-A5E5-B7977BBF8589}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{57CC28E5-9915-4AFA-A5E5-B7977BBF8589}.Debug|x86.Build.0 = Debug|Any CPU
-		{57CC28E5-9915-4AFA-A5E5-B7977BBF8589}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{57CC28E5-9915-4AFA-A5E5-B7977BBF8589}.Release|Any CPU.Build.0 = Release|Any CPU
-		{57CC28E5-9915-4AFA-A5E5-B7977BBF8589}.Release|x64.ActiveCfg = Release|Any CPU
-		{57CC28E5-9915-4AFA-A5E5-B7977BBF8589}.Release|x64.Build.0 = Release|Any CPU
-		{57CC28E5-9915-4AFA-A5E5-B7977BBF8589}.Release|x86.ActiveCfg = Release|Any CPU
-		{57CC28E5-9915-4AFA-A5E5-B7977BBF8589}.Release|x86.Build.0 = Release|Any CPU
+		{13BD603E-B8C8-D56D-C9C5-DFFB1D896FFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13BD603E-B8C8-D56D-C9C5-DFFB1D896FFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13BD603E-B8C8-D56D-C9C5-DFFB1D896FFB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{13BD603E-B8C8-D56D-C9C5-DFFB1D896FFB}.Debug|x64.Build.0 = Debug|Any CPU
+		{13BD603E-B8C8-D56D-C9C5-DFFB1D896FFB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{13BD603E-B8C8-D56D-C9C5-DFFB1D896FFB}.Debug|x86.Build.0 = Debug|Any CPU
+		{13BD603E-B8C8-D56D-C9C5-DFFB1D896FFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13BD603E-B8C8-D56D-C9C5-DFFB1D896FFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13BD603E-B8C8-D56D-C9C5-DFFB1D896FFB}.Release|x64.ActiveCfg = Release|Any CPU
+		{13BD603E-B8C8-D56D-C9C5-DFFB1D896FFB}.Release|x64.Build.0 = Release|Any CPU
+		{13BD603E-B8C8-D56D-C9C5-DFFB1D896FFB}.Release|x86.ActiveCfg = Release|Any CPU
+		{13BD603E-B8C8-D56D-C9C5-DFFB1D896FFB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -256,7 +264,7 @@ Global
 		{BC356FD7-5D47-495A-9255-A4199AA8E3A1} = {AD84CF32-2208-43FD-95CE-31DF8DFEB2CD}
 		{58E76A9C-D28E-45BD-85F2-885FF3E4B363} = {8F902BB3-7573-4180-A911-6CC019E999CC}
 		{6034AA93-6F76-4F4B-B8AC-0A20E3BD35FF} = {AD84CF32-2208-43FD-95CE-31DF8DFEB2CD}
-		{57CC28E5-9915-4AFA-A5E5-B7977BBF8589} = {F5ED37EA-8110-4262-9310-3990EE6D9BFE}
+		{13BD603E-B8C8-D56D-C9C5-DFFB1D896FFB} = {AD84CF32-2208-43FD-95CE-31DF8DFEB2CD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A7580602-9393-4620-89A0-6BFD34FFB7E0}

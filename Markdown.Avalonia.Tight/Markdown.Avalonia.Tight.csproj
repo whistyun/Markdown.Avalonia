@@ -18,7 +18,7 @@
     <PackageReadmeFile>Markdown.Avalonia.Tight.md</PackageReadmeFile>
     <PackageTags>Markdown Avalonia Avaloniaui</PackageTags>
     <Configurations>Debug;Release</Configurations>
-    <LangVersion>9</LangVersion>
+    <LangVersion>$(LangVersion)</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

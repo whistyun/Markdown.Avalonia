@@ -877,7 +877,7 @@ namespace ColorTextBlock.Avalonia
             InvalidateVisual();
         }
 
-        public void Select(TextPointer begin, TextPointer end)
+        private void Select(TextPointer begin, TextPointer end)
         {
             _beginSelect = begin;
             _endSelect = end;
@@ -1017,32 +1017,7 @@ namespace ColorTextBlock.Avalonia
                 end = _beginSelect;
             }
 
-            if (ReferenceEquals(bgn.Geometry, end.Geometry))
-            {
-                if (bgn.Geometry is TextLineGeometry tlg)
-                {
-                    return tlg.Text.Substring(bgn.InternalIndex, end.InternalIndex - bgn.InternalIndex);
-                }
-                else return "";
-            }
-            else
-            {
-                var buffer = new StringBuilder();
-
-                if (bgn.Geometry is TextLineGeometry btlg)
-                    buffer.Append(btlg.Text.Substring(bgn.InternalIndex));
-
-                foreach (var inter in _intermediates)
-                {
-                    if (inter is TextLineGeometry itlg)
-                        buffer.Append(itlg.ToString());
-                }
-
-                if (end.Geometry is TextLineGeometry etlg)
-                    buffer.Append(etlg.Text.Substring(etlg.Line.FirstTextSourceIndex, end.InternalIndex - etlg.Line.FirstTextSourceIndex));
-
-                return buffer.ToString();
-            }
+            return Text.Substring(bgn.Index, end.Index - bgn.Index);
         }
     }
 

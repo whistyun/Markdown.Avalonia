@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using System;
 using System.Collections.Generic;
@@ -118,6 +118,8 @@ namespace ColorDocument.Avalonia.DocumentElements
             var border = new Border();
             border.Classes.Add(ClassNames.TableClass);
             border.Child = grid;
+
+            ApplyEffects(border);
 
             //var grid = new Grid();
             //grid.Classes.Add(ClassNames.TableClass);

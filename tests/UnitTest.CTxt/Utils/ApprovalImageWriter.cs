@@ -17,7 +17,7 @@ namespace UnitTest.CTxt.Utils
         {
             Data = image;
         }
-        public ApprovalImageWriter(string dir, Bitmap image, string suffix)
+        public ApprovalImageWriter(string? dir, Bitmap image, string suffix)
         {
             Dir = dir;
             Data = image;
@@ -49,12 +49,17 @@ namespace UnitTest.CTxt.Utils
                         Path.Combine(basepath, Dir, name);
         }
 
-
         public string WriteReceivedFile(string received)
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(received));
-            Data.Save(received);
+            WriteBitmap(Data, received);
             return received;
+        }
+
+        public static void WriteBitmap(Bitmap data, string path)
+        {
+            var dir = Path.GetDirectoryName(path);
+            if (dir is not null) Directory.CreateDirectory(dir);
+            data.Save(path);
         }
     }
 }

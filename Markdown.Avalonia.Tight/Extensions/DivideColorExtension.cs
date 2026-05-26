@@ -31,7 +31,7 @@ namespace Markdown.Avalonia.Extensions
             IBinding left;
             if (Color.TryParse(_frmKey, out var leftColor))
             {
-                left = new StaticBinding(new ImmutableSolidColorBrush(leftColor));
+                left = new Binding { Source = new ImmutableSolidColorBrush(leftColor), Mode = BindingMode.OneTime };
             }
             else
             {
@@ -42,7 +42,7 @@ namespace Markdown.Avalonia.Extensions
             IBinding right;
             if (Color.TryParse(_toKey, out var rightColor))
             {
-                right = new StaticBinding(new ImmutableSolidColorBrush(rightColor));
+                right = new Binding { Source = new ImmutableSolidColorBrush(rightColor), Mode = BindingMode.OneTime };
             }
             else
             {
@@ -56,92 +56,6 @@ namespace Markdown.Avalonia.Extensions
                 Converter = new DivideConverter(_relate)
             };
         }
-    }
-
-    class StaticBinding : IBinding
-    {
-        private readonly object _value;
-
-        public StaticBinding(object value)
-        {
-            _value = value;
-        }
-
-        public InstancedBinding? Initiate(AvaloniaObject target, AvaloniaProperty? targetProperty, object? anchor = null, bool enableDataValidation = false)
-        {
-            return InstancedBinding.OneWay(new StaticBindingObservable(_value));
-        }
-
-        class StaticBindingObservable : IObservable<object>
-        {
-            object Value { get; set; }
-
-            public StaticBindingObservable(object value)
-            {
-                Value = value;
-            }
-
-            private readonly ConcurrentDictionary<StaticTicket, IObserver<object>> _cache = new();
-
-            public IDisposable Subscribe(IObserver<object> observer)
-            {
-                //StaticTicket ticket;
-                //do
-                //{
-                //    ticket = new StaticTicket(this);
-                //} while (Cache.ContainsKey(ticket));
-                //
-                //Cache[ticket] = observer;
-                //
-                //return ticket;
-
-                observer.OnNext(Value);
-
-                return new DummyDisposable();
-            }
-
-            public void Remove(StaticTicket nemui)
-            {
-                _cache.TryRemove(nemui, out var _);
-            }
-        }
-
-        class DummyDisposable : IDisposable
-        {
-            public void Dispose() { }
-        }
-
-        class StaticTicket : IDisposable
-        {
-            private readonly StaticBindingObservable _owner;
-            private readonly Guid _guid = new();
-
-            public StaticTicket(StaticBindingObservable owner)
-            {
-                this._owner = owner;
-            }
-
-
-            ~StaticTicket() => Dispose();
-
-            public override int GetHashCode()
-                => _guid.GetHashCode();
-
-            public override bool Equals(object? obj)
-            {
-                if (obj is StaticTicket nemu)
-                    return nemu._guid.Equals(nemu._guid);
-
-                return false;
-            }
-
-            public void Dispose()
-            {
-                _owner.Remove(this);
-                GC.SuppressFinalize(this);
-            }
-        }
-
     }
 
     class DivideConverter : IMultiValueConverter

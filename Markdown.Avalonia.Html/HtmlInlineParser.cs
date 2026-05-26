@@ -1,4 +1,4 @@
-﻿using ColorTextBlock.Avalonia;
+using ColorTextBlock.Avalonia;
 using Markdown.Avalonia.Html.Core;
 using Markdown.Avalonia;
 using Markdown.Avalonia.Parsers;
@@ -13,7 +13,7 @@ namespace Markdown.Avalonia.Html
     {
         private readonly ReplaceManager _replacer;
 
-        public HtmlInlineParser(SyntaxHighlight highlight, SetupInfo info) : this(new ReplaceManager(highlight, info)) { }
+        public HtmlInlineParser(SyntaxHighlight highlight, SetupInfo info) : this(new ReplaceManager(highlight, info, true)) { }
 
         private HtmlInlineParser(ReplaceManager replacer) : base(SimpleHtmlUtils.CreateTagstartPattern(replacer.InlineTags), nameof(HtmlInlineParser))
         {
@@ -32,7 +32,7 @@ namespace Markdown.Avalonia.Html
             parseTextBegin = firstMatch.Index;
             parseTextEnd = SimpleHtmlUtils.SearchTagRange(text, firstMatch);
 
-            _replacer.Engine = engine;
+            _replacer.Engine = engine.Upgrade();
 
             return _replacer.ParseInline(text.Substring(parseTextBegin, parseTextEnd - parseTextBegin));
         }
