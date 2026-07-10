@@ -36,6 +36,7 @@ namespace Markdown.Avalonia
                 TextMarkerStyle.UpperLatin => ColorDocument.Avalonia.DocumentElements.TextMarkerStyle.UpperLatin,
                 TextMarkerStyle.UpperRoman => ColorDocument.Avalonia.DocumentElements.TextMarkerStyle.UpperRoman,
                 TextMarkerStyle.Square => ColorDocument.Avalonia.DocumentElements.TextMarkerStyle.Square,
+                _ => throw new ArgumentException(),
             };
         }
 

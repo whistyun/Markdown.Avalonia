@@ -47,7 +47,9 @@ namespace UnitTest.Md
             bordered.Classes.Add("test");
 
             var border = bordered.Control;
-            var innerPanel = ((Border) bordered.Control).Child;
+            var innerPanel = ((Border)bordered.Control).Child;
+            if (innerPanel is null)
+                throw new NullReferenceException(nameof(innerPanel));
 
             Assert.That(innerPanel.Classes, Does.Contain("test"));
             Assert.That(border.Classes, Does.Contain("test"));
@@ -61,10 +63,13 @@ namespace UnitTest.Md
             var bordered = new BorderedDocumentGroupElement(new[] { line });
             bordered.HorizontalAlignment = HorizontalAlignment.Right;
 
-            var border =(Border) bordered.Control;
+            var border = (Border)bordered.Control;
             Assert.That(border.HorizontalAlignment, Is.EqualTo(HorizontalAlignment.Right));
 
-            var innerPanel = (StackPanel)border.Child;
+            var innerPanel = border.Child as StackPanel;
+            if (innerPanel is null)
+                throw new NullReferenceException(nameof(innerPanel));
+
             var txt = (CTextBlock)innerPanel.Children[0];
             Assert.That(innerPanel.HorizontalAlignment, Is.EqualTo(HorizontalAlignment.Right));
             Assert.That(txt.TextAlignment, Is.EqualTo(TextAlignment.Right));

@@ -19,15 +19,18 @@ using Markdown.Avalonia.SyntaxHigh;
 
 namespace Markdown.Avalonia.Html.Core
 {
-    public class ReplaceManager
+    public class ReplaceManagerSyntax
     {
         private readonly Dictionary<string, List<IInlineTagParser>> _inlineBindParsers;
         private readonly Dictionary<string, List<IBlockTagParser>> _blockBindParsers;
         private readonly bool _inlineMode;
-
         private TextNodeParser _textParser;
+        public UnknownTagsOption UnknownTags { get; set; }
 
-        public ReplaceManager(SyntaxHighlight highlight, SetupInfo info, bool inlineMode)
+        public IEnumerable<string> InlineTags => _inlineBindParsers.Keys.Where(tag => !tag.StartsWith("#"));
+        public IEnumerable<string> BlockTags => _blockBindParsers.Keys.Where(tag => !tag.StartsWith("#"));
+
+        public ReplaceManagerSyntax(SyntaxHighlight highlight, SetupInfo info, bool inlineMode)
         {
             _inlineBindParsers = new(StringComparer.OrdinalIgnoreCase);
             _blockBindParsers = new(StringComparer.OrdinalIgnoreCase);
@@ -58,31 +61,6 @@ namespace Markdown.Avalonia.Html.Core
             foreach (var parser in TypicalInlineParser.Load())
                 Register(parser);
         }
-
-        #region Properties
-
-        public IEnumerable<string> InlineTags => _inlineBindParsers.Keys.Where(tag => !tag.StartsWith("#"));
-
-        public IEnumerable<string> BlockTags => _blockBindParsers.Keys.Where(tag => !tag.StartsWith("#"));
-
-        public UnknownTagsOption UnknownTags { get; set; }
-
-        public IMarkdownEngine2 Engine { get; set; }
-
-        public ICommand? HyperlinkCommand => Engine.HyperlinkCommand;
-
-        public string? AssetPathRoot => Engine.AssetPathRoot;
-
-        #endregion
-
-
-        #region Supported tags
-
-        public bool MaybeSupportBodyTag(string tagName)
-            => _blockBindParsers.ContainsKey(tagName);
-
-        public bool MaybeSupportInlineTag(string tagName)
-            => _inlineBindParsers.ContainsKey(tagName);
 
         public void Register(ITagParserBase parser)
         {
@@ -126,6 +104,68 @@ namespace Markdown.Avalonia.Html.Core
             static int GetPriority(object? p)
                 => p is IHasPriority prop ? prop.Priority : HasPriority.DefaultPriority;
         }
+
+
+        public ReplaceManager Create(IMarkdownEngine2 engine)
+            => new ReplaceManager(
+                _inlineBindParsers,
+                _blockBindParsers,
+                _inlineMode,
+                _textParser,
+                UnknownTags,
+                engine);
+    }
+
+    public class ReplaceManager
+    {
+        private readonly Dictionary<string, List<IInlineTagParser>> _inlineBindParsers;
+        private readonly Dictionary<string, List<IBlockTagParser>> _blockBindParsers;
+        private readonly bool _inlineMode;
+        private TextNodeParser _textParser;
+
+        public ReplaceManager(
+            Dictionary<string, List<IInlineTagParser>> inlineBindParsers,
+            Dictionary<string, List<IBlockTagParser>> blockBindParsers,
+            bool inlineMode,
+            TextNodeParser textParser,
+            UnknownTagsOption unknownTags,
+            IMarkdownEngine2 engine)
+        {
+            _inlineBindParsers = inlineBindParsers;
+            _blockBindParsers = blockBindParsers;
+            _inlineMode = inlineMode;
+            _textParser = textParser;
+            UnknownTags = unknownTags;
+            Engine = engine;
+        }
+
+
+
+        #region Properties
+
+        public IEnumerable<string> InlineTags => _inlineBindParsers.Keys.Where(tag => !tag.StartsWith("#"));
+
+        public IEnumerable<string> BlockTags => _blockBindParsers.Keys.Where(tag => !tag.StartsWith("#"));
+
+        public UnknownTagsOption UnknownTags { get; }
+
+        public IMarkdownEngine2 Engine { get; }
+
+        public ICommand? HyperlinkCommand => Engine.HyperlinkCommand;
+
+        public string? AssetPathRoot => Engine.AssetPathRoot;
+
+        #endregion
+
+
+        #region Supported tags
+
+        public bool MaybeSupportBodyTag(string tagName)
+            => _blockBindParsers.ContainsKey(tagName);
+
+        public bool MaybeSupportInlineTag(string tagName)
+            => _inlineBindParsers.ContainsKey(tagName);
+
 
         #endregion
 

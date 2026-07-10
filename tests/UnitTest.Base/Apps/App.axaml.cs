@@ -62,7 +62,7 @@ namespace UnitTest.Base.Apps
 
     class AppStarter : IDisposable
     {
-        ClassicDesktopStyleApplicationLifetime lifetime;
+        ClassicDesktopStyleApplicationLifetime? lifetime;
 
         public void Start()
         {
@@ -83,6 +83,8 @@ namespace UnitTest.Base.Apps
 
         public void Dispose()
         {
+            if (lifetime is null) return;
+
             try { lifetime.Shutdown(); }
             finally { lifetime.Dispose(); }
         }

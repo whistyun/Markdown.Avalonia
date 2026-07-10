@@ -712,19 +712,22 @@ namespace Markdown.Avalonia
                 {
                     var brush = _viewer.ComputedSelectionBrush;
                     var bounds = GetRectInDoc(control);
-                    var rect = new Rectangle()
+                    if (bounds.HasValue)
                     {
-                        Width = bounds.Value.Width,
-                        Height = bounds.Value.Height,
-                        Fill = brush,
-                        Opacity = .5
-                    };
+                        var rect = new Rectangle()
+                        {
+                            Width = bounds.Value.Width,
+                            Height = bounds.Value.Height,
+                            Fill = brush,
+                            Opacity = .5
+                        };
 
-                    Canvas.SetLeft(rect, bounds.Value.Left);
-                    Canvas.SetTop(rect, bounds.Value.Top);
+                        Canvas.SetLeft(rect, bounds.Value.Left);
+                        Canvas.SetTop(rect, bounds.Value.Top);
 
-                    _rects[control] = rect;
-                    _canvas.Children.Add(rect);
+                        _rects[control] = rect;
+                        _canvas.Children.Add(rect);
+                    }
                 }
             }
 
@@ -761,6 +764,9 @@ namespace Markdown.Avalonia
             public Rect? GetRectInDoc(Control control)
             {
                 if (!LayoutInformation.GetPreviousArrangeBounds(control).HasValue)
+                    return null;
+
+                if (_document is null)
                     return null;
 
                 double driftX = 0;

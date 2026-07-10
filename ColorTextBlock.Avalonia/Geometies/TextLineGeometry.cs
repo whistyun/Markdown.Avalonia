@@ -70,7 +70,7 @@ namespace ColorTextBlock.Avalonia.Geometries
             }
         }
 
-        public override TextPointer CalcuatePointerFrom(double x, double y)
+        public override PhysicalTextPointer CalcuatePointerFrom(double x, double y)
         {
             var relX = x - Left;
 
@@ -80,28 +80,28 @@ namespace ColorTextBlock.Avalonia.Geometries
             var hit = Line.GetCharacterHitFromDistance(relX);
             var dst = Line.GetDistanceFromCharacterHit(hit);
 
-            return new TextPointer((CRun)Owner, this, hit, dst, false);
+            return new PhysicalTextPointer((CRun)Owner, this, hit, dst, false);
         }
-        public override TextPointer CalcuatePointerFrom(int index)
+        public override PhysicalTextPointer CalcuatePointerFrom(int index)
         {
             var hit = new CharacterHit(Line.FirstTextSourceIndex + index);
             var dst = Line.GetDistanceFromCharacterHit(hit);
 
-            return new TextPointer((CRun)Owner, this, hit, dst, false);
+            return new PhysicalTextPointer((CRun)Owner, this, hit, dst, false);
         }
 
-        public override TextPointer GetBegin()
+        public override PhysicalTextPointer GetBegin()
         {
             var hit = Line.GetCharacterHitFromDistance(0);
 
-            return new TextPointer((CRun)Owner, this, hit, false);
+            return new PhysicalTextPointer((CRun)Owner, this, hit, false);
         }
 
-        public override TextPointer GetEnd()
+        public override PhysicalTextPointer GetEnd()
         {
             var hit = Line.GetCharacterHitFromDistance(Double.MaxValue);
 
-            return new TextPointer((CRun)Owner, this, hit, Width, true);
+            return new PhysicalTextPointer((CRun)Owner, this, hit, Width, true);
         }
 
         public override string ToString()

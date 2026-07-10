@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows.Input;
 
 namespace Markdown.AvaloniaDemo.ViewModels
 {
@@ -50,9 +51,9 @@ namespace Markdown.AvaloniaDemo.ViewModels
             set => this.RaiseAndSetIfChanged(ref _ErrorInfo, value);
         }
 
-        public List<StyleViewModel> Styles { set; get; }
+        public ICommand XamlParseResult { get; }
 
-        public void XamlParseResult(string result) => ErrorInfo = result;
+        public List<StyleViewModel> Styles { set; get; }
 
         public void TryParse() => AppendStyleXamlText = EdittingStyleXamlText;
 
@@ -83,6 +84,8 @@ namespace Markdown.AvaloniaDemo.ViewModels
             {
                 EdittingStyleXamlText = reader.ReadToEnd();
             }
+
+            XamlParseResult = new ErrorInfoAction(this);
         }
     }
 
@@ -93,6 +96,26 @@ namespace Markdown.AvaloniaDemo.ViewModels
         public StyleViewModel(string name)
         {
             Name = name;
+        }
+    }
+
+    public class ErrorInfoAction : ICommand
+    {
+        public event EventHandler CanExecuteChanged;
+
+        private MainWindowViewModel _model;
+
+        public ErrorInfoAction(MainWindowViewModel model)
+        {
+            this._model = model;
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        public bool CanExecute(object parameter) => true;
+
+        public void Execute(object parameter)
+        {
+            _model.ErrorInfo = parameter?.ToString() ?? string.Empty;
         }
     }
 }

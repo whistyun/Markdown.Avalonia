@@ -17,6 +17,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>Markdown.Avalonia.md</PackageReadmeFile>
     <PackageTags>Markdown Avalonia Avaloniaui</PackageTags>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

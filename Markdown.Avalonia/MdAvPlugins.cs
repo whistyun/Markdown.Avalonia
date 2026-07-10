@@ -21,7 +21,6 @@ namespace Markdown.Avalonia.Full
         {
             var setupInf = new SetupInfo();
 
-            var hasSyntaxHigh = false;
             var hasSvgFormat = false;
             var hasHtml = false;
 
@@ -43,14 +42,13 @@ namespace Markdown.Avalonia.Full
 
                 if (plugin is SyntaxHighlight light)
                 {
-                    hasSyntaxHigh = true;
                     syntaxPlugin = light;
                 }
                 hasSvgFormat |= plugin is SvgFormat;
                 hasHtml |= plugin is HtmlPlugin;
             }
 
-            if (!hasSyntaxHigh)
+            if (syntaxPlugin is null)
             {
                 syntaxPlugin = new SyntaxHighlight();
                 syntaxPlugin.Setup(setupInf);

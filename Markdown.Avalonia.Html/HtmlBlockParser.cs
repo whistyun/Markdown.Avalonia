@@ -11,17 +11,14 @@ namespace Markdown.Avalonia.Html
 {
     public class HtmlBlockParser : BlockParser2
     {
-        private static readonly Regex s_emptyLine = new Regex("\n{2,}", RegexOptions.Compiled);
         private static readonly Regex s_headTagPattern = new(@"^<[\t ]*(?'tagname'[a-z][a-z0-9]*)(?'attributes'[ \t][^>]*|/)?>",
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private static readonly Regex s_tagPattern = new(@"<(?'close'/?)[\t ]*(?'tagname'[a-z][a-z0-9]*)(?'attributes'[ \t][^>]*|/)?>",
-            RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        private ReplaceManager _replacer;
+        private ReplaceManagerSyntax _syntax;
 
         public HtmlBlockParser(SyntaxHighlight highlight, SetupInfo info) : base(s_headTagPattern, nameof(HtmlBlockParser))
         {
-            _replacer = new ReplaceManager(highlight, info, false);
+            _syntax = new ReplaceManagerSyntax(highlight, info, false);
         }
 
         public override IEnumerable<DocumentElement>? Convert2(
@@ -34,11 +31,9 @@ namespace Markdown.Avalonia.Html
             parseTextBegin = firstMatch.Index;
             parseTextEnd = SimpleHtmlUtils.SearchTagRangeContinuous(text, firstMatch);
 
-            _replacer.Engine = engine;
-
             var textchip = text.Substring(parseTextBegin, parseTextEnd - parseTextBegin);
 
-            return _replacer.Parse(textchip);
+            return _syntax.Create(engine).Parse(textchip);
         }
     }
 }

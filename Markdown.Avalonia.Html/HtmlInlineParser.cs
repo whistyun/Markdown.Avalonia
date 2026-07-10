@@ -11,14 +11,14 @@ namespace Markdown.Avalonia.Html
 {
     public class HtmlInlineParser : InlineParser
     {
-        private readonly ReplaceManager _replacer;
+        private readonly ReplaceManagerSyntax _syntax;
 
-        public HtmlInlineParser(SyntaxHighlight highlight, SetupInfo info) : this(new ReplaceManager(highlight, info, true)) { }
+        public HtmlInlineParser(SyntaxHighlight highlight, SetupInfo info) : this(new ReplaceManagerSyntax(highlight, info, true)) { }
 
-        private HtmlInlineParser(ReplaceManager replacer) : base(SimpleHtmlUtils.CreateTagstartPattern(replacer.InlineTags), nameof(HtmlInlineParser))
+        private HtmlInlineParser(ReplaceManagerSyntax replacer) : base(SimpleHtmlUtils.CreateTagstartPattern(replacer.InlineTags), nameof(HtmlInlineParser))
         {
-            _replacer = replacer;
-            FirstMatchPattern = SimpleHtmlUtils.CreateTagstartPattern(_replacer.InlineTags);
+            _syntax = replacer;
+            FirstMatchPattern = SimpleHtmlUtils.CreateTagstartPattern(_syntax.InlineTags);
         }
 
         public Regex FirstMatchPattern { get; }
@@ -32,9 +32,8 @@ namespace Markdown.Avalonia.Html
             parseTextBegin = firstMatch.Index;
             parseTextEnd = SimpleHtmlUtils.SearchTagRange(text, firstMatch);
 
-            _replacer.Engine = engine.Upgrade();
-
-            return _replacer.ParseInline(text.Substring(parseTextBegin, parseTextEnd - parseTextBegin));
+            var replacer = _syntax.Create(engine.Upgrade());
+            return replacer.ParseInline(text.Substring(parseTextBegin, parseTextEnd - parseTextBegin));
         }
     }
 }
