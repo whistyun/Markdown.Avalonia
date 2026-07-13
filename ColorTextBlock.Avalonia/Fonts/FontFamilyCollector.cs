@@ -10,22 +10,51 @@ namespace ColorTextBlock.Avalonia.Fonts
     {
         public static FontFamily? TryGetMonospace()
         {
-            string[] RequestFamilies = {
-                "menlo",
-                "monaco",
-                "consolas",
-                "droid sans mono",
-                "inconsolata",
-                "courier new",
-                "monospace",
-                "dejavu sans mono",
+            string[] requestFamilies = {
+                "Menlo",
+                "Monaco",
+                "Consolas",
+                "Droid Sans Mono",
+                "Inconsolata",
+                "Courier New",
+                "Monospace",
+                "DejaVu Sans Mono",
             };
 
-            var monospaceName = FontManager.Current.SystemFonts
-                                           .Where(family => RequestFamilies.Any(reqNm => family.Name.ToLower().Contains(reqNm)))
-                                           .FirstOrDefault();
+            var fontManager = FontManager.Current;
+            var systemFonts = fontManager.SystemFonts;
 
-            return monospaceName;
+            // Prefer exact matches in the requested order.
+            foreach (var requestedFamily in requestFamilies)
+            {
+                var exact = systemFonts.FirstOrDefault(family =>
+                    string.Equals(family.Name, requestedFamily, StringComparison.OrdinalIgnoreCase));
+
+                if (exact != null && CanCreateGlyphTypeface(fontManager, exact))
+                {
+                    return exact;
+                }
+            }
+
+            // Then allow partial matches for font variants, but still validate they are loadable.
+            foreach (var requestedFamily in requestFamilies)
+            {
+                var partial = systemFonts.FirstOrDefault(family =>
+                    family.Name.Contains(requestedFamily, StringComparison.OrdinalIgnoreCase));
+
+                if (partial != null && CanCreateGlyphTypeface(fontManager, partial))
+                {
+                    return partial;
+                }
+            }
+
+            return null;
+        }
+
+        private static bool CanCreateGlyphTypeface(FontManager fontManager, FontFamily family)
+        {
+            var typeface = new Typeface(family, FontStyle.Normal, FontWeight.Normal, FontStretch.Normal);
+            return fontManager.TryGetGlyphTypeface(typeface, out _);
         }
     }
 }
