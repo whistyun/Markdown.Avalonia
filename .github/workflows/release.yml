@@ -1,0 +1,52 @@
+name: Publish NuGet packages
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch: 
+
+jobs:
+  publish:
+    permissions:
+      id-token: write
+      contents: read
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Clean
+      run: dotnet clean
+
+    - name: Restore
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test  --configuration Release --no-build --verbosity normal
+
+    - name: Pack Package
+      run: |
+        mkdir ./artifacts
+        dotnet pack     --configuration Release --no-build --output ./artifacts
+
+    - name: List Target Packages
+      run: |
+        echo "=== The list of publish packages ==="     >> $GITHUB_STEP_SUMMARY
+        ls -1 ./artifacts/*.nupkg | xargs -n 1 basename >> $GITHUB_STEP_SUMMARY
+
+    - name: NuGet login
+      uses: NuGet/login@v1
+      id: login
+
+    - name: Push Package
+      if: github.event_name == 'release'
+      run: |
+        dotnet nuget push "./artifacts/*.nupkg"            \
+          --api-key ${{steps.login.outputs.NUGET_API_KEY}} \
+          --source https://api.nuget.org/v3/index.json     \
+          --skip-duplicate
