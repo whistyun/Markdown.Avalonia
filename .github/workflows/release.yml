@@ -42,6 +42,8 @@ jobs:
     - name: NuGet login
       uses: NuGet/login@v1
       id: login
+      with:
+        user: whistyun
 
     - name: Push Package
       if: github.event_name == 'release'
