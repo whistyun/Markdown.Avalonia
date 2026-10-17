@@ -1,0 +1,70 @@
+name: Publish NuGet packages
+
+on:
+  push:
+    tags:
+      - '*'
+
+env:
+  NUGET_CERT_REVOCATION_MODE: offline
+
+permissions:
+  contents: write
+
+jobs:
+  validate-tag:
+    permissions:
+      id-token: write
+      contents: read
+
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Validate tag name format
+      run: |
+        $tagName = "${{ github.ref_name }}"
+        Write-Host "Target Tag: $tagName"
+
+        if ($tagName -notmatch '^v\d+\.\d+\.\d+(-.*)?$') {
+          Write-Error "The tag name format is invalid. Only v#.#.# and v#.#.#-* are valid."
+          exit 1
+        }
+
+    - name: Validate tag name and project version
+      run: |
+        $tagName = "${{ github.ref_name }}"
+        $scriptPath = ".\.github\my_scripts\get-version.ps1"
+        $propsPath = ".\Markdown.Avalonia.props"
+
+        $projectVersion = (& $scriptPath $propsPath).Trim()
+
+        if ($tagName -ne ("v" + $projectVersion)) {
+          Write-Error "Unmatch tag name and project version. Tag name: $tagName, Project version: $projectVersion"
+          exit 1
+        }
+
+    - name: Clean
+      run: dotnet clean
+
+    - name: Restore with Retry
+      uses: nick-fields/retry@v3
+      with:
+        timeout_minutes: 5
+        max_attempts: 2
+        retry_on: error
+        command: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test  --configuration Release --no-build --verbosity normal
+
+    - name: Delete tag on failure
+      if: failure()
+      run: |
+        $tagName = "${{ github.ref_name }}"
+        git push origin --delete $tagName

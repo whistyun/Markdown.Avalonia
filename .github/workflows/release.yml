@@ -59,7 +59,7 @@ jobs:
     - name: Push Package
       if: github.event_name == 'release'
       run: |
-        dotnet nuget push "./artifacts/*.nupkg"            \
-          --api-key ${{steps.login.outputs.NUGET_API_KEY}} \
-          --source https://api.nuget.org/v3/index.json     \
+        dotnet nuget push "./artifacts/*.nupkg"            `
+          --api-key ${{steps.login.outputs.NUGET_API_KEY}} `
+          --source https://api.nuget.org/v3/index.json     `
           --skip-duplicate
