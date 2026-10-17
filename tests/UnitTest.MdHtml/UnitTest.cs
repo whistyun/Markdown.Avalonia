@@ -80,6 +80,9 @@ namespace UnitTest.MdHtml
 
             var xaml = BrokenXamlWriter.AsXaml(doc);
 
+            // Remove ':empty' pseudoclass to the test compatibility of Avalonia 12.1.0 and 12.1.4.
+            xaml = xaml.Replace("Classes=\":empty,", "Classes=\"");
+
             Approvals.Verify(xaml);
         }
 
@@ -92,6 +95,9 @@ namespace UnitTest.MdHtml
             var doc = Engine.Transform(html);
 
             var xaml = BrokenXamlWriter.AsXaml(doc);
+
+            // Remove ':empty' pseudoclass to the test compatibility of Avalonia 12.1.0 and 12.1.4.
+            xaml = xaml.Replace("Classes=\":empty,", "Classes=\"");
 
             Approvals.Verify(xaml);
         }

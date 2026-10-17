@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <AvaloniaVersion>12.0.0</AvaloniaVersion>
-    <DemoAvaloniaVersion>12.1.0</DemoAvaloniaVersion>
+    <DemoAvaloniaVersion>12.1.4</DemoAvaloniaVersion>
     <EnableAvaloniaEdit>enabled</EnableAvaloniaEdit>
     <AvaloniaEditVersion>12.0.0</AvaloniaEditVersion>
     <AvaloniaSvgVersion>12.0.0.1</AvaloniaSvgVersion>
@@ -23,7 +23,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>12.0.0-a3</PackageVersion>
+    <PackageVersion>12.0.0</PackageVersion>
   </PropertyGroup>
 
 </Project>
