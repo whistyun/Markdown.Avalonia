@@ -23,7 +23,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>12.0.0</PackageVersion>
+    <PackageVersion>12.0.2</PackageVersion>
   </PropertyGroup>
 
 </Project>

@@ -44,8 +44,11 @@ jobs:
 
     - name: List Target Packages
       run: |
-        echo "=== The list of publish packages ==="     >> $GITHUB_STEP_SUMMARY
-        Get-ChildItem -Name ./artifacts/*.nupkg >> $GITHUB_STEP_SUMMARY
+        echo "## The list of publish packages" | Add-Content -Path "test.txt"
+        echo "" | Add-Content -Path "test.txt"
+        ls -Name ./artifacts/*.nupkg | ForEach-Object {
+            "* " + $_
+        } | Add-Content -Path "test.txt"
 
     - name: NuGet login
       uses: NuGet/login@v1
