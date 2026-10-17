@@ -25,7 +25,7 @@ jobs:
         Write-Host "Target Tag: $tagName"
 
         if ($tagName -notmatch '^v\d+\.\d+\.\d+(-.*)?$') {
-          Write-Error "The tag name format is invalid. Only v#.#.# and v#.#.#-* are valid."
+          Throw "The tag name format is invalid. Only v#.#.# and v#.#.#-* are valid."
           exit 1
         }
 
@@ -35,10 +35,10 @@ jobs:
         $scriptPath = ".\.github\my_scripts\get-version.ps1"
         $propsPath = ".\Markdown.Avalonia.props"
 
-        $projectVersion = (& $scriptPath $propsPath).Trim()
+        $projectVersion = (powershell $scriptPath $propsPath).Trim()
 
         if ($tagName -ne ("v" + $projectVersion)) {
-          Write-Error "Unmatch tag name and project version. Tag name: $tagName, Project version: $projectVersion"
+          Throw "Unmatch tag name and project version. Tag name: $tagName, Project version: $projectVersion"
           exit 1
         }
 
