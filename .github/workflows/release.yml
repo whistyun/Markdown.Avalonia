@@ -37,7 +37,7 @@ jobs:
     - name: List Target Packages
       run: |
         echo "=== The list of publish packages ==="     >> $GITHUB_STEP_SUMMARY
-        ls -1 ./artifacts/*.nupkg | xargs -n 1 basename >> $GITHUB_STEP_SUMMARY
+        Get-ChildItem -Name ./artifacts/*.nupkg >> $GITHUB_STEP_SUMMARY
 
     - name: NuGet login
       uses: NuGet/login@v1
