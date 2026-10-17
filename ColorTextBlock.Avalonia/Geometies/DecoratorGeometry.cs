@@ -196,7 +196,7 @@ namespace ColorTextBlock.Avalonia.Geometries
                 target.Render(ctx);
         }
 
-        public override TextPointer CalcuatePointerFrom(double x, double y)
+        public override PhysicalTextPointer CalcuatePointerFrom(double x, double y)
         {
             if (x < Left)
             {
@@ -220,7 +220,7 @@ namespace ColorTextBlock.Avalonia.Geometries
             return Targets[Targets.Length - 1].GetEnd().Wrap(Owner, indexAdd);
         }
 
-        public override TextPointer CalcuatePointerFrom(int index)
+        public override PhysicalTextPointer CalcuatePointerFrom(int index)
         {
             if (index < 0)
                 throw new ArgumentOutOfRangeException(nameof(index));
@@ -241,13 +241,13 @@ namespace ColorTextBlock.Avalonia.Geometries
         }
 
 
-        public override TextPointer GetBegin()
+        public override PhysicalTextPointer GetBegin()
         {
             var pointer = Targets[0].GetBegin();
             return pointer.Wrap(Owner, 0);
         }
 
-        public override TextPointer GetEnd()
+        public override PhysicalTextPointer GetEnd()
         {
             var pointer = Targets[Targets.Length - 1].GetEnd();
 

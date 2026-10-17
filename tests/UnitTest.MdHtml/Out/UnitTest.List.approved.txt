@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-16"?>
 <StackPanel xmlns:c="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia" xmlns:m="https://github.com/whistyun/Markdown.Avalonia.Tight" xmlns:ma="https://github.com/whistyun/Markdown.Avalonia.Tight/Styles" xmlns:ma2="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="https://github.com/avaloniaui">
-  <Grid xmlns="">
+  <Grid Classes="List" xmlns="">
     <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
       <c:CRun Text="1." />
     </c:CTextBlock>
@@ -8,7 +8,7 @@
       <c:CTextBlock>
         <c:CRun Text="asdf " />
         <c:CBold Classes="Bold">
-          <c:CRun Text="fdsa " />
+          <c:CRun Text="fdsa" />
         </c:CBold>
         <c:CRun Text=" jkl; " />
         <c:CItalic Classes="Italic">
@@ -48,15 +48,15 @@
     </Grid.RowDefinitions>
   </Grid>
   <ma2:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
-  <Grid xmlns="">
+  <Grid Classes="List" xmlns="">
     <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
-      <c:CRun Text="・" />
+      <c:CRun Text="•" />
     </c:CTextBlock>
     <StackPanel Grid.Column="1" Grid.Row="0">
       <c:CTextBlock>
         <c:CRun Text="asdf " />
         <c:CBold Classes="Bold">
-          <c:CRun Text="fdsa " />
+          <c:CRun Text="fdsa" />
         </c:CBold>
         <c:CRun Text=" jkl; " />
         <c:CItalic Classes="Italic">
@@ -65,7 +65,7 @@
       </c:CTextBlock>
     </StackPanel>
     <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="1">
-      <c:CRun Text="・" />
+      <c:CRun Text="•" />
     </c:CTextBlock>
     <StackPanel Grid.Column="1" Grid.Row="1">
       <c:CTextBlock>
@@ -73,7 +73,7 @@
       </c:CTextBlock>
     </StackPanel>
     <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="2">
-      <c:CRun Text="・" />
+      <c:CRun Text="•" />
     </c:CTextBlock>
     <StackPanel Grid.Column="1" Grid.Row="2">
       <c:CTextBlock>
@@ -96,7 +96,7 @@
     </Grid.RowDefinitions>
   </Grid>
   <ma2:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
-  <Grid xmlns="">
+  <Grid Classes="List" xmlns="">
     <c:CTextBlock Classes="ListMarker" Grid.Column="0" Grid.Row="0">
       <c:CRun Text="12." />
     </c:CTextBlock>
@@ -104,7 +104,7 @@
       <c:CTextBlock>
         <c:CRun Text="asdf " />
         <c:CBold Classes="Bold">
-          <c:CRun Text="fdsa " />
+          <c:CRun Text="fdsa" />
         </c:CBold>
         <c:CRun Text=" jkl; " />
         <c:CItalic Classes="Italic">

@@ -130,6 +130,7 @@
       SaveScrollValueWhenContentUpdated="True"
       Markdown="{Binding Text}"
       HeaderScrolled="HeaderScrolled"
+      SelectionEnabled="True"
       
       local:DynamicStyleBehavior.XamlText="{Binding AppendStyleXamlText}"
       local:DynamicStyleBehavior.ValidationResult="{Binding XamlParseResult}"

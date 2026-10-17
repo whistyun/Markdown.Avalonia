@@ -5,6 +5,7 @@ using NUnit.Framework;
 using System.Linq;
 using UnitTest.Base;
 using UnitTest.Base.Utils;
+using XamlUtils;
 
 namespace UnitTest.Md
 {
@@ -18,7 +19,7 @@ namespace UnitTest.Md
             var text = Util.LoadText("Test1.md");
             var markdown = new Markdown.Avalonia.Markdown();
             var result = markdown.Transform(text);
-            Approvals.Verify(Util.AsXaml(result));
+            Approvals.Verify(BrokenXamlWriter.AsXaml(result));
         }
 
         [Test]
@@ -28,7 +29,7 @@ namespace UnitTest.Md
             var text = Util.LoadText("Lists1.md");
             var markdown = new Markdown.Avalonia.Markdown();
             var result = markdown.Transform(text);
-            Approvals.Verify(Util.AsXaml(result));
+            Approvals.Verify(BrokenXamlWriter.AsXaml(result));
         }
 
         [Test]
@@ -38,7 +39,7 @@ namespace UnitTest.Md
             var text = Util.LoadText("Lists2.md");
             var markdown = new Markdown.Avalonia.Markdown();
             var result = markdown.Transform(text);
-            Approvals.Verify(Util.AsXaml(result));
+            Approvals.Verify(BrokenXamlWriter.AsXaml(result));
         }
 
         [Test]
@@ -48,7 +49,7 @@ namespace UnitTest.Md
             var text = Util.LoadText("Lists3.md");
             var markdown = new Markdown.Avalonia.Markdown();
             var result = markdown.Transform(text);
-            Approvals.Verify(Util.AsXaml(result));
+            Approvals.Verify(BrokenXamlWriter.AsXaml(result));
         }
 
         [Test]
@@ -58,7 +59,7 @@ namespace UnitTest.Md
             var text = Util.LoadText("Tables.md");
             var markdown = new Markdown.Avalonia.Markdown();
             var result = markdown.Transform(text);
-            Approvals.Verify(Util.AsXaml(result));
+            Approvals.Verify(BrokenXamlWriter.AsXaml(result));
         }
 
         [Test]
@@ -68,7 +69,7 @@ namespace UnitTest.Md
             var text = Util.LoadText("HorizontalRules.md");
             var markdown = new Markdown.Avalonia.Markdown();
             var result = markdown.Transform(text);
-            Approvals.Verify(Util.AsXaml(result));
+            Approvals.Verify(BrokenXamlWriter.AsXaml(result));
         }
 
         [Test]
@@ -78,7 +79,7 @@ namespace UnitTest.Md
             var text = Util.LoadText("Links_inline_style.md");
             var markdown = new Markdown.Avalonia.Markdown();
             var result = markdown.Transform(text);
-            Approvals.Verify(Util.AsXaml(result));
+            Approvals.Verify(BrokenXamlWriter.AsXaml(result));
         }
 
         [Test]
@@ -88,7 +89,7 @@ namespace UnitTest.Md
             var text = Util.LoadText("Text_style.md");
             var markdown = new Markdown.Avalonia.Markdown();
             var result = markdown.Transform(text);
-            Approvals.Verify(Util.AsXaml(result));
+            Approvals.Verify(BrokenXamlWriter.AsXaml(result));
         }
 
         [Test]
@@ -99,7 +100,7 @@ namespace UnitTest.Md
             var markdown = new Markdown.Avalonia.Markdown() { AssetPathRoot = AssetPath };
 
             var result = markdown.Transform(text);
-            Approvals.Verify(Util.AsXaml(result));
+            Approvals.Verify(BrokenXamlWriter.AsXaml(result));
         }
 
         [Test]
@@ -110,7 +111,7 @@ namespace UnitTest.Md
             var markdown = new Markdown.Avalonia.Markdown();
 
             var result = markdown.Transform(text);
-            Approvals.Verify(Util.AsXaml(result));
+            Approvals.Verify(BrokenXamlWriter.AsXaml(result));
         }
 
         [Test]
@@ -121,7 +122,7 @@ namespace UnitTest.Md
             var markdown = new Markdown.Avalonia.Markdown() { AssetPathRoot = AssetPath };
 
             var result = markdown.Transform(text);
-            Approvals.Verify(Util.AsXaml(result));
+            Approvals.Verify(BrokenXamlWriter.AsXaml(result));
         }
 
         [Test]
@@ -132,7 +133,7 @@ namespace UnitTest.Md
             var markdown = new Markdown.Avalonia.Markdown() { AssetPathRoot = AssetPath };
 
             var result = markdown.Transform(text);
-            Approvals.Verify(Util.AsXaml(result));
+            Approvals.Verify(BrokenXamlWriter.AsXaml(result));
         }
 
         [Test]
@@ -143,7 +144,7 @@ namespace UnitTest.Md
             var markdown = new Markdown.Avalonia.Markdown() { AssetPathRoot = AssetPath };
 
             var result = markdown.Transform(text);
-            Approvals.Verify(Util.AsXaml(result));
+            Approvals.Verify(BrokenXamlWriter.AsXaml(result));
         }
 
         [Test]
@@ -154,7 +155,7 @@ namespace UnitTest.Md
             var markdown = new Markdown.Avalonia.Markdown() { AssetPathRoot = AssetPath };
 
             var result = markdown.Transform(text);
-            Approvals.Verify(Util.AsXaml(result));
+            Approvals.Verify(BrokenXamlWriter.AsXaml(result));
         }
 
         [Test]
@@ -165,7 +166,7 @@ namespace UnitTest.Md
             var markdown = new Markdown.Avalonia.Markdown() { AssetPathRoot = AssetPath };
 
             var result = markdown.Transform(text);
-            Approvals.Verify(Util.AsXaml(result));
+            Approvals.Verify(BrokenXamlWriter.AsXaml(result));
         }
 
         [Test]

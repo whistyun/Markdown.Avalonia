@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using ColorTextBlock.Avalonia;
@@ -11,6 +11,8 @@ namespace ColorDocument.Avalonia.DocumentElements
 {
     public class ListBlockElement : DocumentElement
     {
+        private readonly TextMarkerStyle _marker;
+        private readonly int _orderedListStart;
         private Lazy<Grid> _control;
         private EnumerableEx<ListItemElement> _items;
         private SelectionList? _prevSelection;
@@ -18,9 +20,11 @@ namespace ColorDocument.Avalonia.DocumentElements
         public override Control Control => _control.Value;
         public override IEnumerable<DocumentElement> Children => _items;
 
-        public ListBlockElement(TextMarkerStyle marker, IEnumerable<ListItemElement> items)
+        public ListBlockElement(TextMarkerStyle marker, IEnumerable<ListItemElement> items, int orderedListStart = 1)
         {
-            _control = new Lazy<Grid>(() => CreateList(marker));
+            _marker = marker;
+            _orderedListStart = orderedListStart;
+            _control = new Lazy<Grid>(() => CreateList(_marker));
             _items = items.ToEnumerable();
         }
 
@@ -58,7 +62,7 @@ namespace ColorDocument.Avalonia.DocumentElements
             int index = 0;
             foreach (var item in _items)
             {
-                var markerTxt = new CTextBlock(marker.CreateMakerText(index));
+                var markerTxt = new CTextBlock(marker.CreateMakerText(index + _orderedListStart));
                 var itemCtrl = item.Control;
 
                 item.MarkerText = markerTxt.Text;
@@ -83,6 +87,7 @@ namespace ColorDocument.Avalonia.DocumentElements
                 ++index;
             }
 
+            ApplyEffects(grid);
             return grid;
 
             static CTextBlock? FindFirstFrom(Control ctrl)

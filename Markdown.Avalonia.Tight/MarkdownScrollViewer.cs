@@ -9,6 +9,7 @@ using Avalonia.Media;
 using Avalonia.Metadata;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using ColorDocument.Avalonia;
 using ColorDocument.Avalonia.DocumentElements;
 using ColorTextBlock.Avalonia;
@@ -17,6 +18,7 @@ using Markdown.Avalonia.StyleCollections;
 using Markdown.Avalonia.Utils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -205,16 +207,34 @@ namespace Markdown.Avalonia
         {
             if (!SelectionEnabled) return;
 
-            // Ctrl+C
-            if (e.Key == Key.C && e.KeyModifiers == KeyModifiers.Control)
+            // Copy hotkey
+            if (e.Key == Key.C)
             {
-                if (_document is not null
-                    && TopLevel.GetTopLevel(this) is TopLevel top
-                    && top.Clipboard is IClipboard clipboard)
+                switch (e.KeyModifiers)
                 {
-                    clipboard.SetTextAsync(_document.GetSelectedText());
+                    case KeyModifiers.Control: // windows , linux
+                    case KeyModifiers.Meta: // macOS
+                        if (_document is not null
+                            && TopLevel.GetTopLevel(this) is TopLevel top
+                            && top.Clipboard is IClipboard clipboard)
+                        {
+                            var selectedText = _document.GetSelectedText();
+                            Dispatcher.UIThread.Post(async () =>
+                                await clipboard.SetTextAsync(selectedText)
+                                         .ContinueWith(_ =>
+                                         {
+                                             if (_.IsFaulted)
+                                             {
+                                                 Debug.Print("Failed:" + _.Exception.ToString());
+                                             }
+                                         })
+                            );
+                        }
+                        break;
                 }
+
             }
+
         }
 
         #endregion
@@ -692,19 +712,22 @@ namespace Markdown.Avalonia
                 {
                     var brush = _viewer.ComputedSelectionBrush;
                     var bounds = GetRectInDoc(control);
-                    var rect = new Rectangle()
+                    if (bounds.HasValue)
                     {
-                        Width = bounds.Value.Width,
-                        Height = bounds.Value.Height,
-                        Fill = brush,
-                        Opacity = .5
-                    };
+                        var rect = new Rectangle()
+                        {
+                            Width = bounds.Value.Width,
+                            Height = bounds.Value.Height,
+                            Fill = brush,
+                            Opacity = .5
+                        };
 
-                    Canvas.SetLeft(rect, bounds.Value.Left);
-                    Canvas.SetTop(rect, bounds.Value.Top);
+                        Canvas.SetLeft(rect, bounds.Value.Left);
+                        Canvas.SetTop(rect, bounds.Value.Top);
 
-                    _rects[control] = rect;
-                    _canvas.Children.Add(rect);
+                        _rects[control] = rect;
+                        _canvas.Children.Add(rect);
+                    }
                 }
             }
 
@@ -741,6 +764,9 @@ namespace Markdown.Avalonia
             public Rect? GetRectInDoc(Control control)
             {
                 if (!LayoutInformation.GetPreviousArrangeBounds(control).HasValue)
+                    return null;
+
+                if (_document is null)
                     return null;
 
                 double driftX = 0;

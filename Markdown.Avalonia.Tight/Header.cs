@@ -20,7 +20,7 @@ namespace Markdown.Avalonia
             => obj is Header arg ? Equals(arg) : false;
 
         public bool Equals(Header? other)
-            => Level == other.Level && Text == other.Text;
+            => other is not null && Level == other.Level && Text == other.Text;
 
         public static bool operator !=(Header? left, Header? right)
             => !(left == right);

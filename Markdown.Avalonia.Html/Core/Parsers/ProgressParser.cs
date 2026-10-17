@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using ColorTextBlock.Avalonia;
 using HtmlAgilityPack;
@@ -9,13 +9,6 @@ namespace Markdown.Avalonia.Html.Core.Parsers
     public class ProgressParser : IInlineTagParser
     {
         public IEnumerable<string> SupportTag => new[] { "progress", "meter" };
-
-        bool ITagParser.TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<StyledElement> generated)
-        {
-            var rtn = TryReplace(node, manager, out var list);
-            generated = list;
-            return rtn;
-        }
 
         public bool TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<CInline> generated)
         {

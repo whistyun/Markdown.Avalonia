@@ -28,7 +28,7 @@ namespace ColorTextBlock.Avalonia.Geometies
         {
         }
 
-        public override TextPointer CalcuatePointerFrom(double x, double y)
+        public override PhysicalTextPointer CalcuatePointerFrom(double x, double y)
         {
             if (x < Left + Width / 2)
             {
@@ -40,7 +40,7 @@ namespace ColorTextBlock.Avalonia.Geometies
             }
         }
 
-        public override TextPointer CalcuatePointerFrom(int index)
+        public override PhysicalTextPointer CalcuatePointerFrom(int index)
         {
             return index switch
             {
@@ -50,14 +50,14 @@ namespace ColorTextBlock.Avalonia.Geometies
             };
         }
 
-        public override TextPointer GetBegin()
+        public override PhysicalTextPointer GetBegin()
         {
-            return new TextPointer(this);
+            return new PhysicalTextPointer(this);
         }
 
-        public override TextPointer GetEnd()
+        public override PhysicalTextPointer GetEnd()
         {
-            return new TextPointer(this, 1, Width);
+            return new PhysicalTextPointer(this, 1, Width);
         }
     }
 }

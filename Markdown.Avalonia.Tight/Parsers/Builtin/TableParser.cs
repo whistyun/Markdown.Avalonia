@@ -75,7 +75,6 @@ namespace Markdown.Avalonia.Parsers.Builtin
                     .ToDictionary(tpl => tpl.Item1, tpl => tpl.Item2!.Value);
 
 
-            int colOffset = 0;
             TableCellElement[][] headerCells = new[] { CreateRow(styleMt, match.Groups["hdr"].Value, engine, true) };
 
             List<TableCellElement[]> detailCells = new();

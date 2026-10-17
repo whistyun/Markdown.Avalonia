@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
@@ -50,6 +50,7 @@ namespace ColorDocument.Avalonia.DocumentElements
             result.Classes.Add(ClassNames.CodeBlockClass);
             result.Child = scrl;
 
+            ApplyEffects(result);
             return result;
         }
 

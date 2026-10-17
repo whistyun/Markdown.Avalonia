@@ -45,9 +45,11 @@ namespace UnitTest.MdSyntax
                     }
 
                     var wrapperType = wrapper.GetType();
-                    var cvtFldInf = wrapperType.GetField("_converted", BindingFlags.NonPublic | BindingFlags.Instance);
+                    var cvtFldInf = wrapperType.GetField("_converted", BindingFlags.NonPublic | BindingFlags.Instance)
+                                        ?? throw new NullReferenceException("Failed to get a FieldInfo: _converted");
 
-                    var cvt = (Dictionary<HighlightingRuleSet, HighlightingRuleSet>)cvtFldInf.GetValue(wrapper);
+                    var cvtVal = cvtFldInf.GetValue(wrapper) ?? throw new NullReferenceException("Failed to get a value: _converted");
+                    var cvt = (Dictionary<HighlightingRuleSet, HighlightingRuleSet>)cvtVal;
                     foreach (var rule in cvt.Values)
                     {
                         Look(rule);

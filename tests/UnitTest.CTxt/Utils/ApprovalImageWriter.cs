@@ -52,7 +52,8 @@ namespace UnitTest.CTxt.Utils
 
         public string WriteReceivedFile(string received)
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(received));
+            var dir = Path.GetDirectoryName(received);
+            if (dir is not null) Directory.CreateDirectory(dir);
             Data.Save(received);
             return received;
         }

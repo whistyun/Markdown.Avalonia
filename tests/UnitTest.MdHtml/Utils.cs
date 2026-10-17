@@ -14,17 +14,12 @@ namespace UnitTest.MdHtml.Test
 {
     public static class Utils
     {
-        public static string ReadHtml([CallerMemberName] string fileBaseName = null)
+        public static string ReadHtml([CallerMemberName] string? fileBaseName = null)
         {
             if (fileBaseName is null)
                 throw new ArgumentNullException(nameof(fileBaseName));
 
             return Util.LoadText(fileBaseName + ".html");
-        }
-
-        public static string AsXaml(object result)
-        {
-            return global::UnitTest.Base.Utils.Util.AsXaml(result);
         }
 
         public static string GetRuntimeName()

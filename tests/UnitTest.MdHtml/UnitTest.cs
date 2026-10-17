@@ -8,6 +8,7 @@ using System.Linq;
 using UnitTest.Base;
 using UnitTest.Base.Utils;
 using UnitTest.MdHtml.Test;
+using XamlUtils;
 
 using MarkdownEngine = Markdown.Avalonia.Markdown;
 
@@ -38,7 +39,7 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
 
             Approvals.Verify(xaml);
         }
@@ -51,7 +52,7 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
 
             Approvals.Verify(xaml);
         }
@@ -64,7 +65,7 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
 
             Approvals.Verify(xaml);
         }
@@ -77,7 +78,10 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
+
+            // Remove ':empty' pseudoclass to the test compatibility of Avalonia 12.1.0 and 12.1.4.
+            xaml = xaml.Replace("Classes=\":empty,", "Classes=\"");
 
             Approvals.Verify(xaml);
         }
@@ -90,7 +94,10 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
+
+            // Remove ':empty' pseudoclass to the test compatibility of Avalonia 12.1.0 and 12.1.4.
+            xaml = xaml.Replace("Classes=\":empty,", "Classes=\"");
 
             Approvals.Verify(xaml);
         }
@@ -103,7 +110,7 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
 
             Approvals.Verify(xaml);
         }
@@ -116,7 +123,7 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
 
             Approvals.Verify(xaml);
         }
@@ -129,7 +136,7 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
 
             Approvals.Verify(xaml);
         }
@@ -142,7 +149,7 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
 
             Approvals.Verify(xaml);
         }
@@ -155,7 +162,7 @@ namespace UnitTest.MdHtml
 
             var doc = Engine.Transform(html);
 
-            var xaml = Utils.AsXaml(doc);
+            var xaml = BrokenXamlWriter.AsXaml(doc);
 
             Approvals.Verify(xaml);
         }

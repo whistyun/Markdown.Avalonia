@@ -8,6 +8,7 @@ using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows.Input;
 
 namespace Markdown.AvaloniaFluentAvaloniaDemo.ViewModels
 {
@@ -77,7 +78,7 @@ namespace Markdown.AvaloniaFluentAvaloniaDemo.ViewModels
             }
         }
 
-        public void XamlParseResult(string result) => ErrorInfo = result;
+        public ICommand XamlParseResult { get; }
 
         public void TryParse() => AppendStyleXamlText = EdittingStyleXamlText;
 
@@ -94,6 +95,8 @@ namespace Markdown.AvaloniaFluentAvaloniaDemo.ViewModels
             {
                 EdittingStyleXamlText = reader.ReadToEnd();
             }
+
+            XamlParseResult = new ErrorInfoAction(this);
         }
 
         public void ApplyAssetPathRoot()
@@ -101,5 +104,25 @@ namespace Markdown.AvaloniaFluentAvaloniaDemo.ViewModels
 
         public void ApplySource()
             => Source = new Uri(SourceText);
+    }
+
+    public class ErrorInfoAction : ICommand
+    {
+        public event EventHandler CanExecuteChanged;
+
+        private MainWindowViewModel _model;
+
+        public ErrorInfoAction(MainWindowViewModel model)
+        {
+            this._model = model;
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        public bool CanExecute(object parameter) => true;
+
+        public void Execute(object parameter)
+        {
+            _model.ErrorInfo = parameter?.ToString() ?? string.Empty;
+        }
     }
 }

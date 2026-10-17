@@ -74,6 +74,9 @@ namespace Markdown.Avalonia.Controls
                 throw new ArgumentException(nameof(ruleType));
 
             this.Classes.Add(cls);
+
+            // see https://github.com/AvaloniaUI/Avalonia/pull/21829
+            this.PseudoClasses.Remove(":empty");
         }
 
         protected override Size MeasureOverride(Size availableSize)

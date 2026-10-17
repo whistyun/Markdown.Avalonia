@@ -4,11 +4,12 @@
     <PackageTargetFrameworks>net8.0;net10.0</PackageTargetFrameworks>
     <DemoAppTargetFrameworks>net8.0;net10.0</DemoAppTargetFrameworks>
     <TestTargetFrameworks>net8.0;net10.0</TestTargetFrameworks>
+    <LangVersion>14</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup>
     <AvaloniaVersion>12.0.0</AvaloniaVersion>
-    <DemoAvaloniaVersion>12.0.0</DemoAvaloniaVersion>
+    <DemoAvaloniaVersion>12.1.4</DemoAvaloniaVersion>
     <EnableAvaloniaEdit>enabled</EnableAvaloniaEdit>
     <AvaloniaEditVersion>12.0.0</AvaloniaEditVersion>
     <AvaloniaSvgVersion>12.0.0.1</AvaloniaSvgVersion>
@@ -18,11 +19,11 @@
     <TestAvaloniaVersion>$(AVA_VER)</TestAvaloniaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(AVA_VER)' == '' ">
-    <TestAvaloniaVersion>$(AvaloniaVersion)</TestAvaloniaVersion>
+    <TestAvaloniaVersion>$(DemoAvaloniaVersion)</TestAvaloniaVersion>
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>12.0.0-a3</PackageVersion>
+    <PackageVersion>12.0.0</PackageVersion>
   </PropertyGroup>
 
 </Project>

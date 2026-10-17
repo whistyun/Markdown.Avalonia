@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using ColorTextBlock.Avalonia;
@@ -40,6 +40,7 @@ namespace ColorDocument.Avalonia.DocumentElements
             result.Classes.Add(ClassNames.NoteClass);
             result.Child = note;
 
+            ApplyEffects(result);
             return result;
         }
 

@@ -1,9 +1,10 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using ColorTextBlock.Avalonia;
 using HtmlAgilityPack;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Markdown.Avalonia.Html.Core.Parsers
 {
@@ -11,17 +12,10 @@ namespace Markdown.Avalonia.Html.Core.Parsers
     {
         public IEnumerable<string> SupportTag => new[] { "button" };
 
-        bool ITagParser.TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<StyledElement> generated)
-        {
-            var rtn = TryReplace(node, manager, out var list);
-            generated = list;
-            return rtn;
-        }
-
         public bool TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<CInline> generated)
         {
             var doc = new StackPanel() { Orientation = Orientation.Vertical };
-            doc.Children.AddRange(manager.ParseChildrenAndGroup(node));
+            doc.Children.AddRange(manager.ParseChildNodes(node).Select(e => e.Control));
 
             doc.Loaded += (s, e) =>
             {

@@ -28,12 +28,12 @@ namespace ColorTextBlock.Avalonia.Geometries
 
         public override void Render(DrawingContext ctx) { }
 
-        public override TextPointer CalcuatePointerFrom(double x, double y)
+        public override PhysicalTextPointer CalcuatePointerFrom(double x, double y)
         {
             throw new InvalidOperationException();
         }
 
-        public override TextPointer CalcuatePointerFrom(int index)
+        public override PhysicalTextPointer CalcuatePointerFrom(int index)
         {
             return index switch
             {
@@ -43,16 +43,16 @@ namespace ColorTextBlock.Avalonia.Geometries
             };
         }
 
-        public override TextPointer GetBegin()
+        public override PhysicalTextPointer GetBegin()
         {
-            return new TextPointer(this);
+            return new PhysicalTextPointer(this);
         }
 
-        public override TextPointer GetEnd()
+        public override PhysicalTextPointer GetEnd()
         {
             return IsDummy ?
-                new TextPointer(this) :
-                new TextPointer(this, 1, Width);
+                new PhysicalTextPointer(this) :
+                new PhysicalTextPointer(this, 1, Width);
         }
     }
 }

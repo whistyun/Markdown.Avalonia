@@ -42,10 +42,7 @@ namespace ColorDocument.Avalonia
             {
                 var doc = controls[i];
                 var rect = doc.Control.GetRectInDoc(anchor);
-                if (rect.HasValue)
-                {
-                    rs[i] = new DocumentElementWithBound(doc, rect.Value);
-                }
+                rs[i] = new DocumentElementWithBound(doc, rect ?? default);
             }
 
             return new EnumerableExAry<DocumentElementWithBound>(rs);

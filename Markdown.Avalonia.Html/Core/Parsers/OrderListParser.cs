@@ -1,15 +1,9 @@
-﻿using HtmlAgilityPack;
-using System;
+using HtmlAgilityPack;
 using System.Collections.Generic;
+using ColorDocument.Avalonia;
+using ColorDocument.Avalonia.DocumentElements;
 using Markdown.Avalonia.Html.Core.Utils;
-using System.Windows;
-using System.Linq;
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Layout;
-using System.Reflection;
-using ColorTextBlock.Avalonia;
-using Avalonia.Media;
+using ListMark=ColorDocument.Avalonia.DocumentElements.TextMarkerStyle;
 
 namespace Markdown.Avalonia.Html.Core.Parsers
 {
@@ -17,64 +11,26 @@ namespace Markdown.Avalonia.Html.Core.Parsers
     {
         public IEnumerable<string> SupportTag => new[] { "ol" };
 
-        bool ITagParser.TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<StyledElement> generated)
+        public bool TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<DocumentElement> generated)
         {
-            var rtn = TryReplace(node, manager, out var list);
-            generated = list;
-            return rtn;
-        }
-
-        public bool TryReplace(HtmlNode node, ReplaceManager manager, out IEnumerable<Control> generated)
-        {
-            var list = new Grid();
-            list.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
-            list.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridUnitType.Star)));
-
-            int index = 0;
-            int order = 1;
-
+            var start = 1;
             var startAttr = node.Attributes["start"];
-            if (startAttr is not null && Int32.TryParse(startAttr.Value, out var start))
-            {
-                order = start;
-            }
+            if (startAttr is not null && int.TryParse(startAttr.Value, out var parsedStart))
+                start = parsedStart;
+
+            var items = new List<ListItemElement>();
 
             foreach (var listItemTag in node.ChildNodes.CollectTag("li"))
             {
-                var itemContent = manager.ParseChildrenAndGroup(listItemTag);
-
-                var markerTxt = new CTextBlock(order + ".");
-                markerTxt.TextAlignment = TextAlignment.Right;
-                markerTxt.TextWrapping = TextWrapping.NoWrap;
-                markerTxt.Classes.Add(global::Markdown.Avalonia.Markdown.ListMarkerClass);
-
-                var item = CreateItem(itemContent);
-
-                list.RowDefinitions.Add(new RowDefinition());
-                list.Children.Add(markerTxt);
-                list.Children.Add(item);
-
-                Grid.SetRow(markerTxt, index);
-                Grid.SetColumn(markerTxt, 0);
-
-                Grid.SetRow(item, index);
-                Grid.SetColumn(item, 1);
-
-                ++index;
-                ++order;
+                var children = manager.ParseChildNodes(listItemTag);
+                items.Add(new ListItemElement(children));
             }
 
-            generated = new[] { list };
+            generated = new DocumentElement[]
+            {
+                new ListBlockElement(ListMark.Decimal, items, start),
+            };
             return true;
-        }
-
-        private StackPanel CreateItem(IEnumerable<Control> children)
-        {
-            var panel = new StackPanel() { Orientation = Orientation.Vertical };
-            foreach (var child in children)
-                panel.Children.Add(child);
-
-            return panel;
         }
     }
 }

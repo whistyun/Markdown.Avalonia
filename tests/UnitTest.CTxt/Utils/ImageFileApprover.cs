@@ -2,6 +2,7 @@
 using ApprovalTests.Core;
 using ApprovalTests.Core.Exceptions;
 using Avalonia.Controls;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -19,7 +20,7 @@ namespace UnitTest.CTxt.Utils
         {
         }
 
-        public override ApprovalException Approve(string approvedPath, string receivedPath)
+        public override ApprovalException? Approve(string approvedPath, string receivedPath)
         {
             if (Path.GetExtension(approvedPath) != ".png")
                 return base.Approve(approvedPath, receivedPath);
@@ -32,39 +33,39 @@ namespace UnitTest.CTxt.Utils
             // FIXME: I have no idea to compare bitmap with Avalonia.Media.Imaging
             //        This logic use System.Drawing, So only run on Windows.
 
-            using var approvedImg = new Bitmap(approvedPath);
-            using var receivedImg = new Bitmap(receivedPath);
+            using var approvedImg = SKBitmap.FromImage(SKImage.FromEncodedData(approvedPath));
+            using var receivedImg = SKBitmap.FromImage(SKImage.FromEncodedData(receivedPath));
 
             var approvedByte = BitmapToByte(approvedImg);
             var receivedByte = BitmapToByte(receivedImg);
 
-            return !Compare(receivedByte, approvedByte) ?
-                    new ApprovalMismatchException(receivedPath, approvedPath) :
-                    null;
+            if (Compare(receivedByte, approvedByte))
+            {
+                return null;
+            }
+
+            return new ApprovalMismatchException(receivedPath, approvedPath);
         }
 
 
-        private byte[] BitmapToByte(Bitmap bmp)
+        private byte[] BitmapToByte(SKBitmap bmp)
         {
             var rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
-            var bDt = bmp.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
 
             var bary = new byte[bmp.Width * bmp.Height * 3];
 
-            var ptr = bDt.Scan0;
+            var ptr = bmp.GetPixels();
             var lineLen = bmp.Width * 3;
             for (int i = 0; i < bmp.Height; ++i)
             {
                 Marshal.Copy(ptr, bary, i * lineLen, lineLen);
-                ptr += bDt.Stride;
+                ptr += bmp.RowBytes;
             }
-
-            bmp.UnlockBits(bDt);
 
             return bary;
         }
 
-        private new static bool Compare(ICollection<byte> bytes1, ICollection<byte> bytes2)
+        private static bool Compare(ICollection<byte> bytes1, ICollection<byte> bytes2)
         {
             if (bytes1.Count != bytes2.Count)
             {

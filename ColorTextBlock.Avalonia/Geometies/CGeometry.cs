@@ -1,7 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Media;
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace ColorTextBlock.Avalonia.Geometries
 {
@@ -44,10 +43,15 @@ namespace ColorTextBlock.Avalonia.Geometries
 
         internal void RequestRepaint() => RepaintRequested?.Invoke();
 
-        public abstract TextPointer CalcuatePointerFrom(int index);
-        public abstract TextPointer CalcuatePointerFrom(double x, double y);
-        public abstract TextPointer GetBegin();
-        public abstract TextPointer GetEnd();
+        public abstract PhysicalTextPointer CalcuatePointerFrom(int index);
+        public abstract PhysicalTextPointer CalcuatePointerFrom(double x, double y);
+        public abstract PhysicalTextPointer GetBegin();
+        public abstract PhysicalTextPointer GetEnd();
+
+        TextPointer ITextPointerHandleable.CalcuatePointerFrom(int index) => CalcuatePointerFrom(index);
+        TextPointer ITextPointerHandleable.CalcuatePointerFrom(double x, double y) => CalcuatePointerFrom(x, y);
+        TextPointer ITextPointerHandleable.GetBegin() => GetBegin();
+        TextPointer ITextPointerHandleable.GetEnd() => GetEnd();
 
         public virtual void Arranged() { }
 

@@ -3,18 +3,18 @@
   <c:CTextBlock Classes="Paragraph">
     <c:CRun Text="An " />
     <c:CCode Classes="CodeSpan">
-      <c:CRun Text="apple " />
+      <c:CRun Text="apple" />
     </c:CCode>
     <c:CRun Text=" is an editable fruit produced by an " />
     <c:CCode Classes="CodeSpan">
-      <c:CRun Text="apple tree " />
+      <c:CRun Text="apple tree" />
     </c:CCode>
     <c:CRun Text="." />
   </c:CTextBlock>
   <ma2:Rule BoldLineWidth="2" Classes="Single,RuleSingle" />
   <c:CTextBlock>
     <c:CCode Classes="CodeSpan">
-      <c:CRun Text="Apple trees " />
+      <c:CRun Text="Apple trees" />
     </c:CCode>
     <c:CRun Text=" are caltivated wordwide." />
   </c:CTextBlock>

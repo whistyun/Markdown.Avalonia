@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -65,8 +65,9 @@ namespace ColorDocument.Avalonia.DocumentElements
         {
             if (_items.Count == 1)
             {
-
-                return new Border() { Child = Setup(_items[0].Control) };
+                var border = new Border() { Child = Setup(_items[0].Control) };
+                ApplyEffects(border);
+                return border;
             }
             else
             {
@@ -74,7 +75,9 @@ namespace ColorDocument.Avalonia.DocumentElements
                 foreach (var cnt in _items)
                     pnl.Children.Add(Setup(cnt.Control));
 
-                return new Border() { Child = pnl };
+                var border = new Border() { Child = pnl };
+                ApplyEffects(border);
+                return border;
             }
         }
 
@@ -87,13 +90,13 @@ namespace ColorDocument.Avalonia.DocumentElements
                 switch (Horizontal.Value)
                 {
                     case TextAlignment.Left:
-                        control.HorizontalAlignment = HorizontalAlignment.Left;
+                        control.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left;
                         break;
                     case TextAlignment.Right:
-                        control.HorizontalAlignment = HorizontalAlignment.Right;
+                        control.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Right;
                         break;
                     case TextAlignment.Center:
-                        control.HorizontalAlignment = HorizontalAlignment.Center;
+                        control.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Center;
                         break;
                 }
             }

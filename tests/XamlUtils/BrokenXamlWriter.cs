@@ -6,13 +6,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 
-namespace UnitTest.Base.Utils
+namespace XamlUtils
 {
     /*
      * Export AvaloniaObject to xaml-like text
@@ -24,6 +25,22 @@ namespace UnitTest.Base.Utils
      */
     public class BrokenXamlWriter
     {
+        public static string AsXaml(object instance)
+        {
+            using var writer = new StringWriter();
+            var settings = new XmlWriterSettings { Indent = true };
+            using (var xmlWriter = XmlWriter.Create(writer, settings))
+            {
+                var docGen = new BrokenXamlWriter();
+                var docObj = docGen.Transform(instance);
+                docObj.Save(xmlWriter);
+            }
+
+            writer.WriteLine();
+            return writer.ToString();
+        }
+
+
         #region assembly management
 
         /// <summary>
@@ -58,8 +75,7 @@ namespace UnitTest.Base.Utils
                     continue;
                 }
 
-                XmlNamespace alreadyRegistered = _xmlNamespaces.Values.Where(xpc => xpc.Namespace == xmlurl).FirstOrDefault();
-
+                var alreadyRegistered = _xmlNamespaces.Values.FirstOrDefault(xpc => xpc.Namespace == xmlurl);
                 if (alreadyRegistered is null)
                 {
                     /* register as new*/
@@ -95,7 +111,8 @@ namespace UnitTest.Base.Utils
                     .Where(fld => typeof(AvaloniaProperty).IsAssignableFrom(fld.FieldType))
                     .Where(fld => fld.FieldType.IsGenericType)
                     .Where(fld => fld.FieldType.GetGenericTypeDefinition() == typeof(AttachedProperty<>))
-                    .Select(fld => (AvaloniaProperty)fld.GetValue(null));
+                    .Select(fld => fld.GetValue(null))
+                    .OfType<AvaloniaProperty>();
 
             _attachedProperties.AddRange(attachecProperties);
 
@@ -106,15 +123,18 @@ namespace UnitTest.Base.Utils
 
         private string GeneratePrefixFor(Assembly asm)
         {
+            var asmName = asm.GetName().Name;
+
             // 'Markdown.Avalonia' -> "ma"
-            string full = String.Join("", asm.GetName().Name.Split('.')
-                                             .Select(nmchip => nmchip[0].ToString().ToLower()));
+            string full = asmName is null? 
+                                "null": 
+                                String.Join("", asmName.Split('.')
+                                      .Select(nmchip => nmchip[0].ToString().ToLower()));
 
             // When full is 'yoghurt', Try 'y', 'yo', 'yog', ...
-            string prefix = Enumerable.Range(1, full.Length)
+            string? prefix = Enumerable.Range(1, full.Length)
                                       .Select(len => full.Substring(0, len))
-                                      .Where(chip => !_xmlNamespaces.ContainsKey(chip))
-                                      .FirstOrDefault();
+                                      .FirstOrDefault(chip => !_xmlNamespaces.ContainsKey(chip));
 
             // 'yogurt2', 'yogurt3', 'yogurt4', ...
             for (var idx = 2; prefix is null; ++idx)
@@ -127,7 +147,7 @@ namespace UnitTest.Base.Utils
                 }
             }
 
-            return prefix;
+            return prefix ?? throw new InvalidOperationException("Failed to generate XML namespace prefix.");
         }
 
         public string GetPrefixFor(Type type)
@@ -139,7 +159,7 @@ namespace UnitTest.Base.Utils
                 RegisterAssembly(asm);
             }
 
-            string nmspc = type.Namespace;
+            string nmspc = type.Namespace ?? "";
 
             // already registered?
             KeyValuePair<string, XmlNamespace>[] keyAndValues = _xmlNamespaces
@@ -170,7 +190,7 @@ namespace UnitTest.Base.Utils
 
         public ObjectNode Collect(AvaloniaObject obj)
         {
-            var node = new ObjectNode();
+            var node = new ObjectNode(obj);
 
             Type objType = obj.GetType();
 
@@ -178,22 +198,15 @@ namespace UnitTest.Base.Utils
             /*
              * Check Content property
              */
-            PropertyInfo contentProp = objType.GetProperties()
-                                              .Where(pinf => pinf.GetCustomAttribute(typeof(ContentAttribute)) != null)
-                                              .FirstOrDefault();
+            PropertyInfo? contentProp = objType.GetProperties()
+                                               .FirstOrDefault(pinf => pinf.GetCustomAttribute<ContentAttribute>() != null);
 
             if (contentProp != null)
             {
                 var objValue = contentProp.GetValue(obj);
                 if (objValue != null)
                 {
-                    node.Content = new ObjectProperty()
-                    {
-                        Owner = obj,
-                        AttributeName = contentProp.Name,
-                        PropertyInfo = contentProp,
-                        Value = objValue
-                    };
+                    node.Content = new ObjectProperty(obj, contentProp.Name, objValue, contentProp);
                 }
             }
 
@@ -202,21 +215,19 @@ namespace UnitTest.Base.Utils
              */
             var attrAvaProps = objType.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
                                   .Where(fld => typeof(AvaloniaProperty).IsAssignableFrom(fld.FieldType))
-                                  .Select(fld => ((AvaloniaProperty)fld.GetValue(null)))
+                                  .Select(fld => ((AvaloniaProperty?)fld.GetValue(null)))
+                                  .OfType<AvaloniaProperty>()
                                   // ignore content property
                                   .Where(ap => ap.Name != contentProp?.Name);
 
-            node.Attributes = new List<ObjectProperty>();
             node.Attributes.AddRange(
                 CollectChangedValue(obj, attrAvaProps)
-                    .Select(tpl => new ObjectProperty()
-                    {
-                        Owner = obj,
-                        AvaloniaProperty = tpl.Item1,
-                        AttributeName = tpl.Item1.Name,
-                        PropertyInfo = objType.GetProperty(tpl.Item1.Name),
-                        Value = tpl.Item2
-                    })
+                    .Select(tpl => new ObjectProperty(
+                        obj,
+                        tpl.Item1.Name,
+                        tpl.Item2,
+                        objType.GetProperty(tpl.Item1.Name),
+                        tpl.Item1))
             );
 
             /*
@@ -230,11 +241,15 @@ namespace UnitTest.Base.Utils
                                // has getter and setter
                                .Where(pinf => pinf.CanWrite && pinf.CanRead)
                                .Where(pinf => pinf.GetSetMethod() != null)
-                               .Where(pinf => pinf.GetGetMethod() != null && pinf.GetGetMethod().GetParameters().Length == 0);
+                               .Where(pinf =>
+                               {
+                                   var getMethod = pinf.GetGetMethod();
+                                   return getMethod != null && getMethod.GetParameters().Length == 0;
+                               });
 
             foreach (var pinf in plainProps)
             {
-                object value = pinf.GetValue(obj);
+                var value = pinf.GetValue(obj);
 
                 if (obj is StyledElement elm)
                 {
@@ -257,13 +272,7 @@ namespace UnitTest.Base.Utils
                     continue;
                 }
 
-                node.Attributes.Add(new ObjectProperty()
-                {
-                    Owner = obj,
-                    AttributeName = pinf.Name,
-                    PropertyInfo = pinf,
-                    Value = pinf.GetValue(obj)
-                });
+                node.Attributes.Add(new ObjectProperty(obj, pinf.Name, pinf.GetValue(obj), pinf));
             }
 
 
@@ -274,11 +283,15 @@ namespace UnitTest.Base.Utils
                    .Where(pinf => pinf != contentProp)
                    .Where(pinf => pinf.CanRead)
                    .Where(pinf => pinf.GetSetMethod() == null)
-                   .Where(pinf => pinf.GetGetMethod() != null && pinf.GetGetMethod().GetParameters().Length == 0);
+                   .Where(pinf =>
+                   {
+                       var getMethod = pinf.GetGetMethod();
+                       return getMethod != null && getMethod.GetParameters().Length == 0;
+                   });
 
             foreach (var pinf in addableProps)
             {
-                object value = pinf.GetValue(obj);
+                object? value = pinf.GetValue(obj);
 
                 if (obj is StyledElement elm)
                 {
@@ -301,35 +314,27 @@ namespace UnitTest.Base.Utils
                 if (list.Count == 0)
                     continue;
 
-                node.Attributes.Add(new ObjectProperty()
-                {
-                    Owner = obj,
-                    AttributeName = pinf.Name,
-                    PropertyInfo = pinf,
-                    Value = pinf.GetValue(obj)
-                });
+                node.Attributes.Add(new ObjectProperty(obj, pinf.Name, pinf.GetValue(obj), pinf));
             }
 
 
             var attachAvaProps = _attachedProperties.Where(prop => !node.Attributes.Any(attr => attr.AvaloniaProperty == prop));
             node.Attributes.AddRange(
                 CollectChangedValue(obj, attachAvaProps)
-                    .Select(tpl => new ObjectProperty()
-                    {
-                        Owner = obj,
-                        AvaloniaProperty = tpl.Item1,
-                        AttributePrefix = GetPrefixFor(tpl.Item1.OwnerType),
-                        AttributeName = $"{tpl.Item1.OwnerType.Name}.{tpl.Item1.Name}",
-                        PropertyInfo = objType.GetProperty(tpl.Item1.Name),
-                        Value = tpl.Item2
-                    })
+                    .Select(tpl => new ObjectProperty(
+                        obj,
+                        $"{tpl.Item1.OwnerType.Name}.{tpl.Item1.Name}",
+                        tpl.Item2,
+                        objType.GetProperty(tpl.Item1.Name),
+                        tpl.Item1,
+                        GetPrefixFor(tpl.Item1.OwnerType)))
             );
 
 
             return node;
         }
 
-        private IEnumerable<(AvaloniaProperty, object)> CollectChangedValue(AvaloniaObject obj, IEnumerable<AvaloniaProperty> aprops)
+        private IEnumerable<(AvaloniaProperty, Object?)> CollectChangedValue(AvaloniaObject obj, IEnumerable<AvaloniaProperty> aprops)
         {
             foreach (var aprop in aprops)
             {
@@ -341,10 +346,11 @@ namespace UnitTest.Base.Utils
                     var objValue = obj.GetValue(aprop);
                     yield return (aprop, objValue);
                 }
-                else if (aprop.Name == "Text" && obj.GetValue(aprop) is not null && !String.IsNullOrEmpty(obj.GetValue(aprop).ToString()))
+                else if (aprop.Name == "Text")
                 {
-                    var objValue = obj.GetValue(aprop);
-                    yield return (aprop, objValue);
+                    var textValue = obj.GetValue(aprop);
+                    if (textValue is not null && !String.IsNullOrEmpty(textValue.ToString()))
+                        yield return (aprop, textValue);
                 }
             }
         }
@@ -367,7 +373,7 @@ namespace UnitTest.Base.Utils
                         CreateElement(null, name) :
                         CreateElement(name.Substring(0, spidx), name.Substring(spidx + 1));
         }
-        private XmlElement CreateElement(string prefix, string name)
+        private XmlElement CreateElement(string? prefix, string name)
         {
             if (string.IsNullOrEmpty(prefix))
             {
@@ -375,10 +381,9 @@ namespace UnitTest.Base.Utils
 
                 return Document.CreateElement(name);
             }
-            else
-            {
-                return Document.CreateElement(prefix, name, _xmlNamespaces[prefix].Namespace);
-            }
+
+            var nsPrefix = prefix ?? throw new ArgumentException(nameof(prefix));
+            return Document.CreateElement(nsPrefix, name, _xmlNamespaces[nsPrefix].Namespace);
         }
 
         private XmlAttribute CreateAttribute(string name)
@@ -390,7 +395,7 @@ namespace UnitTest.Base.Utils
                         CreateAttribute(name.Substring(0, spidx), name.Substring(spidx + 1));
         }
 
-        private XmlAttribute CreateAttribute(string prefix, string name)
+        private XmlAttribute CreateAttribute(string? prefix, string name)
         {
             if (string.IsNullOrEmpty(prefix))
             {
@@ -398,10 +403,9 @@ namespace UnitTest.Base.Utils
 
                 return Document.CreateAttribute(name);
             }
-            else
-            {
-                return Document.CreateAttribute(prefix, name, _xmlNamespaces[prefix].Namespace);
-            }
+
+            var nsPrefix = prefix ?? throw new ArgumentException(nameof(prefix));
+            return Document.CreateAttribute(nsPrefix, name, _xmlNamespaces[nsPrefix].Namespace);
         }
 
         public XmlDocument Transform(object value)
@@ -414,13 +418,16 @@ namespace UnitTest.Base.Utils
 
             ApplyTo(root, (AvaloniaObject)value);
 
+            var rootElement = Document.DocumentElement
+                ?? throw new InvalidOperationException("Document has no root element.");
+
             foreach (var xmlSpc in _xmlNamespaces.Values)
             {
                 if (string.IsNullOrEmpty(xmlSpc.Prefix)) continue;
 
-                Document.DocumentElement.SetAttribute("xmlns:" + xmlSpc.Prefix, xmlSpc.Namespace);
+                rootElement.SetAttribute("xmlns:" + xmlSpc.Prefix, xmlSpc.Namespace);
             }
-            Document.DocumentElement.SetAttribute("xmlns:x", "http://schemas.microsoft.com/winfx/2006/xaml");
+            rootElement.SetAttribute("xmlns:x", "http://schemas.microsoft.com/winfx/2006/xaml");
 
             return Document;
         }
@@ -447,7 +454,6 @@ namespace UnitTest.Base.Utils
                     || prop.Value is short || prop.Value is int || prop.Value is long
                     || prop.Value is float || prop.Value is double)
             {
-
                 XmlAttribute attr = CreateAttribute(prop.AttributePrefix, prop.AttributeName);
                 attr.Value = prop.Value.ToString();
 
@@ -546,19 +552,42 @@ namespace UnitTest.Base.Utils
 
     public class ObjectNode
     {
-        public object Owner { get; set; }
-        public ObjectProperty Content { get; set; }
-        public List<ObjectProperty> Attributes { get; set; }
+        public object Owner { get; }
+        public ObjectProperty? Content { get; set; }
+        public List<ObjectProperty> Attributes { get; }
+
+        public ObjectNode(object owner)
+        {
+            Owner = owner;
+            Content = null;
+            Attributes = new List<ObjectProperty>();
+        }
     }
 
     public class ObjectProperty
     {
-        public object Owner { get; set; }
-        public string AttributePrefix { get; set; }
-        public string AttributeName { get; set; }
+        public object Owner { get; }
+        public string? AttributePrefix { get; }
+        public string AttributeName { get; }
 
-        public AvaloniaProperty AvaloniaProperty { get; set; }
-        public PropertyInfo PropertyInfo { get; set; }
-        public object Value { get; set; }
+        public AvaloniaProperty? AvaloniaProperty { get; }
+        public PropertyInfo? PropertyInfo { get; }
+        public object? Value { get; }
+
+        public ObjectProperty(
+            object owner,
+            string attributeName,
+            object? value,
+            PropertyInfo? propertyInfo = null,
+            AvaloniaProperty? avaloniaProperty = null,
+            string? attributePrefix = null)
+        {
+            Owner = owner;
+            AttributeName = attributeName;
+            Value = value;
+            PropertyInfo = propertyInfo;
+            AvaloniaProperty = avaloniaProperty;
+            AttributePrefix = attributePrefix;
+        }
     }
 }

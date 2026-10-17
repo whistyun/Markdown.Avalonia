@@ -37,7 +37,7 @@ namespace UnitTest.CTxt
         public void GivenTest1_generatesExpectedResult()
         {
             var tst1 = new Test1();
-            var ctxt = (CTextBlock)tst1.Content;
+            var ctxt = (CTextBlock)tst1.Content!;
 
             var info = new MetryHolder(ctxt, 360, 1000);
 
@@ -52,7 +52,7 @@ namespace UnitTest.CTxt
         public void GivenTest2_generatesExpectedResult()
         {
             var tst2 = new Test2();
-            var ctxt = (CTextBlock)tst2.Content;
+            var ctxt = (CTextBlock)tst2.Content!;
 
             var info = new MetryHolder(ctxt, 1000, 1000);
 
@@ -67,7 +67,7 @@ namespace UnitTest.CTxt
         public void GivenTest3_generatesExpectedResult_sub0()
         {
             var tst3 = new Test3();
-            var spnl = (StackPanel)tst3.Content;
+            var spnl = (StackPanel)tst3.Content!;
 
             var ctxt = (CTextBlock)spnl.Children[0];
             var info = new MetryHolder(ctxt, 1000, 1000);
@@ -83,7 +83,7 @@ namespace UnitTest.CTxt
         public void GivenTest3_generatesExpectedResult_sub1()
         {
             var tst3 = new Test3();
-            var spnl = (StackPanel)tst3.Content;
+            var spnl = (StackPanel)tst3.Content!;
 
             var ctxt = (CTextBlock)spnl.Children[1];
             var info = new MetryHolder(ctxt, 1000, 1000);
@@ -99,7 +99,7 @@ namespace UnitTest.CTxt
         public void GivenTest3_generatesExpectedResult_sub2()
         {
             var tst3 = new Test3();
-            var spnl = (StackPanel)tst3.Content;
+            var spnl = (StackPanel)tst3.Content!;
 
             var ctxt = (CTextBlock)spnl.Children[2];
             var info = new MetryHolder(ctxt, 1000, 1000);
@@ -115,7 +115,7 @@ namespace UnitTest.CTxt
         public void GivenTest3_generatesExpectedResult_sub3()
         {
             var tst3 = new Test3();
-            var spnl = (StackPanel)tst3.Content;
+            var spnl = (StackPanel)tst3.Content!;
 
             var ctxt = (CTextBlock)spnl.Children[3];
             var info = new MetryHolder(ctxt, 1000, 1000);
@@ -185,7 +185,7 @@ namespace UnitTest.CTxt
         public void GivenTest4_generatesExpectedResult()
         {
             var tst4 = new Test4();
-            var ctxt = (CTextBlock)tst4.Content;
+            var ctxt = (CTextBlock)tst4.Content!;
 
             var info = new MetryHolder(ctxt, 1000, 1000);
 
@@ -200,7 +200,7 @@ namespace UnitTest.CTxt
         public void GivenTest5_generatesExpectedResult()
         {
             var tst5 = new Test5();
-            var ctxt = (CTextBlock)tst5.Content;
+            var ctxt = (CTextBlock)tst5.Content!;
 
             var info = new MetryHolder(ctxt, 1000, 1000);
 
@@ -215,7 +215,7 @@ namespace UnitTest.CTxt
         public void GivenTest6_generatesExpectedResult()
         {
             var tst6 = new Test6();
-            var ctxt = (CTextBlock)tst6.Content;
+            var ctxt = (CTextBlock)tst6.Content!;
 
             var info = new MetryHolder(ctxt, 1000, 1000);
 
@@ -230,7 +230,7 @@ namespace UnitTest.CTxt
         public void GivenTest7_generatesExpectedResult()
         {
             var tst6 = new Test7();
-            var ctxt = (StackPanel)tst6.Content;
+            var ctxt = (StackPanel)tst6.Content!;
 
             var info = new MetryHolder(ctxt, 480, 1000);
 
@@ -296,7 +296,7 @@ namespace UnitTest.CTxt
         public void GivenTest99_generatesExpectedResult(int width)
         {
             var tst99 = new Test99();
-            var ctxt = (CTextBlock)tst99.Content;
+            var ctxt = (CTextBlock)tst99.Content!;
 
             var info = new MetryHolder(ctxt, width, 1000);
 
@@ -373,7 +373,10 @@ namespace UnitTest.CTxt
                                             .Where(fld => fld.Name == "VisualChildren")
                                             .First();
 
-                var children = (IAvaloniaList<Visual>)childrenProp.GetValue(vis);
+                var visualChildrenObj = childrenProp.GetValue(vis) 
+                                        ?? throw new NullReferenceException("Failed to get a value: VisualChildren");
+
+                var children = (IAvaloniaList<Visual>)visualChildrenObj;
                 foreach (var child in children)
                     RenderHelper(child, ctx);
             }

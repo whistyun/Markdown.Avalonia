@@ -35,7 +35,7 @@ namespace Markdown.Avalonia.Parsers
                 IMarkdownEngine engine = engine2 is IMarkdownEngine e ? e : new MarkdownEngineDng(engine2);
 
                 var rtn = _parser.Convert(text, firstMatch, status, engine, out parseTextBegin, out parseTextEnd);
-                return rtn.Select(c => new UnBlockElement(c));
+                return rtn?.Select(c => new UnBlockElement(c));
             }
         }
 

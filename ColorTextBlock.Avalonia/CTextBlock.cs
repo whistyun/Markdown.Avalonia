@@ -18,6 +18,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -164,8 +165,8 @@ namespace ColorTextBlock.Avalonia
 
 
         public Selection? Selection =>
-            _beginSelect is not null && _endSelect is not null ?
-                new Selection(_beginSelect.Index, _endSelect.Index) :
+            _beginSelect is PhysicalTextPointer beginPhysical && _endSelect is PhysicalTextPointer endPhysical ?
+                new Selection(beginPhysical.Index, endPhysical.Index) :
                 null;
 
         /// <summary>
@@ -516,8 +517,9 @@ namespace ColorTextBlock.Avalonia
                 if (item is CInlineUIContainer container)
                 {
                     var content = container.Content;
+                    if (content is null) return;
 
-                    var visparent = container.Content.GetVisualParent();
+                    var visparent = content.GetVisualParent();
                     if (visparent is CTextBlock cblock)
                     {
                         cblock.VisualChildren.Remove(content);
@@ -529,8 +531,8 @@ namespace ColorTextBlock.Avalonia
                         return;
                     }
 
-                    VisualChildren.Add(container.Content);
-                    LogicalChildren.Add(container.Content);
+                    VisualChildren.Add(content);
+                    LogicalChildren.Add(content);
 
                     _containers.Add(container);
                 }
@@ -556,8 +558,11 @@ namespace ColorTextBlock.Avalonia
             {
                 if (item is CInlineUIContainer container)
                 {
-                    VisualChildren.Remove(container.Content);
-                    LogicalChildren.Remove(container.Content);
+                    var content = container.Content;
+                    if (content is null) return;
+
+                    VisualChildren.Remove(content);
+                    LogicalChildren.Remove(content);
 
                     _containers.Remove(container);
                 }
@@ -754,9 +759,9 @@ namespace ColorTextBlock.Avalonia
 
             foreach (CGeometry metry in _metries) metry.RepaintRequested += RepaintRequested;
 
-            if (_beginSelect is not null && _endSelect is not null)
+            if (_beginSelect is PhysicalTextPointer beginPhysical && _endSelect is PhysicalTextPointer endPhysical)
             {
-                Select(_beginSelect.Index, _endSelect.Index);
+                Select(beginPhysical.Index, endPhysical.Index);
             }
 
             return new Size(width, height);
@@ -772,43 +777,40 @@ namespace ColorTextBlock.Avalonia
             IBrush select = SelectionBrush ?? Brushes.Cyan;
             List<Rect>? fillAfter = null;
 
-            if (_beginSelect is not null && _endSelect is not null)
+            var bgnPhysical = _beginSelect as PhysicalTextPointer;
+            var endPhysical = _endSelect as PhysicalTextPointer;
+            if (bgnPhysical is not null && endPhysical is not null)
             {
                 fillAfter = new List<Rect>();
 
-                TextPointer bgn, end;
-                if (_beginSelect < _endSelect)
+                if (bgnPhysical > endPhysical)
                 {
-                    bgn = _beginSelect;
-                    end = _endSelect;
-                }
-                else
-                {
-                    bgn = _endSelect;
-                    end = _beginSelect;
+                    var inter = bgnPhysical;
+                    bgnPhysical = endPhysical;
+                    endPhysical = inter;
                 }
 
 
-                if (ReferenceEquals(bgn.Geometry, end.Geometry))
+                if (ReferenceEquals(bgnPhysical.Geometry, endPhysical.Geometry))
                 {
                     var rct = new Rect(
-                        bgn.Geometry.Left + bgn.Distance,
-                        bgn.Geometry.Top,
-                        end.Distance - bgn.Distance,
-                        bgn.Geometry.Height);
+                        bgnPhysical.Geometry.Left + bgnPhysical.Distance,
+                        bgnPhysical.Geometry.Top,
+                        endPhysical.Distance - bgnPhysical.Distance,
+                        bgnPhysical.Geometry.Height);
 
-                    TryRender(bgn.Geometry, rct);
+                    TryRender(bgnPhysical.Geometry, rct);
                 }
                 else
                 {
-                    TryRender(bgn.Geometry, new Rect(bgn.Geometry.Left + bgn.Distance, bgn.Geometry.Top, bgn.Geometry.Width - bgn.Distance, bgn.Geometry.Height));
+                    TryRender(bgnPhysical.Geometry, new Rect(bgnPhysical.Geometry.Left + bgnPhysical.Distance, bgnPhysical.Geometry.Top, bgnPhysical.Geometry.Width - bgnPhysical.Distance, bgnPhysical.Geometry.Height));
 
                     foreach (var inter in _intermediates)
                     {
                         TryRender(inter, new Rect(inter.Left, inter.Top, inter.Width, inter.Height));
                     }
 
-                    TryRender(end.Geometry, new Rect(end.Geometry.Left, end.Geometry.Top, end.Distance, end.Geometry.Height));
+                    TryRender(endPhysical.Geometry, new Rect(endPhysical.Geometry.Left, endPhysical.Geometry.Top, endPhysical.Distance, endPhysical.Geometry.Height));
                 }
 
                 void TryRender(CGeometry metry, Rect rct)
@@ -860,6 +862,9 @@ namespace ColorTextBlock.Avalonia
         {
             int beginBack = begin;
             int endBack = end;
+
+            TextPointer beginPointer = LogicalTextPointer.Home;
+            TextPointer endPointer = LogicalTextPointer.End;
             for (var i = 0; i < _metries.Count; ++i)
             {
                 var metry = _metries[i];
@@ -867,44 +872,52 @@ namespace ColorTextBlock.Avalonia
 
                 if (begin < caretLength || (i == _metries.Count - 1 && begin == caretLength))
                 {
-                    _beginSelect = metry.CalcuatePointerFrom(begin).Wrap(this, beginBack - begin);
+                    beginPointer = metry.CalcuatePointerFrom(begin).Wrap(this, beginBack - begin);
                     begin = Int32.MaxValue;
                 }
                 else begin -= caretLength;
 
                 if (end < caretLength || (i == _metries.Count - 1 && end == caretLength))
                 {
-                    _endSelect = metry.CalcuatePointerFrom(end).Wrap(this, endBack - end);
-                    if (endBack != _endSelect.Index)
+                    endPointer = metry.CalcuatePointerFrom(end).Wrap(this, endBack - end);
+                    if (endPointer is PhysicalTextPointer endPhysical && endBack != endPhysical.Index)
                         throw new Exception();
                     end = Int32.MaxValue;
                 }
                 else end -= caretLength;
             }
-            ComplementIntermediate();
+
+            ComplementIntermediate(beginPointer, endPointer);
             InvalidateVisual();
         }
 
         public void Select(TextPointer begin, TextPointer end)
         {
-            _beginSelect = begin;
-            _endSelect = end;
-            ComplementIntermediate();
+            ComplementIntermediate(begin, end);
             InvalidateVisual();
         }
 
-        private void ComplementIntermediate()
+        private void ComplementIntermediate(TextPointer beginPointer, TextPointer endPointer)
         {
             bool bgn = false;
             bool end = false;
 
+            _beginSelect = beginPointer;
+            _endSelect = endPointer;
             _intermediates.Clear();
+
+            var beginPhysical = _beginSelect as PhysicalTextPointer;
+            var endPhysical = _endSelect as PhysicalTextPointer;
+
+            if (beginPhysical is null || endPhysical is null)
+                return;
+
             foreach (var metry in _metries)
             {
                 bool hitB = false;
                 bool hitE = false;
-                bgn |= (hitB = ReferenceEquals(metry, _beginSelect.Geometry));
-                end |= (hitE = ReferenceEquals(metry, _endSelect.Geometry));
+                bgn |= (hitB = ReferenceEquals(metry, beginPhysical.Geometry));
+                end |= (hitE = ReferenceEquals(metry, endPhysical.Geometry));
 
                 if (bgn && end) break;
 
@@ -987,7 +1000,7 @@ namespace ColorTextBlock.Avalonia
             }
             else
             {
-                return new TextPointer(this, 0);
+                return LogicalTextPointer.Home;
             }
         }
 
@@ -1002,34 +1015,32 @@ namespace ColorTextBlock.Avalonia
             }
             else
             {
-                return new TextPointer(this, 0);
+                return LogicalTextPointer.End;
             }
         }
 
         public string GetSelectedText()
         {
-            if (_beginSelect is null || _endSelect is null)
+            var bgnPhysical = _beginSelect as PhysicalTextPointer;
+            var endPhysical = _endSelect as PhysicalTextPointer;
+
+            if (bgnPhysical is null || endPhysical is null)
             {
                 return string.Empty;
             }
 
-            TextPointer bgn, end;
-            if (_beginSelect < _endSelect)
+            if (bgnPhysical > endPhysical)
             {
-                bgn = _beginSelect;
-                end = _endSelect;
-            }
-            else
-            {
-                bgn = _endSelect;
-                end = _beginSelect;
+                var inter = bgnPhysical;
+                bgnPhysical = endPhysical;
+                endPhysical = inter;
             }
 
-            if (ReferenceEquals(bgn.Geometry, end.Geometry))
+            if (ReferenceEquals(bgnPhysical.Geometry, endPhysical.Geometry))
             {
-                if (bgn.Geometry is TextLineGeometry tlg)
+                if (bgnPhysical.Geometry is TextLineGeometry tlg)
                 {
-                    return tlg.Text.Substring(bgn.InternalIndex, end.InternalIndex - bgn.InternalIndex);
+                    return tlg.Text.Substring(bgnPhysical.InternalIndex, endPhysical.InternalIndex - bgnPhysical.InternalIndex);
                 }
                 else return "";
             }
@@ -1037,8 +1048,8 @@ namespace ColorTextBlock.Avalonia
             {
                 var buffer = new StringBuilder();
 
-                if (bgn.Geometry is TextLineGeometry btlg)
-                    buffer.Append(btlg.Text.Substring(bgn.InternalIndex));
+                if (bgnPhysical.Geometry is TextLineGeometry btlg)
+                    buffer.Append(btlg.Text.Substring(bgnPhysical.InternalIndex));
 
                 foreach (var inter in _intermediates)
                 {
@@ -1046,8 +1057,8 @@ namespace ColorTextBlock.Avalonia
                         buffer.Append(itlg.ToString());
                 }
 
-                if (end.Geometry is TextLineGeometry etlg)
-                    buffer.Append(etlg.Text.Substring(etlg.Line.FirstTextSourceIndex, end.InternalIndex - etlg.Line.FirstTextSourceIndex));
+                if (endPhysical.Geometry is TextLineGeometry etlg)
+                    buffer.Append(etlg.Text.Substring(etlg.Line.FirstTextSourceIndex, endPhysical.InternalIndex - etlg.Line.FirstTextSourceIndex));
 
                 return buffer.ToString();
             }

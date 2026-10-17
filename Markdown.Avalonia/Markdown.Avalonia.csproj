@@ -13,10 +13,11 @@
     <Description>Markdown Controls for Avalonia</Description>
     <Copyright>Copyright (c) 2010 Bevan Arps, 2020 whistyun</Copyright>
     <PackageProjectUrl>https://github.com/whistyun/Markdown.Avalonia</PackageProjectUrl>
-    <LangVersion>9</LangVersion>
+    <LangVersion>$(LangVersion)</LangVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>Markdown.Avalonia.md</PackageReadmeFile>
     <PackageTags>Markdown Avalonia Avaloniaui</PackageTags>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

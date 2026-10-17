@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows.Input;
 
 namespace Markdown.AvaloniaDemo.ViewModels
 {
@@ -50,9 +51,9 @@ namespace Markdown.AvaloniaDemo.ViewModels
             set => this.RaiseAndSetIfChanged(ref _ErrorInfo, value);
         }
 
-        public List<StyleViewModel> Styles { set; get; }
+        public ICommand XamlParseResult { get; }
 
-        public void XamlParseResult(string result) => ErrorInfo = result;
+        public List<StyleViewModel> Styles { set; get; }
 
         public void TryParse() => AppendStyleXamlText = EdittingStyleXamlText;
 
@@ -70,23 +71,51 @@ namespace Markdown.AvaloniaDemo.ViewModels
 
             Styles = new List<StyleViewModel>
             {
-                new StyleViewModel() { Name = nameof(MarkdownStyle.Standard) },
-                new StyleViewModel() { Name = nameof(MarkdownStyle.SimpleTheme) },
-                new StyleViewModel() { Name = nameof(MarkdownStyle.GithubLike) }
+                new(nameof(MarkdownStyle.Standard)),
+                new(nameof(MarkdownStyle.SimpleTheme)),
+                new(nameof(MarkdownStyle.GithubLike))
             };
 
             SelectedStyle = Styles[1];
 
-            using (var strm = AssetLoader.Open(new Uri("avares://Markdown.AvaloniaDemo/Assets/XamlTemplate.txt")))
+            var uri = new Uri("avares://Markdown.AvaloniaDemo/Assets/XamlTemplate.txt");
+            using (var strm = AssetLoader.Open(uri))
             using (var reader = new StreamReader(strm))
             {
                 EdittingStyleXamlText = reader.ReadToEnd();
             }
+
+            XamlParseResult = new ErrorInfoAction(this);
         }
     }
 
     public class StyleViewModel
     {
-        public string Name { get; set; }
+        public string Name { get; }
+
+        public StyleViewModel(string name)
+        {
+            Name = name;
+        }
+    }
+
+    public class ErrorInfoAction : ICommand
+    {
+        public event EventHandler CanExecuteChanged;
+
+        private MainWindowViewModel _model;
+
+        public ErrorInfoAction(MainWindowViewModel model)
+        {
+            this._model = model;
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        public bool CanExecute(object parameter) => true;
+
+        public void Execute(object parameter)
+        {
+            _model.ErrorInfo = parameter?.ToString() ?? string.Empty;
+        }
     }
 }

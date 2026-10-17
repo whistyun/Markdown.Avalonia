@@ -1,78 +1,46 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Layout;
+using ColorDocument.Avalonia;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace ColorDocument.Avalonia.DocumentElements
 {
     public class ListItemElement : DocumentElement
     {
-        private Lazy<StackPanel> _panel;
-        private EnumerableEx<DocumentElement> _elements;
-        private SelectionList? _prevSelection;
+        private readonly DocumentGroupElement _stack;
 
-        internal string MarkerText { get; set; }
+        internal string MarkerText { get; set; } = string.Empty;
 
-        public override Control Control => _panel.Value;
-        public override IEnumerable<DocumentElement> Children => _elements;
+        public override Control Control => _stack.Control;
+        public override IEnumerable<DocumentElement> Children => _stack.Children;
 
         public ListItemElement(IEnumerable<DocumentElement> contents)
         {
-            _elements = contents.ToEnumerable();
-            _panel = new Lazy<StackPanel>(() =>
-            {
-                var panel = new StackPanel();
-                foreach (var content in _elements)
-                    panel.Children.Add(content.Control);
-
-                return panel;
-            });
+            _stack = new DocumentGroupElement(contents);
         }
 
+        protected override void OnClassAdded(string className)
+            => _stack.Classes.Add(className);
+
+        protected override void OnHorizontalAlignmentChanged(HorizontalAlignment alignment)
+            => _stack.HorizontalAlignment = alignment;
 
         public override void Select(Point from, Point to)
         {
-            var selection = SelectionUtil.SelectVertical(Control, _elements, from, to);
-
-            if (_prevSelection is not null)
-            {
-                foreach (var ps in _prevSelection)
-                {
-                    if (!selection.Any(cs => ReferenceEquals(cs, ps)))
-                    {
-                        ps.UnSelect();
-                    }
-                }
-            }
-
-            _prevSelection = selection;
+            _stack.Select(from, to);
         }
 
         public override void UnSelect()
         {
-            foreach (var c in _elements)
-                c.UnSelect();
+            _stack.UnSelect();
         }
 
         public override void ConstructSelectedText(StringBuilder builder)
         {
-            if (_prevSelection is null)
-                return;
-
-            var preLen = builder.Length;
-
-            foreach (var para in _prevSelection)
-            {
-                para.ConstructSelectedText(builder);
-
-                if (preLen == builder.Length)
-                    continue;
-
-                if (builder[builder.Length - 1] != '\n')
-                    builder.Append('\n');
-            }
+            _stack.ConstructSelectedText(builder);
         }
     }
 }
