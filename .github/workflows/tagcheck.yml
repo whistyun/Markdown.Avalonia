@@ -13,10 +13,6 @@ permissions:
 
 jobs:
   validate-tag:
-    permissions:
-      id-token: write
-      contents: read
-
     runs-on: windows-latest
 
     steps:
