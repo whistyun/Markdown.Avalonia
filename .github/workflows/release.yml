@@ -44,11 +44,11 @@ jobs:
 
     - name: List Target Packages
       run: |
-        echo "## The list of publish packages" | Add-Content -Path "test.txt"
-        echo "" | Add-Content -Path "test.txt"
+        echo "## The list of publish packages" | Add-Content -Path $env:GITHUB_STEP_SUMMARY
+        echo "" | Add-Content -Path $env:GITHUB_STEP_SUMMARY
         ls -Name ./artifacts/*.nupkg | ForEach-Object {
             "* " + $_
-        } | Add-Content -Path "test.txt"
+        } | Add-Content -Path $env:GITHUB_STEP_SUMMARY
 
     - name: NuGet login
       uses: NuGet/login@v1
