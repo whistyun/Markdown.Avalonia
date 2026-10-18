@@ -25,7 +25,7 @@ jobs:
         Write-Host "Target Tag: $tagName"
 
         if ($tagName -notmatch '^v\d+\.\d+\.\d+(-.*)?$') {
-          Throw "The tag name format is invalid. Only v#.#.# and v#.#.#-* are valid."
+          echo "::error::The tag name format is invalid. Only v#.#.# and v#.#.#-* are valid."
           exit 1
         }
 
@@ -38,7 +38,7 @@ jobs:
         $projectVersion = (powershell $scriptPath $propsPath).Trim()
 
         if ($tagName -ne ("v" + $projectVersion)) {
-          Throw "Unmatch tag name and project version. Tag name: $tagName, Project version: $projectVersion"
+          echo "::error::Unmatch tag name and project version. Tag name: $tagName, Project version: $projectVersion"
           exit 1
         }
 
